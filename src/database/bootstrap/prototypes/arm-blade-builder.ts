@@ -25,7 +25,8 @@ export class ArmBladeBuilder implements Builder {
       this.obj = await this.manager.define('armBlade', cyberware, {
         properties: {
           name: 'Arm Blade',
-          description: 'A 30cm blade that extends from the forearm past the wrist',
+          description:
+            'A 30cm blade that extends from the forearm past the wrist',
           weight: 800,
           slot: 'forearm',
           side: 'right',
@@ -73,8 +74,14 @@ Major surgery to remove. May lose forearm function.`,
       });
 
       this.obj.setPropertyDescription('side', 'Which arm: left or right');
-      this.obj.setPropertyDescription('bladeLength', 'Blade length in centimeters');
-      this.obj.setPropertyDescription('extended', 'Whether blade is currently extended');
+      this.obj.setPropertyDescription(
+        'bladeLength',
+        'Blade length in centimeters',
+      );
+      this.obj.setPropertyDescription(
+        'extended',
+        'Whether blade is currently extended',
+      );
     }
   }
 

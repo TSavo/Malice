@@ -25,7 +25,8 @@ export class BoneLacingBuilder implements Builder {
       this.obj = await this.manager.define('boneLacing', cyberware, {
         properties: {
           name: 'Bone Lacing',
-          description: 'Titanium mesh surgically bonded to bones throughout body',
+          description:
+            'Titanium mesh surgically bonded to bones throughout body',
           weight: 10000,
           slot: 'skeleton',
           material: 'titanium',
@@ -74,8 +75,14 @@ Severe rejection = chronic pain, reduced mobility. No fix.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('material', 'Lacing material (titanium, ceramic, etc.)');
-      this.obj.setPropertyDescription('addedWeight', 'Additional body weight in kilograms');
+      this.obj.setPropertyDescription(
+        'material',
+        'Lacing material (titanium, ceramic, etc.)',
+      );
+      this.obj.setPropertyDescription(
+        'addedWeight',
+        'Additional body weight in kilograms',
+      );
     }
   }
 

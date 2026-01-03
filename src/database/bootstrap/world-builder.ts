@@ -432,7 +432,8 @@ export class WorldBuilder implements Builder {
             hidden: exitData?.hidden ?? false,
             locked: exitData?.locked ?? false,
             // Vehicles allowed on surface streets only (z=0, horizontal movement)
-            vehicleAllowed: exitData?.vehicleAllowed ?? (z >= 0 && dir.dz === 0),
+            vehicleAllowed:
+              exitData?.vehicleAllowed ?? (z >= 0 && dir.dz === 0),
           };
 
           // Add custom properties from exit definition

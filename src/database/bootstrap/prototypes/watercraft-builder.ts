@@ -13,12 +13,7 @@ import { type Builder, registerBuilder } from '../builder-registry';
  */
 export class WatercraftBuilder implements Builder {
   static provides = ['watercraft'];
-  static depends = [
-    'vehicle',
-    'spatial',
-    'waterRoom',
-    'underwaterRoom',
-  ];
+  static depends = ['vehicle', 'spatial', 'waterRoom', 'underwaterRoom'];
 
   private obj: RuntimeObject | null = null;
 
@@ -824,10 +819,7 @@ Don't sail aimlessly - AI won't create rooms in random deep ocean.`,
       'mooredAt',
       'Land room where vessel is docked (when not in water).',
     );
-    obj.setPropertyDescription(
-      'anchored',
-      'true if anchor is deployed.',
-    );
+    obj.setPropertyDescription('anchored', 'true if anchor is deployed.');
     obj.setPropertyDescription(
       'draft',
       'Meters below waterline. Deeper draft = more stable but needs deeper water.',

@@ -21,6 +21,10 @@ The buildings at this intersection span eras, all arriving at the same destinati
   objects: [
     { prototype: 'streetSignal', name: 'Traffic Signal' },
     { prototype: 'streetSign', streetName: '3rd Ave S', direction: ['N', 'S'] },
-    { prototype: 'streetSign', streetName: 'S. Jackson St', direction: ['E', 'W'] },
+    {
+      prototype: 'streetSign',
+      streetName: 'S. Jackson St',
+      direction: ['E', 'W'],
+    },
   ],
 };

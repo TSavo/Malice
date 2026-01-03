@@ -20,7 +20,15 @@ The buildings surrounding the park maintain their Victorian facades—arched win
   // Street furniture
   objects: [
     { prototype: 'streetSignal', name: 'Traffic Signal' },
-    { prototype: 'streetSign', streetName: 'Occidental Ave S', direction: ['N', 'S'] },
-    { prototype: 'streetSign', streetName: 'S. Washington St', direction: ['E', 'W'] },
+    {
+      prototype: 'streetSign',
+      streetName: 'Occidental Ave S',
+      direction: ['N', 'S'],
+    },
+    {
+      prototype: 'streetSign',
+      streetName: 'S. Washington St',
+      direction: ['E', 'W'],
+    },
   ],
 };

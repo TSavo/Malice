@@ -36,8 +36,14 @@ Provides some cover if you duck behind it.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('capacity', 'Number of people who can sit');
-      this.obj.setPropertyDescription('occupants', 'Array of objrefs to seated people');
+      this.obj.setPropertyDescription(
+        'capacity',
+        'Number of people who can sit',
+      );
+      this.obj.setPropertyDescription(
+        'occupants',
+        'Array of objrefs to seated people',
+      );
     }
   }
 

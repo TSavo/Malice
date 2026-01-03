@@ -7,7 +7,13 @@ import { type Builder, registerBuilder } from '../builder-registry';
  * Engines determine vehicle speed and fuel efficiency
  */
 export class EngineBuilder implements Builder {
-  static provides = ['engine', 'v4Engine', 'v6Engine', 'v8Engine', 'electricMotor'];
+  static provides = [
+    'engine',
+    'v4Engine',
+    'v6Engine',
+    'v8Engine',
+    'electricMotor',
+  ];
   static depends = ['vehiclePart'];
 
   private engine: RuntimeObject | null = null;
@@ -33,7 +39,8 @@ export class EngineBuilder implements Builder {
       this.engine = await this.manager.define('engine', vehiclePart, {
         properties: {
           name: 'Engine',
-          description: 'Internal combustion or electric motor that powers a vehicle',
+          description:
+            'Internal combustion or electric motor that powers a vehicle',
           partType: 'engine',
           // Performance characteristics
           horsepower: 100, // Base HP
@@ -173,17 +180,18 @@ Condition: \${condition}%\`;
     if (!engine) throw new Error('Engine type not found');
 
     await this.manager.define('v4Engine', engine, {
-        properties: {
-          name: '4-Cylinder Engine',
-          description: 'Economical 4-cylinder engine. Good fuel efficiency, modest power.',
-          horsepower: 120,
-          maxSpeed: 45, // ~162 km/h
-          fuelEfficiency: 0.08, // 8 L/100km
-          idleFuelRate: 0.03, // Efficient idle
-          weight: 120000, // 120kg
-        },
-        methods: {},
-      });
+      properties: {
+        name: '4-Cylinder Engine',
+        description:
+          'Economical 4-cylinder engine. Good fuel efficiency, modest power.',
+        horsepower: 120,
+        maxSpeed: 45, // ~162 km/h
+        fuelEfficiency: 0.08, // 8 L/100km
+        idleFuelRate: 0.03, // Efficient idle
+        weight: 120000, // 120kg
+      },
+      methods: {},
+    });
   }
 
   private async buildV6Engine(): Promise<void> {
@@ -196,7 +204,8 @@ Condition: \${condition}%\`;
     await this.manager.define('v6Engine', engine, {
       properties: {
         name: 'V6 Engine',
-        description: 'Balanced 6-cylinder engine. Good power and reasonable efficiency.',
+        description:
+          'Balanced 6-cylinder engine. Good power and reasonable efficiency.',
         horsepower: 280,
         maxSpeed: 55, // ~198 km/h
         fuelEfficiency: 0.11, // 11 L/100km
@@ -217,7 +226,8 @@ Condition: \${condition}%\`;
     await this.manager.define('v8Engine', engine, {
       properties: {
         name: 'V8 Engine',
-        description: 'Powerful 8-cylinder engine. High performance, drinks fuel.',
+        description:
+          'Powerful 8-cylinder engine. High performance, drinks fuel.',
         horsepower: 450,
         maxSpeed: 70, // ~252 km/h
         fuelEfficiency: 0.16, // 16 L/100km
@@ -236,16 +246,17 @@ Condition: \${condition}%\`;
     if (!engine) throw new Error('Engine type not found');
 
     await this.manager.define('electricMotor', engine, {
-        properties: {
-          name: 'Electric Motor',
-          description: 'Silent electric motor. Instant torque, zero emissions, quiet operation.',
-          horsepower: 300,
-          maxSpeed: 50, // ~180 km/h (often electronically limited)
-          fuelEfficiency: 0.02, // 0.2 kWh/km equivalent (very efficient)
-          idleFuelRate: 0.005, // Minimal draw when "on" but stationary
-          fuelType: 'electric',
-          weight: 80000, // 80kg (lighter than combustion)
-          abilities: `Silent electric power unit.
+      properties: {
+        name: 'Electric Motor',
+        description:
+          'Silent electric motor. Instant torque, zero emissions, quiet operation.',
+        horsepower: 300,
+        maxSpeed: 50, // ~180 km/h (often electronically limited)
+        fuelEfficiency: 0.02, // 0.2 kWh/km equivalent (very efficient)
+        idleFuelRate: 0.005, // Minimal draw when "on" but stationary
+        fuelType: 'electric',
+        weight: 80000, // 80kg (lighter than combustion)
+        abilities: `Silent electric power unit.
 
 PERFORMANCE: Instant torque from 0 RPM. Smooth, quiet acceleration.
 'fuelType' is 'electric' - requires compatible battery/charging.
@@ -256,9 +267,9 @@ Regenerative braking can recover some energy.
 SOUND: Nearly silent operation. Harder to detect by sound.
 
 CHARGING: Recharges from electrical sources, not fuel pumps.`,
-        },
-        methods: {},
-      });
+      },
+      methods: {},
+    });
   }
 
   async registerAliases(): Promise<void> {

@@ -40,7 +40,10 @@ Anti-personnel or anti-vehicle types. Area denial weapon.`,
       });
 
       this.obj.setPropertyDescription('triggerWeight', 'Minimum kg to trigger');
-      this.obj.setPropertyDescription('buried', 'Whether mine is buried/concealed');
+      this.obj.setPropertyDescription(
+        'buried',
+        'Whether mine is buried/concealed',
+      );
     }
   }
 

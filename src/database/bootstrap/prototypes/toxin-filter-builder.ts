@@ -80,7 +80,10 @@ Liver regenerates around it. Self-maintaining.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('processingRate', 'Toxin processing speed multiplier');
+      this.obj.setPropertyDescription(
+        'processingRate',
+        'Toxin processing speed multiplier',
+      );
     }
   }
 

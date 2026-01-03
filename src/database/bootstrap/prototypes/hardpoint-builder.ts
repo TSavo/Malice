@@ -44,10 +44,22 @@ Set 'mount' to attach equipment. One mount per hardpoint.`,
 
     const obj = this.obj;
 
-    obj.setPropertyDescription('slot', 'Position on vehicle: roof, left-side, right-side, front, rear');
-    obj.setPropertyDescription('supportedMounts', 'Array of mount types this hardpoint accepts');
-    obj.setPropertyDescription('mount', 'Installed equipment ($turret, $rack, etc.) or null');
-    obj.setPropertyDescription('vehicle', 'Parent vehicle this hardpoint is on');
+    obj.setPropertyDescription(
+      'slot',
+      'Position on vehicle: roof, left-side, right-side, front, rear',
+    );
+    obj.setPropertyDescription(
+      'supportedMounts',
+      'Array of mount types this hardpoint accepts',
+    );
+    obj.setPropertyDescription(
+      'mount',
+      'Installed equipment ($turret, $rack, etc.) or null',
+    );
+    obj.setPropertyDescription(
+      'vehicle',
+      'Parent vehicle this hardpoint is on',
+    );
   }
 
   async registerAliases(): Promise<void> {

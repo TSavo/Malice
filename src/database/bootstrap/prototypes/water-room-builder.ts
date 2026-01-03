@@ -285,7 +285,10 @@ Rooms are PERMANENT once created - they stay forever for future voyages.`,
     );
 
     // Property descriptions
-    obj.setPropertyDescription('water', 'Flag indicating this is a water surface room');
+    obj.setPropertyDescription(
+      'water',
+      'Flag indicating this is a water surface room',
+    );
     obj.setPropertyDescription('x', 'X coordinate (30m per unit)');
     obj.setPropertyDescription('y', 'Y coordinate (30m per unit)');
     obj.setPropertyDescription('z', 'Z coordinate (always 0 for surface)');

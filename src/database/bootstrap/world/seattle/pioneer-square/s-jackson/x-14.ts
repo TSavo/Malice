@@ -21,6 +21,10 @@ The buildings at this intersection represent different eras of Seattle developme
   objects: [
     { prototype: 'streetSignal', name: 'Traffic Signal' },
     { prototype: 'streetSign', streetName: '1st Ave S', direction: ['N', 'S'] },
-    { prototype: 'streetSign', streetName: 'S. Jackson St', direction: ['E', 'W'] },
+    {
+      prototype: 'streetSign',
+      streetName: 'S. Jackson St',
+      direction: ['E', 'W'],
+    },
   ],
 };

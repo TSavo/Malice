@@ -25,7 +25,8 @@ export class NeuralProbeBuilder implements Builder {
       this.obj = await this.manager.define('neuralProbe', tool, {
         properties: {
           name: 'Neural Probe',
-          description: 'A diagnostic and installation tool for neural interfaces',
+          description:
+            'A diagnostic and installation tool for neural interfaces',
           weight: 150,
           charge: 100,
           condition: 100,
@@ -71,8 +72,14 @@ Replace probe tips if corroded.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('charge', 'Battery charge percentage (0-100). Uses ~20% per procedure');
-      this.obj.setPropertyDescription('condition', 'Calibration accuracy (0-100). Below 50% causes unreliable readings');
+      this.obj.setPropertyDescription(
+        'charge',
+        'Battery charge percentage (0-100). Uses ~20% per procedure',
+      );
+      this.obj.setPropertyDescription(
+        'condition',
+        'Calibration accuracy (0-100). Below 50% causes unreliable readings',
+      );
     }
   }
 

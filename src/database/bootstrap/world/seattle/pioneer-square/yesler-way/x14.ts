@@ -24,6 +24,10 @@ This is as far east as you can go. The International District lies beyond the ba
   objects: [
     { prototype: 'streetSignal', name: 'Traffic Signal' },
     { prototype: 'streetSign', streetName: '4th Ave S', direction: ['N', 'S'] },
-    { prototype: 'streetSign', streetName: 'Yesler Way', direction: ['E', 'W'] },
+    {
+      prototype: 'streetSign',
+      streetName: 'Yesler Way',
+      direction: ['E', 'W'],
+    },
   ],
 };

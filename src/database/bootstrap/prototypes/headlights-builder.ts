@@ -40,8 +40,14 @@ Broken lights = can't see at night, illegal to drive. Draws battery power.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('on', 'Whether headlights are currently on');
-      this.obj.setPropertyDescription('highBeam', 'Whether high beams are active');
+      this.obj.setPropertyDescription(
+        'on',
+        'Whether headlights are currently on',
+      );
+      this.obj.setPropertyDescription(
+        'highBeam',
+        'Whether high beams are active',
+      );
     }
   }
 

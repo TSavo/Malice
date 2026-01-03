@@ -25,7 +25,8 @@ export class CyberArmBuilder implements Builder {
       this.obj = await this.manager.define('cyberArm', cyberware, {
         properties: {
           name: 'Cyber Arm',
-          description: 'A full cybernetic arm replacement with enhanced strength',
+          description:
+            'A full cybernetic arm replacement with enhanced strength',
           weight: 5000,
           slot: 'arm',
           side: 'right',
@@ -73,7 +74,10 @@ Heavy use = tired faster. Eat more to compensate.`,
       });
 
       this.obj.setPropertyDescription('side', 'Which arm: left or right');
-      this.obj.setPropertyDescription('strengthMultiplier', 'Strength multiplier compared to biological arm');
+      this.obj.setPropertyDescription(
+        'strengthMultiplier',
+        'Strength multiplier compared to biological arm',
+      );
     }
   }
 

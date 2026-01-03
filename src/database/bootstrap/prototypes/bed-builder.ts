@@ -38,7 +38,10 @@ Very vulnerable while sleeping - ambush risk.`,
       });
 
       this.obj.setPropertyDescription('occupant', 'Objref to person sleeping');
-      this.obj.setPropertyDescription('quality', 'cheap, standard, or luxury - affects rest quality');
+      this.obj.setPropertyDescription(
+        'quality',
+        'cheap, standard, or luxury - affects rest quality',
+      );
     }
   }
 

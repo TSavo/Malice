@@ -21,7 +21,15 @@ A totem pole rises near the pergola, the carved cedar column that has stood in v
   // Street furniture
   objects: [
     { prototype: 'streetSignal', name: 'Traffic Signal' },
-    { prototype: 'streetSign', streetName: 'Occidental Ave S', direction: ['N', 'S'] },
-    { prototype: 'streetSign', streetName: 'Yesler Way', direction: ['E', 'W'] },
+    {
+      prototype: 'streetSign',
+      streetName: 'Occidental Ave S',
+      direction: ['N', 'S'],
+    },
+    {
+      prototype: 'streetSign',
+      streetName: 'Yesler Way',
+      direction: ['E', 'W'],
+    },
   ],
 };

@@ -17,7 +17,5 @@ A dead maple stands nearby, its trunk hollow, its bark peeling in sheets. Birds 
   waterLevel: 0, // Dry
   outdoor: true,
   // Park furniture
-  objects: [
-    { prototype: 'parkLamp', name: 'Park Lamp' },
-  ],
+  objects: [{ prototype: 'parkLamp', name: 'Park Lamp' }],
 };

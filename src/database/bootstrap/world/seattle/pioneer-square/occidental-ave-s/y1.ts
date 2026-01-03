@@ -17,14 +17,13 @@ Cast-iron lamp posts line the mall at intervals, their globes of rippled glass d
   waterLevel: 0, // Dry
   outdoor: true,
   // Park furniture
-  objects: [
-    { prototype: 'parkLamp', name: 'Park Lamp' },
-  ],
+  objects: [{ prototype: 'parkLamp', name: 'Park Lamp' }],
   sittables: [
     {
       name: 'a restaurant window seat',
       capacity: 2,
-      emptyMsg: 'A window table waits beyond the restaurant glass, place settings intact.',
+      emptyMsg:
+        'A window table waits beyond the restaurant glass, place settings intact.',
       occupiedMsg: '%s sitting in the restaurant window',
     },
   ],

@@ -21,6 +21,10 @@ Parking meters line the curb in ranks, their mechanical faces showing TIME EXPIR
   objects: [
     { prototype: 'streetSignal', name: 'Traffic Signal' },
     { prototype: 'streetSign', streetName: '3rd Ave S', direction: ['N', 'S'] },
-    { prototype: 'streetSign', streetName: 'S. Main St', direction: ['E', 'W'] },
+    {
+      prototype: 'streetSign',
+      streetName: 'S. Main St',
+      direction: ['E', 'W'],
+    },
   ],
 };

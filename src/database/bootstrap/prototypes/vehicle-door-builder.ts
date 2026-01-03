@@ -82,11 +82,26 @@ Damageable - high damage may jam door or break locks.`,
     `,
     );
 
-    obj.setPropertyDescription('side', 'Door position: left, right, rear, front');
-    obj.setPropertyDescription('condition', 'Functional state 0-100. Higher is better.');
-    obj.setPropertyDescription('damage', 'Physical damage 0-100. Lower is better.');
-    obj.setPropertyDescription('partType', 'Part type for vehicle installation');
-    obj.setPropertyDescription('installed', 'Vehicle this door is installed on');
+    obj.setPropertyDescription(
+      'side',
+      'Door position: left, right, rear, front',
+    );
+    obj.setPropertyDescription(
+      'condition',
+      'Functional state 0-100. Higher is better.',
+    );
+    obj.setPropertyDescription(
+      'damage',
+      'Physical damage 0-100. Lower is better.',
+    );
+    obj.setPropertyDescription(
+      'partType',
+      'Part type for vehicle installation',
+    );
+    obj.setPropertyDescription(
+      'installed',
+      'Vehicle this door is installed on',
+    );
   }
 
   async registerAliases(): Promise<void> {

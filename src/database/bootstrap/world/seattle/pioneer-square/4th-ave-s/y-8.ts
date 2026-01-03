@@ -16,7 +16,5 @@ A fire hydrant stands at the corner, its red paint faded to pink, its cap rusted
   waterLevel: 0,
   outdoor: true,
   // Street furniture
-  objects: [
-    { prototype: 'lamppost', name: 'Street Lamp' },
-  ],
+  objects: [{ prototype: 'lamppost', name: 'Street Lamp' }],
 };

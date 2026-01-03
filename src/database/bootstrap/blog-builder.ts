@@ -622,7 +622,9 @@ Welcome to Malice.
     // Get the root route of meta domain
     const rootRoute = metaDomain.get('rootRoute') as RuntimeObject | null;
     if (!rootRoute) {
-      console.warn('[BlogBuilder] metaDomain has no rootRoute, skipping route registration');
+      console.warn(
+        '[BlogBuilder] metaDomain has no rootRoute, skipping route registration',
+      );
       return;
     }
 

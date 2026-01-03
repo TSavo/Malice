@@ -76,8 +76,14 @@ Paralysis possible if rejection not caught early.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('reflexMultiplier', 'Reaction time improvement multiplier');
-      this.obj.setPropertyDescription('metabolismIncrease', 'Percentage increase in calorie needs');
+      this.obj.setPropertyDescription(
+        'reflexMultiplier',
+        'Reaction time improvement multiplier',
+      );
+      this.obj.setPropertyDescription(
+        'metabolismIncrease',
+        'Percentage increase in calorie needs',
+      );
     }
   }
 

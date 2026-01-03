@@ -31,7 +31,8 @@ export class RotorBuilder implements Builder {
       this.rotor = await this.manager.define('rotor', vehiclePart, {
         properties: {
           name: 'Rotor',
-          description: 'Spinning blade assembly that provides lift for rotorcraft',
+          description:
+            'Spinning blade assembly that provides lift for rotorcraft',
           partType: 'rotor',
           // Performance
           rpm: 0, // Current revolutions per minute (0 when stopped)
@@ -146,7 +147,10 @@ Condition: \${condition}%\`;
     );
 
     // Property descriptions
-    obj.setPropertyDescription('rpm', 'Current revolutions per minute (0 = stopped)');
+    obj.setPropertyDescription(
+      'rpm',
+      'Current revolutions per minute (0 = stopped)',
+    );
     obj.setPropertyDescription('maxRpm', 'Maximum operational RPM');
     obj.setPropertyDescription('bladeCount', 'Number of rotor blades');
     obj.setPropertyDescription('diameter', 'Rotor disc diameter in meters');
@@ -206,7 +210,9 @@ SIZE: Smaller and faster-spinning than main rotor. Less visible.`,
   async registerAliases(): Promise<void> {
     // Types auto-alias by name, no manual registration needed
     if (!this.rotor) return;
-    console.log(`[RotorBuilder] Types 'rotor', 'mainRotor', 'tailRotor' auto-aliased`);
+    console.log(
+      `[RotorBuilder] Types 'rotor', 'mainRotor', 'tailRotor' auto-aliased`,
+    );
   }
 
   getObject(): RuntimeObject | null {

@@ -21,6 +21,10 @@ PACIFIC WIRELESS occupies the corner building, its windows smashed, its inventor
   objects: [
     { prototype: 'streetSignal', name: 'Traffic Signal' },
     { prototype: 'streetSign', streetName: '3rd Ave S', direction: ['N', 'S'] },
-    { prototype: 'streetSign', streetName: 'S. King St', direction: ['E', 'W'] },
+    {
+      prototype: 'streetSign',
+      streetName: 'S. King St',
+      direction: ['E', 'W'],
+    },
   ],
 };

@@ -38,8 +38,14 @@ Bounces off walls. Roll under doors, through windows.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('fuseTime', 'Seconds until detonation after pin pull');
-      this.obj.setPropertyDescription('pinPulled', 'Whether pin has been pulled');
+      this.obj.setPropertyDescription(
+        'fuseTime',
+        'Seconds until detonation after pin pull',
+      );
+      this.obj.setPropertyDescription(
+        'pinPulled',
+        'Whether pin has been pulled',
+      );
     }
   }
 

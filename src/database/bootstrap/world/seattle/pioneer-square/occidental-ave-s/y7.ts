@@ -17,7 +17,5 @@ OBLIQUE STRATEGIES reads the plaque beneath a public art installation—steel ro
   waterLevel: 0, // Dry
   outdoor: true,
   // Park furniture
-  objects: [
-    { prototype: 'parkLamp', name: 'Park Lamp' },
-  ],
+  objects: [{ prototype: 'parkLamp', name: 'Park Lamp' }],
 };

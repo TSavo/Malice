@@ -16,7 +16,5 @@ To the east, you can see Fourth Avenue’s broader right-of-way cutting north an
   waterLevel: 0,
   outdoor: true,
   // Street furniture
-  objects: [
-    { prototype: 'lamppost', name: 'Street Lamp' },
-  ],
+  objects: [{ prototype: 'lamppost', name: 'Street Lamp' }],
 };

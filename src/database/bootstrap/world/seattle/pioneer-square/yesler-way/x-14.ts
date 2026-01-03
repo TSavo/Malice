@@ -22,6 +22,10 @@ Yesler Way and 1st Avenue intersect here at a point that represents Seattle's ge
   objects: [
     { prototype: 'streetSignal', name: 'Traffic Signal' },
     { prototype: 'streetSign', streetName: '1st Ave S', direction: ['N', 'S'] },
-    { prototype: 'streetSign', streetName: 'Yesler Way', direction: ['E', 'W'] },
+    {
+      prototype: 'streetSign',
+      streetName: 'Yesler Way',
+      direction: ['E', 'W'],
+    },
   ],
 };

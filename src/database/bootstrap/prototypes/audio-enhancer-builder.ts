@@ -25,7 +25,8 @@ export class AudioEnhancerBuilder implements Builder {
       this.obj = await this.manager.define('audioEnhancer', cyberware, {
         properties: {
           name: 'Audio Enhancer',
-          description: 'A cybernetic ear replacement with enhanced audio processing',
+          description:
+            'A cybernetic ear replacement with enhanced audio processing',
           weight: 30,
           slot: 'ear',
           recordingCapacity: 6,
@@ -67,8 +68,14 @@ audio distortion, phantom sounds, hearing loss.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('recordingCapacity', 'Hours of audio storage capacity');
-      this.obj.setPropertyDescription('recording', 'Whether currently recording audio');
+      this.obj.setPropertyDescription(
+        'recordingCapacity',
+        'Hours of audio storage capacity',
+      );
+      this.obj.setPropertyDescription(
+        'recording',
+        'Whether currently recording audio',
+      );
     }
   }
 

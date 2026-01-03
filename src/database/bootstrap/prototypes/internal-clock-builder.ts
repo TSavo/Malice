@@ -75,7 +75,10 @@ Otherwise maintenance-free. Most reliable chrome available.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('alarms', 'Array of scheduled alarm times');
+      this.obj.setPropertyDescription(
+        'alarms',
+        'Array of scheduled alarm times',
+      );
     }
   }
 

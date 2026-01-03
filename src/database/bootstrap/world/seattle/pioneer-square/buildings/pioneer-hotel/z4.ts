@@ -49,7 +49,13 @@ It's also the most private. No one above, no one beside, only the hallway below.
         west: '%HALL_4',
       },
       objects: [
-        { prototype: 'bed', name: 'a corner bed', description: 'A bed fits in the corner where the sloping ceiling allows sitting up.', quality: 'standard' },
+        {
+          prototype: 'bed',
+          name: 'a corner bed',
+          description:
+            'A bed fits in the corner where the sloping ceiling allows sitting up.',
+          quality: 'standard',
+        },
       ],
     },
   },

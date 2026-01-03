@@ -16,7 +16,5 @@ Overhead, fire escapes zigzag up the building faces, their ladders retracted, th
   waterLevel: 0,
   outdoor: true,
   // Street furniture
-  objects: [
-    { prototype: 'lamppost', name: 'Street Lamp' },
-  ],
+  objects: [{ prototype: 'lamppost', name: 'Street Lamp' }],
 };

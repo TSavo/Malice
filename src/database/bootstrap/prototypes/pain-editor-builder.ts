@@ -71,7 +71,10 @@ or blocks too much (numbness). Either is dangerous.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('painSuppressed', 'Whether pain signals are currently being blocked');
+      this.obj.setPropertyDescription(
+        'painSuppressed',
+        'Whether pain signals are currently being blocked',
+      );
     }
   }
 

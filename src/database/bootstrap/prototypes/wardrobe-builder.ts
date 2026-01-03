@@ -40,8 +40,14 @@ Hiding inside - can't see out, limited air, heard if moving.`,
       });
 
       this.obj.setPropertyDescription('open', 'Whether doors are open');
-      this.obj.setPropertyDescription('contents', 'Pocket objref for stored items');
-      this.obj.setPropertyDescription('hiddenOccupant', 'Objref to person hiding inside');
+      this.obj.setPropertyDescription(
+        'contents',
+        'Pocket objref for stored items',
+      );
+      this.obj.setPropertyDescription(
+        'hiddenOccupant',
+        'Objref to person hiding inside',
+      );
     }
   }
 

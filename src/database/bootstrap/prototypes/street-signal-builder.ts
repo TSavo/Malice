@@ -45,7 +45,9 @@ export class StreetSignalBuilder implements Builder {
       // Get parent type
       const describable = await this.manager.load('describable');
       if (!describable) {
-        throw new Error('Describable type not found - required for StreetSignal');
+        throw new Error(
+          'Describable type not found - required for StreetSignal',
+        );
       }
 
       this.obj = await this.manager.define('streetSignal', describable, {

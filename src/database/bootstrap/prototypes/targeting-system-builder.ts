@@ -77,9 +77,18 @@ Damaged system causes targeting errors - dangerous.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('color', 'Iris color (typically crimson for targeting systems)');
-      this.obj.setPropertyDescription('maxTargets', 'Maximum number of targets that can be tracked');
-      this.obj.setPropertyDescription('trackedTargets', 'Array of currently tracked target IDs');
+      this.obj.setPropertyDescription(
+        'color',
+        'Iris color (typically crimson for targeting systems)',
+      );
+      this.obj.setPropertyDescription(
+        'maxTargets',
+        'Maximum number of targets that can be tracked',
+      );
+      this.obj.setPropertyDescription(
+        'trackedTargets',
+        'Array of currently tracked target IDs',
+      );
     }
   }
 

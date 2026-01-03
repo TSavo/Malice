@@ -16,7 +16,5 @@ The Pioneer Building rises to the east, its Romanesque bulk anchoring the inters
   waterLevel: 0,
   outdoor: true,
   // Street furniture
-  objects: [
-    { prototype: 'lamppost', name: 'Street Lamp' },
-  ],
+  objects: [{ prototype: 'lamppost', name: 'Street Lamp' }],
 };

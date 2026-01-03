@@ -25,7 +25,8 @@ export class VehicleBatteryBuilder implements Builder {
       this.obj = await this.manager.define('vehicleBattery', vehiclePart, {
         properties: {
           name: 'Vehicle Battery',
-          description: '12V lead-acid battery for starting the engine and powering electronics',
+          description:
+            '12V lead-acid battery for starting the engine and powering electronics',
           partType: 'battery',
           // Charge level
           charge: 100, // 0-100 percentage

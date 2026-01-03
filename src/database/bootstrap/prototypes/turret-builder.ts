@@ -78,14 +78,35 @@ Damaged turrets rotate slower or jam.`,
     `,
     );
 
-    obj.setPropertyDescription('mountType', 'Type identifier for hardpoint matching');
-    obj.setPropertyDescription('hardpoint', 'Parent hardpoint this turret is installed on');
+    obj.setPropertyDescription(
+      'mountType',
+      'Type identifier for hardpoint matching',
+    );
+    obj.setPropertyDescription(
+      'hardpoint',
+      'Parent hardpoint this turret is installed on',
+    );
     obj.setPropertyDescription('weapon', 'Mounted $gun or null');
-    obj.setPropertyDescription('arc', 'Horizontal firing arc [min, max] in degrees');
-    obj.setPropertyDescription('elevation', 'Vertical firing arc [min, max] in degrees');
-    obj.setPropertyDescription('rotation', 'Current turret facing in degrees (0 = forward)');
-    obj.setPropertyDescription('condition', 'Functional state 0-100. Affects rotation speed.');
-    obj.setPropertyDescription('damage', 'Physical damage 0-100. High damage jams turret.');
+    obj.setPropertyDescription(
+      'arc',
+      'Horizontal firing arc [min, max] in degrees',
+    );
+    obj.setPropertyDescription(
+      'elevation',
+      'Vertical firing arc [min, max] in degrees',
+    );
+    obj.setPropertyDescription(
+      'rotation',
+      'Current turret facing in degrees (0 = forward)',
+    );
+    obj.setPropertyDescription(
+      'condition',
+      'Functional state 0-100. Affects rotation speed.',
+    );
+    obj.setPropertyDescription(
+      'damage',
+      'Physical damage 0-100. High damage jams turret.',
+    );
   }
 
   async registerAliases(): Promise<void> {

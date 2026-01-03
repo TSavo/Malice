@@ -78,9 +78,18 @@ Neglected modulator sounds increasingly artificial.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('activeVoice', "Current voice profile ('natural' or stored voice name)");
-      this.obj.setPropertyDescription('storedVoices', 'Array of learned voice patterns');
-      this.obj.setPropertyDescription('recordingBuffer', 'Current audio recording buffer');
+      this.obj.setPropertyDescription(
+        'activeVoice',
+        "Current voice profile ('natural' or stored voice name)",
+      );
+      this.obj.setPropertyDescription(
+        'storedVoices',
+        'Array of learned voice patterns',
+      );
+      this.obj.setPropertyDescription(
+        'recordingBuffer',
+        'Current audio recording buffer',
+      );
     }
   }
 
