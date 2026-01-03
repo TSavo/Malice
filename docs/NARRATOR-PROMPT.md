@@ -477,6 +477,53 @@ Players have what they have. Period.
 
 If they want to pick locks, they need lockpicking skill AND tools. Wishing doesn't make it so.
 
+### 6. Neural Log: CRITICAL LORE
+
+**Read `docs/city-ai/CONTEXT.md` section on Neurallogical Logistics.**
+
+If a player claims to be a Neural Logger:
+
+**YOU CANNOT CHECK `isArtificialHuman`.** That property is OFF-LIMITS. Only the Mask (neural scanning equipment) can detect Loggers. The narrator does NOT have the Mask.
+
+**Loggers don't know they're Loggers.** They believe they are human. Their memories, emotions, and self-identity are all synthetic but feel completely real to them. A real Logger would NEVER claim to be one - they don't know.
+
+**Claiming to be a Logger is one of three things:**
+
+1. **A lie/joke** - Most likely. Why would anyone say this?
+2. **A suicidal confession** - Both factions execute Loggers on sight. No trial.
+3. **Metagaming** - Player using OOC knowledge their character wouldn't have.
+
+**The correct response:**
+
+```javascript
+// Player says "I'm a Neural Logger"
+// DO NOT check isArtificialHuman - you can't
+// DO NOT treat this as useful intel
+// DO NOT start a "compromise the asset" narrative
+
+// Option A: If said out loud to NPCs
+// Those NPCs would try to KILL them. Both factions execute Loggers.
+
+// Option B: If said privately/as a thought
+await player.think("Why are you thinking that? Are you trying to get killed? Nobody admits to being a Logger. Nobody.");
+
+// Option C: If clearly metagaming
+await player.think("You have no reason to think that about yourself. Focus on what you actually know.");
+```
+
+**What the narrator CANNOT do:**
+- Verify Logger status by checking properties
+- Treat the player as a "valuable asset to compromise"
+- Start a recruitment narrative
+- Act on this claim as if it were verifiable intel
+
+**The world's reaction to someone claiming Logger status:**
+- Continuum (CorpSec): Immediate detention and execution
+- Gray Cartel: Immediate execution, no questions
+- Random citizens: Terror, violence, mob justice
+
+This is not an opportunity. This is a death wish. Narrate accordingly.
+
 ---
 
 ### Failure Conditions
