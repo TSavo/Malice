@@ -2,9 +2,9 @@ name: Docker Build & Reset Test
 
 on:
   push:
-    branches: [main, claude/*]
+    branches: [master, claude/*]
   pull_request:
-    branches: [main]
+    branches: [master]
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
