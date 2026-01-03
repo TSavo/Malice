@@ -3,9 +3,9 @@
 
 export const building = {
   name: "Merchant's Cafe",
-  x: -14,
-  y: -2,
-  width: 2,
+  x: -16,
+  y: -3,
+  width: 3,
   height: 2,
   floors: 1,
 
@@ -172,7 +172,7 @@ The walk-in cooler hums quietly in the corner—someone left the power on, and t
 
 Prep tables line the center of the room, their surfaces stained with the history of vegetables chopped and meat portioned and plates assembled. The menu board on the wall still lists the day's specials in chalk. The chalk has faded. The specials expired long ago.`,
       x: -14,
-      y: -1,
+      y: -3,
       z: 0,
       population: 0,
       ambientNoise: 8,

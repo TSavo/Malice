@@ -3,10 +3,10 @@
 
 export const building = {
   name: 'Pioneer Books',
-  x: -14,
-  y: 12,
+  x: -15,
+  y: 11,
   width: 2,
-  height: 2,
+  height: 3,
   floors: 1,
 
   rooms: {
@@ -97,7 +97,7 @@ Bookshelves line the walls here too, but these hold the prestige inventory: art 
 
 A coffee table holds scattered magazines—literary journals, The New Yorker, publications for readers who took reading seriously. The dates on the covers are months old. The articles inside discuss a world that no longer exists.`,
       x: -14,
-      y: 13,
+      y: 11,
       z: 0,
       population: 0,
       ambientNoise: 2,
