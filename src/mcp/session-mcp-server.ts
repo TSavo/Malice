@@ -50,6 +50,7 @@ interface SessionState {
   context: ConnectionContext | null;
   playerId: ObjId | null;
   playerName: string | null;
+  player: RuntimeObject | null;
   sessionId: string;
 }
 
@@ -358,6 +359,7 @@ export class SessionMCPServer {
         context,
         playerId,
         playerName,
+        player,
         sessionId,
       };
     } else {
@@ -372,6 +374,7 @@ export class SessionMCPServer {
         context: null,
         playerId: null,
         playerName: null,
+        player: null,
         sessionId,
       };
     }
@@ -505,12 +508,12 @@ NOTE: After registering, use the auth tool to log in.`,
           }
 
           // Create player via charGen
-          const result = await charGen.call('createPlayer', {
+          const result = (await charGen.call('createPlayer', {
             username: normalizedUsername,
             password,
             email,
             factionId: this.factionId,
-          });
+          })) as { success?: boolean; error?: string; playerId?: number };
 
           if (!result || !result.success) {
             return err(result?.error || 'Failed to create account.');

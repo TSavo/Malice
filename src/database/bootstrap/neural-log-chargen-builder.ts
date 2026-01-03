@@ -52,6 +52,9 @@ export class NeuralLogCharGenBuilder implements Builder {
         );
       }
       const $charGen = await this.manager.load(charGenId);
+      if (!$charGen) {
+        throw new Error('$charGen object not found');
+      }
       this.neuralLogCharGen = await this.manager.create({
         parent: $charGen,
         properties: {
