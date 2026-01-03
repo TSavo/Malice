@@ -35,7 +35,10 @@ Each wound uses 1-3 stitches depending on size. Painful without anesthetic.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('stitches', 'Number of sutures remaining');
+      this.obj.setPropertyDescription(
+        'stitches',
+        'Number of sutures remaining',
+      );
     }
   }
 

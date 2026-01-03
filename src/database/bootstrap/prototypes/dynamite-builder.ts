@@ -39,7 +39,10 @@ Good for demolition, mining, improvised weapons.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('fuseLength', 'Fuse burn time in seconds');
+      this.obj.setPropertyDescription(
+        'fuseLength',
+        'Fuse burn time in seconds',
+      );
       this.obj.setPropertyDescription('fuseLit', 'Whether fuse is burning');
     }
   }

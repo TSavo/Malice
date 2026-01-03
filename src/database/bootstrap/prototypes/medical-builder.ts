@@ -36,7 +36,10 @@ Using non-sterile items risks infection. Skill affects effectiveness.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('sterile', 'Whether item is uncontaminated');
+      this.obj.setPropertyDescription(
+        'sterile',
+        'Whether item is uncontaminated',
+      );
     }
   }
 

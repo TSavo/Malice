@@ -16,7 +16,5 @@ A former coffee shop occupies one corner, its espresso machine still visible thr
   waterLevel: 0,
   outdoor: true,
   // Street furniture
-  objects: [
-    { prototype: 'lamppost', name: 'Street Lamp' },
-  ],
+  objects: [{ prototype: 'lamppost', name: 'Street Lamp' }],
 };

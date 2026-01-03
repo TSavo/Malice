@@ -71,13 +71,21 @@ May require removal if mechanisms fail.`,
       });
 
       this.obj.setPropertyDescription('side', 'Which hand: left or right');
-      this.obj.setPropertyDescription('bladeLength', 'Blade length in centimeters');
-      this.obj.setPropertyDescription('extended', 'Whether blades are currently extended');
+      this.obj.setPropertyDescription(
+        'bladeLength',
+        'Blade length in centimeters',
+      );
+      this.obj.setPropertyDescription(
+        'extended',
+        'Whether blades are currently extended',
+      );
     }
   }
 
   async registerAliases(): Promise<void> {
-    console.log("[RetractableClawsBuilder] Type 'retractableClaws' auto-aliased");
+    console.log(
+      "[RetractableClawsBuilder] Type 'retractableClaws' auto-aliased",
+    );
   }
 
   getObject(): RuntimeObject | null {

@@ -42,8 +42,14 @@ Condition degrades when hit. Damaged armor protects less. Heavy armor slows move
         methods: {},
       });
 
-      this.obj.setPropertyDescription('armorType', 'Protection type: ballistic, stab, blunt, or composite');
-      this.obj.setPropertyDescription('condition', 'Armor integrity 0-100, degrades when hit');
+      this.obj.setPropertyDescription(
+        'armorType',
+        'Protection type: ballistic, stab, blunt, or composite',
+      );
+      this.obj.setPropertyDescription(
+        'condition',
+        'Armor integrity 0-100, degrades when hit',
+      );
     }
   }
 

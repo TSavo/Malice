@@ -16,7 +16,5 @@ The Underground tours once started somewhere near here, guides leading tourists 
   waterLevel: 0,
   outdoor: true,
   // Street furniture
-  objects: [
-    { prototype: 'lamppost', name: 'Street Lamp' },
-  ],
+  objects: [{ prototype: 'lamppost', name: 'Street Lamp' }],
 };

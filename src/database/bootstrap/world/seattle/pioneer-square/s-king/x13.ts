@@ -16,7 +16,5 @@ A traditional Chinese gate once stood at this intersection, marking the entrance
   waterLevel: 0,
   outdoor: true,
   // Street furniture
-  objects: [
-    { prototype: 'lamppost', name: 'Street Lamp' },
-  ],
+  objects: [{ prototype: 'lamppost', name: 'Street Lamp' }],
 };

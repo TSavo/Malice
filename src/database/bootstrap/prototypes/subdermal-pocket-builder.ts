@@ -25,7 +25,8 @@ export class SubdermalPocketBuilder implements Builder {
       this.obj = await this.manager.define('subdermalPocket', cyberware, {
         properties: {
           name: 'Subdermal Pocket',
-          description: 'A surgically created cavity beneath the skin with sealable opening',
+          description:
+            'A surgically created cavity beneath the skin with sealable opening',
           weight: 50,
           slot: 'torso',
           contents: [],
@@ -77,7 +78,10 @@ Requires removal if seal won't hold. Infection risk increases.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('contents', 'Array of items currently stored in the pocket');
+      this.obj.setPropertyDescription(
+        'contents',
+        'Array of items currently stored in the pocket',
+      );
     }
   }
 

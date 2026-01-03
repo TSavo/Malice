@@ -25,7 +25,8 @@ export class ArmorMeshBuilder implements Builder {
       this.obj = await this.manager.define('armorMesh', medical, {
         properties: {
           name: 'Armor Mesh Roll',
-          description: 'Medical-grade carbon fiber mesh for subdermal armor installation',
+          description:
+            'Medical-grade carbon fiber mesh for subdermal armor installation',
           weight: 500,
           sealed: true,
           expirationMonths: 24,
@@ -73,8 +74,14 @@ Proper storage extends usable life.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('sealed', 'Whether the sterile packaging is intact');
-      this.obj.setPropertyDescription('expirationMonths', 'Months until expiration');
+      this.obj.setPropertyDescription(
+        'sealed',
+        'Whether the sterile packaging is intact',
+      );
+      this.obj.setPropertyDescription(
+        'expirationMonths',
+        'Months until expiration',
+      );
     }
   }
 

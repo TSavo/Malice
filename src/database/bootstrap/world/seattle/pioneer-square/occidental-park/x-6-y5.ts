@@ -18,9 +18,7 @@ The market continues east. Occidental Park opens to the south.`,
   waterLevel: 0,
   outdoor: true,
   // Park furniture
-  objects: [
-    { prototype: 'parkLamp', name: 'Park Lamp' },
-  ],
+  objects: [{ prototype: 'parkLamp', name: 'Park Lamp' }],
   sittables: [
     {
       name: 'a vendor stall counter',

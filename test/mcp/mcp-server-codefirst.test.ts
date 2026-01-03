@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { MaliceMCPServer } from '../../src/mcp/mcp-server-codefirst.js';
-import type { ObjectManager } from '../../src/database/object-manager.js';
 import http from 'node:http';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { ObjectManager } from '../../src/database/object-manager.js';
+import { MaliceMCPServer } from '../../src/mcp/mcp-server-codefirst.js';
 
 // Mock ObjectManager - only need minimal interface for MCP server
 const createMockManager = (): ObjectManager => {
@@ -16,13 +16,17 @@ const createMockManager = (): ObjectManager => {
 };
 
 // Helper to wait for server to be ready
-const waitForServer = async (url: string, maxAttempts = 10, delayMs = 100): Promise<void> => {
+const waitForServer = async (
+  url: string,
+  maxAttempts = 10,
+  delayMs = 100,
+): Promise<void> => {
   for (let i = 0; i < maxAttempts; i++) {
     try {
       await fetch(url);
       return;
     } catch {
-      await new Promise(resolve => setTimeout(resolve, delayMs));
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
     }
   }
   throw new Error(`Server at ${url} did not become ready`);
@@ -50,7 +54,10 @@ describe('MaliceMCPServer', () => {
 
   describe('Health Check Endpoint', () => {
     it('should return 200 OK with session stats when healthy', async () => {
-      server = new MaliceMCPServer(manager, { port: testPort, host: '127.0.0.1' });
+      server = new MaliceMCPServer(manager, {
+        port: testPort,
+        host: '127.0.0.1',
+      });
       await server.start();
       await waitForServer(`http://127.0.0.1:${testPort}/health`);
 
@@ -71,7 +78,10 @@ describe('MaliceMCPServer', () => {
     });
 
     it('should reject non-GET requests to /health', async () => {
-      server = new MaliceMCPServer(manager, { port: testPort, host: '127.0.0.1' });
+      server = new MaliceMCPServer(manager, {
+        port: testPort,
+        host: '127.0.0.1',
+      });
       await server.start();
       await waitForServer(`http://127.0.0.1:${testPort}/health`);
 
@@ -124,7 +134,10 @@ describe('MaliceMCPServer', () => {
 
   describe('Graceful Shutdown', () => {
     it('should prevent concurrent shutdown calls', async () => {
-      server = new MaliceMCPServer(manager, { port: testPort, host: '127.0.0.1' });
+      server = new MaliceMCPServer(manager, {
+        port: testPort,
+        host: '127.0.0.1',
+      });
       await server.start();
       await waitForServer(`http://127.0.0.1:${testPort}/health`);
 
@@ -139,7 +152,10 @@ describe('MaliceMCPServer', () => {
 
   describe('DELETE Session Endpoint', () => {
     it('should return 404 for non-existent session', async () => {
-      server = new MaliceMCPServer(manager, { port: testPort, host: '127.0.0.1' });
+      server = new MaliceMCPServer(manager, {
+        port: testPort,
+        host: '127.0.0.1',
+      });
       await server.start();
       await waitForServer(`http://127.0.0.1:${testPort}/health`);
 
@@ -154,7 +170,10 @@ describe('MaliceMCPServer', () => {
     });
 
     it('should return 404 when deleting without session ID', async () => {
-      server = new MaliceMCPServer(manager, { port: testPort, host: '127.0.0.1' });
+      server = new MaliceMCPServer(manager, {
+        port: testPort,
+        host: '127.0.0.1',
+      });
       await server.start();
       await waitForServer(`http://127.0.0.1:${testPort}/health`);
 
@@ -169,7 +188,10 @@ describe('MaliceMCPServer', () => {
 
   describe('Server Lifecycle', () => {
     it('should start and stop cleanly', async () => {
-      server = new MaliceMCPServer(manager, { port: testPort, host: '127.0.0.1' });
+      server = new MaliceMCPServer(manager, {
+        port: testPort,
+        host: '127.0.0.1',
+      });
 
       await server.start();
       await waitForServer(`http://127.0.0.1:${testPort}/health`);
@@ -200,7 +222,10 @@ describe('MaliceMCPServer', () => {
 
   describe('404 Handling', () => {
     it('should return 404 for unknown paths', async () => {
-      server = new MaliceMCPServer(manager, { port: testPort, host: '127.0.0.1' });
+      server = new MaliceMCPServer(manager, {
+        port: testPort,
+        host: '127.0.0.1',
+      });
       await server.start();
       await waitForServer(`http://127.0.0.1:${testPort}/health`);
 
@@ -213,7 +238,10 @@ describe('MaliceMCPServer', () => {
 
   describe('Health Endpoint During Shutdown', () => {
     it('should return 503 during shutdown', async () => {
-      server = new MaliceMCPServer(manager, { port: testPort, host: '127.0.0.1' });
+      server = new MaliceMCPServer(manager, {
+        port: testPort,
+        host: '127.0.0.1',
+      });
       await server.start();
       await waitForServer(`http://127.0.0.1:${testPort}/health`);
 
@@ -221,7 +249,7 @@ describe('MaliceMCPServer', () => {
       const shutdownPromise = server.stop();
 
       // Give it a moment to set isShuttingDown flag
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Health check should return 503
       const response = await fetch(`http://127.0.0.1:${testPort}/health`);
@@ -238,7 +266,10 @@ describe('MaliceMCPServer', () => {
     });
 
     it('should handle errors and return 500', async () => {
-      server = new MaliceMCPServer(manager, { port: testPort, host: '127.0.0.1' });
+      server = new MaliceMCPServer(manager, {
+        port: testPort,
+        host: '127.0.0.1',
+      });
       await server.start();
       await waitForServer(`http://127.0.0.1:${testPort}/health`);
 
@@ -284,7 +315,7 @@ describe('MaliceMCPServer', () => {
       (server as any).sessions.set(sessionId, mockSession);
 
       // Wait for cleanup interval to run
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Session should be cleaned up
       const sessions = (server as any).sessions;
@@ -295,7 +326,10 @@ describe('MaliceMCPServer', () => {
 
   describe('Shutdown Session Prevention', () => {
     it('should prevent new session initialization during shutdown', async () => {
-      server = new MaliceMCPServer(manager, { port: testPort, host: '127.0.0.1' });
+      server = new MaliceMCPServer(manager, {
+        port: testPort,
+        host: '127.0.0.1',
+      });
       await server.start();
       await waitForServer(`http://127.0.0.1:${testPort}/health`);
 
@@ -329,7 +363,10 @@ describe('MaliceMCPServer', () => {
     });
 
     it('should prevent stale session recreation during shutdown', async () => {
-      server = new MaliceMCPServer(manager, { port: testPort, host: '127.0.0.1' });
+      server = new MaliceMCPServer(manager, {
+        port: testPort,
+        host: '127.0.0.1',
+      });
       await server.start();
       await waitForServer(`http://127.0.0.1:${testPort}/health`);
 
@@ -361,7 +398,10 @@ describe('MaliceMCPServer', () => {
 
   describe('Session Activity Tracking', () => {
     it('should update lastActivity on GET requests', async () => {
-      server = new MaliceMCPServer(manager, { port: testPort, host: '127.0.0.1' });
+      server = new MaliceMCPServer(manager, {
+        port: testPort,
+        host: '127.0.0.1',
+      });
       await server.start();
       await waitForServer(`http://127.0.0.1:${testPort}/health`);
 
@@ -370,7 +410,9 @@ describe('MaliceMCPServer', () => {
       const initialTime = Date.now() - 1000; // 1 second ago
       const mockSession = {
         server: {} as any,
-        transport: { handleRequest: vi.fn().mockResolvedValue(undefined) } as any,
+        transport: {
+          handleRequest: vi.fn().mockResolvedValue(undefined),
+        } as any,
         lastActivity: initialTime,
       };
       (server as any).sessions.set(sessionId, mockSession);
@@ -389,7 +431,10 @@ describe('MaliceMCPServer', () => {
     });
 
     it('should update lastActivity on POST requests', async () => {
-      server = new MaliceMCPServer(manager, { port: testPort, host: '127.0.0.1' });
+      server = new MaliceMCPServer(manager, {
+        port: testPort,
+        host: '127.0.0.1',
+      });
       await server.start();
       await waitForServer(`http://127.0.0.1:${testPort}/health`);
 
@@ -398,7 +443,9 @@ describe('MaliceMCPServer', () => {
       const initialTime = Date.now() - 1000; // 1 second ago
       const mockSession = {
         server: {} as any,
-        transport: { handleRequest: vi.fn().mockResolvedValue(undefined) } as any,
+        transport: {
+          handleRequest: vi.fn().mockResolvedValue(undefined),
+        } as any,
         lastActivity: initialTime,
       };
       (server as any).sessions.set(sessionId, mockSession);

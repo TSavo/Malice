@@ -92,9 +92,18 @@ Law enforcement watches for bulk purchases.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('doses', 'Number of doses remaining in container');
-      this.obj.setPropertyDescription('potency', "Anesthetic strength: 'low', 'standard', or 'high'");
-      this.obj.setPropertyDescription('expirationMonths', 'Months until expiration');
+      this.obj.setPropertyDescription(
+        'doses',
+        'Number of doses remaining in container',
+      );
+      this.obj.setPropertyDescription(
+        'potency',
+        "Anesthetic strength: 'low', 'standard', or 'high'",
+      );
+      this.obj.setPropertyDescription(
+        'expirationMonths',
+        'Months until expiration',
+      );
     }
   }
 

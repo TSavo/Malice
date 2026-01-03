@@ -52,14 +52,27 @@ export class CarBuilder implements Builder {
             'brakes',
             'steering',
             'transmission',
-            'wheel', 'wheel', 'wheel', 'wheel', // 4 wheels
+            'wheel',
+            'wheel',
+            'wheel',
+            'wheel', // 4 wheels
           ],
           // 4 doors
           doors: [
             { name: 'driver door', side: 'left', locked: false, lock: null },
-            { name: 'passenger door', side: 'right', locked: false, lock: null },
+            {
+              name: 'passenger door',
+              side: 'right',
+              locked: false,
+              lock: null,
+            },
             { name: 'rear left door', side: 'left', locked: false, lock: null },
-            { name: 'rear right door', side: 'right', locked: false, lock: null },
+            {
+              name: 'rear right door',
+              side: 'right',
+              locked: false,
+              lock: null,
+            },
           ],
           // 4 seats
           seats: [

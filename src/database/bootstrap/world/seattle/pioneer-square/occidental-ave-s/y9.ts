@@ -16,7 +16,5 @@ A ghost sign is barely visible on one brick facade—white paint faded almost to
   waterLevel: 0,
   outdoor: true,
   // Park furniture
-  objects: [
-    { prototype: 'parkLamp', name: 'Park Lamp' },
-  ],
+  objects: [{ prototype: 'parkLamp', name: 'Park Lamp' }],
 };

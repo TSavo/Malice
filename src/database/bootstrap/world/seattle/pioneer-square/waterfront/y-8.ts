@@ -16,7 +16,5 @@ A collapsed pier extends into the water to the west, its wooden planks rotted th
   waterLevel: 0,
   outdoor: true,
   // Street furniture
-  objects: [
-    { prototype: 'lamppost', name: 'Street Lamp' },
-  ],
+  objects: [{ prototype: 'lamppost', name: 'Street Lamp' }],
 };

@@ -17,14 +17,13 @@ S. Washington Street is visible beyond the park's northern edge, Victorian build
   waterLevel: 0, // Dry
   outdoor: true,
   // Park furniture
-  objects: [
-    { prototype: 'parkLamp', name: 'Park Lamp' },
-  ],
+  objects: [{ prototype: 'parkLamp', name: 'Park Lamp' }],
   sittables: [
     {
       name: 'a memorial bench',
       capacity: 3,
-      emptyMsg: 'Memorial benches line the park edge, plaques dedicated to the forgotten.',
+      emptyMsg:
+        'Memorial benches line the park edge, plaques dedicated to the forgotten.',
       occupiedMsg: '%s sitting on a memorial bench',
     },
   ],

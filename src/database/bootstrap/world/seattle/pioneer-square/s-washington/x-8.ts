@@ -16,7 +16,5 @@ A decorative clock is mounted on one building's corner, its hands frozen at a ti
   waterLevel: 0,
   outdoor: true,
   // Street furniture
-  objects: [
-    { prototype: 'lamppost', name: 'Street Lamp' },
-  ],
+  objects: [{ prototype: 'lamppost', name: 'Street Lamp' }],
 };

@@ -21,7 +21,15 @@ The street rises eastward from here, climbing the grade that Yesler's original r
   // Street furniture
   objects: [
     { prototype: 'streetSignal', name: 'Traffic Signal' },
-    { prototype: 'streetSign', streetName: 'Waterfront', direction: ['N', 'S'] },
-    { prototype: 'streetSign', streetName: 'Yesler Way', direction: ['E', 'W'] },
+    {
+      prototype: 'streetSign',
+      streetName: 'Waterfront',
+      direction: ['N', 'S'],
+    },
+    {
+      prototype: 'streetSign',
+      streetName: 'Yesler Way',
+      direction: ['E', 'W'],
+    },
   ],
 };

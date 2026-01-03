@@ -280,10 +280,7 @@ launch() to enter water, sail() to move, moor() to dock.`,
     );
 
     // Property descriptions
-    obj.setPropertyDescription(
-      'isBoat',
-      'Flag identifying this as a boat.',
-    );
+    obj.setPropertyDescription('isBoat', 'Flag identifying this as a boat.');
     obj.setPropertyDescription(
       'sizeCategory',
       'Size: small, medium, large. Affects wave tolerance.',

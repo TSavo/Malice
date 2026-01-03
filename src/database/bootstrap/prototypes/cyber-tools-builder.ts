@@ -25,7 +25,8 @@ export class CyberToolsBuilder implements Builder {
       this.obj = await this.manager.define('cyberTools', tool, {
         properties: {
           name: 'Cyber-Tools',
-          description: 'A maintenance kit for cybernetic limbs and large implants',
+          description:
+            'A maintenance kit for cybernetic limbs and large implants',
           weight: 800,
           condition: 100,
           lubricantLevel: 100,
@@ -74,8 +75,14 @@ Combat damage sometimes requires immediate attention.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('condition', 'Tool kit condition (0-100)');
-      this.obj.setPropertyDescription('lubricantLevel', 'Remaining servo lubricant percentage (0-100)');
+      this.obj.setPropertyDescription(
+        'condition',
+        'Tool kit condition (0-100)',
+      );
+      this.obj.setPropertyDescription(
+        'lubricantLevel',
+        'Remaining servo lubricant percentage (0-100)',
+      );
     }
   }
 

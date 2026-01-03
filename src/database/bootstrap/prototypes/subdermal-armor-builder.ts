@@ -72,8 +72,14 @@ can be reinforced with additional mesh (more surgery).`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('armorRating', 'Ballistic protection level 1-5');
-      this.obj.setPropertyDescription('coverage', 'Body coverage percentage 0-100');
+      this.obj.setPropertyDescription(
+        'armorRating',
+        'Ballistic protection level 1-5',
+      );
+      this.obj.setPropertyDescription(
+        'coverage',
+        'Body coverage percentage 0-100',
+      );
     }
   }
 

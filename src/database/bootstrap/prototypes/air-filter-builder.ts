@@ -75,7 +75,10 @@ Requires removal. Host breathes normally after rejection cleared.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('filterLife', 'Percentage of filter capacity remaining (0-100)');
+      this.obj.setPropertyDescription(
+        'filterLife',
+        'Percentage of filter capacity remaining (0-100)',
+      );
     }
   }
 

@@ -39,7 +39,10 @@ Kitchen cabinets, filing cabinets, medicine cabinets - all variations.`,
       });
 
       this.obj.setPropertyDescription('open', 'Whether doors are open');
-      this.obj.setPropertyDescription('lock', 'Objref to lock, null if unlockable');
+      this.obj.setPropertyDescription(
+        'lock',
+        'Objref to lock, null if unlockable',
+      );
     }
   }
 

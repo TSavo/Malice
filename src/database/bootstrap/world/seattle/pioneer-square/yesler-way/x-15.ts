@@ -16,7 +16,5 @@ The debris pile that blocks passage to downtown is visible ahead, the collapsed 
   waterLevel: 0,
   outdoor: true,
   // Street furniture
-  objects: [
-    { prototype: 'lamppost', name: 'Street Lamp' },
-  ],
+  objects: [{ prototype: 'lamppost', name: 'Street Lamp' }],
 };

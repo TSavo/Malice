@@ -16,7 +16,5 @@ A railroad viaduct once crossed Fourth Avenue here, carrying freight trains to a
   waterLevel: 0,
   outdoor: true,
   // Street furniture
-  objects: [
-    { prototype: 'lamppost', name: 'Street Lamp' },
-  ],
+  objects: [{ prototype: 'lamppost', name: 'Street Lamp' }],
 };

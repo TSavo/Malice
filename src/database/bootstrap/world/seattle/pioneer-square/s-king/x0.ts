@@ -21,6 +21,10 @@ The street is wider here than typical, extra lanes and broader sidewalks built f
   objects: [
     { prototype: 'streetSignal', name: 'Traffic Signal' },
     { prototype: 'streetSign', streetName: '2nd Ave S', direction: ['N', 'S'] },
-    { prototype: 'streetSign', streetName: 'S. King St', direction: ['E', 'W'] },
+    {
+      prototype: 'streetSign',
+      streetName: 'S. King St',
+      direction: ['E', 'W'],
+    },
   ],
 };

@@ -17,9 +17,7 @@ One bicycle was expensive once—you can tell by the frame geometry, the remnant
   waterLevel: 0, // Dry
   outdoor: true,
   // Park furniture
-  objects: [
-    { prototype: 'parkLamp', name: 'Park Lamp' },
-  ],
+  objects: [{ prototype: 'parkLamp', name: 'Park Lamp' }],
   sittables: [
     {
       name: 'the concrete steps',

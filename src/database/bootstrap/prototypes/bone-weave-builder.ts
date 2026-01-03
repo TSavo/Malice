@@ -78,9 +78,18 @@ Long shelf life - 5+ years if sealed.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('material', "Mesh material type ('titanium', 'ceramic', 'aluminum')");
-      this.obj.setPropertyDescription('sealed', 'Whether the sterile packaging is intact');
-      this.obj.setPropertyDescription('expirationMonths', 'Months until expiration');
+      this.obj.setPropertyDescription(
+        'material',
+        "Mesh material type ('titanium', 'ceramic', 'aluminum')",
+      );
+      this.obj.setPropertyDescription(
+        'sealed',
+        'Whether the sterile packaging is intact',
+      );
+      this.obj.setPropertyDescription(
+        'expirationMonths',
+        'Months until expiration',
+      );
     }
   }
 

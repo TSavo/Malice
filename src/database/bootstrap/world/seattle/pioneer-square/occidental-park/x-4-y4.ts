@@ -17,7 +17,5 @@ S. Washington Street is visible to the north, the Victorian buildings beyond it 
   waterLevel: 0, // Dry
   outdoor: true,
   // Park furniture
-  objects: [
-    { prototype: 'parkLamp', name: 'Park Lamp' },
-  ],
+  objects: [{ prototype: 'parkLamp', name: 'Park Lamp' }],
 };

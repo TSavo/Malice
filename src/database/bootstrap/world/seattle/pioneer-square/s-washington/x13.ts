@@ -16,7 +16,5 @@ Fourth Avenue is close enough to smell differently—less brick dust, more wet c
   waterLevel: 0,
   outdoor: true,
   // Street furniture
-  objects: [
-    { prototype: 'lamppost', name: 'Street Lamp' },
-  ],
+  objects: [{ prototype: 'lamppost', name: 'Street Lamp' }],
 };

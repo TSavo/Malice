@@ -25,7 +25,8 @@ export class VectorThrusterBuilder implements Builder {
       this.obj = await this.manager.define('vectorThruster', vehiclePart, {
         properties: {
           name: 'Vector Thruster',
-          description: 'A thrust-vectoring engine for vertical takeoff and landing',
+          description:
+            'A thrust-vectoring engine for vertical takeoff and landing',
           partType: 'vectorThruster',
           // Performance
           thrust: 5000, // Newtons of thrust
@@ -138,10 +139,7 @@ At damage > 80, thruster may cut out intermittently.`,
     );
 
     // Property descriptions
-    obj.setPropertyDescription(
-      'thrust',
-      'Current thrust output in Newtons.',
-    );
+    obj.setPropertyDescription('thrust', 'Current thrust output in Newtons.');
     obj.setPropertyDescription(
       'maxThrust',
       'Maximum thrust capacity in Newtons.',
@@ -150,10 +148,7 @@ At damage > 80, thruster may cut out intermittently.`,
       'efficiency',
       'Power efficiency 0-1. Affects battery drain.',
     );
-    obj.setPropertyDescription(
-      'active',
-      'true when thruster is firing.',
-    );
+    obj.setPropertyDescription('active', 'true when thruster is firing.');
     obj.setPropertyDescription(
       'vectorAngle',
       'Thrust direction: 0=hover, 90=cruise.',

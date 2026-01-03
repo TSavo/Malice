@@ -185,7 +185,13 @@ Personal effects are absent, but the room shows signs of occupation at various p
         out: { room: '%GC_HALL_2S', door: '%GC_D_5', locks: ['%GC_RL_5'] },
       },
       objects: [
-        { prototype: 'bed', name: 'an iron bed frame', description: 'An iron bed frame sits against the wall, its mattress long since rotted to springs and stuffing.', quality: 'cheap' },
+        {
+          prototype: 'bed',
+          name: 'an iron bed frame',
+          description:
+            'An iron bed frame sits against the wall, its mattress long since rotted to springs and stuffing.',
+          quality: 'cheap',
+        },
       ],
       sittables: [
         {
@@ -216,7 +222,12 @@ A transom window above the door provided ventilation; it's jammed open now, lett
         out: { room: '%GC_HALL_2S', door: '%GC_D_6', locks: ['%GC_RL_6'] },
       },
       objects: [
-        { prototype: 'bed', name: 'an iron bed', description: 'An iron-framed bed sits against the interior wall.', quality: 'standard' },
+        {
+          prototype: 'bed',
+          name: 'an iron bed',
+          description: 'An iron-framed bed sits against the interior wall.',
+          quality: 'standard',
+        },
       ],
       sittables: [
         {
@@ -251,7 +262,12 @@ Strangely, this room is in better condition than its neighbors. The wallpaper is
         out: { room: '%GC_HALL_2', door: '%GC_D_3', locks: ['%GC_RL_3'] },
       },
       objects: [
-        { prototype: 'bed', name: 'a narrow bed', description: 'A narrow iron bed occupies most of the room.', quality: 'standard' },
+        {
+          prototype: 'bed',
+          name: 'a narrow bed',
+          description: 'A narrow iron bed occupies most of the room.',
+          quality: 'standard',
+        },
       ],
     },
 
@@ -299,7 +315,13 @@ Despite the damage, the room is fundamentally sound. The floor is solid, the cei
         out: { room: '%GC_HALL_2', door: '%GC_D_4', locks: ['%GC_RL_4'] },
       },
       objects: [
-        { prototype: 'bed', name: 'a damaged bed', description: 'A bent iron bed frame sits at an angle, one leg broken.', quality: 'cheap' },
+        {
+          prototype: 'bed',
+          name: 'a damaged bed',
+          description:
+            'A bent iron bed frame sits at an angle, one leg broken.',
+          quality: 'cheap',
+        },
       ],
     },
 
@@ -356,7 +378,12 @@ Crown molding decorates the ceiling, water-stained but intact. This was where bu
         out: { room: '%GC_HALL_2N', door: '%GC_D_1', locks: ['%GC_RL_1'] },
       },
       objects: [
-        { prototype: 'bed', name: 'an iron bed', description: "A larger iron bed frame occupies the room's center.", quality: 'standard' },
+        {
+          prototype: 'bed',
+          name: 'an iron bed',
+          description: "A larger iron bed frame occupies the room's center.",
+          quality: 'standard',
+        },
       ],
       sittables: [
         {

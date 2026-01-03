@@ -35,7 +35,10 @@ Sticky residue remains. Can be torn by hand. Weakens when wet.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('remaining', 'Percentage of tape left on roll');
+      this.obj.setPropertyDescription(
+        'remaining',
+        'Percentage of tape left on roll',
+      );
     }
   }
 

@@ -67,8 +67,14 @@ Damaged chrome causes visual glitches, thermal false positives.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('color', 'Iris color when powered (electric blue, crimson, gold, etc.)');
-      this.obj.setPropertyDescription('glowing', 'Whether iris visibly glows when active');
+      this.obj.setPropertyDescription(
+        'color',
+        'Iris color when powered (electric blue, crimson, gold, etc.)',
+      );
+      this.obj.setPropertyDescription(
+        'glowing',
+        'Whether iris visibly glows when active',
+      );
     }
   }
 

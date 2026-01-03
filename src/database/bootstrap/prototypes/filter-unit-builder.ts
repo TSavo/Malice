@@ -25,7 +25,8 @@ export class FilterUnitBuilder implements Builder {
       this.obj = await this.manager.define('filterUnit', medical, {
         properties: {
           name: 'Filter Unit',
-          description: 'Biocompatible filtration mesh for internal filter installation',
+          description:
+            'Biocompatible filtration mesh for internal filter installation',
           weight: 150,
           filterType: 'universal',
           sealed: true,
@@ -79,9 +80,18 @@ Order as needed rather than stockpiling.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('filterType', "Filter specialization: 'universal', 'pulmonary', or 'hepatic'");
-      this.obj.setPropertyDescription('sealed', 'Whether the sterile packaging is intact');
-      this.obj.setPropertyDescription('expirationMonths', 'Months until expiration');
+      this.obj.setPropertyDescription(
+        'filterType',
+        "Filter specialization: 'universal', 'pulmonary', or 'hepatic'",
+      );
+      this.obj.setPropertyDescription(
+        'sealed',
+        'Whether the sterile packaging is intact',
+      );
+      this.obj.setPropertyDescription(
+        'expirationMonths',
+        'Months until expiration',
+      );
     }
   }
 

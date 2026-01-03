@@ -40,8 +40,14 @@ Unreliable - may fail or detonate prematurely. Bomb squad can disarm.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('triggerType', 'How it detonates: remote, pressure, tripwire, timer');
-      this.obj.setPropertyDescription('concealed', 'Whether hidden in container/debris');
+      this.obj.setPropertyDescription(
+        'triggerType',
+        'How it detonates: remote, pressure, tripwire, timer',
+      );
+      this.obj.setPropertyDescription(
+        'concealed',
+        'Whether hidden in container/debris',
+      );
     }
   }
 

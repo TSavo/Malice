@@ -70,7 +70,10 @@ MAINTENANCE: Minimal. Sensors are durable. Nerve amplification stable.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('sensitivity', 'Touch sensitivity multiplier 1-10');
+      this.obj.setPropertyDescription(
+        'sensitivity',
+        'Touch sensitivity multiplier 1-10',
+      );
     }
   }
 

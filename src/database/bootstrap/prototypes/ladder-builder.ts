@@ -39,9 +39,18 @@ Can be kicked away by someone at top or bottom.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('length', 'Length in meters. 3m = 1 z-level');
-      this.obj.setPropertyDescription('deployed', 'Whether ladder is set up for climbing');
-      this.obj.setPropertyDescription('portable', 'Whether ladder can be picked up and moved');
+      this.obj.setPropertyDescription(
+        'length',
+        'Length in meters. 3m = 1 z-level',
+      );
+      this.obj.setPropertyDescription(
+        'deployed',
+        'Whether ladder is set up for climbing',
+      );
+      this.obj.setPropertyDescription(
+        'portable',
+        'Whether ladder can be picked up and moved',
+      );
     }
   }
 

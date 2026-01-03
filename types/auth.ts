@@ -72,6 +72,7 @@ export interface AuthInfo {
     | 'ssh-key'
     | 'token'
     | 'custom'
+    | 'mcp-auth'
     | 'none';
 
   /** SSL client certificate (if mode === 'ssl-cert') */

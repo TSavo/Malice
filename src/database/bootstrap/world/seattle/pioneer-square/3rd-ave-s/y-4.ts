@@ -16,9 +16,7 @@ Graffiti covers the lower stories of buildings on both sides—tags and murals l
   waterLevel: 0,
   outdoor: true,
   // Street furniture
-  objects: [
-    { prototype: 'lamppost', name: 'Street Lamp' },
-  ],
+  objects: [{ prototype: 'lamppost', name: 'Street Lamp' }],
   sittables: [
     {
       name: 'bus shelter remains',

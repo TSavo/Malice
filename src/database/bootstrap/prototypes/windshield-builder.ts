@@ -46,10 +46,22 @@ Optional - vehicle works without it.`,
 
     const obj = this.obj;
 
-    obj.setPropertyDescription('position', 'Glass position: front, rear, side-left, side-right');
-    obj.setPropertyDescription('tinted', 'Darkened glass, reduces visibility from outside');
-    obj.setPropertyDescription('bulletResistant', 'Armored glass, harder to break');
-    obj.setPropertyDescription('shattered', 'true when broken, impairs visibility');
+    obj.setPropertyDescription(
+      'position',
+      'Glass position: front, rear, side-left, side-right',
+    );
+    obj.setPropertyDescription(
+      'tinted',
+      'Darkened glass, reduces visibility from outside',
+    );
+    obj.setPropertyDescription(
+      'bulletResistant',
+      'Armored glass, harder to break',
+    );
+    obj.setPropertyDescription(
+      'shattered',
+      'true when broken, impairs visibility',
+    );
   }
 
   async registerAliases(): Promise<void> {

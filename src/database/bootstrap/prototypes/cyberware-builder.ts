@@ -55,13 +55,34 @@ overall state 0-100.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('slot', 'Body part slot this replaces (eye, arm, spine, etc.)');
-      this.obj.setPropertyDescription('installedIn', 'Body part slot name when installed');
-      this.obj.setPropertyDescription('installedOn', 'Host agent when installed');
-      this.obj.setPropertyDescription('replacedPart', 'Reference to biological part that was replaced');
-      this.obj.setPropertyDescription('powerDraw', 'Power consumption in mW per hour (0 = passive/bioelectric)');
-      this.obj.setPropertyDescription('installAbilities', 'Ability text to add to host when installed');
-      this.obj.setPropertyDescription('condition', 'Chrome condition 0-100, degrades without maintenance');
+      this.obj.setPropertyDescription(
+        'slot',
+        'Body part slot this replaces (eye, arm, spine, etc.)',
+      );
+      this.obj.setPropertyDescription(
+        'installedIn',
+        'Body part slot name when installed',
+      );
+      this.obj.setPropertyDescription(
+        'installedOn',
+        'Host agent when installed',
+      );
+      this.obj.setPropertyDescription(
+        'replacedPart',
+        'Reference to biological part that was replaced',
+      );
+      this.obj.setPropertyDescription(
+        'powerDraw',
+        'Power consumption in mW per hour (0 = passive/bioelectric)',
+      );
+      this.obj.setPropertyDescription(
+        'installAbilities',
+        'Ability text to add to host when installed',
+      );
+      this.obj.setPropertyDescription(
+        'condition',
+        'Chrome condition 0-100, degrades without maintenance',
+      );
     }
   }
 

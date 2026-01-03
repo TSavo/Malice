@@ -57,7 +57,12 @@ export class AvBuilder implements Builder {
           // Doors
           doors: [
             { name: 'driver door', side: 'left', locked: false, lock: null },
-            { name: 'passenger door', side: 'right', locked: false, lock: null },
+            {
+              name: 'passenger door',
+              side: 'right',
+              locked: false,
+              lock: null,
+            },
           ],
           // Flight characteristics
           maxSpeed: 80, // m/s (~288 km/h)

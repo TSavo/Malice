@@ -36,7 +36,10 @@ Quality affects effectiveness. Broken tools may injure user.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('condition', 'Tool condition 0-100, degrades with use');
+      this.obj.setPropertyDescription(
+        'condition',
+        'Tool condition 0-100, degrades with use',
+      );
     }
   }
 

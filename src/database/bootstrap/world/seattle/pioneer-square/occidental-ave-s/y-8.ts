@@ -16,7 +16,5 @@ Broken glass crunches underfoot where it's collected in the gaps between cobbles
   waterLevel: 0,
   outdoor: true,
   // Park furniture
-  objects: [
-    { prototype: 'parkLamp', name: 'Park Lamp' },
-  ],
+  objects: [{ prototype: 'parkLamp', name: 'Park Lamp' }],
 };

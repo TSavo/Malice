@@ -39,7 +39,10 @@ Hydraulic fluid leak = stiff steering. Complete failure = uncontrollable.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('powerAssist', 'Whether power steering is functional');
+      this.obj.setPropertyDescription(
+        'powerAssist',
+        'Whether power steering is functional',
+      );
     }
   }
 

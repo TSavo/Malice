@@ -18,9 +18,7 @@ The smell of rotting fruit is long gone. Only brick and wood and the faint green
   waterLevel: 0,
   outdoor: true,
   // Park furniture
-  objects: [
-    { prototype: 'parkLamp', name: 'Park Lamp' },
-  ],
+  objects: [{ prototype: 'parkLamp', name: 'Park Lamp' }],
   sittables: [
     {
       name: 'a produce bin',

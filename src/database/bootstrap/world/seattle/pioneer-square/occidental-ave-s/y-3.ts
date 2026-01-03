@@ -17,9 +17,7 @@ Pigeons have colonized the rafters, their cooing a constant murmur like distant 
   waterLevel: 0, // Dry
   outdoor: true,
   // Park furniture
-  objects: [
-    { prototype: 'parkLamp', name: 'Park Lamp' },
-  ],
+  objects: [{ prototype: 'parkLamp', name: 'Park Lamp' }],
   sittables: [
     {
       name: 'the pergola corner nest',

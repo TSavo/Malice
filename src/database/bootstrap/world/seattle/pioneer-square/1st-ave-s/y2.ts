@@ -20,7 +20,8 @@ These buildings connect below street level—the Underground passages run beneat
     {
       name: 'a bouncer stool',
       capacity: 1,
-      emptyMsg: 'A black metal bouncer stool sits bolted near the nightclub entrance.',
+      emptyMsg:
+        'A black metal bouncer stool sits bolted near the nightclub entrance.',
       occupiedMsg: '%s sitting on the bouncer stool',
     },
   ],

@@ -301,20 +301,16 @@ NO MAINTENANCE: Blunt weapons don't need sharpening. Durable. May bend or crack 
     if (existing_clawHammer) {
       this.weapons.clawHammer = existing_clawHammer;
     } else {
-      this.weapons.clawHammer = await this.manager.define(
-        'clawHammer',
-        blunt,
-        {
-          properties: {
-            name: 'Claw Hammer',
-            description: "A carpenter's hammer with a nail-pulling claw.",
-            skill: 'hammer',
-            damage: 18,
-            damageType: 'bruise',
-          },
-          methods: {},
+      this.weapons.clawHammer = await this.manager.define('clawHammer', blunt, {
+        properties: {
+          name: 'Claw Hammer',
+          description: "A carpenter's hammer with a nail-pulling claw.",
+          skill: 'hammer',
+          damage: 18,
+          damageType: 'bruise',
         },
-      );
+        methods: {},
+      });
     }
 
     const existing_sledgehammer = await this.manager.load('sledgehammer');

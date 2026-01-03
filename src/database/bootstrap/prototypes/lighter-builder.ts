@@ -37,7 +37,10 @@ Can ignite flammable materials. Small light source when lit.`,
       });
 
       this.obj.setPropertyDescription('fuel', 'Fuel remaining 0-100');
-      this.obj.setPropertyDescription('lit', 'Whether flame is currently burning');
+      this.obj.setPropertyDescription(
+        'lit',
+        'Whether flame is currently burning',
+      );
     }
   }
 

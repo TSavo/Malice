@@ -17,7 +17,5 @@ A drinking fountain stands near the center, its basin dry, its spout corroded gr
   waterLevel: 0, // Dry
   outdoor: true,
   // Park furniture
-  objects: [
-    { prototype: 'parkLamp', name: 'Park Lamp' },
-  ],
+  objects: [{ prototype: 'parkLamp', name: 'Park Lamp' }],
 };

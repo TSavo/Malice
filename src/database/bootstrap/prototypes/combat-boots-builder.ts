@@ -38,7 +38,10 @@ Loud footsteps. Takes time to lace up. Good traction.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('steelToe', 'Whether boots have steel toe caps');
+      this.obj.setPropertyDescription(
+        'steelToe',
+        'Whether boots have steel toe caps',
+      );
     }
   }
 

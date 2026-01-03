@@ -38,9 +38,18 @@ Colored smoke for signaling. Inhaling irritates lungs.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('smokeRadius', 'Radius of smoke cloud in meters');
-      this.obj.setPropertyDescription('smokeDuration', 'How long smoke lasts in seconds');
-      this.obj.setPropertyDescription('smokeColor', 'Smoke color for signaling');
+      this.obj.setPropertyDescription(
+        'smokeRadius',
+        'Radius of smoke cloud in meters',
+      );
+      this.obj.setPropertyDescription(
+        'smokeDuration',
+        'How long smoke lasts in seconds',
+      );
+      this.obj.setPropertyDescription(
+        'smokeColor',
+        'Smoke color for signaling',
+      );
     }
   }
 

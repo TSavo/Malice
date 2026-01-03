@@ -25,7 +25,8 @@ export class EcholocationModuleBuilder implements Builder {
       this.obj = await this.manager.define('echolocationModule', cyberware, {
         properties: {
           name: 'Echolocation Module',
-          description: 'Ultrasonic emitter and enhanced auditory processing for sonar',
+          description:
+            'Ultrasonic emitter and enhanced auditory processing for sonar',
           weight: 25,
           slot: 'ear',
           active: false,
@@ -73,12 +74,17 @@ causes inaccurate echo returns - dangerous in combat.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('active', 'Whether actively emitting ultrasonic pulses');
+      this.obj.setPropertyDescription(
+        'active',
+        'Whether actively emitting ultrasonic pulses',
+      );
     }
   }
 
   async registerAliases(): Promise<void> {
-    console.log("[EcholocationModuleBuilder] Type 'echolocationModule' auto-aliased");
+    console.log(
+      "[EcholocationModuleBuilder] Type 'echolocationModule' auto-aliased",
+    );
   }
 
   getObject(): RuntimeObject | null {

@@ -120,10 +120,7 @@ causes audio glitches, phantom sounds, dropped calls.
       'installedIn',
       'Body part slot name when installed',
     );
-    obj.setPropertyDescription(
-      'installedOn',
-      'Host agent when installed',
-    );
+    obj.setPropertyDescription('installedOn', 'Host agent when installed');
     obj.setPropertyDescription(
       'condition',
       'Implant condition 0-100, degrades without maintenance',

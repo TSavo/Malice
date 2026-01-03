@@ -38,7 +38,10 @@ Extinguishes in water or without oxygen. Smoke and light visible from distance.`
       });
 
       this.obj.setPropertyDescription('lit', 'Whether torch is burning');
-      this.obj.setPropertyDescription('burnTime', 'Minutes of burn time remaining');
+      this.obj.setPropertyDescription(
+        'burnTime',
+        'Minutes of burn time remaining',
+      );
     }
   }
 

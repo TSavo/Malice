@@ -20,7 +20,15 @@ Occidental Mall stretches north and south, its cobblestones and maples and wroug
   // Street furniture
   objects: [
     { prototype: 'streetSignal', name: 'Traffic Signal' },
-    { prototype: 'streetSign', streetName: 'Occidental Ave S', direction: ['N', 'S'] },
-    { prototype: 'streetSign', streetName: 'S. Main St', direction: ['E', 'W'] },
+    {
+      prototype: 'streetSign',
+      streetName: 'Occidental Ave S',
+      direction: ['N', 'S'],
+    },
+    {
+      prototype: 'streetSign',
+      streetName: 'S. Main St',
+      direction: ['E', 'W'],
+    },
   ],
 };

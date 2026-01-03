@@ -130,10 +130,16 @@ Rooms are PERMANENT once created - they stay forever for future flights.`,
     );
 
     // Property descriptions
-    obj.setPropertyDescription('airspace', 'Flag indicating this is an airspace room');
+    obj.setPropertyDescription(
+      'airspace',
+      'Flag indicating this is an airspace room',
+    );
     obj.setPropertyDescription('x', 'X coordinate (30m per unit)');
     obj.setPropertyDescription('y', 'Y coordinate (30m per unit)');
-    obj.setPropertyDescription('z', 'Z coordinate (3m per unit, altitude = z * 3)');
+    obj.setPropertyDescription(
+      'z',
+      'Z coordinate (3m per unit, altitude = z * 3)',
+    );
 
     this.obj = obj;
   }

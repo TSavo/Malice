@@ -39,7 +39,10 @@ Night vision models exist. May have remote viewing capability.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('recording', 'Whether actively recording');
+      this.obj.setPropertyDescription(
+        'recording',
+        'Whether actively recording',
+      );
       this.obj.setPropertyDescription('storage', 'Array of recorded events');
     }
   }

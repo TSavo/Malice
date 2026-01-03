@@ -62,7 +62,10 @@ Full service every 20 procedures recommended.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('condition', 'Tool condition percentage (0-100). Below 50% increases complication risk');
+      this.obj.setPropertyDescription(
+        'condition',
+        'Tool condition percentage (0-100). Below 50% increases complication risk',
+      );
     }
   }
 

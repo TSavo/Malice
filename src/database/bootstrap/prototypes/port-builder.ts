@@ -44,8 +44,14 @@ Optional - vehicle works without ports.`,
 
     const obj = this.obj;
 
-    obj.setPropertyDescription('side', 'Port position: left, right, rear, front');
-    obj.setPropertyDescription('coverOpen', 'true = port open for firing/viewing');
+    obj.setPropertyDescription(
+      'side',
+      'Port position: left, right, rear, front',
+    );
+    obj.setPropertyDescription(
+      'coverOpen',
+      'true = port open for firing/viewing',
+    );
   }
 
   async registerAliases(): Promise<void> {

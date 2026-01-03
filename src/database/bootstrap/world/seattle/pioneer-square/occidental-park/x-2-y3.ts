@@ -17,9 +17,7 @@ One tree has begun to lean, its root system compromised by decades of drought an
   waterLevel: 0, // Dry
   outdoor: true,
   // Park furniture
-  objects: [
-    { prototype: 'parkLamp', name: 'Park Lamp' },
-  ],
+  objects: [{ prototype: 'parkLamp', name: 'Park Lamp' }],
   sittables: [
     {
       name: 'a bench in the maple colonnade',

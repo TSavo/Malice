@@ -21,6 +21,10 @@ The northwest corner holds a building that survived, its brick facade cracked bu
   objects: [
     { prototype: 'streetSignal', name: 'Traffic Signal' },
     { prototype: 'streetSign', streetName: '3rd Ave S', direction: ['N', 'S'] },
-    { prototype: 'streetSign', streetName: 'S. Washington St', direction: ['E', 'W'] },
+    {
+      prototype: 'streetSign',
+      streetName: 'S. Washington St',
+      direction: ['E', 'W'],
+    },
   ],
 };

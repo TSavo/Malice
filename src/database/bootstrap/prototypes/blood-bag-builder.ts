@@ -36,7 +36,10 @@ Must be refrigerated or expires. Takes time to transfuse.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('bloodType', 'A+, A-, B+, B-, AB+, AB-, O+, O-');
+      this.obj.setPropertyDescription(
+        'bloodType',
+        'A+, A-, B+, B-, AB+, AB-, O+, O-',
+      );
       this.obj.setPropertyDescription('expired', 'Whether blood has gone bad');
     }
   }

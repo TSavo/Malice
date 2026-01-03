@@ -43,8 +43,14 @@ Voice interface: "target that", "weapons free", "hold fire".`,
       methods: {},
     });
 
-    this.obj.setPropertyDescription('condition', 'Targeting accuracy degrades with condition');
-    this.obj.setPropertyDescription('damage', 'High damage = targeting failure');
+    this.obj.setPropertyDescription(
+      'condition',
+      'Targeting accuracy degrades with condition',
+    );
+    this.obj.setPropertyDescription(
+      'damage',
+      'High damage = targeting failure',
+    );
   }
 
   async registerAliases(): Promise<void> {

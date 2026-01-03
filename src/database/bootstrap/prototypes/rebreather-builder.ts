@@ -25,7 +25,8 @@ export class RebreatherBuilder implements Builder {
       this.obj = await this.manager.define('rebreather', cyberware, {
         properties: {
           name: 'Rebreather',
-          description: 'A compressed oxygen reservoir and recycler in chest cavity',
+          description:
+            'A compressed oxygen reservoir and recycler in chest cavity',
           weight: 800,
           slot: 'chest',
           airSupply: 100,
@@ -85,9 +86,18 @@ Neglected unit loses efficiency, may fail when needed most.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('airSupply', 'Percentage of air supply remaining (0-100)');
-      this.obj.setPropertyDescription('maxMinutes', 'Maximum minutes of air when full');
-      this.obj.setPropertyDescription('active', 'Whether rebreather is currently active');
+      this.obj.setPropertyDescription(
+        'airSupply',
+        'Percentage of air supply remaining (0-100)',
+      );
+      this.obj.setPropertyDescription(
+        'maxMinutes',
+        'Maximum minutes of air when full',
+      );
+      this.obj.setPropertyDescription(
+        'active',
+        'Whether rebreather is currently active',
+      );
     }
   }
 
