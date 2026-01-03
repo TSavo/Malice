@@ -7,7 +7,7 @@ export const building = {
   y: 7,
   width: 2,
   height: 2,
-  floors: 1,
+  floors: 2,
 
   rooms: {
     // ═══════════════════════════════════════════════════════════════════
@@ -217,6 +217,8 @@ A credenza against the wall holds a coffee service—carafe, cups, sugar and cre
 
 A research table occupies the center of the room, surrounded by wooden chairs with worn leather seats. Legal pads and pencils are scattered across the surface, notes from research that was never completed. The Westlaw terminal is dark, its subscription long since lapsed.
 
+A metal ladder is bolted to the wall in the corner, leading up through a hatch to the roof. Fire code compliance, probably—an alternate exit in case the main stairs became blocked.
+
 The room smells of old paper and leather bindings, the distinct scent of accumulated legal knowledge. The knowledge remains. The lawyers who might have applied it are gone.`,
       x: -15,
       y: 8,
@@ -229,6 +231,7 @@ The room smells of old paper and leather bindings, the distinct scent of accumul
       exits: {
         south: '%OFFICE_MAIN',
         east: '%CONFERENCE',
+        up: { room: '%ROOF_NW', locks: ['%ROOF_HATCH_LOCK'] },
       },
       sittables: [
         {

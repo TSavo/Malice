@@ -7,7 +7,7 @@ export const building = {
   y: 1,
   width: 2,
   height: 2,
-  floors: 1,
+  floors: 2,
 
   rooms: {
     // ═══════════════════════════════════════════════════════════════════
@@ -134,6 +134,8 @@ Art still hangs on the brick walls, pieces by local artists that were for sale w
 
 A door marked EMPLOYEES ONLY leads to what must be a bathroom, the universal stick figure offering no additional information. A second door, heavier, opens onto what looks like a narrow alley—a fire exit or service entrance, its crash bar rusted but functional.
 
+A metal ladder in the corner leads up through a hatch to the roof—the smoke break escape route, judging by the worn rungs.
+
 The employee schedule still hangs on a corkboard, shifts assigned to people who stopped showing up. Someone named Taylor was supposed to open on a Tuesday that never quite arrived. A handwritten note reminds staff that BEARD NETS ARE MANDATORY IN FOOD PREP, a health code that seems almost touching in its irrelevance.`,
       x: -16,
       y: 0,
@@ -146,6 +148,7 @@ The employee schedule still hangs on a corkboard, shifts assigned to people who 
       exits: {
         north: '%SEATING',
         east: '%COUNTER',
+        up: { room: '%ROOF_SW', locks: ['%ROOF_HATCH_LOCK'] },
       },
       objects: [
         {
