@@ -1,0 +1,40 @@
+name: Claude Auto Merge
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  claude-merge:
+    # Only run if:
+    # 1. Comment is on a PR
+    # 2. Comment has the review marker
+    # 3. Comment contains LGTM (approved)
+    if: |
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '<!-- CLAUDE_REVIEW_MARKER -->') &&
+      contains(github.event.comment.body, 'LGTM')
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Merge PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🎉 Claude approved PR #${{ github.event.issue.number }} - merging..."
+
+          # Wait a moment for any in-flight CI to register
+          sleep 5
+
+          # Merge with squash
+          gh pr merge ${{ github.event.issue.number }} \
+            --repo ${{ github.repository }} \
+            --squash \
+            --auto \
+            --delete-branch
+
+          echo "✅ PR merged successfully"
