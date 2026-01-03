@@ -15,4 +15,8 @@ On the western side, buildings that should have been demolished stand empty and 
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

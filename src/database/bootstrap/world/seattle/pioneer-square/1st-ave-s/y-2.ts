@@ -16,4 +16,12 @@ The curb cut here still shows yellow paint where carriages loaded passengers. Th
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  sittables: [
+    {
+      name: 'a hitching post',
+      capacity: 1,
+      emptyMsg: 'An old cast-iron hitching post stands bolted to the curb.',
+      occupiedMsg: '%s leaning against the hitching post',
+    },
+  ],
 };

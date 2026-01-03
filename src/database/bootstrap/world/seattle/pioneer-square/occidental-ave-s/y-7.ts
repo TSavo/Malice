@@ -15,4 +15,8 @@ Fire escapes zigzag down the eastern building's facade, their metal ladders exte
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
 };

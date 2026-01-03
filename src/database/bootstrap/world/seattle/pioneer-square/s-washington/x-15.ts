@@ -15,4 +15,8 @@ A seawall overlook interrupts the streetscape, a small plaza with benches facing
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

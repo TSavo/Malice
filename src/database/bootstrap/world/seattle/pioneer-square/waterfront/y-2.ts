@@ -18,4 +18,12 @@ Oil rainbows swirl on puddles between the cobblestones. Beyond the seawall, Elli
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  sittables: [
+    {
+      name: 'a loading dock edge',
+      capacity: 3,
+      emptyMsg: 'The edge of an old loading dock provides a precarious perch.',
+      occupiedMsg: '%s sitting on the loading dock edge',
+    },
+  ],
 };

@@ -15,4 +15,8 @@ A decorative iron fence runs along one building's frontage, its bars topped with
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
 };

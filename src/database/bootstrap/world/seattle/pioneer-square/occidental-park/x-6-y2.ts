@@ -19,5 +19,17 @@ The park extends north, east, and south.`,
   ambientNoise: 15, // Open space, wind
   lighting: 100, // Full daylight
   waterLevel: 0, // Dry
-  outdoor: true, // Open plaza
+  outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
+  sittables: [
+    {
+      name: 'an east-facing wooden bench',
+      capacity: 2,
+      emptyMsg: 'A wooden bench faces east toward the morning light.',
+      occupiedMsg: '%s sitting on the wooden bench',
+    },
+  ],
 };

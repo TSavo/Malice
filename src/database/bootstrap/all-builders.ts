@@ -50,6 +50,12 @@ import './prototypes/clone-tank-builder';
 import './prototypes/rentable-lock-builder';
 import './prototypes/totem-pole-builder';
 import './prototypes/sealed-box-builder';
+
+// Street furniture / urban infrastructure
+import './prototypes/lamppost-builder';
+import './prototypes/park-lamp-builder';
+import './prototypes/street-signal-builder';
+import './prototypes/street-sign-builder';
 import './prototypes/faction-builder';
 import './prototypes/faction-manager-builder';
 
@@ -233,6 +239,7 @@ import './prototypes/wardrobe-builder';
 // Furniture
 import './prototypes/furniture-builder';
 import './prototypes/bed-builder';
+import './prototypes/bench-builder';
 import './prototypes/chair-builder';
 import './prototypes/couch-builder';
 import './prototypes/desk-builder';

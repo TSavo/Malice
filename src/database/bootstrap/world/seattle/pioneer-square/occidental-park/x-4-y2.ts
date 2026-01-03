@@ -15,5 +15,9 @@ A dead maple stands nearby, its trunk hollow, its bark peeling in sheets. Birds 
   ambientNoise: 15, // Open plaza, wind across brick
   lighting: 100, // Full daylight (open space)
   waterLevel: 0, // Dry
-  outdoor: true, // Open plaza
+  outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
 };

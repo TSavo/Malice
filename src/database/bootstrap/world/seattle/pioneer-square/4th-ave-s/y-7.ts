@@ -15,4 +15,8 @@ Fourth Avenue itself feels cleaner here, the pavement less damaged, the building
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

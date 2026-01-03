@@ -16,4 +16,10 @@ North on Fourth, you can see the line of the city climbing toward Yesler. South,
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'streetSignal', name: 'Traffic Signal' },
+    { prototype: 'streetSign', streetName: '4th Ave S', direction: ['N', 'S'] },
+    { prototype: 'streetSign', streetName: 'S. Washington St', direction: ['E', 'W'] },
+  ],
 };

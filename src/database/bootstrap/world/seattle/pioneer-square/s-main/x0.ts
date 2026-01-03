@@ -17,4 +17,10 @@ A clock is mounted above the bank's entrance, analog hands showing 3:47—the mo
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  // Street furniture
+  objects: [
+    { prototype: 'streetSignal', name: 'Traffic Signal' },
+    { prototype: 'streetSign', streetName: '2nd Ave S', direction: ['N', 'S'] },
+    { prototype: 'streetSign', streetName: 'S. Main St', direction: ['E', 'W'] },
+  ],
 };

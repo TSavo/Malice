@@ -15,4 +15,8 @@ The south side is intact enough to offer cover: alcoves, recessed doorways, load
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

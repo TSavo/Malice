@@ -15,4 +15,8 @@ The sinkhole's edge is visible to the north, its flooded depression a constant p
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

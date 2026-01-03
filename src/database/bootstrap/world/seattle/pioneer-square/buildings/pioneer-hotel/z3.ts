@@ -48,6 +48,9 @@ Despite everything, this is the room people request. Warmth matters when the nig
       exits: {
         west: '%HALL_3',
       },
+      objects: [
+        { prototype: 'bed', name: 'a bed by the radiator', description: 'A bed sits near the working radiator, the warmest spot in the building.', quality: 'standard' },
+      ],
     },
   },
 

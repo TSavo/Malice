@@ -15,5 +15,17 @@ Concrete planters flank the walkway, their metal cages meant to discourage skate
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
+  sittables: [
+    {
+      name: 'a concrete planter edge',
+      capacity: 3,
+      emptyMsg: 'A low concrete planter lines the sidewalk.',
+      occupiedMsg: '%s perched on the planter edge',
+    },
+  ],
 };

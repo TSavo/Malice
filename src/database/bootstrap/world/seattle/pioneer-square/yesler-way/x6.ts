@@ -15,4 +15,8 @@ The street surface buckles and heaves where it approaches the crater's edge, the
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

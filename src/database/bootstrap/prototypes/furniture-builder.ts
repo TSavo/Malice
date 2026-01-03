@@ -27,16 +27,13 @@ export class FurnitureBuilder implements Builder {
           name: 'Furniture',
           description: 'A piece of furniture',
           weight: 20000,
-          anchored: false,
 
           abilities: `Room fixture. Can hide behind for cover. May conceal items underneath/behind.
-Anchored furniture can't be moved. Heavy furniture hard to move alone.
+Bolted-down furniture can't be moved. Heavy furniture hard to move alone.
 Can be destroyed - wood burns, glass shatters.`,
         },
         methods: {},
       });
-
-      this.obj.setPropertyDescription('anchored', 'Whether bolted down or too heavy to move');
     }
   }
 

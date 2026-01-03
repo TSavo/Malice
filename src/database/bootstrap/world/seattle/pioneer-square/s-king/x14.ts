@@ -19,4 +19,10 @@ Fourth Avenue continues north from here. King Street continues west. East is a d
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  // Street furniture
+  objects: [
+    { prototype: 'streetSignal', name: 'Traffic Signal' },
+    { prototype: 'streetSign', streetName: '4th Ave S', direction: ['N', 'S'] },
+    { prototype: 'streetSign', streetName: 'S. King St', direction: ['E', 'W'] },
+  ],
 };

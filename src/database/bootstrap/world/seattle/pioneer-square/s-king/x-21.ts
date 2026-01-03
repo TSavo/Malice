@@ -17,4 +17,10 @@ A public fishing pier extends from the seawall, wooden planking rotting on concr
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  // Street furniture
+  objects: [
+    { prototype: 'streetSignal', name: 'Traffic Signal' },
+    { prototype: 'streetSign', streetName: 'Alaskan Way', direction: ['N', 'S'] },
+    { prototype: 'streetSign', streetName: 'S. King St', direction: ['E', 'W'] },
+  ],
 };

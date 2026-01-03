@@ -15,5 +15,17 @@ A Lime bike share station runs along the building's base, twenty docking ports i
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
+  sittables: [
+    {
+      name: 'a Lime bike share dock ledge',
+      capacity: 3,
+      emptyMsg: 'Empty Lime bike docks line the building base in neat rows.',
+      occupiedMsg: '%s sitting on a bike share dock',
+    },
+  ],
 };

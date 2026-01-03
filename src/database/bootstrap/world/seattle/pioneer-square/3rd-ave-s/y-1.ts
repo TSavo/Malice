@@ -15,4 +15,8 @@ Newspaper boxes cluster at the corner, their windows showing headlines from the 
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

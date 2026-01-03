@@ -15,4 +15,8 @@ A faded mural wraps around one corner, its colors sun-bleached into pastels. The
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
 };

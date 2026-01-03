@@ -18,4 +18,10 @@ The street rises eastward from here, climbing the grade that Yesler's original r
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  // Street furniture
+  objects: [
+    { prototype: 'streetSignal', name: 'Traffic Signal' },
+    { prototype: 'streetSign', streetName: 'Waterfront', direction: ['N', 'S'] },
+    { prototype: 'streetSign', streetName: 'Yesler Way', direction: ['E', 'W'] },
+  ],
 };

@@ -15,5 +15,9 @@ To the south, the stadiums rise like monuments to distraction—T-Mobile Park's 
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
 };

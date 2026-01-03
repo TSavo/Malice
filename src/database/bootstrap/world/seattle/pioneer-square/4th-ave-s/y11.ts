@@ -15,4 +15,8 @@ Fourth Avenue ends here in any practical sense. The city continues beyond, but n
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

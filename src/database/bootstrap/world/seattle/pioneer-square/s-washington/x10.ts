@@ -15,4 +15,8 @@ The street is quiet enough to hear small sounds: gravel shifting underfoot, wate
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

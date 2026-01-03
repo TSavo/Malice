@@ -15,4 +15,8 @@ The street is wide here, designed for the vehicle and pedestrian traffic that on
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

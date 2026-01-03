@@ -17,4 +17,10 @@ The streetscape transitions here: Occidental's cracked cobblestones ending where
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  // Street furniture
+  objects: [
+    { prototype: 'streetSignal', name: 'Traffic Signal' },
+    { prototype: 'streetSign', streetName: 'Occidental Ave S', direction: ['N', 'S'] },
+    { prototype: 'streetSign', streetName: 'S. King St', direction: ['E', 'W'] },
+  ],
 };

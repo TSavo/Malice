@@ -15,5 +15,17 @@ The dead trees ringing the plaza create an accidental amphitheater, their bare b
   ambientNoise: 15, // Open plaza, wind across brick
   lighting: 100, // Full daylight (open space)
   waterLevel: 0, // Dry
-  outdoor: true, // Open plaza
+  outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
+  sittables: [
+    {
+      name: 'the central performance platform',
+      capacity: 3,
+      emptyMsg: 'A raised brick platform sits at the heart of the plaza.',
+      occupiedMsg: '%s sitting on the performance platform',
+    },
+  ],
 };

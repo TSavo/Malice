@@ -15,4 +15,8 @@ The wind off the bay is constant here, salt spray carried on air that never quit
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

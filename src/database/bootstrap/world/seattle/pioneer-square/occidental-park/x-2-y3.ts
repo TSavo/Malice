@@ -15,5 +15,17 @@ One tree has begun to lean, its root system compromised by decades of drought an
   ambientNoise: 15, // Open plaza, wind across brick
   lighting: 100, // Full daylight (open space)
   waterLevel: 0, // Dry
-  outdoor: true, // Open plaza
+  outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
+  sittables: [
+    {
+      name: 'a bench in the maple colonnade',
+      capacity: 2,
+      emptyMsg: 'Weathered benches sit between the dead maple trees.',
+      occupiedMsg: '%s sitting beneath the dead maples',
+    },
+  ],
 };

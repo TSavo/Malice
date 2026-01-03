@@ -15,4 +15,8 @@ Storm drains line the curb, their grates clogged with decades of debris. When it
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

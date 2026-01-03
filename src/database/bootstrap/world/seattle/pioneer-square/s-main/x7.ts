@@ -17,4 +17,10 @@ Parking meters line the curb in ranks, their mechanical faces showing TIME EXPIR
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  // Street furniture
+  objects: [
+    { prototype: 'streetSignal', name: 'Traffic Signal' },
+    { prototype: 'streetSign', streetName: '3rd Ave S', direction: ['N', 'S'] },
+    { prototype: 'streetSign', streetName: 'S. Main St', direction: ['E', 'W'] },
+  ],
 };

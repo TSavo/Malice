@@ -17,6 +17,10 @@ Faded photographs are still pinned to some of the stall backboards, protected by
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
   sittables: [
     {
       name: 'a craftsman stool',
