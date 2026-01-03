@@ -52,6 +52,7 @@ export class MaliceMCPServer {
   private httpServer: ReturnType<typeof createServer> | null = null;
   private sessions = new Map<string, SessionState>();
   private cleanupInterval: ReturnType<typeof setInterval> | null = null;
+  private isShuttingDown = false;
   private port: number;
   private host: string;
 
@@ -68,23 +69,24 @@ export class MaliceMCPServer {
    */
   private cleanupStaleSessions(): void {
     const now = Date.now();
-    // Collect stale session IDs first to avoid modifying Map while iterating
-    const staleIds: string[] = [];
+    // Collect stale sessions to avoid modifying Map while iterating
+    const staleSessions: Array<{ id: string; session: SessionState }> = [];
     for (const [sessionId, session] of this.sessions) {
       if (now - session.lastActivity > SESSION_TTL_MS) {
-        staleIds.push(sessionId);
+        staleSessions.push({ id: sessionId, session });
       }
     }
     // Now safely close and delete stale sessions
-    for (const id of staleIds) {
-      const session = this.sessions.get(id);
-      if (session) {
+    for (const { id, session } of staleSessions) {
+      try {
         session.transport.close();
-        this.sessions.delete(id);
+      } catch (err) {
+        console.error(`[MCP] Error closing session ${id}:`, err);
       }
+      this.sessions.delete(id);
     }
-    if (staleIds.length > 0) {
-      console.log(`[MCP] Cleaned up ${staleIds.length} stale session(s)`);
+    if (staleSessions.length > 0) {
+      console.log(`[MCP] Cleaned up ${staleSessions.length} stale session(s)`);
     }
   }
 
@@ -2177,21 +2179,41 @@ Core Objects:
             res.end('Method Not Allowed');
             return;
           }
-          const now = Date.now();
-          const activeSessions = Array.from(this.sessions.values()).filter(
-            (s) => now - s.lastActivity <= SESSION_TTL_MS
-          ).length;
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({
-            status: 'ok',
-            service: 'mcp-codefirst',
-            sessions: {
-              total: this.sessions.size,
-              active: activeSessions,
-            },
-            sessionTtlMinutes: SESSION_TTL_MS / 60000,
-            timestamp: new Date().toISOString(),
-          }));
+          try {
+            // Return 503 during shutdown
+            if (this.isShuttingDown) {
+              res.writeHead(503, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({
+                status: 'shutting_down',
+                service: 'mcp-codefirst',
+                timestamp: new Date().toISOString(),
+              }));
+              return;
+            }
+            const now = Date.now();
+            const activeSessions = Array.from(this.sessions.values()).filter(
+              (s) => now - s.lastActivity <= SESSION_TTL_MS
+            ).length;
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+              status: 'ok',
+              service: 'mcp-codefirst',
+              sessions: {
+                total: this.sessions.size,
+                active: activeSessions,
+              },
+              sessionTtlMinutes: SESSION_TTL_MS / 60000,
+              timestamp: new Date().toISOString(),
+            }));
+          } catch (err) {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+              status: 'error',
+              service: 'mcp-codefirst',
+              error: err instanceof Error ? err.message : 'Unknown error',
+              timestamp: new Date().toISOString(),
+            }));
+          }
           return;
         }
 
@@ -2226,13 +2248,12 @@ Core Objects:
       console.log(
         `🔮 MCP server (code-first) listening on http://${this.host}:${this.port}/mcp`,
       );
+      // Start periodic cleanup of stale sessions after server is listening
+      this.cleanupInterval = setInterval(
+        () => this.cleanupStaleSessions(),
+        SESSION_CLEANUP_INTERVAL_MS,
+      );
     });
-
-    // Start periodic cleanup of stale sessions
-    this.cleanupInterval = setInterval(
-      () => this.cleanupStaleSessions(),
-      SESSION_CLEANUP_INTERVAL_MS,
-    );
   }
 
   private async handlePost(
@@ -2366,6 +2387,9 @@ Core Objects:
   }
 
   async stop(): Promise<void> {
+    // Signal shutdown for health endpoint
+    this.isShuttingDown = true;
+
     // Stop cleanup interval
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval);
@@ -2374,7 +2398,11 @@ Core Objects:
 
     // Close all sessions
     for (const [id, session] of this.sessions) {
-      session.transport.close();
+      try {
+        session.transport.close();
+      } catch (err) {
+        console.error(`[MCP] Error closing session ${id} during shutdown:`, err);
+      }
       this.sessions.delete(id);
     }
 
