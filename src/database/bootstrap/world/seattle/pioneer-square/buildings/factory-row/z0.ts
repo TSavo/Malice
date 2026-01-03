@@ -7,7 +7,7 @@ export const building = {
   y: 7,
   width: 3,
   height: 1,
-  floors: 1,
+  floors: 2,
 
   rooms: {
     // ═══════════════════════════════════════════════════════════════════
@@ -132,6 +132,8 @@ The space between the shutters smells of dust and old metal, the scent of invent
 
 The space has the bones of a functional watering hole: a long bar, booth seating along the walls, a back room that probably held storage or worse. The decorations are industrial-themed, playing off the factory next door—gear motifs, pipe fixtures, sheet metal wainscoting. Ironic or earnest, hard to tell.
 
+A metal ladder is bolted to the back wall, leading up through a hatch in the ceiling. Roof access—probably added for maintenance, now a back way out for anyone who knows.
+
 A notice on the door claims temporary closure for "renovation." The dust suggests the renovation has been indefinitely postponed. The lock still works. The owner, wherever they are, hasn't given up the lease.`,
       x: -18,
       y: 7,
@@ -152,6 +154,7 @@ A notice on the door claims temporary closure for "renovation." The dust suggest
           locks: ['%BAR_BACK_LOCK'],
           description: 'A dented steel door leads to the alley',
         },
+        up: { room: '%ROOF_C', locks: ['%ROOF_HATCH_LOCK'] },
       },
     },
   },

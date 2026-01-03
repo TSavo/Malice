@@ -7,7 +7,7 @@ export const building = {
   y: -5,
   width: 2,
   height: 2,
-  floors: 1,
+  floors: 2,
 
   rooms: {
     // ═══════════════════════════════════════════════════════════════════
@@ -134,6 +134,8 @@ The dock connects to the receiving bay to the south and the inventory office to 
 
 Filing cabinets line one wall, drawers labeled by date and destination. The system is old but functional. Inventory in, inventory out, everything tracked, everything accounted for. The Continuum knows exactly what it has and where it went.
 
+A metal ladder is bolted to the wall in the corner, leading up through a hatch to the roof. Maintenance access, according to the faded signage. The hatch looks well-used.
+
 A corkboard displays routes, delivery schedules, and worker assignments. Some pins mark active routes, others mark areas no longer serviced. The map of what remains.`,
       x: -19,
       y: -4,
@@ -146,6 +148,7 @@ A corkboard displays routes, delivery schedules, and worker assignments. Some pi
       exits: {
         south: '%WAREHOUSE',
         west: '%LOADING',
+        up: { room: '%ROOF_NE', locks: ['%ROOF_HATCH_LOCK'] },
       },
       objects: [
         {
