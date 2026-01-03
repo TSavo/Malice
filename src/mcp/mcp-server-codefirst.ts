@@ -2138,8 +2138,13 @@ Core Objects:
           return;
         }
 
-        // Health check endpoint
+        // Health check endpoint (GET only)
         if (req.url === '/health') {
+          if (req.method !== 'GET') {
+            res.writeHead(405);
+            res.end('Method Not Allowed');
+            return;
+          }
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({
             status: 'ok',
