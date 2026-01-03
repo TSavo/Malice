@@ -53,12 +53,12 @@ A checkout counter near the entrance holds a cash register, a stack of bookmarks
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: {
+        east: {
           to: 'yesler-way/x-13.ts',
           description: 'The glass door leads back to Yesler Way',
           door: '%FRONT_DOOR',
         },
-        east: '%BACK',
+        west: '%BACK',
         north: '%READING',
       },
       objects: [
@@ -167,7 +167,7 @@ A small desk in the corner was the staff's workspace—inventory lists, special 
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: '%MAIN',
+        east: '%MAIN',
       },
       objects: [
         {

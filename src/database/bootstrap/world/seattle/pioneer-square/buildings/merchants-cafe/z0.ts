@@ -3,7 +3,7 @@
 
 export const building = {
   name: "Merchant's Cafe",
-  x: -15,
+  x: -14,
   y: -2,
   width: 2,
   height: 2,
@@ -55,7 +55,7 @@ export const building = {
 Behind the bar, bottles line the mirrored shelves in neat rows—whiskey, bourbon, gin, the amber and clear spirits that fueled the neighborhood's evenings. The bottles are dusty but full, their labels faded, their contents still potent. A brass cash register sits at one end, its keys frozen, its drawer slightly open.
 
 Bar stools with torn leather seats line the mahogany counter, their chrome bases dulled, their cushions cracked. Someone sat on each of these stools. Someone drank and talked and laughed. The stools remember even if no one else does.`,
-      x: -15,
+      x: -14,
       y: -2,
       z: 0,
       population: 0,
@@ -116,7 +116,7 @@ Bar stools with torn leather seats line the mahogany counter, their chrome bases
 Framed photographs line the walls—black and white images of Seattle's past, the waterfront when it was a working port, the streets before automobiles, faces of people who have been dead for a century. The photographs document a city that no longer exists, displayed for diners who no longer come.
 
 A fireplace occupies one wall, its hearth cold, its mantle displaying trophies and awards the restaurant earned over the decades. BEST OF SEATTLE 1987. JAMES BEARD SEMIFINALIST 1994. The accolades accumulated. The restaurant kept serving. Until it didn't.`,
-      x: -16,
+      x: -15,
       y: -2,
       z: 0,
       population: 0,
@@ -172,7 +172,7 @@ A fireplace occupies one wall, its hearth cold, its mantle displaying trophies a
 The walk-in cooler hums quietly in the corner—someone left the power on, and the compressor still cycles, keeping whatever remains inside at temperature. The door is heavy steel with a latch that opens from inside, a safety feature for the staff who once worked here.
 
 Prep tables line the center of the room, their surfaces stained with the history of vegetables chopped and meat portioned and plates assembled. The menu board on the wall still lists the day's specials in chalk. The chalk has faded. The specials expired long ago.`,
-      x: -15,
+      x: -14,
       y: -3,
       z: 0,
       population: 0,
