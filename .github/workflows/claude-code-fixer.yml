@@ -43,7 +43,8 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ steps.pr-details.outputs.branch }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # Use PAT to allow push to trigger workflows (GITHUB_TOKEN doesn't trigger workflows)
+          token: ${{ secrets.PAT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Configure git
         run: |
@@ -98,11 +99,22 @@ jobs:
 
           claude_args: '--allowed-tools "Bash(git:*),Bash(npm run typecheck),Bash(npm test:*),Bash(gh pr comment:*),Bash(gh pr view:*),Read,Edit,Write,Glob,Grep"'
 
-      - name: Trigger re-review
+      # When PAT_GITHUB_TOKEN is configured, the push automatically triggers all
+      # pull_request workflows. When only GITHUB_TOKEN is used, we manually trigger them.
+      - name: Trigger workflows (fallback when no PAT)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "🔄 Triggering re-review of PR #${{ github.event.issue.number }}"
+          echo "🔄 Triggering workflows for PR #${{ github.event.issue.number }}"
+          # Trigger review
           gh workflow run claude-code-review.yml \
             --repo ${{ github.repository }} \
             --field pr_number=${{ github.event.issue.number }}
+          # Trigger tests
+          gh workflow run claude-test-coverage.yml \
+            --repo ${{ github.repository }} \
+            --field pr_number=${{ github.event.issue.number }} || true
+          # Trigger docs
+          gh workflow run claude-docs.yml \
+            --repo ${{ github.repository }} \
+            --field pr_number=${{ github.event.issue.number }} || true
