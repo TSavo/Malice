@@ -55,9 +55,9 @@ while ! docker compose ps game 2>/dev/null | grep -q healthy; do
   sleep 3
   ELAPSED=$((ELAPSED + 3))
   if [ $ELAPSED -ge $TIMEOUT ]; then
-    echo "WARNING: Game server did not report healthy within ${TIMEOUT}s"
-    echo "Check logs with: docker compose logs game"
-    break
+    echo "ERROR: Game server did not report healthy within ${TIMEOUT}s"
+    docker compose logs game --tail=20
+    exit 1
   fi
   echo "  ... waiting (${ELAPSED}s)"
 done
