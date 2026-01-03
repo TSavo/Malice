@@ -135,13 +135,17 @@ export class MaliceMCPServer {
         timestamp: new Date().toISOString(),
       }));
     } catch (err) {
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({
-        status: 'error',
-        service: 'mcp-codefirst',
-        error: err instanceof Error ? err.message : 'Unknown error',
-        timestamp: new Date().toISOString(),
-      }));
+      try {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          status: 'error',
+          service: 'mcp-codefirst',
+          error: err instanceof Error ? err.message : 'Unknown error',
+          timestamp: new Date().toISOString(),
+        }));
+      } catch (innerErr) {
+        console.error('[MCP] Failed to send error response:', innerErr);
+      }
     }
   }
 
@@ -2287,6 +2291,19 @@ Core Objects:
       session.lastActivity = Date.now(); // Update activity timestamp
       await session.transport.handleRequest(req, res, message);
     } else if (message.method === 'initialize') {
+      // Reject new sessions during shutdown
+      if (this.isShuttingDown) {
+        res.writeHead(503, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          jsonrpc: '2.0',
+          id: message.id || null,
+          error: {
+            code: -32000,
+            message: 'Server is shutting down',
+          },
+        }));
+        return;
+      }
       // Authenticate user via HTTP Basic Auth
       const authHeader = req.headers.authorization;
       const playerId = await this.authenticate(authHeader);
@@ -2390,7 +2407,6 @@ Core Objects:
       return;
     }
     const session = this.sessions.get(sessionId)!;
-    session.lastActivity = Date.now();
     session.transport.close();
     this.sessions.delete(sessionId);
     res.writeHead(200);
@@ -2419,12 +2435,16 @@ Core Objects:
       this.cleanupInterval = null;
     }
 
-    // Close all sessions
-    for (const [id, session] of this.sessions) {
-      try {
-        session.transport.close();
-      } catch (err) {
-        console.error(`[MCP] Error closing session ${id} during shutdown:`, err);
+    // Close all sessions - collect IDs first to avoid modifying Map during iteration
+    const sessionIds = Array.from(this.sessions.keys());
+    for (const id of sessionIds) {
+      const session = this.sessions.get(id);
+      if (session) {
+        try {
+          session.transport.close();
+        } catch (err) {
+          console.error(`[MCP] Error closing session ${id} during shutdown:`, err);
+        }
       }
       this.sessions.delete(id);
     }
