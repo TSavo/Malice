@@ -170,7 +170,7 @@ A credenza against the wall holds a coffee service—carafe, cups, sugar and cre
           prototype: 'describable',
           name: 'coffee service',
           aliases: ['coffee', 'carafe'],
-          description: `A silver coffee service on the credenza—carafe, cups and saucers, sugar bowl and creamer, all arranged on a tray. The carafe is empty and tarnished. The sugar has solidite into a single mass. The creamer contains something that was once milk and is now better left unexamined. The service awaits a meeting that was adjourned permanently.`,
+          description: `A silver coffee service on the credenza—carafe, cups and saucers, sugar bowl and creamer, all arranged on a tray. The carafe is empty and tarnished. The sugar has solidified into a single mass. The creamer contains something that was once milk and is now better left unexamined. The service awaits a meeting that was adjourned permanently.`,
         },
         {
           prototype: 'describable',
