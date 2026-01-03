@@ -70,7 +70,7 @@ Bar stools with torn leather seats line the mahogany counter, their chrome bases
           door: '%FRONT_DOOR',
         },
         west: '%DINING',
-        south: '%KITCHEN',
+        north: '%KITCHEN',
       },
       sittables: [
         {
@@ -126,7 +126,6 @@ A fireplace occupies one wall, its hearth cold, its mantle displaying trophies a
       outdoor: false,
       exits: {
         east: '%BAR',
-        south: '%KITCHEN',
       },
       sittables: [
         {
@@ -173,7 +172,7 @@ The walk-in cooler hums quietly in the corner—someone left the power on, and t
 
 Prep tables line the center of the room, their surfaces stained with the history of vegetables chopped and meat portioned and plates assembled. The menu board on the wall still lists the day's specials in chalk. The chalk has faded. The specials expired long ago.`,
       x: -14,
-      y: -3,
+      y: -1,
       z: 0,
       population: 0,
       ambientNoise: 8,
@@ -181,12 +180,11 @@ Prep tables line the center of the room, their surfaces stained with the history
       waterLevel: 0,
       outdoor: false,
       exits: {
-        north: {
+        south: {
           description: 'A swinging door leads to the bar',
           door: '%KITCHEN_DOOR',
           to: '%BAR',
         },
-        west: '%DINING',
       },
       objects: [
         {
