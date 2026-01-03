@@ -19,6 +19,8 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      checks: read
+      statuses: read
 
     steps:
       - name: Wait for checks and merge PR
