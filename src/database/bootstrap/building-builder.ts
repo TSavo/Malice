@@ -900,12 +900,15 @@ export class BuildingBuilder implements Builder {
         const name = (room.get('name') as string) || '';
         const outdoor = room.get('outdoor') as boolean;
 
-        // World rooms are typically streets/avenues and are outdoor
+        // World rooms are typically streets/avenues (outdoor) or underground passages
         if (
           outdoor ||
           name.includes('Way') ||
           name.includes('Ave') ||
-          name.includes('St')
+          name.includes('St') ||
+          name.includes('Underground') ||
+          name.includes('Passage') ||
+          name.includes('Tunnel')
         ) {
           return room;
         }
