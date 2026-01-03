@@ -192,7 +192,20 @@ Neurals are designed to be convincing in every way imaginable. Standard detectio
 
 Neural scanning devices detect the subtle patterns that distinguish synthetic consciousness from organic. The patterns are invisible to standard observation — you need specialized equipment designed to read the architecture of thought itself.
 
-The **Mask** is such a device. It reads `isArtificialHuman` directly. The disguise means nothing to it. A Mask wearer could identify every Logger in the city with a glance.
+**Room-sized neural scanners** exist in a handful of locations:
+- **Immigration Services** - Mandatory screening for new arrivals
+- **CorpSec Central** - Interrogation facility
+- **Smith Tower medical wing** - Rumored
+- **The Cartel** - May have captured one (unconfirmed)
+
+These installations are:
+- **Massive** - 850kg MRI-sized chambers, not portable
+- **Expensive** - 15-20 million credits per unit
+- **Rare** - Fewer than a dozen in the entire Pacific Northwest
+- **Reliable** - 99.97% accuracy when calibrated, reads `isArtificialHuman` directly
+- **Slow** - 3-5 minute scans with 15-minute cooldown between subjects
+
+The **Mask** is the only **portable** neural scanning device. It reads `isArtificialHuman` directly with a glance. The disguise means nothing to it. A Mask wearer could identify every Logger in the city instantly.
 
 Sister Gray holds the Mask. If she ever gets a wearer she trusts...
 

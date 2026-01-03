@@ -205,6 +205,7 @@ When wearing The Mask:
 
 ## Related Documentation
 
+- [Neural Scanner](./neural-scanner.md) - Room-sized neural scanning installations
 - [Perception Filters](./perception-filters.md) - Filter system overview
 - [Wearables](./wearables.md) - Wearable prototype
 - [AI Integration](../ai.md) - AI query system
