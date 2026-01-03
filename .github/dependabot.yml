@@ -4,8 +4,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "daily"  # Changed to daily to trigger immediately
     open-pull-requests-limit: 10
     groups:
       # Group minor/patch updates together
