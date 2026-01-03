@@ -116,7 +116,7 @@ Bar stools with torn leather seats line the mahogany counter, their chrome bases
 Framed photographs line the walls—black and white images of Seattle's past, the waterfront when it was a working port, the streets before automobiles, faces of people who have been dead for a century. The photographs document a city that no longer exists, displayed for diners who no longer come.
 
 A fireplace occupies one wall, its hearth cold, its mantle displaying trophies and awards the restaurant earned over the decades. BEST OF SEATTLE 1987. JAMES BEARD SEMIFINALIST 1994. The accolades accumulated. The restaurant kept serving. Until it didn't.`,
-      x: -14,
+      x: -16,
       y: -2,
       z: 0,
       population: 0,
