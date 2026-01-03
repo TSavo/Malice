@@ -100,9 +100,10 @@ async function main() {
   const db = new ObjectDatabase(opts.mongoUri, opts.dbName);
   await db.connect();
 
-  try {
-    const manager = new ObjectManager(db);
+  // Declare manager outside try so finally can access it
+  const manager = new ObjectManager(db);
 
+  try {
     // Load existing objects into memory (may be empty)
     console.log('Loading existing objects...');
     await manager.loadAll();
@@ -161,15 +162,21 @@ async function main() {
     }
 
     console.log('');
-    console.log('Flushing pending writes...');
-    await manager.flushWrites();
-
-    console.log('');
     console.log('═══════════════════════════════════════════════════════════');
     console.log('  ✅ World bootstrap complete!');
     console.log('═══════════════════════════════════════════════════════════');
     console.log('');
   } finally {
+    // Always flush writes before disconnecting, even if an error occurred
+    // This ensures partial progress is saved and prevents data loss
+    try {
+      console.log('');
+      console.log('Flushing pending writes...');
+      await manager.flushWrites();
+      console.log('  ✅ Writes flushed');
+    } catch (flushErr) {
+      console.error('  ⚠️ Error flushing writes:', flushErr);
+    }
     await db.disconnect();
   }
 }

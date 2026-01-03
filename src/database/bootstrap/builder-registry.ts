@@ -196,5 +196,10 @@ export async function runBuilders(manager: ObjectManager): Promise<void> {
     }
   }
 
+  // Phase 3: Flush all pending writes to ensure consistency
+  // This prevents race conditions where later code queries MongoDB
+  // before fire-and-forget writes from builders have completed
+  await manager.flushWrites();
+
   console.log(`[BuilderRegistry] ✅ Completed ${sorted.length} builders`);
 }

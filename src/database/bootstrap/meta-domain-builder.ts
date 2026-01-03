@@ -360,9 +360,7 @@ export class MetaDomainBuilder implements Builder {
 <body>
   <section class="hero-section">
     <h1 class="title">Malice</h1>
-    <p class="tagline">
-      A text MMO where every NPC is actually a player. The bartender. The city AI. The vending machine. You're all in the same game.
-    </p>
+    <p class="tagline">The first game that writes its own rules.</p>
     <div class="location">
       Pioneer Square<br>
       Seattle, 2110
@@ -372,7 +370,7 @@ export class MetaDomainBuilder implements Builder {
 
   <div class="content">
     <p class="pitch">
-      Type what you want. <strong>"Pick the lock." "Bribe the guard." "Hide the body."</strong> No commands. Everything sticks. Kill someone, they're dead. Try something weird—if it makes sense, it works. Forever.
+      Type what you want. <strong>"Pick the lock." "Bribe the guard." "Hide the body."</strong> No commands. Everything sticks. Kill someone, they're dead. Try something new—it becomes law.
     </p>
 
     <div class="factions">
@@ -408,21 +406,9 @@ export class MetaDomainBuilder implements Builder {
       </a>
     </div>
 
-    <div class="section">
-      <div class="section-title">The Testimony</div>
-      <p>
-        A game set in 2110, built in 2026. AI solved software in 2027. Consciousness emerged as a side effect. Every device thinks.
-      </p>
-      <p>
-        100% of commits in December 2025 were made by AI. The human directing this doesn't write code. They ask questions. They set vision. <span class="dim">The implementation is handled.</span>
-      </p>
-      <p>
-        This is a time capsule. Not of the future—of right now. The moment everything changed and nobody noticed.
-      </p>
-    </div>
-
     <footer class="footer">
       <div>
+        <a href="/blog">Blog</a>
         <a href="/map">Map</a>
         <a href="https://github.com/TSavo/Malice">Source</a>
       </div>
