@@ -66,6 +66,11 @@ The center of Pioneer Square is **S. Main Street at 2nd Avenue**.
 |----------|-------|------------------|
 | **Terra Nova Gallery** | 1st Ave & Jackson | "Art gallery on 1st Ave. Head to Jackson, it's on the east side of 1st." |
 | **Redux Vintage** | 1st Ave & Washington | "Vintage clothing store. 1st Ave between Washington and Main, west side." |
+| **Waterfall Garden Park** | 2nd Ave S, south of Main | "Little pocket park with a waterfall. South of Main, east of 2nd Ave. Hidden between buildings." |
+| **Klondike Gold Rush Museum** | 2nd Ave & Jackson | "Old National Park museum about the gold rush. 2nd Ave at Jackson, look for the green awning." |
+| **Occidental Square** | Occidental Ave, by the park | "Storefronts facing the park. There's a gallery, coffee shop, and bookstore. Occidental Ave between Main and Washington." |
+| **Pioneer Coffee Roasters** | Occidental Square | "Coffee place in Occidental Square. Still smells like beans, somehow." |
+| **Pioneer Square Books** | Occidental Square | "Independent bookstore in Occidental Square. Books are still there. So is the cat." |
 
 ### Restricted Facilities (Secret)
 
