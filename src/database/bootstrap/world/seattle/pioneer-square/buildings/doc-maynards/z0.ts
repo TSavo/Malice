@@ -53,10 +53,10 @@ export const building = {
     },
     '%BACK_DOOR': {
       prototype: 'door',
-      name: 'Back Door',
+      name: 'Emergency Exit',
       description:
-        'A steel door marked EMERGENCY EXIT - ALARM WILL SOUND. The alarm hasn\'t sounded in years. The door is dented from someone forcing it open from inside.',
-      locked: false,
+        'A steel door marked EMERGENCY EXIT - ALARM WILL SOUND. The door is secured from the outside—won\'t budge more than an inch. Something heavy is blocking it. The alarm wiring hangs disconnected.',
+      locked: true,
       open: false,
       locks: [],
       material: 'metal',
@@ -139,7 +139,7 @@ Old photographs cover the walls: Seattle in the 1890s, the waterfront before the
 
 Display cases show artifacts from the Underground: bottles, china fragments, the detritus of businesses that operated at street level before the streets were raised. A scale model of Pioneer Square circa 1889 sits under glass, tiny buildings that will be buried in the disaster to come.
 
-A heavy door at the back opens onto stairs descending into darkness—the tour entrance, the passage down into the buried city. The stairs are still there. The tours are not.`,
+A heavy steel door at the back is padlocked shut, a chain looped through the handles. This was the tour entrance—stairs descending into the buried city beyond. The door is sealed now, the tours long over. A faded sign reads AUTHORIZED PERSONNEL ONLY.`,
       x: -15,
       y: 3,
       z: 0,
@@ -187,7 +187,7 @@ A heavy door at the back opens onto stairs descending into darkness—the tour e
       name: "Doc Maynard's - Back Room",
       description: `The back room served multiple purposes over the years—storage, office, overflow seating on busy nights, and according to rumor, poker games that ran from midnight to dawn. The current configuration is haphazard: a desk shoved against one wall, kegs stacked in a corner, chairs and tables stored upside-down for a reorganization that never happened.
 
-A steel door leads to the alley, its emergency-exit sign dark but the door itself functional—someone forced it open at some point, bending the frame but not the lock. The door swings freely now, its alarm long since disconnected.
+A steel emergency exit door is visible in the west wall, marked EMERGENCY EXIT - ALARM WILL SOUND. The door has been secured from the outside—something heavy is blocking it, judging from the way it doesn't budge when tested. The alarm is long disconnected, but the exit is no longer viable.
 
 A narrow stairway leads up to the second floor, where the building's original hotel rooms were converted to storage and offices decades ago.`,
       x: -16,
@@ -238,7 +238,7 @@ A narrow stairway leads up to the second floor, where the building's original ho
 
 Kegs and cases line the walls, the bar's reserve inventory dusty but intact. A ancient refrigeration unit hums in one corner, somehow still keeping things cold, its compressor rattling with the effort of decades. The unit probably shouldn't work. It does.
 
-A passage opens in the far wall—rough-cut through the original brick, connecting to the network of underground passages that run beneath Pioneer Square. This is how the tour groups descended, entering the buried streets through the bar's cellar. The passage is dark, but not empty. The Underground is still down there.`,
+In the far wall, a passage has been sealed with fresh cinderblocks—the old tour entrance to the Seattle Underground, now bricked shut. Tour groups descended through here for sixty years before the tours stopped. Someone sealed it recently. The mortar is still light-colored, the work deliberate. The Underground remains beyond, inaccessible from here.`,
       x: -15,
       y: 2,
       z: -1,
@@ -262,9 +262,9 @@ A passage opens in the far wall—rough-cut through the original brick, connecti
         },
         {
           prototype: 'describable',
-          name: 'underground passage',
+          name: 'sealed passage',
           aliases: ['passage', 'tunnel', 'underground'],
-          description: `A rough-cut passage opens in the far wall, the bricks removed to reveal older construction beyond—the original street-level storefronts, now buried beneath modern Pioneer Square. This is the entrance to the Seattle Underground, the buried streets that tour groups explored for sixty years. The passage is dark, the air beyond it still and cold. The Underground is not empty, but it is quiet.`,
+          description: `A rough-cut passage in the far wall has been sealed with cinderblocks and mortar, the bricks stacked to close what was once the entrance to the Seattle Underground. Tour groups descended through here for sixty years, passing into the buried streets. The tours stopped. The passage was sealed. Fresh mortar suggests recent work—someone didn't want this entrance accessible. The Underground remains beyond the barrier, dark and quiet.`,
         },
         {
           prototype: 'furniture',
