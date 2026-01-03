@@ -39,10 +39,12 @@ interface SessionState {
   lastActivity: number; // Timestamp of last activity (Date.now())
 }
 
+// Time constants
+const MS_PER_MINUTE = 60_000;
 // Session TTL: 30 minutes of inactivity
-const SESSION_TTL_MS = 30 * 60 * 1000;
+const SESSION_TTL_MS = 30 * MS_PER_MINUTE;
 // Cleanup interval: check every 5 minutes
-const SESSION_CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
+const SESSION_CLEANUP_INTERVAL_MS = 5 * MS_PER_MINUTE;
 
 /**
  * Code-First MCP Server
@@ -87,6 +89,52 @@ export class MaliceMCPServer {
     }
     if (staleSessions.length > 0) {
       console.log(`[MCP] Cleaned up ${staleSessions.length} stale session(s)`);
+    }
+  }
+
+  /**
+   * Handle health check requests
+   */
+  private handleHealthCheck(req: IncomingMessage, res: ServerResponse): void {
+    if (req.method !== 'GET') {
+      res.writeHead(405);
+      res.end('Method Not Allowed');
+      return;
+    }
+    try {
+      // Return 503 during shutdown
+      if (this.isShuttingDown) {
+        res.writeHead(503, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          status: 'shutting_down',
+          service: 'mcp-codefirst',
+          timestamp: new Date().toISOString(),
+        }));
+        return;
+      }
+      const now = Date.now();
+      const activeSessions = Array.from(this.sessions.values()).filter(
+        (s) => now - s.lastActivity <= SESSION_TTL_MS
+      ).length;
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        status: 'ok',
+        service: 'mcp-codefirst',
+        sessions: {
+          total: this.sessions.size,
+          active: activeSessions,
+        },
+        sessionTtlMinutes: SESSION_TTL_MS / MS_PER_MINUTE,
+        timestamp: new Date().toISOString(),
+      }));
+    } catch (err) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        status: 'error',
+        service: 'mcp-codefirst',
+        error: err instanceof Error ? err.message : 'Unknown error',
+        timestamp: new Date().toISOString(),
+      }));
     }
   }
 
@@ -2174,46 +2222,7 @@ Core Objects:
 
         // Health check endpoint (GET only)
         if (req.url === '/health') {
-          if (req.method !== 'GET') {
-            res.writeHead(405);
-            res.end('Method Not Allowed');
-            return;
-          }
-          try {
-            // Return 503 during shutdown
-            if (this.isShuttingDown) {
-              res.writeHead(503, { 'Content-Type': 'application/json' });
-              res.end(JSON.stringify({
-                status: 'shutting_down',
-                service: 'mcp-codefirst',
-                timestamp: new Date().toISOString(),
-              }));
-              return;
-            }
-            const now = Date.now();
-            const activeSessions = Array.from(this.sessions.values()).filter(
-              (s) => now - s.lastActivity <= SESSION_TTL_MS
-            ).length;
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({
-              status: 'ok',
-              service: 'mcp-codefirst',
-              sessions: {
-                total: this.sessions.size,
-                active: activeSessions,
-              },
-              sessionTtlMinutes: SESSION_TTL_MS / 60000,
-              timestamp: new Date().toISOString(),
-            }));
-          } catch (err) {
-            res.writeHead(500, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({
-              status: 'error',
-              service: 'mcp-codefirst',
-              error: err instanceof Error ? err.message : 'Unknown error',
-              timestamp: new Date().toISOString(),
-            }));
-          }
+          this.handleHealthCheck(req, res);
           return;
         }
 
@@ -2248,6 +2257,8 @@ Core Objects:
       console.log(
         `🔮 MCP server (code-first) listening on http://${this.host}:${this.port}/mcp`,
       );
+      // Run initial cleanup in case any stale sessions exist
+      this.cleanupStaleSessions();
       // Start periodic cleanup of stale sessions after server is listening
       this.cleanupInterval = setInterval(
         () => this.cleanupStaleSessions(),
@@ -2408,10 +2419,11 @@ Core Objects:
 
     // Close HTTP server
     if (this.httpServer) {
-      await new Promise<void>((resolve, reject) => {
-        this.httpServer?.close((err) => (err ? reject(err) : resolve()));
-      });
+      const server = this.httpServer;
       this.httpServer = null;
+      await new Promise<void>((resolve, reject) => {
+        server.close((err) => (err ? reject(err) : resolve()));
+      });
     }
   }
 }
