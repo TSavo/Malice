@@ -97,14 +97,14 @@ Inherits from: **$exit**
 
 ### Purpose
 
-Restricts passage to members of a specific faction. Uses the $faction singleton to check membership.
+Restricts passage to members of a specific faction. Uses `$factionManager.getMembership()` to check membership.
 
 ### Properties
 
 ```javascript
 {
-  allowedFaction: 'Citizen',  // Faction that can pass (null = unrestricted)
-  denyMessage: 'Citizens only.'  // Shown when access denied
+  allowedFaction: 'Gray Cartel',  // Faction name that can pass (null = unrestricted)
+  denyMessage: 'You are not authorized to pass.'  // Shown when access denied
 }
 ```
 
@@ -134,12 +134,11 @@ await guardedExit.setAllowedFaction(null);  // Remove restriction
 
 ```javascript
 exits: {
-  north: {
-    to: 'waterfront/y10.ts',
+  down: {
     prototype: 'guardedExit',
-    allowedFaction: 'Citizen',
-    denyMessage: 'The scanner flashes red. "Citizens only."',
-    description: 'Glass doors open onto the Waterfront',
+    allowedFaction: 'Gray Cartel',
+    denyMessage: 'A heavy padlock secures the hasp. You lack the combination.',
+    description: 'A heavy iron grate covers a vertical shaft.',
   },
 }
 ```

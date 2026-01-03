@@ -215,8 +215,8 @@ Faction-restricted exit.
 **Additional Properties:**
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
-| `requiredFaction` | string | `null` | Faction required to pass |
-| `minRank` | number | `0` | Minimum rank in faction |
+| `allowedFaction` | string | `null` | Faction name that can pass (null = unrestricted) |
+| `denyMessage` | string | `'You are not authorized to pass.'` | Message shown when access denied |
 
 ---
 
