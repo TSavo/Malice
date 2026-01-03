@@ -32,7 +32,7 @@ A handrail runs along one wall, worn smooth by thousands of tourist hands. Safet
       exits: {
         up: '%ENTRY',
         down: {
-          to: 'underground/upper-tunnels/x-14-y-3.ts',
+          to: 'underground/upper-tunnels/x-15-y-3.ts',
           description: 'The stairs continue down into the buried streets',
         },
       },
