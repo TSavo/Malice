@@ -259,7 +259,9 @@ export class SessionMCPServer {
               const who = player
                 ? `${auth?.username} (authenticated)`
                 : 'guest';
-              console.log(`[SessionMCP] Session initialized: ${newId} for ${who}`);
+              console.log(
+                `[SessionMCP] Session initialized: ${newId} for ${who}`,
+              );
             },
           });
 
@@ -475,7 +477,9 @@ NOTE: After registering, use the auth tool to log in.`,
         try {
           // Check if already authenticated
           if (session.playerId) {
-            return err('Already authenticated. Cannot register while logged in.');
+            return err(
+              'Already authenticated. Cannot register while logged in.',
+            );
           }
 
           // Normalize username
@@ -574,7 +578,9 @@ After successful auth, you can use send/receive/status tools.`,
 
           // Check email verification
           if (!player.get('emailVerified')) {
-            return err('Email not verified. Check your inbox for verification link.');
+            return err(
+              'Email not verified. Check your inbox for verification link.',
+            );
           }
 
           // Upgrade session to authenticated
@@ -584,7 +590,8 @@ After successful auth, you can use send/receive/status tools.`,
             success: true,
             playerId: session.playerId,
             playerName: session.playerName,
-            message: 'Authenticated successfully. You can now use send/receive/status.',
+            message:
+              'Authenticated successfully. You can now use send/receive/status.',
           });
         } catch (error) {
           return err(

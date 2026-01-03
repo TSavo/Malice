@@ -41,8 +41,14 @@ Disarming requires care - failed attempt triggers trap.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('armed', 'Whether trap is ready to trigger');
-      this.obj.setPropertyDescription('trapType', 'Type: tripwire, pressure, proximity');
+      this.obj.setPropertyDescription(
+        'armed',
+        'Whether trap is ready to trigger',
+      );
+      this.obj.setPropertyDescription(
+        'trapType',
+        'Type: tripwire, pressure, proximity',
+      );
       this.obj.setPropertyDescription('hidden', 'Whether trap is concealed');
     }
   }

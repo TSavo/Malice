@@ -25,7 +25,8 @@ export class AirTankBuilder implements Builder {
       this.obj = await this.manager.define('airTank', medical, {
         properties: {
           name: 'Implant Air Tank',
-          description: 'Compressed oxygen reservoir for rebreather installation',
+          description:
+            'Compressed oxygen reservoir for rebreather installation',
           weight: 200,
           capacity: 30,
           pressurized: true,
@@ -85,9 +86,18 @@ Do not use if dented or corroded.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('capacity', 'Minutes of breathable air at rest');
-      this.obj.setPropertyDescription('pressurized', 'Whether tank is currently pressurized');
-      this.obj.setPropertyDescription('sealed', 'Whether the sterile packaging is intact');
+      this.obj.setPropertyDescription(
+        'capacity',
+        'Minutes of breathable air at rest',
+      );
+      this.obj.setPropertyDescription(
+        'pressurized',
+        'Whether tank is currently pressurized',
+      );
+      this.obj.setPropertyDescription(
+        'sealed',
+        'Whether the sterile packaging is intact',
+      );
     }
   }
 

@@ -35,7 +35,10 @@ Can cut through bars, locks, pipes. Blade can break under pressure.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('bladeCondition', 'Blade sharpness 0-100');
+      this.obj.setPropertyDescription(
+        'bladeCondition',
+        'Blade sharpness 0-100',
+      );
     }
   }
 

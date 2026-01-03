@@ -39,7 +39,10 @@ Hydraulic system - leaks from damage. Wet brakes work poorly.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('padWear', 'Brake pad wear 0-100. High = needs replacement');
+      this.obj.setPropertyDescription(
+        'padWear',
+        'Brake pad wear 0-100. High = needs replacement',
+      );
     }
   }
 

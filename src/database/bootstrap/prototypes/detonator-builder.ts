@@ -38,8 +38,14 @@ Safety prevents accidental trigger. Multiple channels available.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('linkedExplosives', 'Array of objrefs to linked explosives');
-      this.obj.setPropertyDescription('range', 'Maximum detonation range in meters');
+      this.obj.setPropertyDescription(
+        'linkedExplosives',
+        'Array of objrefs to linked explosives',
+      );
+      this.obj.setPropertyDescription(
+        'range',
+        'Maximum detonation range in meters',
+      );
     }
   }
 

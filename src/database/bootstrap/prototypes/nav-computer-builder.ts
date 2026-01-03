@@ -43,8 +43,7 @@ export class NavComputerBuilder implements Builder {
     this.obj = await this.manager.define('navComputer', vehiclePart, {
       properties: {
         name: 'Navigation Computer',
-        description:
-          'An onboard navigation computer with voice interface.',
+        description: 'An onboard navigation computer with voice interface.',
         partType: 'navComputer',
         weight: 2000, // 2kg
         // AI system prompt loaded from docs/prompts/NAV-COMPUTER.md

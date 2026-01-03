@@ -22,6 +22,10 @@ Second Avenue stretches north and south from here, the cross-axis that connects 
   objects: [
     { prototype: 'streetSignal', name: 'Traffic Signal' },
     { prototype: 'streetSign', streetName: '2nd Ave S', direction: ['N', 'S'] },
-    { prototype: 'streetSign', streetName: 'S. Washington St', direction: ['E', 'W'] },
+    {
+      prototype: 'streetSign',
+      streetName: 'S. Washington St',
+      direction: ['E', 'W'],
+    },
   ],
 };

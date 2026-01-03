@@ -71,12 +71,17 @@ anosmia or phantom odors.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('sensitivity', 'Smell sensitivity multiplier 1-10');
+      this.obj.setPropertyDescription(
+        'sensitivity',
+        'Smell sensitivity multiplier 1-10',
+      );
     }
   }
 
   async registerAliases(): Promise<void> {
-    console.log("[OlfactoryBoosterBuilder] Type 'olfactoryBooster' auto-aliased");
+    console.log(
+      "[OlfactoryBoosterBuilder] Type 'olfactoryBooster' auto-aliased",
+    );
   }
 
   getObject(): RuntimeObject | null {

@@ -20,7 +20,15 @@ The waterfront promenade extends north from here, the pedestrian path cracked an
   // Street furniture
   objects: [
     { prototype: 'streetSignal', name: 'Traffic Signal' },
-    { prototype: 'streetSign', streetName: 'Alaskan Way', direction: ['N', 'S'] },
-    { prototype: 'streetSign', streetName: 'S. Jackson St', direction: ['E', 'W'] },
+    {
+      prototype: 'streetSign',
+      streetName: 'Alaskan Way',
+      direction: ['N', 'S'],
+    },
+    {
+      prototype: 'streetSign',
+      streetName: 'S. Jackson St',
+      direction: ['E', 'W'],
+    },
   ],
 };

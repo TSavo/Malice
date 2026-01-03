@@ -17,9 +17,7 @@ Someone placed the mannequin here. Someone thought it was funny, or meaningful, 
   waterLevel: 0, // Dry
   outdoor: true,
   // Park furniture
-  objects: [
-    { prototype: 'parkLamp', name: 'Park Lamp' },
-  ],
+  objects: [{ prototype: 'parkLamp', name: 'Park Lamp' }],
   sittables: [
     {
       name: 'a circular arrangement bench',

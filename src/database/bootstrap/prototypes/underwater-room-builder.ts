@@ -28,7 +28,9 @@ export class UnderwaterRoomBuilder implements Builder {
       // Get parent type
       const location = await this.manager.load('location');
       if (!location) {
-        throw new Error('Location type not found - required for UnderwaterRoom');
+        throw new Error(
+          'Location type not found - required for UnderwaterRoom',
+        );
       }
 
       this.obj = await this.manager.define('underwaterRoom', location, {

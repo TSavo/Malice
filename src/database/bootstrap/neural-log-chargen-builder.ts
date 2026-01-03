@@ -47,9 +47,7 @@ export class NeuralLogCharGenBuilder implements Builder {
       // Load charGen via alias to inherit createPlayer and other base methods
       const charGenId = aliases.charGen;
       if (!charGenId) {
-        throw new Error(
-          '$charGen alias not found - run CharGenBuilder first',
-        );
+        throw new Error('$charGen alias not found - run CharGenBuilder first');
       }
       const $charGen = await this.manager.load(charGenId);
       if (!$charGen) {

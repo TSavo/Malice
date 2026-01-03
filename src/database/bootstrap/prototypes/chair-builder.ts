@@ -35,7 +35,10 @@ Standing from chair takes a moment - disadvantage if ambushed while seated.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('occupant', 'Objref to person sitting in chair');
+      this.obj.setPropertyDescription(
+        'occupant',
+        'Objref to person sitting in chair',
+      );
     }
   }
 

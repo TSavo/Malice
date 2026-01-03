@@ -21,6 +21,10 @@ The buildings at this intersection are newer construction, built during the stad
   objects: [
     { prototype: 'streetSignal', name: 'Traffic Signal' },
     { prototype: 'streetSign', streetName: '2nd Ave S', direction: ['N', 'S'] },
-    { prototype: 'streetSign', streetName: 'S. Jackson St', direction: ['E', 'W'] },
+    {
+      prototype: 'streetSign',
+      streetName: 'S. Jackson St',
+      direction: ['E', 'W'],
+    },
   ],
 };

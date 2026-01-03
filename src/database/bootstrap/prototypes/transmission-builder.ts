@@ -142,10 +142,7 @@ Current: \${gearStr}\`;
       'automatic',
       'true = automatic shifting, false = manual transmission.',
     );
-    obj.setPropertyDescription(
-      'gears',
-      'Number of forward gears available.',
-    );
+    obj.setPropertyDescription('gears', 'Number of forward gears available.');
     obj.setPropertyDescription(
       'currentGear',
       'Current gear: 0=neutral, -1=reverse, 1+=forward.',

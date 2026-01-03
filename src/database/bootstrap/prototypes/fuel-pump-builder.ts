@@ -27,7 +27,7 @@ export class FuelPumpBuilder implements Builder {
           name: 'Fuel Pump',
           description: 'A gas station fuel dispenser',
           fuelType: 'gasoline',
-          pricePerLiter: 2.50, // dollars
+          pricePerLiter: 2.5, // dollars
           reservoir: null, // objref to supply tank (unlimited if null)
           enabled: true,
 

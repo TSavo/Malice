@@ -40,8 +40,14 @@ Can be carried when empty (heavy when full).`,
       });
 
       this.obj.setPropertyDescription('open', 'Whether lid is open');
-      this.obj.setPropertyDescription('lock', 'Objref to lock object, null if unlocked');
-      this.obj.setPropertyDescription('contents', 'Pocket objref for stored items');
+      this.obj.setPropertyDescription(
+        'lock',
+        'Objref to lock object, null if unlocked',
+      );
+      this.obj.setPropertyDescription(
+        'contents',
+        'Pocket objref for stored items',
+      );
     }
   }
 

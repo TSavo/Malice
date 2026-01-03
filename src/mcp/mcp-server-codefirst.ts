@@ -116,37 +116,43 @@ export class MaliceMCPServer {
       // Return 503 during shutdown
       if (this.isShuttingDown) {
         res.writeHead(503, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-          status: 'shutting_down',
-          service: 'mcp-codefirst',
-          timestamp: new Date().toISOString(),
-        }));
+        res.end(
+          JSON.stringify({
+            status: 'shutting_down',
+            service: 'mcp-codefirst',
+            timestamp: new Date().toISOString(),
+          }),
+        );
         return;
       }
       const now = Date.now();
       const activeSessions = Array.from(this.sessions.values()).filter(
-        (s) => now - s.lastActivity <= this.sessionTtlMs
+        (s) => now - s.lastActivity <= this.sessionTtlMs,
       ).length;
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({
-        status: 'ok',
-        service: 'mcp-codefirst',
-        sessions: {
-          total: this.sessions.size,
-          active: activeSessions,
-        },
-        sessionTtlMinutes: this.sessionTtlMs / MS_PER_MINUTE,
-        timestamp: new Date().toISOString(),
-      }));
+      res.end(
+        JSON.stringify({
+          status: 'ok',
+          service: 'mcp-codefirst',
+          sessions: {
+            total: this.sessions.size,
+            active: activeSessions,
+          },
+          sessionTtlMinutes: this.sessionTtlMs / MS_PER_MINUTE,
+          timestamp: new Date().toISOString(),
+        }),
+      );
     } catch (err) {
       try {
         res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-          status: 'error',
-          service: 'mcp-codefirst',
-          error: err instanceof Error ? err.message : 'Unknown error',
-          timestamp: new Date().toISOString(),
-        }));
+        res.end(
+          JSON.stringify({
+            status: 'error',
+            service: 'mcp-codefirst',
+            error: err instanceof Error ? err.message : 'Unknown error',
+            timestamp: new Date().toISOString(),
+          }),
+        );
       } catch (innerErr) {
         console.error('[MCP] Failed to send error response:', innerErr);
       }
@@ -2298,14 +2304,16 @@ Core Objects:
       // Reject new sessions during shutdown
       if (this.isShuttingDown) {
         res.writeHead(503, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-          jsonrpc: '2.0',
-          id: message.id || null,
-          error: {
-            code: -32000,
-            message: 'Server is shutting down',
-          },
-        }));
+        res.end(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: message.id || null,
+            error: {
+              code: -32000,
+              message: 'Server is shutting down',
+            },
+          }),
+        );
         return;
       }
       // Authenticate user via HTTP Basic Auth
@@ -2316,7 +2324,12 @@ Core Objects:
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: () => crypto.randomUUID(),
         onsessioninitialized: (newSessionId) => {
-          this.sessions.set(newSessionId, { server, transport, playerId, lastActivity: Date.now() });
+          this.sessions.set(newSessionId, {
+            server,
+            transport,
+            playerId,
+            lastActivity: Date.now(),
+          });
           if (playerId) {
             console.log(
               `[MCP] Authenticated session ${newSessionId} as player #${playerId}`,
@@ -2334,14 +2347,16 @@ Core Objects:
       // Reject stale session recreation during shutdown
       if (this.isShuttingDown) {
         res.writeHead(503, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-          jsonrpc: '2.0',
-          id: message.id || null,
-          error: {
-            code: -32000,
-            message: 'Server is shutting down',
-          },
-        }));
+        res.end(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: message.id || null,
+            error: {
+              code: -32000,
+              message: 'Server is shutting down',
+            },
+          }),
+        );
         return;
       }
 
@@ -2356,7 +2371,12 @@ Core Objects:
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: () => sessionId,
         onsessioninitialized: (newSessionId) => {
-          this.sessions.set(newSessionId, { server, transport, playerId, lastActivity: Date.now() });
+          this.sessions.set(newSessionId, {
+            server,
+            transport,
+            playerId,
+            lastActivity: Date.now(),
+          });
         },
       });
       await server.connect(transport);
@@ -2461,7 +2481,10 @@ Core Objects:
         try {
           session.transport.close();
         } catch (err) {
-          console.error(`[MCP] Error closing session ${id} during shutdown:`, err);
+          console.error(
+            `[MCP] Error closing session ${id} during shutdown:`,
+            err,
+          );
         }
       }
       this.sessions.delete(id);

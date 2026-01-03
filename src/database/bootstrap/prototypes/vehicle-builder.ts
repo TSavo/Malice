@@ -25,7 +25,8 @@ export class VehicleBuilder implements Builder {
       this.obj = await this.manager.define('vehicle', location, {
         properties: {
           name: 'Vehicle',
-          description: 'A vehicle that can transport passengers between locations',
+          description:
+            'A vehicle that can transport passengers between locations',
           // Parts system
           parts: [], // objrefs to installed $vehiclePart instances
           requiredParts: [
@@ -51,7 +52,12 @@ export class VehicleBuilder implements Builder {
           // Doors
           doors: [
             { name: 'driver door', side: 'left', locked: false, lock: null },
-            { name: 'passenger door', side: 'right', locked: false, lock: null },
+            {
+              name: 'passenger door',
+              side: 'right',
+              locked: false,
+              lock: null,
+            },
           ],
           // Multi-room support (all vehicles are multi-room by default)
           internalRooms: [], // Array of room refs - for simple vehicles, populated with [self] after creation
@@ -1074,10 +1080,7 @@ DAMAGE: 'armor' reduces incoming. 80+ = disabled. 100 = destroyed.`,
       'travelState',
       'Travel info when moving, null when parked.',
     );
-    obj.setPropertyDescription(
-      'driver',
-      'Objref to agent in driver seat.',
-    );
+    obj.setPropertyDescription('driver', 'Objref to agent in driver seat.');
     obj.setPropertyDescription(
       'seats',
       'Array of seat objects with name, capacity, occupied[].',

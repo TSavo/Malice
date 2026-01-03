@@ -16,7 +16,5 @@ A rusted pickup truck sits at the curb, its tires flat, its bed filled with rain
   waterLevel: 0,
   outdoor: true,
   // Street furniture
-  objects: [
-    { prototype: 'lamppost', name: 'Street Lamp' },
-  ],
+  objects: [{ prototype: 'lamppost', name: 'Street Lamp' }],
 };

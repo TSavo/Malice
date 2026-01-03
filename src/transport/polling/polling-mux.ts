@@ -81,9 +81,13 @@ export class PollingMux implements IChannelMux {
    * Create a new channel
    */
   private createChannel(id: string): PollingChannel {
-    const channel = new PollingChannel(id, () => {
-      this.removeChannel(id);
-    }, this.muxId);
+    const channel = new PollingChannel(
+      id,
+      () => {
+        this.removeChannel(id);
+      },
+      this.muxId,
+    );
 
     this.channels.set(id, channel);
 

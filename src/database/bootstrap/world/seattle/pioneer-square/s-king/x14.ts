@@ -23,6 +23,10 @@ Fourth Avenue continues north from here. King Street continues west. East is a d
   objects: [
     { prototype: 'streetSignal', name: 'Traffic Signal' },
     { prototype: 'streetSign', streetName: '4th Ave S', direction: ['N', 'S'] },
-    { prototype: 'streetSign', streetName: 'S. King St', direction: ['E', 'W'] },
+    {
+      prototype: 'streetSign',
+      streetName: 'S. King St',
+      direction: ['E', 'W'],
+    },
   ],
 };

@@ -25,7 +25,8 @@ export class CyberLegBuilder implements Builder {
       this.obj = await this.manager.define('cyberLeg', cyberware, {
         properties: {
           name: 'Cyber Leg',
-          description: 'A full cybernetic leg replacement with enhanced speed and power',
+          description:
+            'A full cybernetic leg replacement with enhanced speed and power',
           weight: 8000,
           slot: 'leg',
           side: 'right',
@@ -78,7 +79,10 @@ Running = hungry. Jumping = very hungry. Eat accordingly.`,
       });
 
       this.obj.setPropertyDescription('side', 'Which leg: left or right');
-      this.obj.setPropertyDescription('speedBoost', 'Speed multiplier when running');
+      this.obj.setPropertyDescription(
+        'speedBoost',
+        'Speed multiplier when running',
+      );
       this.obj.setPropertyDescription('jumpBoost', 'Jump height multiplier');
     }
   }

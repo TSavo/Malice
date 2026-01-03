@@ -8,7 +8,15 @@ import { type Builder, registerBuilder } from '../builder-registry';
  */
 export class MotorcycleBuilder implements Builder {
   static provides = ['motorcycle'];
-  static depends = ['vehicle', 'engine', 'fuelTank', 'vehicleBattery', 'wheel', 'transmission', 'pocket'];
+  static depends = [
+    'vehicle',
+    'engine',
+    'fuelTank',
+    'vehicleBattery',
+    'wheel',
+    'transmission',
+    'pocket',
+  ];
 
   private obj: RuntimeObject | null = null;
 
@@ -31,7 +39,8 @@ export class MotorcycleBuilder implements Builder {
             'fuelTank',
             'battery',
             'transmission',
-            'wheel', 'wheel',
+            'wheel',
+            'wheel',
           ],
           doors: [], // No doors
           seats: [
@@ -109,7 +118,10 @@ Kickstand when parked. Helmet recommended.`,
     `,
     );
 
-    obj.setPropertyDescription('saddlebags', 'Small storage containers on sides');
+    obj.setPropertyDescription(
+      'saddlebags',
+      'Small storage containers on sides',
+    );
   }
 
   async registerAliases(): Promise<void> {

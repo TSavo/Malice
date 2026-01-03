@@ -84,8 +84,14 @@ Data port needs occasional cleaning.`,
       });
 
       this.obj.setPropertyDescription('capacity', 'Total storage capacity');
-      this.obj.setPropertyDescription('usedSpace', 'Percentage of storage used (0-100)');
-      this.obj.setPropertyDescription('encrypted', 'Whether stored data is encrypted');
+      this.obj.setPropertyDescription(
+        'usedSpace',
+        'Percentage of storage used (0-100)',
+      );
+      this.obj.setPropertyDescription(
+        'encrypted',
+        'Whether stored data is encrypted',
+      );
     }
   }
 

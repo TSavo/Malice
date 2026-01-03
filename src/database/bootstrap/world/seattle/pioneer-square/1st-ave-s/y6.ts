@@ -20,6 +20,10 @@ Occidental Park is visible to the east, its dead trees marking the open space th
   objects: [
     { prototype: 'streetSignal', name: 'Traffic Signal' },
     { prototype: 'streetSign', streetName: '1st Ave S', direction: ['N', 'S'] },
-    { prototype: 'streetSign', streetName: 'S. Washington St', direction: ['E', 'W'] },
+    {
+      prototype: 'streetSign',
+      streetName: 'S. Washington St',
+      direction: ['E', 'W'],
+    },
   ],
 };

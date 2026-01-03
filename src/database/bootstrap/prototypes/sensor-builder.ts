@@ -40,8 +40,14 @@ Needs power. Small, can be hidden.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('sensorType', 'Type: motion, heat, proximity, laser');
-      this.obj.setPropertyDescription('linkedTo', 'Objref to device activated on trigger');
+      this.obj.setPropertyDescription(
+        'sensorType',
+        'Type: motion, heat, proximity, laser',
+      );
+      this.obj.setPropertyDescription(
+        'linkedTo',
+        'Objref to device activated on trigger',
+      );
     }
   }
 

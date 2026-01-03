@@ -42,7 +42,10 @@ Optional - vehicle works without fenders.`,
 
     const obj = this.obj;
 
-    obj.setPropertyDescription('position', 'Fender position: front-left, front-right, rear-left, rear-right');
+    obj.setPropertyDescription(
+      'position',
+      'Fender position: front-left, front-right, rear-left, rear-right',
+    );
   }
 
   async registerAliases(): Promise<void> {

@@ -38,7 +38,10 @@ Consumes fuel while running. Can be connected to building power grid.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('running', 'Whether generator is running');
+      this.obj.setPropertyDescription(
+        'running',
+        'Whether generator is running',
+      );
       this.obj.setPropertyDescription('fuel', 'Fuel level 0-100');
       this.obj.setPropertyDescription('output', 'Power output in watts');
     }

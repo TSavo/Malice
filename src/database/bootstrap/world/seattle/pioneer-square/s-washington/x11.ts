@@ -16,7 +16,5 @@ Eastward, Fourth Avenue’s wider corridor is visible between structures—more 
   waterLevel: 0,
   outdoor: true,
   // Street furniture
-  objects: [
-    { prototype: 'lamppost', name: 'Street Lamp' },
-  ],
+  objects: [{ prototype: 'lamppost', name: 'Street Lamp' }],
 };

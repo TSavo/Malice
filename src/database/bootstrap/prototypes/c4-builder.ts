@@ -38,7 +38,10 @@ Shaped charges direct blast. Breaching charges blow locks/hinges.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('detonator', 'Objref to attached detonator');
+      this.obj.setPropertyDescription(
+        'detonator',
+        'Objref to attached detonator',
+      );
     }
   }
 

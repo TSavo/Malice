@@ -35,7 +35,10 @@ Flipped table provides partial cover but blocks movement.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('surface', 'Array of objrefs to items on the table');
+      this.obj.setPropertyDescription(
+        'surface',
+        'Array of objrefs to items on the table',
+      );
     }
   }
 

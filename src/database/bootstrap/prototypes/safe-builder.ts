@@ -42,7 +42,10 @@ Drilling takes hours. Explosives may destroy contents.`,
 
       this.obj.setPropertyDescription('open', 'Whether safe door is open');
       this.obj.setPropertyDescription('lock', 'Objref to lock mechanism');
-      this.obj.setPropertyDescription('fireproof', 'Whether contents survive fire');
+      this.obj.setPropertyDescription(
+        'fireproof',
+        'Whether contents survive fire',
+      );
     }
   }
 

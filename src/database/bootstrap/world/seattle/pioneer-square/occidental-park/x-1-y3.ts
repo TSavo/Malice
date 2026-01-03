@@ -17,14 +17,13 @@ Light filters through the dead vines and lattice, creating complex shadows on th
   waterLevel: 0, // Dry
   outdoor: true,
   // Park furniture
-  objects: [
-    { prototype: 'parkLamp', name: 'Park Lamp' },
-  ],
+  objects: [{ prototype: 'parkLamp', name: 'Park Lamp' }],
   sittables: [
     {
       name: 'a pergola bench',
       capacity: 2,
-      emptyMsg: 'Benches arranged in conversation circles sit beneath the pergola.',
+      emptyMsg:
+        'Benches arranged in conversation circles sit beneath the pergola.',
       occupiedMsg: '%s sitting on a pergola bench',
     },
   ],

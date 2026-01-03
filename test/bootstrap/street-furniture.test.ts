@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { MinimalBootstrap } from '../../src/database/bootstrap/minimal-bootstrap.js';
 import { BenchBuilder } from '../../src/database/bootstrap/prototypes/bench-builder.js';
 import { LamppostBuilder } from '../../src/database/bootstrap/prototypes/lamppost-builder.js';
 import { ParkLampBuilder } from '../../src/database/bootstrap/prototypes/park-lamp-builder.js';
 import { StreetSignBuilder } from '../../src/database/bootstrap/prototypes/street-sign-builder.js';
 import { StreetSignalBuilder } from '../../src/database/bootstrap/prototypes/street-signal-builder.js';
-import { MinimalBootstrap } from '../../src/database/bootstrap/minimal-bootstrap.js';
 import { ObjectDatabase } from '../../src/database/object-db.js';
 import { ObjectManager } from '../../src/database/object-manager.js';
 
@@ -34,9 +34,17 @@ describe('Street Furniture and Sittables', () => {
     it('should create bench type with correct properties', async () => {
       // Need to create furniture parent first
       const describableType = await manager.load('describable');
-      const furnitureType = await manager.define('furniture', describableType!, {
-        properties: { name: 'Furniture', description: 'A piece of furniture', weight: 20000 },
-      });
+      const furnitureType = await manager.define(
+        'furniture',
+        describableType!,
+        {
+          properties: {
+            name: 'Furniture',
+            description: 'A piece of furniture',
+            weight: 20000,
+          },
+        },
+      );
 
       const builder = new BenchBuilder(manager);
       await builder.build();
@@ -53,9 +61,17 @@ describe('Street Furniture and Sittables', () => {
 
     it('should be idempotent when built multiple times', async () => {
       const describableType = await manager.load('describable');
-      const furnitureType = await manager.define('furniture', describableType!, {
-        properties: { name: 'Furniture', description: 'A piece of furniture', weight: 20000 },
-      });
+      const furnitureType = await manager.define(
+        'furniture',
+        describableType!,
+        {
+          properties: {
+            name: 'Furniture',
+            description: 'A piece of furniture',
+            weight: 20000,
+          },
+        },
+      );
 
       const builder = new BenchBuilder(manager);
       await builder.build();
@@ -74,7 +90,8 @@ describe('Street Furniture and Sittables', () => {
       // Verify no duplicates
       const allObjects = await db.listAll();
       const benches = allObjects.filter(
-        (obj) => (obj.properties.name?.value || obj.properties.name) === 'Bench'
+        (obj) =>
+          (obj.properties.name?.value || obj.properties.name) === 'Bench',
       );
       expect(benches.length).toBe(1);
     });
@@ -169,7 +186,7 @@ describe('Street Furniture and Sittables', () => {
       // Log an observation
       const observation = await lamppost?.executeMethod('observe', [
         'person_detected',
-        { who: 'Unknown', action: 'walking' }
+        { who: 'Unknown', action: 'walking' },
       ]);
 
       expect(observation).toBeTruthy();
@@ -186,7 +203,7 @@ describe('Street Furniture and Sittables', () => {
       // Surveillance off by default
       const observation = await lamppost?.executeMethod('observe', [
         'person_detected',
-        { who: 'Unknown' }
+        { who: 'Unknown' },
       ]);
 
       expect(observation).toBeNull();
@@ -293,7 +310,10 @@ describe('Street Furniture and Sittables', () => {
 
       const streetSign = await manager.load('streetSign');
 
-      const result = await streetSign?.executeMethod('vandalize', ['graffiti', 'ANARCHY']);
+      const result = await streetSign?.executeMethod('vandalize', [
+        'graffiti',
+        'ANARCHY',
+      ]);
 
       expect(streetSign?.get('graffiti')).toBe('ANARCHY');
       expect(streetSign?.get('damaged')).toBe(true);
@@ -402,7 +422,7 @@ describe('Street Furniture and Sittables', () => {
 
       const observation = await signal?.executeMethod('observe', [
         'vehicle_detected',
-        { type: 'sedan', license: 'ABC123' }
+        { type: 'sedan', license: 'ABC123' },
       ]);
 
       expect(observation).toBeTruthy();
@@ -431,7 +451,7 @@ describe('Street Furniture and Sittables', () => {
       // Report a red light runner
       const violation = await signal?.executeMethod('reportViolation', [
         'ran_red_light',
-        { vehicle: 'sedan', license: 'XYZ789' }
+        { vehicle: 'sedan', license: 'XYZ789' },
       ]);
 
       expect(violation).toBeTruthy();
@@ -446,7 +466,11 @@ describe('Street Furniture and Sittables', () => {
       // Create dependencies
       const describableType = await manager.load('describable');
       await manager.define('furniture', describableType!, {
-        properties: { name: 'Furniture', description: 'A piece of furniture', weight: 20000 },
+        properties: {
+          name: 'Furniture',
+          description: 'A piece of furniture',
+          weight: 20000,
+        },
       });
       await manager.define('sign', describableType!, {
         properties: { name: 'Sign', description: 'A sign', text: '' },

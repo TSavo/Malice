@@ -41,8 +41,14 @@ Tamper detection triggers alarm if opened without disarming.`,
       });
 
       this.obj.setPropertyDescription('armed', 'Whether alarm is active');
-      this.obj.setPropertyDescription('sounding', 'Whether alarm is currently going off');
-      this.obj.setPropertyDescription('silent', 'If true, notifies remotely instead of sounding');
+      this.obj.setPropertyDescription(
+        'sounding',
+        'Whether alarm is currently going off',
+      );
+      this.obj.setPropertyDescription(
+        'silent',
+        'If true, notifies remotely instead of sounding',
+      );
     }
   }
 

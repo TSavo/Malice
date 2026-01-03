@@ -79,8 +79,14 @@ Severe rejection = display removal, skin heals.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('displayActive', 'Whether the display is currently on');
-      this.obj.setPropertyDescription('brightness', 'Display brightness level (0-100)');
+      this.obj.setPropertyDescription(
+        'displayActive',
+        'Whether the display is currently on',
+      );
+      this.obj.setPropertyDescription(
+        'brightness',
+        'Display brightness level (0-100)',
+      );
     }
   }
 

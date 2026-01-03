@@ -22,7 +22,8 @@ The avenue stretches north and south, empty and wide.`,
     {
       name: 'the memorial shrine area',
       capacity: 3,
-      emptyMsg: 'A shrine with burned candles and photos sits at the station entrance.',
+      emptyMsg:
+        'A shrine with burned candles and photos sits at the station entrance.',
       occupiedMsg: '%s sitting near the memorial shrine',
     },
   ],

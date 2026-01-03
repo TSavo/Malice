@@ -38,7 +38,10 @@ Won't stop bullets. Intimidating appearance. Muffles voice.`,
         methods: {},
       });
 
-      this.obj.setPropertyDescription('visorDown', 'Whether face visor is lowered');
+      this.obj.setPropertyDescription(
+        'visorDown',
+        'Whether face visor is lowered',
+      );
     }
   }
 

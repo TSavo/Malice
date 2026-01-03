@@ -20,7 +20,15 @@ PIKE PLACE FLOWERS occupied the corner building, its refrigerated display cases 
   // Street furniture
   objects: [
     { prototype: 'streetSignal', name: 'Traffic Signal' },
-    { prototype: 'streetSign', streetName: 'Occidental Ave S', direction: ['N', 'S'] },
-    { prototype: 'streetSign', streetName: 'S. Jackson St', direction: ['E', 'W'] },
+    {
+      prototype: 'streetSign',
+      streetName: 'Occidental Ave S',
+      direction: ['N', 'S'],
+    },
+    {
+      prototype: 'streetSign',
+      streetName: 'S. Jackson St',
+      direction: ['E', 'W'],
+    },
   ],
 };

@@ -45,8 +45,14 @@ Multiple doses risk overdose at 'overdoseThreshold'. Contraband if illegal.`,
     }
 
     this.obj.setPropertyDescription('contraband', 'Illegal to possess');
-    this.obj.setPropertyDescription('addictive', 'Causes withdrawal if stopped');
-    this.obj.setPropertyDescription('overdoseThreshold', 'Doses before overdose risk');
+    this.obj.setPropertyDescription(
+      'addictive',
+      'Causes withdrawal if stopped',
+    );
+    this.obj.setPropertyDescription(
+      'overdoseThreshold',
+      'Doses before overdose risk',
+    );
   }
 
   async registerAliases(): Promise<void> {

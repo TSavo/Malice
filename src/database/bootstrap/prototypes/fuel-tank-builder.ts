@@ -172,14 +172,8 @@ Type: \${fuelType}\`;
     );
 
     // Property descriptions
-    obj.setPropertyDescription(
-      'capacity',
-      'Maximum fuel capacity in liters.',
-    );
-    obj.setPropertyDescription(
-      'fuel',
-      'Current fuel level in liters.',
-    );
+    obj.setPropertyDescription('capacity', 'Maximum fuel capacity in liters.');
+    obj.setPropertyDescription('fuel', 'Current fuel level in liters.');
     obj.setPropertyDescription(
       'fuelType',
       'Type of fuel: gasoline, diesel, or electric.',
