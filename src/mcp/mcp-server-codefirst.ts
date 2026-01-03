@@ -2327,6 +2327,20 @@ Core Objects:
       await server.connect(transport);
       await transport.handleRequest(req, res, message);
     } else if (sessionId && !this.sessions.has(sessionId)) {
+      // Reject stale session recreation during shutdown
+      if (this.isShuttingDown) {
+        res.writeHead(503, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          jsonrpc: '2.0',
+          id: message.id || null,
+          error: {
+            code: -32000,
+            message: 'Server is shutting down',
+          },
+        }));
+        return;
+      }
+
       // Stale session - recreate with authentication
       console.log(`[MCP] Recreating stale session ${sessionId}`);
 
@@ -2409,7 +2423,7 @@ Core Objects:
     const session = this.sessions.get(sessionId)!;
     session.transport.close();
     this.sessions.delete(sessionId);
-    res.writeHead(200);
+    res.writeHead(204);
     res.end();
   }
 
