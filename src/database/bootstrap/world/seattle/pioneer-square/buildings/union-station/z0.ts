@@ -493,11 +493,11 @@ A service door leads to the alley, its push bar corroded but functional. The doo
       exits: {
         east: '%RESTAURANT',
         south: '%SERVICE_CORRIDOR',
-        west: {
-          to: 'alleys/x-8-y-6.ts',
-          locks: ['%SERVICE_LOCK'],
-          description: 'A service door leads to the alley',
-        },
+        // west: {
+        //   to: 'alleys/x-8-y-6.ts',
+        //   locks: ['%SERVICE_LOCK'],
+        //   description: 'A service door leads to the alley',
+        // },
       },
       objects: [
         {
