@@ -97,3 +97,12 @@ jobs:
             Then add a heading "## 🔧 Fixes Applied" followed by a checklist of what you fixed and the commit hash.
 
           claude_args: '--allowed-tools "Bash(git:*),Bash(npm run typecheck),Bash(npm test:*),Bash(gh pr comment:*),Bash(gh pr view:*),Read,Edit,Write,Glob,Grep"'
+
+      - name: Trigger re-review
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🔄 Triggering re-review of PR #${{ github.event.issue.number }}"
+          gh workflow run claude-code-review.yml \
+            --repo ${{ github.repository }} \
+            --field pr_number=${{ github.event.issue.number }}
