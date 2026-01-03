@@ -25,4 +25,10 @@ These buildings connect below street level—the Underground passages run beneat
       occupiedMsg: '%s sitting on the bouncer stool',
     },
   ],
+  exits: {
+    west: {
+      to: 'buildings/doc-maynards/z0.ts#BAR',
+      description: "Heavy wooden doors lead into Doc Maynard's Public House",
+    },
+  },
 };
