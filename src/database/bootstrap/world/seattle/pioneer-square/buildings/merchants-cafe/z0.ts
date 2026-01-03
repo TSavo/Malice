@@ -5,7 +5,7 @@ export const building = {
   name: "Merchant's Cafe",
   x: -16,
   y: -3,
-  width: 3,
+  width: 2,
   height: 2,
   floors: 1,
 

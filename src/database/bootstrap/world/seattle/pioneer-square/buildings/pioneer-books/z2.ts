@@ -51,7 +51,7 @@ Smith Tower rises to the west, its white terra cotta facade visible above the su
 An old TV antenna rises from this corner, a relic from before cable and satellite made such things obsolete. The antenna is bent, its elements pointing in random directions, no longer capable of receiving anything even if there were signals to receive. Rust has eaten through the mounting bracket.
 
 The parapet offers a view of the debris wall to the north, the collapsed buildings that seal Pioneer Square from downtown. From up here the scale of the destruction is visible—blocks of rubble where blocks of buildings used to stand.`,
-      x: -13,
+      x: -15,
       y: 12,
       z: 2,
       population: 0,
@@ -115,7 +115,7 @@ Pigeons have nested along the edge where the buildings meet. Feathers and droppi
 The view northeast shows the alleys and back lots of Pioneer Square, the infrastructure that the storefronts hide—dumpsters, fire escapes, loading docks, the working parts of a commercial district. Most of the dumpsters are empty now. The loading docks receive nothing.
 
 A vent pipe rises from this corner, exhaust from the back stacks below. The pipe is capped with a conical rain hat, rusted but still attached. The smell of old books rises faintly when the wind is right.`,
-      x: -13,
+      x: -15,
       y: 13,
       z: 2,
       population: 0,
