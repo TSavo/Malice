@@ -16,4 +16,10 @@ Someone wedged a bicycle between the building and a dumpster, locked to a drainp
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  exits: {
+    west: {
+      to: 'buildings/morrison-kline/z0.ts#RECEPTION',
+      description: 'Frosted glass doors lead into Morrison & Kline law office',
+    },
+  },
 };
