@@ -3,8 +3,8 @@
 
 export const building = {
   name: 'Pioneer Books',
-  x: -15,
-  y: 11,
+  x: -14,
+  y: 13,
   width: 2,
   height: 3,
   floors: 1,
