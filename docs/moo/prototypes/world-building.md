@@ -191,7 +191,50 @@ src/database/bootstrap/world/seattle/pioneer-square/buildings/
 
 **File naming:** `z<floor>.ts` where `<floor>` is the z-coordinate.
 
-### Building Definition File
+### Building Metadata (z0.ts)
+
+The first file in a building directory is typically `z0.ts`, which contains **building metadata** in addition to ground-level rooms:
+
+```typescript
+export const building = {
+  name: 'Factory Row',      // Building name
+  x: -20,                   // Southwest corner x-coordinate
+  y: 7,                     // Southwest corner y-coordinate
+  width: 3,                 // Building footprint width (x-axis)
+  height: 1,                // Building footprint height (y-axis)
+  floors: 2,                // Total number of floors (including roofs)
+
+  rooms: {
+    // Ground floor rooms defined here...
+  },
+};
+```
+
+**Important**: The `floors` property indicates the **total number of floor files** (z0.ts, z1.ts, etc.). When you add a new floor to a building (like adding a roof), you must:
+1. Create the new floor file (e.g., `z1.ts`)
+2. Update the `floors` property in `z0.ts` to reflect the new total
+
+**Example: Adding a roof**
+
+Before (1 floor):
+```typescript
+// factory-row/z0.ts
+export const building = {
+  floors: 1,  // Only z0.ts exists
+  // ...
+};
+```
+
+After (2 floors):
+```typescript
+// factory-row/z0.ts
+export const building = {
+  floors: 2,  // z0.ts and z1.ts (roof) now exist
+  // ...
+};
+```
+
+### Room Definition Files
 
 **Example: `smith-tower/z1.ts`**
 
