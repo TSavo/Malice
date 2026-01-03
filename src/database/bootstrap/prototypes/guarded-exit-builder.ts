@@ -47,7 +47,7 @@ export class GuardedExitBuilder implements Builder {
 
 FACTION CHECK: 'allowedFaction' specifies which faction can pass. null = unrestricted.
 
-ACCESS: canUse() checks agent's faction via $.faction.getFaction(). Non-members get 'denyMessage'.
+ACCESS: canUse() checks agent's faction via $factionManager.getMembership(). Non-members get 'denyMessage'.
 
 LAYERED: Faction check happens BEFORE door/lock checks. Must pass faction check first.
 
@@ -78,14 +78,14 @@ DISPLAY: describe() shows faction requirement in exit listing.`,
       // Check faction restriction
       const allowedFaction = self.allowedFaction;
       if (allowedFaction) {
-        const faction = await $.faction;
-        if (!faction) {
+        const factionManager = await $factionManager;
+        if (!factionManager) {
           // Faction system not available - deny by default
           return { allowed: false, reason: 'Access control unavailable.' };
         }
 
-        const agentFaction = await faction.getFaction(agent);
-        if (agentFaction !== allowedFaction) {
+        const agentFaction = await factionManager.getMembership(agent);
+        if (!agentFaction || agentFaction.name !== allowedFaction) {
           return { allowed: false, reason: self.denyMessage || 'You are not authorized to pass.' };
         }
       }
