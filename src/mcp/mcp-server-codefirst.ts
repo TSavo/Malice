@@ -30,6 +30,8 @@ import type { ObjectManager } from '../database/object-manager.js';
 interface MCPServerConfig {
   port?: number;
   host?: string;
+  sessionTtlMinutes?: number; // Default: 30
+  cleanupIntervalMinutes?: number; // Default: 5
 }
 
 interface SessionState {
@@ -41,10 +43,8 @@ interface SessionState {
 
 // Time constants
 const MS_PER_MINUTE = 60_000;
-// Session TTL: 30 minutes of inactivity
-const SESSION_TTL_MS = 30 * MS_PER_MINUTE;
-// Cleanup interval: check every 5 minutes
-const SESSION_CLEANUP_INTERVAL_MS = 5 * MS_PER_MINUTE;
+const DEFAULT_SESSION_TTL_MINUTES = 30;
+const DEFAULT_CLEANUP_INTERVAL_MINUTES = 5;
 
 /**
  * Code-First MCP Server
@@ -57,6 +57,8 @@ export class MaliceMCPServer {
   private isShuttingDown = false;
   private port: number;
   private host: string;
+  private sessionTtlMs: number;
+  private cleanupIntervalMs: number;
 
   constructor(
     private manager: ObjectManager,
@@ -64,17 +66,22 @@ export class MaliceMCPServer {
   ) {
     this.port = config.port ?? 3010;
     this.host = config.host ?? '127.0.0.1';
+    this.sessionTtlMs =
+      (config.sessionTtlMinutes ?? DEFAULT_SESSION_TTL_MINUTES) * MS_PER_MINUTE;
+    this.cleanupIntervalMs =
+      (config.cleanupIntervalMinutes ?? DEFAULT_CLEANUP_INTERVAL_MINUTES) *
+      MS_PER_MINUTE;
   }
 
   /**
-   * Clean up stale sessions that haven't had activity within SESSION_TTL_MS
+   * Clean up stale sessions that haven't had activity within sessionTtlMs
    */
   private cleanupStaleSessions(): void {
     const now = Date.now();
     // Collect stale sessions to avoid modifying Map while iterating
     const staleSessions: Array<{ id: string; session: SessionState }> = [];
     for (const [sessionId, session] of this.sessions) {
-      if (now - session.lastActivity > SESSION_TTL_MS) {
+      if (now - session.lastActivity > this.sessionTtlMs) {
         staleSessions.push({ id: sessionId, session });
       }
     }
@@ -114,7 +121,7 @@ export class MaliceMCPServer {
       }
       const now = Date.now();
       const activeSessions = Array.from(this.sessions.values()).filter(
-        (s) => now - s.lastActivity <= SESSION_TTL_MS
+        (s) => now - s.lastActivity <= this.sessionTtlMs
       ).length;
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({
@@ -124,7 +131,7 @@ export class MaliceMCPServer {
           total: this.sessions.size,
           active: activeSessions,
         },
-        sessionTtlMinutes: SESSION_TTL_MS / MS_PER_MINUTE,
+        sessionTtlMinutes: this.sessionTtlMs / MS_PER_MINUTE,
         timestamp: new Date().toISOString(),
       }));
     } catch (err) {
@@ -2262,7 +2269,7 @@ Core Objects:
       // Start periodic cleanup of stale sessions after server is listening
       this.cleanupInterval = setInterval(
         () => this.cleanupStaleSessions(),
-        SESSION_CLEANUP_INTERVAL_MS,
+        this.cleanupIntervalMs,
       );
     });
   }
@@ -2377,14 +2384,16 @@ Core Objects:
   }
 
   private handleDelete(res: ServerResponse, sessionId?: string): void {
-    if (sessionId) {
-      const session = this.sessions.get(sessionId);
-      if (session) {
-        session.transport.close();
-        this.sessions.delete(sessionId);
-      }
+    if (!sessionId || !this.sessions.has(sessionId)) {
+      res.writeHead(404);
+      res.end('Session not found');
+      return;
     }
-    res.writeHead(204);
+    const session = this.sessions.get(sessionId)!;
+    session.lastActivity = Date.now();
+    session.transport.close();
+    this.sessions.delete(sessionId);
+    res.writeHead(200);
     res.end();
   }
 
@@ -2398,7 +2407,10 @@ Core Objects:
   }
 
   async stop(): Promise<void> {
-    // Signal shutdown for health endpoint
+    // Prevent concurrent shutdown calls
+    if (this.isShuttingDown) {
+      return;
+    }
     this.isShuttingDown = true;
 
     // Stop cleanup interval
@@ -2420,10 +2432,10 @@ Core Objects:
     // Close HTTP server
     if (this.httpServer) {
       const server = this.httpServer;
-      this.httpServer = null;
       await new Promise<void>((resolve, reject) => {
         server.close((err) => (err ? reject(err) : resolve()));
       });
+      this.httpServer = null;
     }
   }
 }
