@@ -168,6 +168,10 @@ A small desk in the corner was the staff's workspace—inventory lists, special 
       outdoor: false,
       exits: {
         east: '%MAIN',
+        up: {
+          description: 'A narrow stairwell leads up to the roof',
+          to: '%ROOF_SW',
+        },
       },
       objects: [
         {
