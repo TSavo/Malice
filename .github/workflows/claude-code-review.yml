@@ -70,30 +70,17 @@ jobs:
             3. Use CLAUDE.md for project conventions
 
             ## Response Format
-            You MUST respond with a structured review comment using `gh pr comment`. Your comment must:
+            You MUST respond with a structured review comment using `gh pr comment`.
 
-            1. Start with `<!-- CLAUDE_REVIEW_MARKER -->` (hidden marker for iteration tracking)
-            2. Include a clear verdict: either `## ✅ LGTM` or `## 🔧 Changes Requested`
-            3. If changes requested, provide SPECIFIC, ACTIONABLE items in this format:
+            CRITICAL: Your comment body MUST begin with exactly these 29 characters (no escaping, no backslashes, copy verbatim):
+            <!-- CLAUDE_REVIEW_MARKER -->
 
-            ```
-            ## 🔧 Changes Requested
+            Do NOT escape the exclamation mark. Do NOT use backslashes. The marker must be a valid HTML comment.
 
-            ### Issue 1: [Brief title]
-            **File:** `path/to/file.ts`
-            **Line:** 42
-            **Problem:** [What's wrong]
-            **Fix:** [Exactly what to do]
+            After the marker, include a verdict heading: "## ✅ LGTM" or "## 🔧 Changes Requested"
 
-            ### Issue 2: ...
-            ```
-
-            4. If everything looks good after reviewing, respond with:
-            ```
-            ## ✅ LGTM
-
-            The code looks good! No changes needed.
-            ```
+            If changes requested, list SPECIFIC issues with file paths, line numbers, and exact fixes needed.
+            If everything looks good, just say the code looks good.
 
             ## Important
             - Be specific with file paths and line numbers
