@@ -68,16 +68,23 @@ export class MaliceMCPServer {
    */
   private cleanupStaleSessions(): void {
     const now = Date.now();
-    let cleaned = 0;
+    // Collect stale session IDs first to avoid modifying Map while iterating
+    const staleIds: string[] = [];
     for (const [sessionId, session] of this.sessions) {
       if (now - session.lastActivity > SESSION_TTL_MS) {
-        session.transport.close();
-        this.sessions.delete(sessionId);
-        cleaned++;
+        staleIds.push(sessionId);
       }
     }
-    if (cleaned > 0) {
-      console.log(`[MCP] Cleaned up ${cleaned} stale session(s)`);
+    // Now safely close and delete stale sessions
+    for (const id of staleIds) {
+      const session = this.sessions.get(id);
+      if (session) {
+        session.transport.close();
+        this.sessions.delete(id);
+      }
+    }
+    if (staleIds.length > 0) {
+      console.log(`[MCP] Cleaned up ${staleIds.length} stale session(s)`);
     }
   }
 
