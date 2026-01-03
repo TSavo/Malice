@@ -1,5 +1,5 @@
-// Smith Tower - Condo Floor (z=10)
-// Condo layout repeated across floors 4–33
+// Smith Tower - Condo Floor (z=31) - Rustic Farmhouse Theme
+// Distressed wood, galvanized metal, mason jars, shiplap walls, barn doors
 
 export const building = {
   rooms: {
@@ -80,7 +80,7 @@ export const building = {
 
     '%A1_z31': {
       name: 'Smith Tower - 31th Floor - North Suite - Living Room',
-      description: 'A corner unit with tall windows and pale wood floors. A kitchenette occupies one wall, its appliances dark and silent. Built-in shelving holds the remnants of someone\'s life—books, decorative objects, a dead potted plant.',
+      description: 'A corner unit with tall windows and wide-plank pine floors weathered to a honey gold. A farmhouse kitchenette occupies one wall, its apron sink and open shelving lending a country charm. Shiplap paneling painted cream white covers the interior walls, softening the urban view beyond.',
       x: -13,
       y: 11,
       z: 31,
@@ -96,17 +96,18 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'table', name: 'a coffee table', description: 'A low wooden coffee table sits before the couch, its surface ringed with water stains from forgotten glasses.', boltedDown: false },
-        { prototype: 'furniture', name: 'a kitchenette counter', description: 'A built-in kitchenette counter runs along one wall. The small sink is dry, the electric burners cold. Cabinet doors hang slightly open.', boltedDown: true },
-        { prototype: 'furniture', name: 'a wall-mounted shelf unit', description: 'Floor-to-ceiling shelving is built into the wall, holding dusty books, a ceramic vase, and a desiccated fern in a cracked pot.', boltedDown: true },
+        { prototype: 'table', name: 'a distressed wood farm table', description: 'A large farm table dominates the space, its surface showing decades of wear with knife marks and water stains that tell stories. The milk paint finish has worn through in places, revealing older layers beneath.', boltedDown: false },
+        { prototype: 'furniture', name: 'a farmhouse kitchenette', description: 'A built-in kitchenette with an apron-front sink, butcher block counters, and open shelving holds enamelware dishes and vintage crocks. Mason jars line the shelves, some still containing dried herbs.', boltedDown: true },
+        { prototype: 'furniture', name: 'shiplap accent wall', description: 'Horizontal shiplap boards cover the main wall, painted a soft cream that has yellowed gracefully with age. The slight gaps between boards create pleasing shadow lines.', boltedDown: true },
+        { prototype: 'furniture', name: 'a galvanized metal bucket', description: 'A large galvanized metal bucket sits in the corner, repurposed as a planter. A dried arrangement of wheat stalks and cotton stems fills it.', boltedDown: false },
       ],
       sittables: [
         {
-          name: 'a worn couch',
+          name: 'a ladder-back bench',
           capacity: 3,
           emptyMsg:
-            'A faded couch sits against the wall, cushions compressed from years of use.',
-          occupiedMsg: '%s sprawled on the couch.',
+            'A long ladder-back bench with a woven rush seat runs along one side of the farm table, worn smooth from years of use.',
+          occupiedMsg: '%s seated on the ladder-back bench.',
         },
       ],
     },
@@ -114,7 +115,7 @@ export const building = {
     '%A2_z31': {
       name: 'Smith Tower - 31th Floor - North Suite - Bedroom',
       description:
-        'A bright one-bedroom overlooking the skyline, hall-facing door to the south. A built-in closet with mirrored doors dominates one wall, its reflection multiplying the dusty light.',
+        'A bright one-bedroom overlooking the skyline, hall-facing door to the south. A sliding barn door on iron hardware serves as the closet, its reclaimed wood weathered to a silvery gray. The room smells faintly of cedar and old linen.',
       x: -12,
       y: 11,
       z: 31,
@@ -134,17 +135,18 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a queen bed', description: 'A queen bed sits against the wall, sheets grey with age but still intact. The mattress sags in the middle from years of use.', quality: 'standard' },
-        { prototype: 'furniture', name: 'a mirrored closet', description: 'Built-in closet doors with age-spotted mirrors run the length of one wall. The closet is mostly empty, a few wire hangers dangling inside.', boltedDown: true },
-        { prototype: 'table', name: 'a bedside table', description: 'A small bedside table holds a dead lamp and an empty water glass, both coated in dust.', boltedDown: false },
+        { prototype: 'bed', name: 'a cast iron bed frame', description: 'A queen-sized cast iron bed frame in antique white holds a thick mattress topped with a hand-stitched quilt in a wedding ring pattern. The iron scrollwork is ornate but not fussy.', quality: 'nice' },
+        { prototype: 'furniture', name: 'a barn door closet', description: 'A sliding barn door on black iron hardware conceals the closet. The reclaimed wood planks are weathered silver-gray, still bearing old nail holes and saw marks.', boltedDown: true },
+        { prototype: 'table', name: 'a milk paint nightstand', description: 'A small nightstand painted in robin\'s egg blue milk paint sits beside the bed. The finish is intentionally distressed, showing raw wood at the edges.', boltedDown: false },
+        { prototype: 'furniture', name: 'a vintage crock', description: 'A stoneware crock with blue decorations sits on the nightstand, holding a bundle of dried lavender that still carries a faint scent.', boltedDown: false },
       ],
       sittables: [
         {
-          name: 'the queen bed',
+          name: 'the cast iron bed',
           capacity: 2,
           emptyMsg:
-            'The bed waits, sheets rumpled as if someone just left.',
-          occupiedMsg: '%s resting on the bed.',
+            'The cast iron bed waits beneath a quilted spread, its springs creaking softly.',
+          occupiedMsg: '%s resting on the cast iron bed.',
         },
       ],
     },
@@ -152,7 +154,7 @@ export const building = {
     '%A3_z31': {
       name: 'Smith Tower - 31th Floor - North Suite - Studio',
       description:
-        'A long studio with exposed brick and a narrow galley kitchen. The space is multipurpose—work area, living space, kitchen all compressed into one room.',
+        'A long studio with exposed brick and a narrow galley kitchen appointed in farmhouse style. Open shelving displays mason jars of dry goods and enamelware. A butcher block island provides workspace in the center.',
       x: -11,
       y: 11,
       z: 31,
@@ -168,24 +170,25 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a galley kitchen', description: 'A narrow galley kitchen runs along one wall—sink, stove, small refrigerator, upper cabinets. Everything is built-in and dated, the appliances a harvest gold that screams 1970s renovation.', boltedDown: true },
-        { prototype: 'table', name: 'a work desk', description: 'A simple desk sits under the window, its surface scratched and stained. An ancient desk lamp with a cracked shade perches on one corner.', boltedDown: false },
-        { prototype: 'furniture', name: 'a futon frame', description: 'A wooden futon frame holds a thin mattress, serving as both couch and bed. The mattress is lumpy but serviceable.', boltedDown: false },
+        { prototype: 'furniture', name: 'a farmhouse galley kitchen', description: 'A narrow galley kitchen features open pine shelving, an apron sink, and a vintage-style stove. Mason jars hold flour, sugar, and other dry goods. The counters are worn butcher block.', boltedDown: true },
+        { prototype: 'table', name: 'a butcher block island', description: 'A heavy butcher block island on turned legs provides workspace in the center of the kitchen. The surface is scarred from years of chopping, its maple top darkened with use.', boltedDown: false },
+        { prototype: 'furniture', name: 'a daybed with burlap cushions', description: 'A wooden daybed frame holds cushions covered in natural burlap and linen. Throw pillows with grain sack stripes add comfort.', boltedDown: false },
+        { prototype: 'furniture', name: 'mason jar light fixtures', description: 'A trio of mason jar pendant lights hangs from the ceiling on twisted cloth cords. The glass is clouded with age but still catches light beautifully.', boltedDown: true },
       ],
       sittables: [
         {
-          name: 'the futon',
+          name: 'the daybed',
           capacity: 2,
           emptyMsg:
-            'The futon sits folded in couch position.',
-          occupiedMsg: '%s lounging on the futon.',
+            'The daybed sits against the wall, burlap cushions stacked invitingly.',
+          occupiedMsg: '%s lounging on the daybed.',
         },
         {
-          name: 'a desk chair',
+          name: 'a ladder-back chair',
           capacity: 1,
           emptyMsg:
-            'A rolling office chair sits at the desk, its vinyl cracked.',
-          occupiedMsg: '%s sitting at the desk.',
+            'A ladder-back chair with a woven seat sits at the butcher block island.',
+          occupiedMsg: '%s sitting at the island.',
         },
       ],
     },
@@ -193,7 +196,7 @@ export const building = {
     '%B1_z31': {
       name: 'Smith Tower - 31th Floor - East Suite - Loft',
       description:
-        'A lofted corner with sloped ceiling beams and a compact mezzanine. The high ceilings make the small footprint feel larger. A wooden ladder leads up to the sleeping loft.',
+        'A lofted corner with exposed beam ceilings and a compact mezzanine sleeping area. Weathered barn wood covers the loft railing, and a chicken wire cabinet displays vintage dishware. A wooden ladder leads to the sleeping loft above.',
       x: -10,
       y: 11,
       z: 31,
@@ -209,24 +212,24 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a loft ladder', description: 'A sturdy wooden ladder is bolted to the mezzanine edge, leading up to the sleeping loft. The rungs are worn smooth from use.', boltedDown: true },
-        { prototype: 'bed', name: 'a loft bed', description: 'A narrow mattress on a simple platform fills the mezzanine space. The ceiling is low enough to require ducking.', quality: 'cheap' },
-        { prototype: 'furniture', name: 'a sagging couch', description: 'An old couch sits beneath the mezzanine, its fabric worn smooth at the armrests. Springs creak ominously when sat upon.', boltedDown: false },
-        { prototype: 'table', name: 'a low bookshelf', description: 'A low bookshelf serves double duty as a side table. A few paperbacks and magazines remain, their covers faded.', boltedDown: false },
+        { prototype: 'furniture', name: 'a barn wood loft ladder', description: 'A sturdy ladder built from reclaimed barn wood leads up to the sleeping mezzanine. The rungs are worn smooth from countless climbs, the wood silvered with age.', boltedDown: true },
+        { prototype: 'bed', name: 'a straw tick mattress', description: 'A simple mattress on a wooden platform fills the mezzanine, covered with a patchwork quilt in faded calico prints. The bedding smells of dried grass.', quality: 'cheap' },
+        { prototype: 'furniture', name: 'a chicken wire cabinet', description: 'A tall cabinet with chicken wire doors displays vintage enamelware plates, chipped ironstone bowls, and an assortment of mason jars. The pine frame is painted in worn white.', boltedDown: true },
+        { prototype: 'furniture', name: 'a canvas drop cloth couch', description: 'An old wooden couch is draped in canvas drop cloth, its cushions lumpy but serviceable. Burlap pillows soften the rustic seating.', boltedDown: false },
       ],
       sittables: [
         {
-          name: 'the couch',
+          name: 'the drop cloth couch',
           capacity: 3,
           emptyMsg:
-            'The couch waits beneath the mezzanine, cushions sagging invitingly.',
-          occupiedMsg: '%s settled into the couch.',
+            'The canvas-covered couch waits beneath the mezzanine, inviting rest.',
+          occupiedMsg: '%s settled into the drop cloth couch.',
         },
         {
           name: 'the loft bed',
           capacity: 1,
           emptyMsg:
-            'The loft bed is visible above, accessible by ladder.',
+            'The loft bed is visible above through the chicken wire railing.',
           occupiedMsg: '%s up in the loft bed.',
         },
       ],
@@ -235,7 +238,7 @@ export const building = {
     '%C1_z31': {
       name: 'Smith Tower - 31th Floor - South Suite - Alcove',
       description:
-        'A snug unit tucked behind the shaft, with one frosted window. The space is barely larger than a closet, intimate or claustrophobic depending on your temperament.',
+        'A snug unit tucked behind the shaft, with one frosted window. Shiplap walls painted buttermilk yellow make the small space feel cheerful despite its size. A wrought iron coat rack stands by the entrance.',
       x: -13,
       y: 10,
       z: 31,
@@ -251,17 +254,18 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a military cot', description: 'A military-style cot is wedged into the corner, a wool blanket folded precisely at the foot. Spartan but functional.', quality: 'cheap' },
-        { prototype: 'furniture', name: 'wall hooks', description: 'A row of brass hooks is mounted on the wall, designed for hanging coats and bags. One still holds an empty wire hanger.', boltedDown: true },
-        { prototype: 'furniture', name: 'a small wall shelf', description: 'A narrow shelf is bolted above the cot, just wide enough for a few personal items. A dead flashlight and a cracked mug sit there now.', boltedDown: true },
+        { prototype: 'bed', name: 'a rope bed frame', description: 'An antique rope bed frame is wedged into the alcove, its hemp rope supports still taut. A thin tick mattress and homespun wool blanket provide simple comfort.', quality: 'cheap' },
+        { prototype: 'furniture', name: 'wrought iron wall hooks', description: 'A row of wrought iron hooks is mounted on the shiplap wall, designed for hanging coats and hats. A worn leather strap hangs from one.', boltedDown: true },
+        { prototype: 'furniture', name: 'a small pie safe', description: 'A narrow pie safe with punched tin panels stands against the wall, its interior dark. The tin panels show a star pattern, tarnished green with age.', boltedDown: false },
+        { prototype: 'furniture', name: 'a hooked rag rug', description: 'A hand-hooked rug in faded stripes covers the floor beside the bed, its fabric strips worn soft from years of feet.', boltedDown: false },
       ],
       sittables: [
         {
-          name: 'the cot',
+          name: 'the rope bed',
           capacity: 1,
           emptyMsg:
-            'The cot waits, blanket folded with military precision.',
-          occupiedMsg: '%s lying on the cot.',
+            'The rope bed waits in the alcove, wool blanket folded at the foot.',
+          occupiedMsg: '%s lying on the rope bed.',
         },
       ],
     },
@@ -269,7 +273,7 @@ export const building = {
     '%B2_z31': {
       name: 'Smith Tower - 31th Floor - East Suite - Living Room',
       description:
-        'A two-room suite with a west-facing door toward the elevator. This is clearly the main living space, larger than the other units on the floor.',
+        'A two-room suite with a west-facing door toward the elevator. This is clearly the main living space, dominated by a massive reclaimed wood coffee table and plank flooring. Galvanized metal accents catch the light throughout.',
       x: -11,
       y: 10,
       z: 31,
@@ -290,18 +294,18 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a sectional sofa', description: 'A large L-shaped sectional dominates the room, its cushions sunken from years of use. The fabric is a nondescript brown that hides stains well.', boltedDown: false },
-        { prototype: 'table', name: 'a glass coffee table', description: 'A glass-topped coffee table sits before the sectional, its metal frame tarnished. A few old magazines are fanned across its surface.', boltedDown: false },
-        { prototype: 'furniture', name: 'an entertainment center', description: 'A built-in entertainment center fills one wall, its shelves holding a dead television and a collection of dusty DVDs. The power light hasn\'t blinked in years.', boltedDown: true },
-        { prototype: 'furniture', name: 'a coat closet', description: 'A small coat closet is built into the wall near the entrance, its door slightly ajar. Wire hangers clink softly when the door moves.', boltedDown: true },
+        { prototype: 'furniture', name: 'a grain sack sectional', description: 'A large L-shaped sectional is upholstered in antique grain sack fabric, the faded blue stripes and stenciled markings adding character. The cushions are deep and comfortable.', boltedDown: false },
+        { prototype: 'table', name: 'a reclaimed barn door coffee table', description: 'A massive coffee table made from an old barn door sits before the sectional. The weathered red paint is mostly worn away, revealing gray wood beneath. Iron corner brackets reinforce the edges.', boltedDown: false },
+        { prototype: 'furniture', name: 'a galvanized metal entertainment shelf', description: 'Industrial galvanized metal shelving holds a dead television and stacks of old books. Galvanized buckets serve as decorative accents, holding dried cotton bolls and pine cones.', boltedDown: true },
+        { prototype: 'furniture', name: 'a barn door coat closet', description: 'A sliding barn door on iron track hardware conceals the coat closet near the entrance. The door is built from mismatched reclaimed planks, each weathered differently.', boltedDown: true },
       ],
       sittables: [
         {
-          name: 'the sectional',
+          name: 'the grain sack sectional',
           capacity: 4,
           emptyMsg:
-            'The sectional sprawls across the room, waiting to swallow anyone who sits.',
-          occupiedMsg: '%s sunk into the sectional.',
+            'The sectional sprawls across the room, grain sack fabric soft from years of use.',
+          occupiedMsg: '%s sunk into the grain sack sectional.',
         },
       ],
     },
@@ -309,7 +313,7 @@ export const building = {
     '%B3_z31': {
       name: 'Smith Tower - 31th Floor - East Suite - Den',
       description:
-        'A narrow end unit with a bay of small windows and built-ins. This was clearly a home office or study, the walls lined with shelving.',
+        'A narrow end unit with a bay of small windows and floor-to-ceiling shelving. This cozy study features whitewashed pine walls and furniture finished in milk paint, creating a light-filled country retreat.',
       x: -10,
       y: 10,
       z: 31,
@@ -325,32 +329,32 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'built-in bookshelves', description: 'Floor-to-ceiling bookshelves are built into the walls, still holding a modest collection of hardbacks—classics, reference books, a few dog-eared mysteries.', boltedDown: true },
-        { prototype: 'table', name: 'a writing desk', description: 'An antique writing desk sits in the window bay, its leather blotter cracked with age. A brass lamp with a green glass shade stands dark.', boltedDown: false },
-        { prototype: 'chair', name: 'a wingback reading chair', description: 'A deep wingback chair in burgundy leather sits angled toward the window. The upholstery is cracked but the cushion still has life.', boltedDown: false },
-        { prototype: 'furniture', name: 'a floor lamp', description: 'A tall floor lamp stands behind the chair, its shade yellowed. The bulb is dead.', boltedDown: false },
+        { prototype: 'furniture', name: 'whitewashed pine bookshelves', description: 'Floor-to-ceiling pine bookshelves whitewashed to a pale gray hold books, vintage jugs, and antique glass bottles. The shelves sag slightly under their burden.', boltedDown: true },
+        { prototype: 'table', name: 'a trestle desk', description: 'A simple trestle desk in honey-stained pine sits in the window bay. The surface is worn smooth, marked by ink stains and the impressions of countless handwritten pages.', boltedDown: false },
+        { prototype: 'chair', name: 'a Windsor armchair', description: 'A classic Windsor armchair in dark green milk paint sits at the desk. The spindles are worn where hands have gripped them, the seat scooped from generations of sitters.', boltedDown: false },
+        { prototype: 'furniture', name: 'an oil lamp', description: 'An antique oil lamp with a glass chimney sits on the desk, its brass base polished. A faint kerosene smell lingers.', boltedDown: false },
       ],
       sittables: [
         {
-          name: 'the wingback chair',
+          name: 'the Windsor armchair',
           capacity: 1,
           emptyMsg:
-            'The wingback chair waits by the window, inviting contemplation.',
-          occupiedMsg: '%s curled up in the reading chair.',
+            'The Windsor chair waits at the desk, its spindles casting shadows.',
+          occupiedMsg: '%s working at the trestle desk.',
         },
         {
-          name: 'the desk chair',
+          name: 'a cane-seat rocker',
           capacity: 1,
           emptyMsg:
-            'A wooden desk chair is pushed under the writing desk.',
-          occupiedMsg: '%s seated at the desk.',
+            'A cane-seat rocking chair sits by the window, ready for contemplation.',
+          occupiedMsg: '%s rocking gently by the window.',
         },
       ],
     },
 
     '%C2_z31': {
       name: 'Smith Tower - 31th Floor - South Suite - Living Room',
-      description: 'A corner unit with western exposure and aged carpeting. The afternoon sun has bleached everything near the windows to a uniform pale.',
+      description: 'A corner unit with western exposure and wide pine plank floors. The afternoon sun has faded the homespun curtains to a uniform cream, and shiplap walls painted sage green give the space a garden cottage feel.',
       x: -13,
       y: 9,
       z: 31,
@@ -366,18 +370,18 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a loveseat', description: 'A compact loveseat faces the window, its fabric faded to an indeterminate beige. The cushions are flat but clean.', boltedDown: false },
-        { prototype: 'table', name: 'a side table', description: 'A small side table holds a ceramic lamp with a beige shade. A water ring marks where a glass once sat.', boltedDown: false },
-        { prototype: 'furniture', name: 'a radiator cover', description: 'An old steam radiator is hidden behind a decorative metal cover. The metal is warm to the touch—the heating still works, somehow.', boltedDown: true },
-        { prototype: 'furniture', name: 'curtain rods', description: 'Brass curtain rods span the windows, holding sun-bleached curtains that were once a floral pattern.', boltedDown: true },
+        { prototype: 'furniture', name: 'a camelback settee', description: 'A small camelback settee in faded floral chintz sits against the sage green shiplap wall. The wooden legs are turned in a traditional style, the upholstery worn but clean.', boltedDown: false },
+        { prototype: 'table', name: 'a painted blanket chest', description: 'A blanket chest in chipped blue milk paint serves as a coffee table. The interior still holds a moth-eaten quilt and dried sachets of lavender.', boltedDown: false },
+        { prototype: 'furniture', name: 'a cast iron radiator cover', description: 'The old steam radiator is hidden behind a cover made from reclaimed barn wood slats. The metal beneath still throws warmth into the room.', boltedDown: true },
+        { prototype: 'furniture', name: 'homespun linen curtains', description: 'Simple homespun linen curtains hang from hand-forged iron rods. The fabric is sun-bleached to a creamy white, the weave loose and rustic.', boltedDown: true },
       ],
       sittables: [
         {
-          name: 'the loveseat',
+          name: 'the camelback settee',
           capacity: 2,
           emptyMsg:
-            'The loveseat faces the fading afternoon light.',
-          occupiedMsg: '%s squeezed onto the loveseat.',
+            'The settee faces the fading afternoon light, chintz faded but inviting.',
+          occupiedMsg: '%s perched on the settee.',
         },
       ],
     },
@@ -385,7 +389,7 @@ export const building = {
     '%C3_z31': {
       name: 'Smith Tower - 31th Floor - South Suite - Foyer',
       description:
-        'The single entrance to the C block, with a stout fire door to the elevator. A small entryway opens into the rest of the unit.',
+        'The single entrance to the C block, with a stout fire door to the elevator. A mudroom-style entryway features peg rails and a deacon\'s bench, all in weathered farmhouse style.',
       x: -12,
       y: 9,
       z: 31,
@@ -405,18 +409,18 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a checkered couch', description: 'A couch with a faded checkered pattern sits against the wall, its cushions worn but structurally sound.', boltedDown: false },
-        { prototype: 'furniture', name: 'an entry closet', description: 'A small closet is built into the wall beside the door, its interior dark. A few empty hangers dangle inside.', boltedDown: true },
-        { prototype: 'furniture', name: 'a mail slot', description: 'An old brass mail slot is set into the door, tarnished with age. Letters haven\'t come this way in decades.', boltedDown: true },
-        { prototype: 'table', name: 'a console table', description: 'A narrow console table holds a ceramic bowl for keys and a dead phone charging dock.', boltedDown: false },
+        { prototype: 'furniture', name: 'a shaker peg rail', description: 'A Shaker-style peg rail runs along the entry wall, the wooden pegs spaced evenly. A few hang empty, one holds a dusty straw hat.', boltedDown: true },
+        { prototype: 'furniture', name: 'an entry bench storage', description: 'A built-in bench with cubbies beneath provides storage for shoes and baskets. The pine seat is worn smooth, the cubbies holding forgotten items.', boltedDown: true },
+        { prototype: 'furniture', name: 'a braided rag rug', description: 'A large braided rug in muted earth tones covers the entryway floor, its fabric strips worn soft from years of traffic.', boltedDown: false },
+        { prototype: 'table', name: 'a washstand console', description: 'An antique washstand serves as an entry console, its marble top holding a ceramic basin and pitcher for decoration. The towel bar still holds a faded linen hand towel.', boltedDown: false },
       ],
       sittables: [
         {
-          name: 'the couch',
+          name: 'the deacon\'s bench',
           capacity: 3,
           emptyMsg:
-            'The checkered couch offers a place to remove shoes before entering.',
-          occupiedMsg: '%s relaxing on the checkered couch.',
+            'A long deacon\'s bench with high back sits against the wall, offering a place to rest while removing boots.',
+          occupiedMsg: '%s resting on the deacon\'s bench.',
         },
       ],
     },
@@ -424,7 +428,7 @@ export const building = {
     '%C4_z31': {
       name: 'Smith Tower - 31th Floor - South Suite - Bedroom',
       description:
-        'A deep plan with a recessed alcove and polished concrete floors. The industrial aesthetic is softened by remnants of personal touches.',
+        'A deep plan with a recessed alcove and worn pine plank floors. The farmhouse aesthetic creates warmth despite the industrial bones, with a wrought iron bed filling the alcove behind gathered cotton curtains.',
       x: -11,
       y: 9,
       z: 31,
@@ -440,17 +444,17 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'an alcove bed', description: 'A bed fills the recessed alcove, half-hidden by a moth-eaten curtain on a tension rod. The mattress is lumpy but dry.', quality: 'standard' },
-        { prototype: 'furniture', name: 'a clothing rack', description: 'A freestanding metal clothing rack serves as an open closet, a few hangers still holding faded garments.', boltedDown: false },
-        { prototype: 'furniture', name: 'a wall mirror', description: 'A full-length mirror is mounted on the wall, its frame simple metal. The glass is spotted with age but still functional.', boltedDown: true },
-        { prototype: 'table', name: 'a nightstand', description: 'A simple nightstand holds a dead alarm clock frozen at 3:47 and a paperback splayed open to a long-forgotten page.', boltedDown: false },
+        { prototype: 'bed', name: 'a wrought iron alcove bed', description: 'A wrought iron bed fills the recessed alcove, hidden behind gathered cotton curtains on an iron tension rod. A log cabin quilt in faded reds and blues covers the mattress.', quality: 'standard' },
+        { prototype: 'furniture', name: 'a ladder-back clothes valet', description: 'A wooden ladder repurposed as a clothes valet leans against the wall, its rungs holding a faded flannel shirt and a leather belt.', boltedDown: false },
+        { prototype: 'furniture', name: 'a farmhouse wall mirror', description: 'A large mirror in a whitewashed frame is mounted on the wall. The glass is foxed with age but still serviceable, the frame showing wear at the corners.', boltedDown: true },
+        { prototype: 'table', name: 'a spool table nightstand', description: 'A small table made from an old thread spool serves as a nightstand, its wooden top holding a chamber stick candleholder and a tattered paperback.', boltedDown: false },
       ],
       sittables: [
         {
           name: 'the alcove bed',
           capacity: 2,
           emptyMsg:
-            'The bed waits in its alcove, curtain half-drawn.',
+            'The iron bed waits in its alcove, curtains half-drawn to reveal the log cabin quilt.',
           occupiedMsg: '%s tucked away in the alcove bed.',
         },
       ],
@@ -459,7 +463,7 @@ export const building = {
     '%B4_z31': {
       name: 'Smith Tower - 31th Floor - East Suite - Bedroom',
       description:
-        'A compact end-cap with a single long window and built-in shelving. Every inch is utilized, the room a study in efficient living.',
+        'A compact end-cap with a single long window and built-in storage. Every inch is utilized in farmhouse fashion, with a fold-down sewing table and a Murphy bed that disappears into whitewashed bead board paneling.',
       x: -10,
       y: 9,
       z: 31,
@@ -475,18 +479,18 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a Murphy bed', description: 'A Murphy bed folds down from the wall cabinet, its mechanism still functional despite years of neglect. The mattress is thin but intact.', quality: 'standard' },
-        { prototype: 'furniture', name: 'a Murphy bed cabinet', description: 'The Murphy bed folds into a tall wooden cabinet when not in use. The cabinet doors are scuffed from decades of opening and closing.', boltedDown: true },
-        { prototype: 'furniture', name: 'built-in shelving', description: 'Shelving is built into the walls around the window, holding a mix of books, decorative items, and dust.', boltedDown: true },
-        { prototype: 'table', name: 'a fold-down desk', description: 'A fold-down desk is hinged to the wall, its surface scarred with old scratches. When folded up, it disappears into the wall.', boltedDown: true },
-        { prototype: 'furniture', name: 'a narrow dresser', description: 'A narrow dresser is wedged into the corner, its drawers sticking slightly when pulled.', boltedDown: false },
+        { prototype: 'bed', name: 'a bead board Murphy bed', description: 'A Murphy bed folds down from whitewashed bead board paneling, its mechanism hidden behind a facade of vintage window frames. The mattress is thin but covered with a lovely Dresden plate quilt.', quality: 'standard' },
+        { prototype: 'furniture', name: 'a bead board Murphy cabinet', description: 'The Murphy bed folds into a tall cabinet faced with whitewashed bead board and vintage six-pane window sashes. When closed, it looks like a charming wall feature.', boltedDown: true },
+        { prototype: 'furniture', name: 'open pine shelving', description: 'Rough-sawn pine shelving is built into the walls around the window, holding woven baskets, vintage tins, and a collection of blue Ball mason jars.', boltedDown: true },
+        { prototype: 'table', name: 'a fold-down sewing table', description: 'A fold-down table hinged to the wall reveals a scarred pine surface, originally used for sewing. A pincushion shaped like a tomato still sits in one corner.', boltedDown: true },
+        { prototype: 'furniture', name: 'a painted blanket box', description: 'A narrow blanket box painted in mustard yellow milk paint is wedged into the corner, its interior cedar-scented and holding moth-eaten woolens.', boltedDown: false },
       ],
       sittables: [
         {
           name: 'the Murphy bed',
           capacity: 2,
           emptyMsg:
-            'The Murphy bed is folded down, its mattress exposed.',
+            'The Murphy bed is folded down, its Dresden plate quilt smoothed and waiting.',
           occupiedMsg: '%s stretched out on the Murphy bed.',
         },
       ],
