@@ -18,8 +18,10 @@ Scratched into the southwest corner is a symbol: a scale balanced over crossed k
   outdoor: false,
   exits: {
     down: {
-      locked: true,
-      description: 'A reinforced hatch is set into the floor. A combination padlock dangles from its hasp.',
+      prototype: 'guardedExit',
+      allowedFaction: 'gray-cartel',
+      denyMessage: 'A combination padlock dangles from its hasp. You lack the combination.',
+      description: 'A reinforced hatch is set into the floor.',
     },
   },
 };

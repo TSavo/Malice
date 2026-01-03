@@ -18,8 +18,10 @@ The park above is empty now, its dead trees and silent fountain a memorial to th
   outdoor: false,
   exits: {
     down: {
-      locked: true,
-      description: 'A concealed trapdoor blends with the brick floor. A padlock secures its iron ring.',
+      prototype: 'guardedExit',
+      allowedFaction: 'gray-cartel',
+      denyMessage: 'A padlock secures the iron ring. You lack the combination.',
+      description: 'A concealed trapdoor blends with the brick floor.',
     },
   },
 };
