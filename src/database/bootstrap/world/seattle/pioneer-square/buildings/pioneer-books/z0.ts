@@ -97,7 +97,7 @@ Bookshelves line the walls here too, but these hold the prestige inventory: art 
 
 A coffee table holds scattered magazines—literary journals, The New Yorker, publications for readers who took reading seriously. The dates on the covers are months old. The articles inside discuss a world that no longer exists.`,
       x: -14,
-      y: 13,
+      y: 11,
       z: 0,
       population: 0,
       ambientNoise: 2,
@@ -158,7 +158,7 @@ A coffee table holds scattered magazines—literary journals, The New Yorker, pu
 A rolling ladder provides access to the highest shelves, its wheels set in brass tracks that run the length of each section. The ladder hasn't rolled in months. The highest shelves hold books that required effort to reach—Heidegger, Wittgenstein, the philosophers who demanded something from their readers.
 
 A small desk in the corner was the staff's workspace—inventory lists, special orders, the paperwork of running a bookstore. A computer sits dark on the desk, its screen dusty. The last inventory was never finished.`,
-      x: -13,
+      x: -15,
       y: 12,
       z: 0,
       population: 0,
