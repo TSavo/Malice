@@ -30,13 +30,21 @@ import type { ObjectManager } from '../database/object-manager.js';
 interface MCPServerConfig {
   port?: number;
   host?: string;
+  sessionTtlMinutes?: number; // Default: 30
+  cleanupIntervalMinutes?: number; // Default: 5
 }
 
 interface SessionState {
   server: McpServer;
   transport: StreamableHTTPServerTransport;
   playerId?: ObjId; // Authenticated player ID (undefined = unauthenticated)
+  lastActivity: number; // Timestamp of last activity (Date.now())
 }
+
+// Time constants
+const MS_PER_MINUTE = 60_000;
+const DEFAULT_SESSION_TTL_MINUTES = 30;
+const DEFAULT_CLEANUP_INTERVAL_MINUTES = 5;
 
 /**
  * Code-First MCP Server
@@ -45,8 +53,12 @@ interface SessionState {
 export class MaliceMCPServer {
   private httpServer: ReturnType<typeof createServer> | null = null;
   private sessions = new Map<string, SessionState>();
+  private cleanupInterval: ReturnType<typeof setInterval> | null = null;
+  private isShuttingDown = false;
   private port: number;
   private host: string;
+  private sessionTtlMs: number;
+  private cleanupIntervalMs: number;
 
   constructor(
     private manager: ObjectManager,
@@ -54,6 +66,91 @@ export class MaliceMCPServer {
   ) {
     this.port = config.port ?? 3010;
     this.host = config.host ?? '127.0.0.1';
+    this.sessionTtlMs =
+      (config.sessionTtlMinutes ?? DEFAULT_SESSION_TTL_MINUTES) * MS_PER_MINUTE;
+    this.cleanupIntervalMs =
+      (config.cleanupIntervalMinutes ?? DEFAULT_CLEANUP_INTERVAL_MINUTES) *
+      MS_PER_MINUTE;
+  }
+
+  /**
+   * Clean up stale sessions that haven't had activity within sessionTtlMs
+   */
+  private cleanupStaleSessions(): void {
+    // Skip cleanup during shutdown - stop() handles session closure
+    if (this.isShuttingDown) {
+      return;
+    }
+    const now = Date.now();
+    // Collect stale sessions to avoid modifying Map while iterating
+    const staleSessions: Array<{ id: string; session: SessionState }> = [];
+    for (const [sessionId, session] of this.sessions) {
+      if (now - session.lastActivity > this.sessionTtlMs) {
+        staleSessions.push({ id: sessionId, session });
+      }
+    }
+    // Now safely close and delete stale sessions
+    for (const { id, session } of staleSessions) {
+      try {
+        session.transport.close();
+      } catch (err) {
+        console.error(`[MCP] Error closing session ${id}:`, err);
+      }
+      this.sessions.delete(id);
+    }
+    if (staleSessions.length > 0) {
+      console.log(`[MCP] Cleaned up ${staleSessions.length} stale session(s)`);
+    }
+  }
+
+  /**
+   * Handle health check requests
+   */
+  private handleHealthCheck(req: IncomingMessage, res: ServerResponse): void {
+    if (req.method !== 'GET') {
+      res.writeHead(405);
+      res.end('Method Not Allowed');
+      return;
+    }
+    try {
+      // Return 503 during shutdown
+      if (this.isShuttingDown) {
+        res.writeHead(503, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          status: 'shutting_down',
+          service: 'mcp-codefirst',
+          timestamp: new Date().toISOString(),
+        }));
+        return;
+      }
+      const now = Date.now();
+      const activeSessions = Array.from(this.sessions.values()).filter(
+        (s) => now - s.lastActivity <= this.sessionTtlMs
+      ).length;
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        status: 'ok',
+        service: 'mcp-codefirst',
+        sessions: {
+          total: this.sessions.size,
+          active: activeSessions,
+        },
+        sessionTtlMinutes: this.sessionTtlMs / MS_PER_MINUTE,
+        timestamp: new Date().toISOString(),
+      }));
+    } catch (err) {
+      try {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          status: 'error',
+          service: 'mcp-codefirst',
+          error: err instanceof Error ? err.message : 'Unknown error',
+          timestamp: new Date().toISOString(),
+        }));
+      } catch (innerErr) {
+        console.error('[MCP] Failed to send error response:', innerErr);
+      }
+    }
   }
 
   /**
@@ -2138,6 +2235,12 @@ Core Objects:
           return;
         }
 
+        // Health check endpoint (GET only)
+        if (req.url === '/health') {
+          this.handleHealthCheck(req, res);
+          return;
+        }
+
         if (req.url !== '/mcp') {
           res.writeHead(404);
           res.end('Not Found');
@@ -2169,6 +2272,13 @@ Core Objects:
       console.log(
         `🔮 MCP server (code-first) listening on http://${this.host}:${this.port}/mcp`,
       );
+      // Run initial cleanup in case any stale sessions exist
+      this.cleanupStaleSessions();
+      // Start periodic cleanup of stale sessions after server is listening
+      this.cleanupInterval = setInterval(
+        () => this.cleanupStaleSessions(),
+        this.cleanupIntervalMs,
+      );
     });
   }
 
@@ -2182,8 +2292,22 @@ Core Objects:
 
     if (sessionId && this.sessions.has(sessionId)) {
       const session = this.sessions.get(sessionId)!;
+      session.lastActivity = Date.now(); // Update activity timestamp
       await session.transport.handleRequest(req, res, message);
     } else if (message.method === 'initialize') {
+      // Reject new sessions during shutdown
+      if (this.isShuttingDown) {
+        res.writeHead(503, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          jsonrpc: '2.0',
+          id: message.id || null,
+          error: {
+            code: -32000,
+            message: 'Server is shutting down',
+          },
+        }));
+        return;
+      }
       // Authenticate user via HTTP Basic Auth
       const authHeader = req.headers.authorization;
       const playerId = await this.authenticate(authHeader);
@@ -2192,7 +2316,7 @@ Core Objects:
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: () => crypto.randomUUID(),
         onsessioninitialized: (newSessionId) => {
-          this.sessions.set(newSessionId, { server, transport, playerId });
+          this.sessions.set(newSessionId, { server, transport, playerId, lastActivity: Date.now() });
           if (playerId) {
             console.log(
               `[MCP] Authenticated session ${newSessionId} as player #${playerId}`,
@@ -2207,6 +2331,20 @@ Core Objects:
       await server.connect(transport);
       await transport.handleRequest(req, res, message);
     } else if (sessionId && !this.sessions.has(sessionId)) {
+      // Reject stale session recreation during shutdown
+      if (this.isShuttingDown) {
+        res.writeHead(503, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          jsonrpc: '2.0',
+          id: message.id || null,
+          error: {
+            code: -32000,
+            message: 'Server is shutting down',
+          },
+        }));
+        return;
+      }
+
       // Stale session - recreate with authentication
       console.log(`[MCP] Recreating stale session ${sessionId}`);
 
@@ -2218,7 +2356,7 @@ Core Objects:
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: () => sessionId,
         onsessioninitialized: (newSessionId) => {
-          this.sessions.set(newSessionId, { server, transport, playerId });
+          this.sessions.set(newSessionId, { server, transport, playerId, lastActivity: Date.now() });
         },
       });
       await server.connect(transport);
@@ -2276,17 +2414,19 @@ Core Objects:
       return;
     }
     const session = this.sessions.get(sessionId)!;
+    session.lastActivity = Date.now(); // Update activity timestamp
     await session.transport.handleRequest(req, res);
   }
 
   private handleDelete(res: ServerResponse, sessionId?: string): void {
-    if (sessionId) {
-      const session = this.sessions.get(sessionId);
-      if (session) {
-        session.transport.close();
-        this.sessions.delete(sessionId);
-      }
+    if (!sessionId || !this.sessions.has(sessionId)) {
+      res.writeHead(404);
+      res.end('Session not found');
+      return;
     }
+    const session = this.sessions.get(sessionId)!;
+    session.transport.close();
+    this.sessions.delete(sessionId);
     res.writeHead(204);
     res.end();
   }
@@ -2301,13 +2441,37 @@ Core Objects:
   }
 
   async stop(): Promise<void> {
-    for (const [id, session] of this.sessions) {
-      session.transport.close();
+    // Prevent concurrent shutdown calls
+    if (this.isShuttingDown) {
+      return;
+    }
+    this.isShuttingDown = true;
+
+    // Stop cleanup interval
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = null;
+    }
+
+    // Close all sessions - collect IDs first to avoid modifying Map during iteration
+    const sessionIds = Array.from(this.sessions.keys());
+    for (const id of sessionIds) {
+      const session = this.sessions.get(id);
+      if (session) {
+        try {
+          session.transport.close();
+        } catch (err) {
+          console.error(`[MCP] Error closing session ${id} during shutdown:`, err);
+        }
+      }
       this.sessions.delete(id);
     }
+
+    // Close HTTP server
     if (this.httpServer) {
+      const server = this.httpServer;
       await new Promise<void>((resolve, reject) => {
-        this.httpServer?.close((err) => (err ? reject(err) : resolve()));
+        server.close((err) => (err ? reject(err) : resolve()));
       });
       this.httpServer = null;
     }
