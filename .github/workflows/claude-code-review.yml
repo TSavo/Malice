@@ -3,16 +3,23 @@ name: Claude Code Review
 on:
   pull_request:
     types: [opened, synchronize]
+  # Allow fixer to re-trigger review after pushing fixes
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to review'
+        required: true
+        type: string
 
 # Prevent multiple review cycles from running simultaneously
 concurrency:
-  group: claude-review-${{ github.event.pull_request.number }}
+  group: claude-review-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
   cancel-in-progress: false
 
 jobs:
   claude-review:
-    # Skip if PR title indicates it was already fixed
-    if: "!contains(github.event.pull_request.title, '[claude-fixed]')"
+    # Skip if PR title indicates it was already fixed (only for pull_request events)
+    if: github.event_name == 'workflow_dispatch' || !contains(github.event.pull_request.title, '[claude-fixed]')
 
     runs-on: ubuntu-latest
     permissions:
@@ -23,11 +30,32 @@ jobs:
       actions: read
 
     steps:
+      - name: Get PR details for workflow_dispatch
+        id: pr-info
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_DATA=$(gh pr view ${{ github.event.inputs.pr_number }} --repo ${{ github.repository }} --json headRefName)
+          echo "branch=$(echo $PR_DATA | jq -r '.headRefName')" >> $GITHUB_OUTPUT
+          echo "pr_number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
+
+      - name: Set PR number
+        id: pr-number
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
+            echo "branch=${{ steps.pr-info.outputs.branch }}" >> $GITHUB_OUTPUT
+          else
+            echo "number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+            echo "branch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.ref }}
+          ref: ${{ steps.pr-number.outputs.branch }}
 
       - name: Check iteration count
         id: check-iterations
@@ -35,7 +63,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Count how many Claude review cycles have happened
-          REVIEW_COUNT=$(gh pr view ${{ github.event.pull_request.number }} --json comments \
+          REVIEW_COUNT=$(gh pr view ${{ steps.pr-number.outputs.number }} --json comments \
             --jq '[.comments[] | select(.body | contains("<!-- CLAUDE_REVIEW_MARKER -->"))] | length')
           echo "review_count=$REVIEW_COUNT" >> $GITHUB_OUTPUT
 
@@ -57,7 +85,7 @@ jobs:
             actions: read
           prompt: |
             REPO: ${{ github.repository }}
-            PR NUMBER: ${{ github.event.pull_request.number }}
+            PR NUMBER: ${{ steps.pr-number.outputs.number }}
             REVIEW ITERATION: ${{ steps.check-iterations.outputs.review_count }}
 
             You are the REVIEWER agent in a two-agent feedback loop. Your job is to review code and provide actionable feedback.
@@ -86,7 +114,7 @@ jobs:
             - If this is iteration 2+, focus only on NEW issues (previous ones should be fixed)
             - The fixer agent will read your comment and implement changes automatically
 
-            Use `gh pr comment ${{ github.event.pull_request.number }} --body "YOUR_REVIEW"` to post.
+            Use `gh pr comment ${{ steps.pr-number.outputs.number }} --body "YOUR_REVIEW"` to post.
 
           claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'
 
