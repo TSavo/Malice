@@ -2,6 +2,15 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Git Workflow
+
+**All changes must go through pull requests.** Do not commit directly to master.
+
+1. Create a feature branch: `git checkout -b feature/description`
+2. Make your changes and commit
+3. Push and create a PR: `gh pr create`
+4. Merge after review
+
 ## Project Overview
 
 Malice is a modern TypeScript-based Text MOO (Multi-User Object-Oriented) game engine inspired by LambdaMOO. It uses MongoDB for persistence, RxJS for reactive patterns, and TypeScript for both server code and in-database method execution.
