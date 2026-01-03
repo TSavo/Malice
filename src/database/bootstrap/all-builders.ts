@@ -384,6 +384,9 @@ import './continuum-domain-builder';
 import './cartel-domain-builder';
 import './neurallog-domain-builder';
 
+// Blog (depends on metaDomain, webPage, webRoute)
+import './blog-builder';
+
 // Faction-specific chargen
 import './cartel-chargen-builder';
 import './neural-log-chargen-builder';
