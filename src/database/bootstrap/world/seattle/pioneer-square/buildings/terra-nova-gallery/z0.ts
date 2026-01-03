@@ -7,7 +7,7 @@ export const building = {
   y: -5,
   width: 2,
   height: 2,
-  floors: 1,
+  floors: 2,
 
   rooms: {
     // ═══════════════════════════════════════════════════════════════════
@@ -121,6 +121,8 @@ A narrow hallway leads south to what appears to be office space. A storage close
 
 A corkboard on the wall displays a constellation of business cards, exhibition announcements, and artist headshots. Some faces are crossed out with red marker, some circled. The criteria for each designation is unclear, but it feels significant somehow—a taxonomy of the art world, preserved in pushpins and paper.
 
+A ladder in the corner leads up through a hatch to the roof—the kind of minimalist access that matches the gallery's aesthetic, painted white to blend with the walls.
+
 A small safe sits in the corner, its door hanging open, its contents long since removed. Whatever valuables the gallery kept—petty cash, small pieces, important documents—are gone now. The safe remains, a monument to security that no longer matters.`,
       x: -16,
       y: -6,
@@ -133,6 +135,7 @@ A small safe sits in the corner, its door hanging open, its contents long since 
       exits: {
         north: '%BACK',
         east: '%MAIN',
+        up: { room: '%ROOF_SW', locks: ['%ROOF_HATCH_LOCK'] },
       },
       objects: [
         {
