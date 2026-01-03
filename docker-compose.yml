@@ -48,7 +48,7 @@ services:
       - FORCE_BOOTSTRAP=${FORCE_BOOTSTRAP:-false}
       - EMAIL_API_KEY=${EMAIL_API_KEY:-}
     volumes:
-      - claude_sessions:/home/node/.claude
+      - claude_sessions:/home/bun/.claude
     depends_on:
       mongodb:
         condition: service_healthy
