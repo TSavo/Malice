@@ -213,36 +213,73 @@ Rooms without special names use one of these types based on conditions:
 
 ---
 
-## Level z=-3: Transitional Shafts (Buffer Zone)
+## Level z=-3: Transitional Layer (Buffer Zone with Horizontal Network)
 
-Vertical connections only. Narrow shafts, steep stairs. No horizontal passages.
-Creates defensive depth between public tunnels (z=-2) and secured territory.
+Originally just vertical shafts, now expanded into a full horizontal network creating true 3D depth.
+This layer connects the public tunnels (z=-2) to secured territory (z=-4) while providing:
+- Defensive depth and chokepoints
+- Old infrastructure access (cisterns, storm drains, utility passages)
+- Water table boundary zones (increasing flooding toward south)
 
 ```
-        x=-14         x=-3
-           │            │
-      ┌────┴────────────┴────┐
-      │                      │
-y=+5  │    ●  JUNCTION       │
-      │    │  SHAFT          │
-      │    ↓                 │
-      │                      │
-y=+2  │                 ●  PARK SHAFT
-      │                 ↓
-      │                      │
-y=-5  │    ●  SUPPLY         │
-      │    │  SHAFT          │
-      │    ↓                 │
-      └──────────────────────┘
+    x=-14 -13 -12 -11 -10  -9  -8  -7  -6  -5  -4  -3  -2  -1   0
+       │   │   │   │   │   │   │   │   │   │   │   │   │   │   │
+  ┌────┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴────┐
+  │                                                                  │
+y=+4  │    ●  JUNCTION SHAFT                                        │
+  │    │                                                            │
+y=+3  │    │                                                        │
+y=+2  │    │                                                   ●  PARK
+  │    │   ●───●───●───●───●───●───●───●   CISTERN BRANCH      │  SHAFT
+  │    │                         THE OLD                        │
+y=+1  │    │                     CISTERN                        │
+  │    │                                                         │
+y=0   │    ●───────────────────────●───●───●───●  THE DEEP      │
+  │    │                              CROSSING  STORM DRAINS    │
+y=-1  │    │                                                     │
+y=-2  │    │                                                     │
+y=-3  │    │                                                     │
+y=-4  │    ●───────────────────────●  SUPPLY SHAFT               │
+  │    │                              (connects to horizontal)   │
+y=-5  │    │  SUPPLY SHAFT                                       │
+y=-6  │    │  (vert only)             ●  FLOODED                 │
+y=-7  │    │                          │                          │
+y=-8  │    ↓                          ●  DROWNED TERMINUS        │
+  │    (to z=-4)                 (fully submerged)               │
+  └──────────────────────────────────────────────────────────────┘
 ```
 
-| Name | Coordinates | Connects |
-|------|-------------|----------|
-| Junction Shaft | (-14, +5, -3) | up: The Junction, down: Lower Junction |
-| Supply Shaft | (-14, -5, -3) | up: Supply Junction, down: Supply Hub |
-| Park Shaft | (-3, +2, -3) | up: Park Access, down: Runner's Den |
+### Named Locations (z=-3)
 
-**Total z=-3 rooms: 3**
+| Name | Coordinates | Description |
+|------|-------------|-------------|
+| Junction Shaft | (-14, +5, -3) | Vertical: up to The Junction (z=-2), down to Lower Junction (z=-4) |
+| Supply Shaft | (-14, -5, -3) | Vertical: up to Supply Junction (z=-2), down to Supply Hub (z=-4) |
+| Park Shaft | (-3, +2, -3) | Vertical: up to Park Access (z=-2), down to Runner's Den (z=-4) |
+| The Deep Crossing | (-14, 0, -3) | Major 4-way junction with ancient carved stone marker |
+| The Old Cistern | (-7, +2, -3) | Vast underground reservoir with domed brick ceiling |
+| Drowned Terminus | (-14, -8, -3) | Fully submerged dead end where aquifer breached tunnels |
+
+### Corridor Definitions (z=-3)
+
+| Corridor | Direction | Start | End | Room Count | Notes |
+|----------|-----------|-------|-----|------------|-------|
+| Main Spine | N-S | (-14, +4) | (-14, -8) | 13 | Vertical connections at y=+5, y=-5 |
+| Cistern Branch | E-W | (-13, +2) | (-4, +2) | 10 | Old utility passage to cistern |
+| Storm Drain Network | E-W | (-3, 0) | (-1, 0) | 3 | Beneath 2nd Ave, ends at Corp wall |
+| Flooded Southern Depths | N-S | (-14, -6) | (-14, -8) | 3 | Increasing submersion toward sinkhole |
+
+### Water Level Zones
+
+| Zone | Coordinates | Water Level | Navigability |
+|------|-------------|-------------|--------------|
+| Dry Tunnels | Most of network | 0-1 | Normal passage |
+| Wet Sections | y=-2 to y=-4 on spine | 2-4 | Ankle to waist deep |
+| Flooded Zone | y=-6 | 5 | Wading required |
+| Submerged Zone | y=-7 | 7 | Chest deep, dangerous |
+| Drowned | y=-8 | 10 | Fully submerged, impassable |
+
+**Total z=-3 rooms: 29** (3 shafts + 26 horizontal network rooms)
 
 ---
 
