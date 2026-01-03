@@ -54,7 +54,7 @@ A checkout counter near the entrance holds a cash register, a stack of bookmarks
       outdoor: false,
       exits: {
         east: {
-          to: 'yesler-way/x-13.ts',
+          to: 'yesler-way/x-14.ts',
           description: 'The glass door leads back to Yesler Way',
           door: '%FRONT_DOOR',
         },
@@ -97,7 +97,7 @@ Bookshelves line the walls here too, but these hold the prestige inventory: art 
 
 A coffee table holds scattered magazines—literary journals, The New Yorker, publications for readers who took reading seriously. The dates on the covers are months old. The articles inside discuss a world that no longer exists.`,
       x: -14,
-      y: 11,
+      y: 13,
       z: 0,
       population: 0,
       ambientNoise: 2,
