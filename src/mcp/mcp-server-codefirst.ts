@@ -77,6 +77,10 @@ export class MaliceMCPServer {
    * Clean up stale sessions that haven't had activity within sessionTtlMs
    */
   private cleanupStaleSessions(): void {
+    // Skip cleanup during shutdown - stop() handles session closure
+    if (this.isShuttingDown) {
+      return;
+    }
     const now = Date.now();
     // Collect stale sessions to avoid modifying Map while iterating
     const staleSessions: Array<{ id: string; session: SessionState }> = [];

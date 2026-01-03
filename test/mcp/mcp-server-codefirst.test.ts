@@ -210,4 +210,216 @@ describe('MaliceMCPServer', () => {
       expect(text).toContain('Not Found');
     });
   });
+
+  describe('Health Endpoint During Shutdown', () => {
+    it('should return 503 during shutdown', async () => {
+      server = new MaliceMCPServer(manager, { port: testPort, host: '127.0.0.1' });
+      await server.start();
+      await waitForServer(`http://127.0.0.1:${testPort}/health`);
+
+      // Initiate shutdown (don't await to allow health check during shutdown)
+      const shutdownPromise = server.stop();
+
+      // Give it a moment to set isShuttingDown flag
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Health check should return 503
+      const response = await fetch(`http://127.0.0.1:${testPort}/health`);
+      expect(response.status).toBe(503);
+
+      const data = await response.json();
+      expect(data).toMatchObject({
+        status: 'shutting_down',
+        service: 'mcp-codefirst',
+        timestamp: expect.any(String),
+      });
+
+      await shutdownPromise;
+    });
+
+    it('should handle errors and return 500', async () => {
+      server = new MaliceMCPServer(manager, { port: testPort, host: '127.0.0.1' });
+      await server.start();
+      await waitForServer(`http://127.0.0.1:${testPort}/health`);
+
+      // Mock the sessions Map to throw an error
+      Object.defineProperty(server, 'sessions', {
+        get: () => {
+          throw new Error('Test error');
+        },
+      });
+
+      const response = await fetch(`http://127.0.0.1:${testPort}/health`);
+      expect(response.status).toBe(500);
+
+      const data = await response.json();
+      expect(data).toMatchObject({
+        status: 'error',
+        service: 'mcp-codefirst',
+        error: expect.any(String),
+        timestamp: expect.any(String),
+      });
+    });
+  });
+
+  describe('Session Cleanup', () => {
+    it('should remove sessions after TTL expires', async () => {
+      // Use very short TTL for testing
+      server = new MaliceMCPServer(manager, {
+        port: testPort,
+        host: '127.0.0.1',
+        sessionTtlMinutes: 0.05, // 3 seconds
+        cleanupIntervalMinutes: 0.02, // 1.2 seconds
+      });
+      await server.start();
+      await waitForServer(`http://127.0.0.1:${testPort}/health`);
+
+      // Create a mock session directly (simpler than full MCP init)
+      const sessionId = 'test-session-123';
+      const mockSession = {
+        server: {} as any,
+        transport: { close: vi.fn() } as any,
+        lastActivity: Date.now() - 4000, // 4 seconds ago (past 3s TTL)
+      };
+      (server as any).sessions.set(sessionId, mockSession);
+
+      // Wait for cleanup interval to run
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Session should be cleaned up
+      const sessions = (server as any).sessions;
+      expect(sessions.has(sessionId)).toBe(false);
+      expect(mockSession.transport.close).toHaveBeenCalled();
+    }, 10000);
+  });
+
+  describe('Shutdown Session Prevention', () => {
+    it('should prevent new session initialization during shutdown', async () => {
+      server = new MaliceMCPServer(manager, { port: testPort, host: '127.0.0.1' });
+      await server.start();
+      await waitForServer(`http://127.0.0.1:${testPort}/health`);
+
+      // Set isShuttingDown flag
+      (server as any).isShuttingDown = true;
+
+      // Try to initialize a new session during shutdown
+      const response = await fetch(`http://127.0.0.1:${testPort}/mcp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {
+            protocolVersion: '2024-11-05',
+            capabilities: {},
+            clientInfo: { name: 'test-client', version: '1.0.0' },
+          },
+        }),
+      });
+
+      expect(response.status).toBe(503);
+      const data = await response.json();
+      expect(data.error).toMatchObject({
+        code: -32000,
+        message: 'Server is shutting down',
+      });
+    });
+
+    it('should prevent stale session recreation during shutdown', async () => {
+      server = new MaliceMCPServer(manager, { port: testPort, host: '127.0.0.1' });
+      await server.start();
+      await waitForServer(`http://127.0.0.1:${testPort}/health`);
+
+      // Set isShuttingDown flag
+      (server as any).isShuttingDown = true;
+
+      // Try to use a stale session ID during shutdown
+      const response = await fetch(`http://127.0.0.1:${testPort}/mcp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'mcp-session-id': 'stale-session-id',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'tools/list',
+        }),
+      });
+
+      expect(response.status).toBe(503);
+      const data = await response.json();
+      expect(data.error).toMatchObject({
+        code: -32000,
+        message: 'Server is shutting down',
+      });
+    });
+  });
+
+  describe('Session Activity Tracking', () => {
+    it('should update lastActivity on GET requests', async () => {
+      server = new MaliceMCPServer(manager, { port: testPort, host: '127.0.0.1' });
+      await server.start();
+      await waitForServer(`http://127.0.0.1:${testPort}/health`);
+
+      // Create a mock session
+      const sessionId = 'test-session-456';
+      const initialTime = Date.now() - 1000; // 1 second ago
+      const mockSession = {
+        server: {} as any,
+        transport: { handleRequest: vi.fn().mockResolvedValue(undefined) } as any,
+        lastActivity: initialTime,
+      };
+      (server as any).sessions.set(sessionId, mockSession);
+
+      // Make a GET request
+      await fetch(`http://127.0.0.1:${testPort}/mcp`, {
+        method: 'GET',
+        headers: {
+          'mcp-session-id': sessionId,
+        },
+      });
+
+      // lastActivity should be updated
+      const updatedSession = (server as any).sessions.get(sessionId);
+      expect(updatedSession.lastActivity).toBeGreaterThan(initialTime);
+    });
+
+    it('should update lastActivity on POST requests', async () => {
+      server = new MaliceMCPServer(manager, { port: testPort, host: '127.0.0.1' });
+      await server.start();
+      await waitForServer(`http://127.0.0.1:${testPort}/health`);
+
+      // Create a mock session
+      const sessionId = 'test-session-789';
+      const initialTime = Date.now() - 1000; // 1 second ago
+      const mockSession = {
+        server: {} as any,
+        transport: { handleRequest: vi.fn().mockResolvedValue(undefined) } as any,
+        lastActivity: initialTime,
+      };
+      (server as any).sessions.set(sessionId, mockSession);
+
+      // Make a POST request
+      await fetch(`http://127.0.0.1:${testPort}/mcp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'mcp-session-id': sessionId,
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'tools/list',
+        }),
+      });
+
+      // lastActivity should be updated
+      const updatedSession = (server as any).sessions.get(sessionId);
+      expect(updatedSession.lastActivity).toBeGreaterThan(initialTime);
+    });
+  });
 });
