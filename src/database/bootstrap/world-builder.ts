@@ -17,6 +17,18 @@ interface ExitData {
   vehicleAllowed?: boolean; // Whether vehicles can use this exit (default true for world exits)
 }
 
+interface ObjectDef {
+  prototype: string; // Type or alias name (e.g., 'streetSignal', 'lamppost')
+  [key: string]: unknown; // Additional properties to set on the object
+}
+
+interface SittableDef {
+  name: string;
+  capacity: number;
+  emptyMsg: string;
+  occupiedMsg: string;
+}
+
 interface RoomData {
   name: string;
   description: string;
@@ -26,6 +38,8 @@ interface RoomData {
   intersection?: string[];
   blocked?: boolean;
   exits?: Record<string, ExitData | string>; // Custom exit definitions
+  objects?: ObjectDef[]; // Objects to spawn in the room
+  sittables?: SittableDef[]; // Sittable locations in the room
 }
 
 interface StreetConfig {
@@ -265,13 +279,24 @@ export class WorldBuilder implements Builder {
    */
   private async createRooms(): Promise<void> {
     const $ = this.manager as any;
+    const objectManager = await this.manager.load(0);
     const recycler = $.recycler;
     const roomProto = $.room;
+    const aliases =
+      (objectManager?.get('aliases') as Record<string, number>) || {};
+
+    let objectCount = 0;
 
     for (const [key, data] of this.roomData) {
       if (data.blocked) {
         continue; // Skip blocked areas
       }
+
+      // Initialize sittables with empty occupied arrays
+      const sittables = (data.sittables || []).map((s) => ({
+        ...s,
+        occupied: [],
+      }));
 
       const room = await recycler.create({
         parent: roomProto,
@@ -282,10 +307,61 @@ export class WorldBuilder implements Builder {
           y: data.y,
           z: data.z || 0,
           exits: [],
+          sittables,
         },
       });
 
       this.rooms.set(key, room);
+
+      // Spawn objects in the room (if specified)
+      if (Array.isArray(data.objects)) {
+        for (const objDef of data.objects) {
+          if (!objDef.prototype) {
+            console.warn(
+              `    Warning: object in room ${key} missing prototype, skipping`,
+            );
+            continue;
+          }
+
+          // Try to load as type first (types use string names), then fall back to aliases
+          let proto = await this.manager.load(objDef.prototype);
+          if (!proto) {
+            // Not a type, try aliases
+            const protoId = aliases[objDef.prototype];
+            if (!protoId) {
+              console.warn(
+                `    Warning: prototype '${objDef.prototype}' not found for object in ${key}`,
+              );
+              continue;
+            }
+            proto = await this.manager.load(protoId);
+          }
+          if (!proto) {
+            console.warn(
+              `    Warning: could not load prototype '${objDef.prototype}'`,
+            );
+            continue;
+          }
+
+          // Extract properties (everything except 'prototype')
+          const objProps = { ...objDef } as Record<string, unknown>;
+          delete objProps.prototype;
+
+          // Create the object
+          const obj = await recycler.create({
+            parent: proto,
+            properties: objProps,
+          });
+
+          // Move object into the room
+          await obj.moveTo(room);
+          objectCount++;
+        }
+      }
+    }
+
+    if (objectCount > 0) {
+      console.log(`    Spawned ${objectCount} objects in rooms`);
     }
   }
 

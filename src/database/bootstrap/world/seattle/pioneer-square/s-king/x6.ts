@@ -15,4 +15,8 @@ The street dips slightly where it crosses the old rail alignment, a subtle depre
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

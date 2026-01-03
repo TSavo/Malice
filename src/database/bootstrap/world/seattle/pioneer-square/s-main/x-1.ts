@@ -15,4 +15,8 @@ Occidental Park is visible to the north, its dead trees standing sentinel over t
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

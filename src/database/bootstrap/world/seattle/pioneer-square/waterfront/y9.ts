@@ -17,4 +17,8 @@ North leads toward the gap—the only way to downtown. South continues along the
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

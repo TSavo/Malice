@@ -15,4 +15,8 @@ Moss has colonized the north-facing surfaces of every building here, green creep
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
 };

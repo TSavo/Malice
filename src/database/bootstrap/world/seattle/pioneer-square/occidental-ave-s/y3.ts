@@ -15,5 +15,17 @@ A bicycle pump is chained to a stand bolted into the cobblestones, one of those 
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
+  sittables: [
+    {
+      name: 'the bicycle pump stand',
+      capacity: 1,
+      emptyMsg: 'A municipal bicycle pump stand is bolted into the cobblestones.',
+      occupiedMsg: '%s sitting on the pump stand',
+    },
+  ],
 };

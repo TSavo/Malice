@@ -17,4 +17,8 @@ Yesler Way intersection lies just ahead to the north—the crossing point to dow
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

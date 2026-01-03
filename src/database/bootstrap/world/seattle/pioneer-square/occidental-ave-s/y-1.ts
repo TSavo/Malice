@@ -15,4 +15,8 @@ The cobblestones give way to asphalt as the avenue approaches Main Street, the p
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
 };

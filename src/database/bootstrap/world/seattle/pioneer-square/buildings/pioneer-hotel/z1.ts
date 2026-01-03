@@ -48,6 +48,9 @@ The walls are thin. You can hear the elevator cables through one, the building's
       exits: {
         west: '%HALL_1',
       },
+      objects: [
+        { prototype: 'bed', name: 'a narrow bed', description: 'A narrow bed with a sagging mattress occupies most of the room.', quality: 'cheap' },
+      ],
     },
   },
 

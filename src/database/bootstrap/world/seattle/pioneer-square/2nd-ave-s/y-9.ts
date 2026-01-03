@@ -15,4 +15,8 @@ A traffic signal dangles from its wire overhead, swaying slightly in whatever br
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

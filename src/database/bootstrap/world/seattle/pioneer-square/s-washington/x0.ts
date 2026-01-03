@@ -18,4 +18,10 @@ Second Avenue stretches north and south from here, the cross-axis that connects 
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  // Street furniture
+  objects: [
+    { prototype: 'streetSignal', name: 'Traffic Signal' },
+    { prototype: 'streetSign', streetName: '2nd Ave S', direction: ['N', 'S'] },
+    { prototype: 'streetSign', streetName: 'S. Washington St', direction: ['E', 'W'] },
+  ],
 };

@@ -17,4 +17,10 @@ A streetlight leans at fifteen degrees from vertical, bent by some impact—a ve
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  // Street furniture
+  objects: [
+    { prototype: 'streetSignal', name: 'Traffic Signal' },
+    { prototype: 'streetSign', streetName: '1st Ave S', direction: ['N', 'S'] },
+    { prototype: 'streetSign', streetName: 'S. Main St', direction: ['E', 'W'] },
+  ],
 };

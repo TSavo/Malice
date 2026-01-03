@@ -15,5 +15,17 @@ One bicycle was expensive once—you can tell by the frame geometry, the remnant
   ambientNoise: 15, // Open plaza, wind across brick
   lighting: 100, // Full daylight (open space)
   waterLevel: 0, // Dry
-  outdoor: true, // Open plaza
+  outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
+  sittables: [
+    {
+      name: 'the concrete steps',
+      capacity: 3,
+      emptyMsg: 'Three shallow concrete steps lead down to the sidewalk.',
+      occupiedMsg: '%s sitting on the park steps',
+    },
+  ],
 };

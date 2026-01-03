@@ -15,4 +15,8 @@ A chain-link fence surrounds an empty lot where a building once stood. The demol
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

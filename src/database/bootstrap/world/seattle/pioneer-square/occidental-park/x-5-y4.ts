@@ -15,5 +15,17 @@ S. Washington Street stretches away to the east and west, Victorian storefronts 
   ambientNoise: 15, // Open plaza, wind across brick
   lighting: 100, // Full daylight (open space)
   waterLevel: 0, // Dry
-  outdoor: true, // Open plaza
+  outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
+  sittables: [
+    {
+      name: 'the fountain basin edge',
+      capacity: 2,
+      emptyMsg: 'An old cast-iron fountain stands dry at the corner.',
+      occupiedMsg: '%s sitting by the old fountain',
+    },
+  ],
 };

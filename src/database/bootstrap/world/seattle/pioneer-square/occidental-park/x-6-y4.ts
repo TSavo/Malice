@@ -19,5 +19,17 @@ The park extends south and east from here.`,
   ambientNoise: 15, // Open corner, street sounds closer
   lighting: 100, // Full daylight
   waterLevel: 0, // Dry
-  outdoor: true, // Open plaza
+  outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
+  sittables: [
+    {
+      name: 'the totem pole viewing bench',
+      capacity: 2,
+      emptyMsg: 'A weathered bench faces the carved totem pole.',
+      occupiedMsg: '%s sitting before the totem',
+    },
+  ],
 };

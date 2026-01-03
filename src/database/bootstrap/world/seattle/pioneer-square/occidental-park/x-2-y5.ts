@@ -17,6 +17,10 @@ A water fountain stands at the edge of the seating area, dry and silent.`,
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
   sittables: [
     {
       name: 'a picnic table',

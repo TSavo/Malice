@@ -17,4 +17,10 @@ The northwest corner holds a building that survived, its brick facade cracked bu
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  // Street furniture
+  objects: [
+    { prototype: 'streetSignal', name: 'Traffic Signal' },
+    { prototype: 'streetSign', streetName: '3rd Ave S', direction: ['N', 'S'] },
+    { prototype: 'streetSign', streetName: 'S. Washington St', direction: ['E', 'W'] },
+  ],
 };

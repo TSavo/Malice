@@ -15,4 +15,8 @@ A brass plaque mounted on one building commemorates the 1889 fire that destroyed
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

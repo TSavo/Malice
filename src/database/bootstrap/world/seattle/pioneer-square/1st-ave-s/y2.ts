@@ -16,4 +16,12 @@ These buildings connect below street level—the Underground passages run beneat
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  sittables: [
+    {
+      name: 'a bouncer stool',
+      capacity: 1,
+      emptyMsg: 'A black metal bouncer stool sits bolted near the nightclub entrance.',
+      occupiedMsg: '%s sitting on the bouncer stool',
+    },
+  ],
 };

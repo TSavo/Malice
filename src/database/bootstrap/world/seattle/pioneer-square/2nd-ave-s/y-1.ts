@@ -15,4 +15,8 @@ The streetscape shows evidence of the last days—barriers that were erected and
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

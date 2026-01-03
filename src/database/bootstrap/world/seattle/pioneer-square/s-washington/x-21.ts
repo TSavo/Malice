@@ -19,4 +19,10 @@ Wind comes off the bay carrying the smell of salt and marine decay—seaweed rot
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  // Street furniture
+  objects: [
+    { prototype: 'streetSignal', name: 'Traffic Signal' },
+    { prototype: 'streetSign', streetName: 'Waterfront', direction: ['N', 'S'] },
+    { prototype: 'streetSign', streetName: 'S. Washington St', direction: ['E', 'W'] },
+  ],
 };

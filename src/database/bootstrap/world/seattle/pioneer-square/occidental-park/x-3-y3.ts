@@ -15,5 +15,17 @@ Someone placed the mannequin here. Someone thought it was funny, or meaningful, 
   ambientNoise: 15, // Open plaza, wind across brick
   lighting: 100, // Full daylight (open space)
   waterLevel: 0, // Dry
-  outdoor: true, // Open plaza
+  outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
+  sittables: [
+    {
+      name: 'a circular arrangement bench',
+      capacity: 2,
+      emptyMsg: 'Benches face each other in a conversation circle.',
+      occupiedMsg: '%s sitting in the bench circle',
+    },
+  ],
 };

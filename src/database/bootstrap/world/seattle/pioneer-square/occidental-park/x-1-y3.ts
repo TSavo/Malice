@@ -15,5 +15,17 @@ Light filters through the dead vines and lattice, creating complex shadows on th
   ambientNoise: 15, // Open plaza, wind across brick
   lighting: 100, // Full daylight (open space)
   waterLevel: 0, // Dry
-  outdoor: true, // Open plaza
+  outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
+  sittables: [
+    {
+      name: 'a pergola bench',
+      capacity: 2,
+      emptyMsg: 'Benches arranged in conversation circles sit beneath the pergola.',
+      occupiedMsg: '%s sitting on a pergola bench',
+    },
+  ],
 };

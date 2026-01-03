@@ -15,4 +15,8 @@ The smell of the bay is strong here—salt and seaweed and something organic dec
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

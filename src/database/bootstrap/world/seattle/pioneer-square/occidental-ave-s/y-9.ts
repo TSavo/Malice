@@ -15,4 +15,8 @@ The street narrows where debris has spilled across the roadway, forcing passage 
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
 };

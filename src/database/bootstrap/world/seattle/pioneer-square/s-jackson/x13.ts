@@ -15,4 +15,8 @@ A traditional herbalist shop occupies one corner, its windows still displaying t
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

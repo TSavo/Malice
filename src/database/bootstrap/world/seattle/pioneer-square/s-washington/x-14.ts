@@ -16,4 +16,10 @@ The intersection feels like a crossroads in the older sense—a place where path
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'streetSignal', name: 'Traffic Signal' },
+    { prototype: 'streetSign', streetName: '1st Ave S', direction: ['N', 'S'] },
+    { prototype: 'streetSign', streetName: 'S. Washington St', direction: ['E', 'W'] },
+  ],
 };

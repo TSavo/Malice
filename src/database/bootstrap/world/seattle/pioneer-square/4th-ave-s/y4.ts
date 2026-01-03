@@ -18,4 +18,12 @@ The avenue stretches north and south, empty and wide.`,
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  sittables: [
+    {
+      name: 'the memorial shrine area',
+      capacity: 3,
+      emptyMsg: 'A shrine with burned candles and photos sits at the station entrance.',
+      occupiedMsg: '%s sitting near the memorial shrine',
+    },
+  ],
 };

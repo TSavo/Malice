@@ -15,4 +15,8 @@ Across the street, a row of storefronts shows the archaeology of commercial fail
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };
