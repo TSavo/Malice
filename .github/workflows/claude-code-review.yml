@@ -3,55 +3,105 @@ name: Claude Code Review
 on:
   pull_request:
     types: [opened, synchronize]
-    # Optional: Only run on specific file changes
-    # paths:
-    #   - "src/**/*.ts"
-    #   - "src/**/*.tsx"
-    #   - "src/**/*.js"
-    #   - "src/**/*.jsx"
+
+# Prevent multiple review cycles from running simultaneously
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
 
 jobs:
   claude-review:
-    # Optional: Filter by PR author
-    # if: |
-    #   github.event.pull_request.user.login == 'external-contributor' ||
-    #   github.event.pull_request.user.login == 'new-developer' ||
-    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
+    # Skip if the push was from Claude Fixer (prevents infinite loops)
+    if: |
+      !contains(github.event.pull_request.title, '[claude-fixed]') &&
+      github.actor != 'github-actions[bot]'
 
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: read
+      pull-requests: write
       issues: read
       id-token: write
+      actions: read
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-          fetch-depth: 1
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Check iteration count
+        id: check-iterations
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Count how many Claude review cycles have happened
+          REVIEW_COUNT=$(gh pr view ${{ github.event.pull_request.number }} --json comments \
+            --jq '[.comments[] | select(.body | contains("<!-- CLAUDE_REVIEW_MARKER -->"))] | length')
+          echo "review_count=$REVIEW_COUNT" >> $GITHUB_OUTPUT
+
+          # Max 5 iterations to prevent runaway loops
+          if [ "$REVIEW_COUNT" -ge 5 ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "::warning::Max review iterations (5) reached. Stopping review loop."
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Run Claude Code Review
+        if: steps.check-iterations.outputs.skip != 'true'
         id: claude-review
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          additional_permissions: |
+            actions: read
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
+            REVIEW ITERATION: ${{ steps.check-iterations.outputs.review_count }}
 
-            Please review this pull request and provide feedback on:
-            - Code quality and best practices
-            - Potential bugs or issues
-            - Performance considerations
-            - Security concerns
-            - Test coverage
+            You are the REVIEWER agent in a two-agent feedback loop. Your job is to review code and provide actionable feedback.
 
-            Use the repository's CLAUDE.md for guidance on style and conventions. Be constructive and helpful in your feedback.
+            ## Your Task
+            1. Review the PR diff thoroughly
+            2. Check for: bugs, security issues, performance problems, code quality, test coverage
+            3. Use CLAUDE.md for project conventions
 
-            Use `gh pr comment` with your Bash tool to leave your review as a comment on the PR.
+            ## Response Format
+            You MUST respond with a structured review comment using `gh pr comment`. Your comment must:
 
-          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
-          # or https://code.claude.com/docs/en/cli-reference for available options
+            1. Start with `<!-- CLAUDE_REVIEW_MARKER -->` (hidden marker for iteration tracking)
+            2. Include a clear verdict: either `## ✅ LGTM` or `## 🔧 Changes Requested`
+            3. If changes requested, provide SPECIFIC, ACTIONABLE items in this format:
+
+            ```
+            ## 🔧 Changes Requested
+
+            ### Issue 1: [Brief title]
+            **File:** `path/to/file.ts`
+            **Line:** 42
+            **Problem:** [What's wrong]
+            **Fix:** [Exactly what to do]
+
+            ### Issue 2: ...
+            ```
+
+            4. If everything looks good after reviewing, respond with:
+            ```
+            ## ✅ LGTM
+
+            The code looks good! No changes needed.
+            ```
+
+            ## Important
+            - Be specific with file paths and line numbers
+            - Only flag real issues, not style preferences
+            - If this is iteration 2+, focus only on NEW issues (previous ones should be fixed)
+            - The fixer agent will read your comment and implement changes automatically
+
+            Use `gh pr comment ${{ github.event.pull_request.number }} --body "YOUR_REVIEW"` to post.
+
           claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'
 

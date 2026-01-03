@@ -1,0 +1,106 @@
+name: Claude Code Fixer
+
+on:
+  issue_comment:
+    types: [created]
+
+# Prevent multiple fixers from running simultaneously
+concurrency:
+  group: claude-fixer-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  claude-fixer:
+    # Only run if:
+    # 1. Comment is on a PR (not an issue)
+    # 2. Comment contains the review marker
+    # 3. Comment contains "Changes Requested" (not LGTM)
+    if: |
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '<!-- CLAUDE_REVIEW_MARKER -->') &&
+      contains(github.event.comment.body, 'Changes Requested')
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+
+    steps:
+      - name: Get PR details
+        id: pr-details
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_DATA=$(gh pr view ${{ github.event.issue.number }} --repo ${{ github.repository }} --json headRefName,headRepository,headRepositoryOwner)
+          echo "branch=$(echo $PR_DATA | jq -r '.headRefName')" >> $GITHUB_OUTPUT
+          echo "repo=$(echo $PR_DATA | jq -r '.headRepositoryOwner.login + "/" + .headRepository.name')" >> $GITHUB_OUTPUT
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ steps.pr-details.outputs.branch }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Run Claude Code Fixer
+        id: claude-fixer
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          additional_permissions: |
+            actions: read
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.issue.number }}
+            BRANCH: ${{ steps.pr-details.outputs.branch }}
+
+            You are the FIXER agent in a two-agent feedback loop. The REVIEWER agent has left feedback that you need to address.
+
+            ## Review Comment to Address
+            ```
+            ${{ github.event.comment.body }}
+            ```
+
+            ## Your Task
+            1. Parse the review comment above for specific issues
+            2. For each issue marked with **File:** and **Fix:**, implement the fix
+            3. Stage and commit your changes with a descriptive message
+            4. Push the changes to the PR branch
+            5. Leave a comment summarizing what you fixed
+
+            ## Important Rules
+            - Only fix issues explicitly mentioned in the review
+            - Do NOT add new features or make unrelated changes
+            - If you can't fix something, note it in your summary comment
+            - Use atomic commits (one commit per logical fix if multiple issues)
+            - Always run any relevant tests/type checks before committing
+
+            ## Workflow
+            1. Read the files mentioned in the review
+            2. Make the requested changes using Edit tool
+            3. Run type checking: `npm run typecheck` (fix any issues you introduced)
+            4. Commit with message: "fix: [description of fix]"
+            5. Push: `git push origin ${{ steps.pr-details.outputs.branch }}`
+            6. Comment on PR: `gh pr comment ${{ github.event.issue.number }} --body "YOUR_SUMMARY"`
+
+            Your summary comment should look like:
+            ```
+            <!-- CLAUDE_FIXER_MARKER -->
+            ## 🔧 Fixes Applied
+
+            - [x] Issue 1: [what you did]
+            - [x] Issue 2: [what you did]
+            - [ ] Issue 3: [why you couldn't fix it, if applicable]
+
+            Pushed commit(s): `abc1234`
+            ```
+
+          claude_args: '--allowed-tools "Bash(git:*),Bash(npm run typecheck),Bash(npm test:*),Bash(gh pr comment:*),Bash(gh pr view:*),Read,Edit,Write,Glob,Grep"'
