@@ -19,7 +19,7 @@ Scratched into the southwest corner is a symbol: a scale balanced over crossed k
   exits: {
     down: {
       prototype: 'guardedExit',
-      allowedFaction: 'gray-cartel',
+      allowedFaction: 'Gray Cartel',
       denyMessage: 'A combination padlock dangles from its hasp. You lack the combination.',
       description: 'A reinforced hatch is set into the floor.',
     },

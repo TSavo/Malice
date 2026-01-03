@@ -19,7 +19,7 @@ Chalk marks cluster in the corners—directional symbols, territorial indicators
   exits: {
     down: {
       prototype: 'guardedExit',
-      allowedFaction: 'gray-cartel',
+      allowedFaction: 'Gray Cartel',
       denyMessage: 'A heavy padlock secures the hasp. You lack the combination.',
       description: 'A heavy iron grate covers a vertical shaft.',
     },
