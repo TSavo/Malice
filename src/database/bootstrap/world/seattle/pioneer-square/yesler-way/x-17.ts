@@ -16,4 +16,10 @@ Smith Tower is visible ahead, its white terra cotta facade stained grey but stil
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  exits: {
+    west: {
+      to: 'buildings/gargoyle-building/z0.ts#LOBBY',
+      description: 'Heavy wooden doors lead into the Gargoyle Building',
+    },
+  },
 };
