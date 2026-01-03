@@ -3,7 +3,7 @@
 
 export const building = {
   name: 'Morrison & Kline',
-  x: -15,
+  x: -14,
   y: 7,
   width: 2,
   height: 2,
@@ -44,7 +44,7 @@ export const building = {
 A reception desk faces the entrance, its surface covered in a thin layer of dust. Behind it, a leather chair sits empty, pushed back as if someone stood up and never returned. The wall behind the desk displays nautical charts in brass frames—Puget Sound, the Strait of Juan de Fuca, the shipping lanes that made Seattle a port city.
 
 The waiting area offers leather chairs arranged around a coffee table stacked with legal journals and maritime trade publications. The publications are dated. The waiting is permanent.`,
-      x: -15,
+      x: -14,
       y: 7,
       z: 0,
       population: 0,

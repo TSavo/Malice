@@ -255,7 +255,7 @@ Light filters down from a skylight far above—four stories up, the glass grimy 
 Doors on each landing lead to the upper floors—offices once, apartments perhaps, the building's mixed-use history evident in the variety of locks and mail slots. Most doors are closed. Some stand ajar, revealing empty rooms beyond.`,
       x: -18,
       y: 12,
-      z: 1,
+      z: 0,
       population: 0,
       ambientNoise: 2,
       lighting: 30,
