@@ -15,8 +15,8 @@ export const building = {
 The roof is flat tar and gravel, the kind of utilitarian surface that was never meant to be walked on except for maintenance. Puddles collect in low spots, reflecting the grey Seattle sky. The parapet is low brick, barely knee-high, topped with aluminum flashing that has oxidized to a dull white.
 
 Smith Tower rises to the west, its white terra cotta facade visible above the surrounding rooftops. From up here you can see how the tower dominates the neighborhood, how everything else defers to its height.`,
-      x: -14,
-      y: 12,
+      x: -15,
+      y: 11,
       z: 2,
       population: 0,
       ambientNoise: 15,
@@ -51,8 +51,8 @@ Smith Tower rises to the west, its white terra cotta facade visible above the su
 An old TV antenna rises from this corner, a relic from before cable and satellite made such things obsolete. The antenna is bent, its elements pointing in random directions, no longer capable of receiving anything even if there were signals to receive. Rust has eaten through the mounting bracket.
 
 The parapet offers a view of the debris wall to the north, the collapsed buildings that seal Pioneer Square from downtown. From up here the scale of the destruction is visible—blocks of rubble where blocks of buildings used to stand.`,
-      x: -15,
-      y: 12,
+      x: -14,
+      y: 11,
       z: 2,
       population: 0,
       ambientNoise: 15,
