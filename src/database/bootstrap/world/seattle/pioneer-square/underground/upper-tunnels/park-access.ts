@@ -16,4 +16,12 @@ The park above is empty now, its dead trees and silent fountain a memorial to th
   lighting: 15,
   waterLevel: 0,
   outdoor: false,
+  exits: {
+    down: {
+      prototype: 'guardedExit',
+      allowedFaction: 'Gray Cartel',
+      denyMessage: 'A padlock secures the iron ring. You lack the combination.',
+      description: 'A concealed trapdoor blends with the brick floor.',
+    },
+  },
 };

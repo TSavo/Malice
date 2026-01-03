@@ -209,6 +209,12 @@ Sound from the shaft above filters down clearly—footsteps, voices, the creak o
         },
         south: '%X3Y1',
       },
+      objects: [
+        { prototype: 'bed', name: 'a salvaged cot', description: 'A cot pushed against the wall, ready to be abandoned at a moment\'s notice.', quality: 'cheap' },
+        { prototype: 'bed', name: 'a salvaged cot', description: 'A cot near the exit, sleeping bag rolled at its foot.', quality: 'cheap' },
+        { prototype: 'trunk', name: 'a battered footlocker', description: 'A dented metal footlocker, its lock missing.' },
+        { prototype: 'crate', name: 'a supply crate', description: 'A crate marked "MRE" in faded stencil.' },
+      ],
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -233,6 +239,15 @@ The air here is different: warmer, more organic, carrying the accumulated presen
       exits: {
         south: '%LJ',
       },
+      objects: [
+        { prototype: 'bed', name: 'a salvaged cot', description: 'An old military cot with a thin mattress, pushed against the curved wall.', quality: 'cheap' },
+        { prototype: 'bed', name: 'a salvaged cot', description: 'A cot with a rolled sleeping bag on top.', quality: 'cheap' },
+        { prototype: 'bed', name: 'a salvaged cot', description: 'A cot near the fabric partition, slightly more private than the others.', quality: 'cheap' },
+        { prototype: 'bed', name: 'a salvaged cot', description: 'A cot by the entrance, positioned for quick exit.', quality: 'cheap' },
+        { prototype: 'trunk', name: 'a battered footlocker', description: 'A dented metal footlocker, its lock mechanism worn smooth from use.' },
+        { prototype: 'crate', name: 'a supply crate', description: 'A wooden crate stamped with faded shipping marks, repurposed as storage.' },
+        { prototype: 'crate', name: 'a supply crate', description: 'A crate serving as an improvised side table between two cots.' },
+      ],
     },
 
     '%SW': {
@@ -253,6 +268,13 @@ Scorch marks darken the concrete floor in irregular patterns—the evidence of f
       exits: {
         east: '%X15Y1',
       },
+      objects: [
+        { prototype: 'desk', name: 'a salvaged workbench', description: 'A heavy workbench covered in burn marks and soldering residue. Tools hang from a pegboard above it.' },
+        { prototype: 'desk', name: 'a salvaged workbench', description: 'A workbench with a vise bolted to one end, its surface scarred by countless repairs.' },
+        { prototype: 'cabinet', name: 'a metal cabinet', description: 'A dented industrial cabinet, its doors secured with a simple padlock.' },
+        { prototype: 'crate', name: 'a components crate', description: 'A crate overflowing with salvaged electronics—circuit boards, wire spools, capacitors.' },
+        { prototype: 'crate', name: 'a tools crate', description: 'A heavy wooden crate holding hand tools and spare parts.' },
+      ],
     },
 
     '%SF': {
@@ -275,6 +297,12 @@ Scratched marks near each passage mouth indicate direction and distance in a cod
         west: '%X13Y0',
         east: '%X11Y0',
       },
+      objects: [
+        { prototype: 'couch', name: 'a threadbare couch', description: 'A sagging couch with springs visible through worn fabric. It has been here a long time.' },
+        { prototype: 'chair', name: 'a folding chair', description: 'A metal folding chair positioned near one of the exits.' },
+        { prototype: 'chair', name: 'a folding chair', description: 'A folding chair against the wall, its seat dented from use.' },
+        { prototype: 'crate', name: 'a supply crate', description: 'A crate containing emergency supplies—water bottles, energy bars, first aid.' },
+      ],
     },
 
     '%DD': {
@@ -298,6 +326,9 @@ The floor shows wear patterns that don't match transit—people stop here, turn,
         west: '%X9Y0',
         east: '%X7Y0',
       },
+      objects: [
+        { prototype: 'crate', name: 'a weathered crate', description: 'An old wooden crate tucked into the alcove, its purpose deliberately unclear.' },
+      ],
     },
 
     '%IR': {
@@ -318,6 +349,10 @@ The air is still and close, carrying the mineral smell of old concrete and somet
       exits: {
         north: { room: '%Y_1', door: '%INTERROG_DOOR' },
       },
+      objects: [
+        { prototype: 'chair', name: 'a metal chair', description: 'A cold metal chair bolted to the floor in the center of the room.' },
+        { prototype: 'desk', name: 'a battered desk', description: 'A small desk pushed against the wall, its surface scarred and stained.' },
+      ],
     },
 
     '%KV': {
@@ -341,6 +376,13 @@ The walls show organizational marks—zones indicated by paint that was once bri
         west: { room: '%X15Y_4', door: '%VAULT_DOOR' },
         east: '%X13Y_4',
       },
+      objects: [
+        { prototype: 'cabinet', name: 'a reinforced cabinet', description: 'A heavy steel cabinet with a combination lock, its surface scratched from years of use.' },
+        { prototype: 'cabinet', name: 'a reinforced cabinet', description: 'A cabinet with reinforced hinges, the paint chipped but the structure solid.' },
+        { prototype: 'crate', name: 'a numbered crate', description: 'A crate marked with faded numbers, its contents unknown.' },
+        { prototype: 'crate', name: 'a numbered crate', description: 'A sealed crate with a manifest tag wired to the handle.' },
+        { prototype: 'crate', name: 'a numbered crate', description: 'A heavy crate positioned against the reinforced wall.' },
+      ],
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -947,6 +989,15 @@ The air carries the hum of powered systems, electronics that serve purposes beyo
         west: '%5X15Y_3',
         east: { room: '%5X13Y_3', door: '%COMMAND_DOOR' },
       },
+      objects: [
+        { prototype: 'desk', name: 'a planning table', description: 'A large table dominates the room\'s center, its surface scarred by years of maps and diagrams.' },
+        { prototype: 'chair', name: 'a metal chair', description: 'A sturdy metal chair at the head of the planning table.' },
+        { prototype: 'chair', name: 'a metal chair', description: 'A chair positioned for viewing the wall displays.' },
+        { prototype: 'chair', name: 'a metal chair', description: 'A chair at the table\'s edge, slightly askew.' },
+        { prototype: 'chair', name: 'a metal chair', description: 'A chair pushed back from the table.' },
+        { prototype: 'cabinet', name: 'a locked cabinet', description: 'A steel cabinet with a heavy padlock, its contents restricted.' },
+        { prototype: 'cabinet', name: 'a map cabinet', description: 'A flat-file cabinet for storing maps and blueprints.' },
+      ],
     },
 
     '%AR': {
@@ -969,6 +1020,13 @@ The silence here is deeper than elsewhere, the room designed to absorb sound. Se
       exits: {
         east: '%5X15Y_3',
       },
+      objects: [
+        { prototype: 'cabinet', name: 'a file cabinet', description: 'A tall filing cabinet with numbered drawers, each secured with its own lock.' },
+        { prototype: 'cabinet', name: 'a file cabinet', description: 'A cabinet labeled with zone codes, its contents organized by a system that requires knowing.' },
+        { prototype: 'cabinet', name: 'a file cabinet', description: 'A cabinet with wear marks around certain drawers—frequently accessed information.' },
+        { prototype: 'cabinet', name: 'a file cabinet', description: 'A cabinet pushed against the far wall, its locks showing no signs of recent use.' },
+        { prototype: 'desk', name: 'a research desk', description: 'A small desk with a reading lamp, positioned for reviewing archived documents.' },
+      ],
     },
 
     '%HC': {
@@ -991,6 +1049,10 @@ The lighting is harsh, flat, designed to eliminate shadows. Concealment has no p
       exits: {
         west: { room: '%5X11Y_3', door: '%CELLS_DOOR' },
       },
+      objects: [
+        { prototype: 'bed', name: 'a detention cot', description: 'A bare metal cot bolted to the floor, mattress thin and stained.', quality: 'cheap' },
+        { prototype: 'bed', name: 'a detention cot', description: 'A cot in the far cell, identical to the others—designed for discomfort.', quality: 'cheap' },
+      ],
     },
 
     '%TV': {
@@ -1015,6 +1077,10 @@ The silence is perfect, engineered, the room isolated from the network's ambient
         south: '%5Y_2',
         west: { room: '%CC', door: '%VAULT5_DOOR' },
       },
+      objects: [
+        { prototype: 'safe', name: 'a reinforced safe', description: 'A heavy safe set into the wall, its door thick enough to stop more than thieves.' },
+        { prototype: 'trunk', name: 'an armored container', description: 'A container of uncertain purpose, its construction suggesting protection against more than physical force.' },
+      ],
     },
 
     '%CC': {
@@ -1037,6 +1103,15 @@ The sound-dampening is extreme, conversations contained absolutely within the ch
       exits: {
         east: { room: '%TV', door: '%VAULT5_DOOR' },
       },
+      objects: [
+        { prototype: 'desk', name: 'a council table', description: 'A long table dominates the room, its surface dark wood worn smooth by hands and elbows.' },
+        { prototype: 'chair', name: 'a high-backed chair', description: 'A chair at the head of the table, slightly larger than the others.' },
+        { prototype: 'chair', name: 'a council chair', description: 'A chair at the table, positioned for equal participation.' },
+        { prototype: 'chair', name: 'a council chair', description: 'A chair showing wear from regular use.' },
+        { prototype: 'chair', name: 'a council chair', description: 'A chair pushed slightly back from the table.' },
+        { prototype: 'chair', name: 'a council chair', description: 'A chair at the table\'s far end.' },
+        { prototype: 'chair', name: 'a council chair', description: 'A chair near the door, positioned for easy exit.' },
+      ],
     },
 
     '%SQ': {
@@ -1065,6 +1140,11 @@ A passage continues downward, narrow and steep, descending toward depths that th
         south: { room: '%5Y0', door: '%QUARTERS_DOOR' },
         west: '%5X15Y1',
       },
+      objects: [
+        { prototype: 'bed', name: 'a narrow cot', description: 'A cot barely wider than a body, its blanket thin and gray.', quality: 'cheap' },
+        { prototype: 'desk', name: 'a simple desk', description: 'A small desk with a single drawer, its surface bare.' },
+        { prototype: 'chair', name: 'a wooden chair', description: 'A plain wooden chair, its finish worn through in places.' },
+      ],
     },
 
     '%CL': {
@@ -1087,6 +1167,12 @@ The lighting is bright but diffuse, designed to eliminate shadows without creati
       exits: {
         east: '%5X15Y1',
       },
+      objects: [
+        { prototype: 'desk', name: 'a lab workstation', description: 'A sterile white workstation with built-in sinks and specimen trays.' },
+        { prototype: 'desk', name: 'a lab workstation', description: 'A workstation with monitoring equipment and specimen containers.' },
+        { prototype: 'cabinet', name: 'a specimen cabinet', description: 'A climate-controlled cabinet with glass doors, its contents obscured by condensation.' },
+        { prototype: 'cabinet', name: 'a supply cabinet', description: 'A locked cabinet labeled with biohazard symbols.' },
+      ],
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -1239,6 +1325,9 @@ Something waits here. Something is kept here. The architecture exists to contain
       exits: {
         up: '%SQ',
       },
+      objects: [
+        { prototype: 'trunk', name: 'a waterproof container', description: 'A sealed container of unknown material, its surface slick with condensation in the perpetual dark.' },
+      ],
     },
   },
 };
