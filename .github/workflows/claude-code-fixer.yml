@@ -39,7 +39,7 @@ jobs:
           echo "repo=$(echo $PR_DATA | jq -r '.headRepositoryOwner.login + "/" + .headRepository.name')" >> $GITHUB_OUTPUT
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           ref: ${{ steps.pr-details.outputs.branch }}
@@ -91,16 +91,9 @@ jobs:
             5. Push: `git push origin ${{ steps.pr-details.outputs.branch }}`
             6. Comment on PR: `gh pr comment ${{ github.event.issue.number }} --body "YOUR_SUMMARY"`
 
-            Your summary comment should look like:
-            ```
+            Your summary comment MUST begin with exactly these 28 characters (no escaping, no backslashes):
             <!-- CLAUDE_FIXER_MARKER -->
-            ## 🔧 Fixes Applied
 
-            - [x] Issue 1: [what you did]
-            - [x] Issue 2: [what you did]
-            - [ ] Issue 3: [why you couldn't fix it, if applicable]
-
-            Pushed commit(s): `abc1234`
-            ```
+            Then add a heading "## 🔧 Fixes Applied" followed by a checklist of what you fixed and the commit hash.
 
           claude_args: '--allowed-tools "Bash(git:*),Bash(npm run typecheck),Bash(npm test:*),Bash(gh pr comment:*),Bash(gh pr view:*),Read,Edit,Write,Glob,Grep"'
