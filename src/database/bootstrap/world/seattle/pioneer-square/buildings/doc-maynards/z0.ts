@@ -201,11 +201,6 @@ A narrow stairway leads up to the second floor, where the building's original ho
       exits: {
         east: '%BAR',
         north: '%TOUR_ROOM',
-        west: {
-          to: 'alley/y11.ts',
-          description: 'The emergency exit opens onto the back alley',
-          door: '%BACK_DOOR',
-        },
         up: {
           description: 'A narrow stairway leads up',
           to: '%STORAGE',

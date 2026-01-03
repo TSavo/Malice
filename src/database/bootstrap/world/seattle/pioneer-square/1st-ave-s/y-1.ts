@@ -17,4 +17,10 @@ A street lamp leans at a slight angle, its pole bent by some long-ago impact—v
   outdoor: true,
   // Street furniture
   objects: [{ prototype: 'lamppost', name: 'Street Lamp' }],
+  exits: {
+    west: {
+      to: 'buildings/owl-cafe/z0.ts#COUNTER',
+      description: 'Glass doors lead into the Owl Cafe diner',
+    },
+  },
 };
