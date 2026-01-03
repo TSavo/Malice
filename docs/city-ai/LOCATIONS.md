@@ -58,6 +58,13 @@ The center of Pioneer Square is **S. Main Street at 2nd Avenue**.
 | **Grand Central** | Occidental & Main | "Old arcade building. Occidental Ave at Main Street." |
 | **Pioneer Building** | 3rd Ave & Washington | "East side, 3rd Ave at Washington." |
 
+### Civilian Establishments
+
+| Location | Where | How to Get There |
+|----------|-------|------------------|
+| **Terra Nova Gallery** | 1st Ave & Jackson | "Art gallery on 1st Ave. Head to Jackson, it's on the east side of 1st." |
+| **Redux Vintage** | 1st Ave & Washington | "Vintage clothing store. 1st Ave between Washington and Main, west side." |
+
 ### Restricted Facilities (Secret)
 
 These locations are NOT public knowledge. NPCs should NOT give directions to them unless they have special clearance.
