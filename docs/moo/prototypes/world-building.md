@@ -510,7 +510,33 @@ On next server start, BuildingBuilder:
 
 ### Entry/Exit Rooms
 
-Create exits between street-level rooms and building entrances:
+Create exits between street-level rooms and building entrances.
+
+### World Room Detection
+
+When buildings have exits that reference world rooms (using `to: 'path/to/room.ts'`), the BuildingBuilder automatically finds the target room by coordinates. To determine which rooms are "world rooms" (outdoor/public spaces vs. building interiors), the builder checks:
+
+**A room is considered a world room if:**
+- `outdoor: true`, OR
+- Name contains: `Way`, `Ave`, `St`, `Underground`, `Passage`, or `Tunnel`
+
+This affects bidirectional exit creation - the builder can automatically create return exits from world rooms back into buildings.
+
+**Examples:**
+```typescript
+// These are detected as world rooms:
+{ name: 'Yesler Way & 2nd Ave', outdoor: true }
+{ name: 'S. Main St & Occidental Ave S' }  // Contains 'St' and 'Ave'
+{ name: 'Underground Passage - North Section' }  // Contains 'Underground' and 'Passage'
+{ name: 'Service Tunnel' }  // Contains 'Tunnel'
+
+// These are NOT world rooms (building interiors):
+{ name: 'Lobby', outdoor: false }
+{ name: 'Office 301' }
+{ name: 'Storage Room' }
+```
+
+**Why this matters:** When creating buildings that connect to underground passages or outdoor areas, make sure your room names follow these conventions so the builder can properly establish bidirectional connections.
 
 **Street room (s-main/x3.ts):**
 ```typescript
@@ -617,6 +643,7 @@ Security: Biometric locks on floors 35, 42
 3. **Coordinate alignment** - Building floors share (x, y), differ in z
 4. **Lock high-security areas** - Use locked exits or elevator floor locks
 5. **Test floor transitions** - Make sure elevator connects all floors properly
+6. **World room naming** - When connecting to streets/underground, ensure target rooms include keywords: `Way`, `Ave`, `St`, `Underground`, `Passage`, or `Tunnel` (or have `outdoor: true`) so the builder can establish bidirectional exits
 
 ### Both Systems
 
