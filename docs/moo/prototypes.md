@@ -40,6 +40,17 @@ $root (#1)
       │           ├─ $arm, $hand, $finger
       │           └─ $leg, $foot
       │
+      ├─ $furniture (room fixtures, cover, storage)
+      │   ├─ $bed (sleeping, rest, recovery)
+      │   ├─ $chair (single seating, improvised weapon)
+      │   ├─ $couch (multi seating, poor sleep)
+      │   ├─ $table (surface, flip for cover)
+      │   │   └─ $desk (work surface, locked drawers)
+      │   ├─ $trunk (lockable chest storage)
+      │   ├─ $cabinet (storage with doors)
+      │   ├─ $crate (shipping container, pry open)
+      │   └─ $safe (heavy secure storage)
+      │
       └─ $wearable (items that can be worn)
           ├─ $clothing (wearable clothing)
           └─ $.theMask (neural interface, perception filter)
