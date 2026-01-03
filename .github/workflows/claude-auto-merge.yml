@@ -21,20 +21,25 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Merge PR
+      - name: Wait for checks and merge PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "🎉 Claude approved PR #${{ github.event.issue.number }} - merging..."
+          echo "🎉 Claude approved PR #${{ github.event.issue.number }}"
+          echo "⏳ Waiting for all checks to complete..."
 
-          # Wait a moment for any in-flight CI to register
-          sleep 5
+          # Wait for all checks to pass (timeout after 30 minutes)
+          gh pr checks ${{ github.event.issue.number }} \
+            --repo ${{ github.repository }} \
+            --watch \
+            --fail-level all
+
+          echo "✅ All checks passed - merging..."
 
           # Merge with squash
           gh pr merge ${{ github.event.issue.number }} \
             --repo ${{ github.repository }} \
             --squash \
-            --auto \
             --delete-branch
 
           echo "✅ PR merged successfully"
