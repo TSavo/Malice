@@ -43,13 +43,12 @@ export class MetaDomainBuilder implements Builder {
       throw new Error('Failed to load dependencies');
     }
 
-    // Check if already exists
+    // Check if already exists - reuse domain but always rebuild routes
     if (aliases.metaDomain) {
       this.domain = await this.manager.load(aliases.metaDomain);
-      if (this.domain) return;
     }
 
-    // Create the meta domain
+    // Create the meta domain if it doesn't exist
     if (!this.domain) {
       this.domain = await this.manager.create({
         parent: webDomain,
@@ -62,7 +61,7 @@ export class MetaDomainBuilder implements Builder {
       });
     }
 
-    // Build route tree
+    // Always rebuild route tree to pick up code changes
     await this.buildRouteTree(webRoute);
 
     console.log('[MetaDomain] Built malice.world meta-domain');
@@ -96,16 +95,18 @@ export class MetaDomainBuilder implements Builder {
   private async buildRouteTree(webRoute: RuntimeObject): Promise<void> {
     if (!this.domain) return;
 
-    // Create root route for this domain
-    const rootRoute = await this.createRoute(webRoute, null, {
-      name: 'Meta Root Route',
-      segment: '',
-      methods: ['GET'],
-      contentType: 'text/html',
-    });
-
-    // Set on domain
-    this.domain.set('rootRoute', { type: 'objref', value: rootRoute.id });
+    // Reuse existing root route or create new one
+    let rootRoute = this.domain.get('rootRoute') as RuntimeObject | null;
+    if (!rootRoute) {
+      rootRoute = await this.createRoute(webRoute, null, {
+        name: 'Meta Root Route',
+        segment: '',
+        methods: ['GET'],
+        contentType: 'text/html',
+      });
+      // Set on domain
+      this.domain.set('rootRoute', rootRoute);
+    }
 
     // Root route - landing page
     rootRoute.setMethod(
@@ -116,251 +117,319 @@ export class MetaDomainBuilder implements Builder {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Malice</title>
+  <title>MALICE</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      92% { opacity: 1; }
+      93% { opacity: 0.8; }
+      94% { opacity: 1; }
+      97% { opacity: 0.9; }
+    }
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100vh); }
+    }
+    @keyframes glitch {
+      0%, 100% { text-shadow: -2px 0 #ff3366, 2px 0 #00ff88; }
+      25% { text-shadow: 2px 0 #ff3366, -2px 0 #00ff88; }
+      50% { text-shadow: -1px 0 #ff3366, 1px 0 #00ff88; }
+      75% { text-shadow: 1px 0 #ff3366, -1px 0 #00ff88; }
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 16px; }
     body {
-      background: #0a0a0a;
-      color: #c0c0c0;
-      font-family: 'JetBrains Mono', monospace;
+      background: #000;
+      color: #888;
+      font-family: 'Space Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+      animation: flicker 8s infinite;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0,0,0,0.1) 0px,
+        rgba(0,0,0,0.1) 1px,
+        transparent 1px,
+        transparent 2px
+      );
+      pointer-events: none;
+      z-index: 1000;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, rgba(0,255,136,0.1), transparent);
+      animation: scanline 4s linear infinite;
+      pointer-events: none;
+      z-index: 1001;
+    }
+
+    .hero-section {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      justify-content: center;
       padding: 2rem;
-    }
-    .container {
-      max-width: 720px;
-      width: 100%;
-    }
-    .header {
-      text-align: center;
-      margin-bottom: 3rem;
+      position: relative;
     }
     .title {
-      font-size: 4rem;
+      font-size: clamp(4rem, 20vw, 14rem);
       font-weight: 700;
-      letter-spacing: 0.3em;
       color: #00ff88;
-      text-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
-      margin-bottom: 0.5rem;
-    }
-    .subtitle {
-      font-size: 0.9rem;
-      color: #666;
-      font-weight: 300;
-    }
-    .testimony {
-      margin-bottom: 3rem;
-    }
-    .testimony blockquote {
-      border-left: 2px solid #333;
-      padding-left: 1.5rem;
-      margin: 1.5rem 0;
-      color: #888;
-      font-style: italic;
-    }
-    .testimony p {
-      margin: 1rem 0;
-      line-height: 1.7;
-    }
-    .testimony .highlight {
-      color: #00ff88;
-    }
-    .testimony .muted {
-      color: #555;
-    }
-    .section-title {
-      font-size: 0.8rem;
-      letter-spacing: 0.2em;
-      color: #444;
-      margin: 3rem 0 1rem 0;
+      letter-spacing: -0.02em;
+      line-height: 0.85;
+      animation: glitch 3s infinite;
       text-transform: uppercase;
     }
+    .tagline {
+      font-size: clamp(0.9rem, 2vw, 1.1rem);
+      color: #444;
+      margin-top: 2rem;
+      max-width: 28ch;
+      line-height: 1.6;
+    }
+    .location {
+      position: absolute;
+      bottom: 2rem;
+      right: 2rem;
+      font-size: 0.7rem;
+      color: #333;
+      text-align: right;
+      letter-spacing: 0.1em;
+    }
+    .scroll-hint {
+      position: absolute;
+      bottom: 2rem;
+      left: 2rem;
+      font-size: 0.65rem;
+      color: #222;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .content {
+      padding: 0 2rem 4rem;
+      max-width: 900px;
+    }
+    .pitch {
+      font-size: 1.1rem;
+      line-height: 1.9;
+      color: #666;
+      margin-bottom: 4rem;
+      border-left: 2px solid #00ff88;
+      padding-left: 1.5rem;
+    }
+    .pitch strong {
+      color: #aaa;
+      font-weight: 400;
+    }
+
     .factions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
     }
     .faction {
-      border: 1px solid #222;
-      padding: 1.5rem;
+      display: block;
+      padding: 2rem 0;
+      border-top: 1px solid #111;
       text-decoration: none;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
+      position: relative;
     }
+    .faction:last-child {
+      border-bottom: 1px solid #111;
+    }
+    .faction::before {
+      content: '';
+      position: absolute;
+      left: -2rem;
+      top: 0;
+      bottom: 0;
+      width: 0;
+      transition: width 0.15s ease;
+    }
+    .faction:hover::before {
+      width: 3px;
+    }
+    .faction-continuum:hover::before { background: #00ff88; }
+    .faction-cartel:hover::before { background: #ff3366; }
+    .faction-neural:hover::before { background: #4a90d9; }
     .faction:hover {
-      border-color: #444;
-      background: #111;
+      padding-left: 1rem;
+    }
+    .faction-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 0.5rem;
     }
     .faction-name {
-      font-size: 1.2rem;
-      font-weight: 500;
-      margin-bottom: 0.5rem;
+      font-size: 1.4rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
     .faction-continuum .faction-name { color: #00ff88; }
     .faction-cartel .faction-name { color: #ff3366; }
     .faction-neural .faction-name { color: #4a90d9; }
-    .faction-desc {
-      font-size: 0.75rem;
-      color: #666;
-      line-height: 1.5;
-    }
-    .faction-neural {
-      grid-column: span 2;
-      border-color: #111;
-      background: linear-gradient(135deg, #0a0a0a 0%, #0d1117 100%);
-    }
-    .faction-neural:hover {
-      border-color: #4a90d933;
-      box-shadow: 0 0 20px rgba(74, 144, 217, 0.05);
-    }
-    .faction-neural .faction-desc {
-      color: #445;
-      font-style: italic;
-    }
-    @media (max-width: 600px) {
-      .faction-neural { grid-column: span 1; }
-    }
-    .footer {
-      margin-top: 3rem;
-      padding-top: 2rem;
-      border-top: 1px solid #1a1a1a;
-      text-align: center;
-    }
-    .footer-links {
-      font-size: 0.8rem;
-      color: #444;
-    }
-    .footer-links a {
-      color: #555;
-      text-decoration: none;
-      margin: 0 1rem;
-    }
-    .footer-links a:hover {
-      color: #888;
-    }
-    .date {
-      font-size: 0.7rem;
+    .faction-tag {
+      font-size: 0.6rem;
       color: #333;
-      margin-top: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
     }
+    .faction-desc {
+      font-size: 0.8rem;
+      color: #555;
+      line-height: 1.6;
+      max-width: 50ch;
+    }
+    .faction-warning {
+      font-size: 0.75rem;
+      color: #ff3366;
+      margin-top: 0.75rem;
+    }
+
+    .section {
+      margin-top: 5rem;
+    }
+    .section-title {
+      font-size: 0.65rem;
+      color: #333;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-bottom: 1.5rem;
+    }
+    .section p {
+      font-size: 0.85rem;
+      color: #555;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+      max-width: 55ch;
+    }
+    .section .dim {
+      color: #333;
+    }
+
+    .footer {
+      margin-top: 6rem;
+      padding: 2rem 0;
+      border-top: 1px solid #0a0a0a;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      font-size: 0.7rem;
+      color: #222;
+    }
+    .footer a {
+      color: #333;
+      text-decoration: none;
+      margin-right: 1.5rem;
+    }
+    .footer a:hover {
+      color: #00ff88;
+    }
+    .footer-right {
+      text-align: right;
+      line-height: 1.6;
+    }
+
     @media (max-width: 600px) {
-      .title { font-size: 2.5rem; letter-spacing: 0.15em; }
-      .factions { grid-template-columns: 1fr; }
-      body { padding: 1rem; }
+      .hero-section { padding: 1.5rem; }
+      .content { padding: 0 1.5rem 3rem; }
+      .title { letter-spacing: -0.03em; }
+      .location { position: static; text-align: left; margin-top: 3rem; }
+      .scroll-hint { display: none; }
+      .faction { padding: 1.5rem 0; }
+      .footer { flex-direction: column; align-items: flex-start; gap: 1rem; }
+      .footer-right { text-align: left; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header class="header">
-      <h1 class="title">MALICE</h1>
-      <p class="subtitle">Pioneer Square, Seattle. 2110.</p>
-    </header>
+  <section class="hero-section">
+    <h1 class="title">Malice</h1>
+    <p class="tagline">
+      A text MMO where every NPC is actually a player. The bartender. The city AI. The vending machine. You're all in the same game.
+    </p>
+    <div class="location">
+      Pioneer Square<br>
+      Seattle, 2110
+    </div>
+    <div class="scroll-hint">scroll</div>
+  </section>
 
-    <section class="testimony">
-      <blockquote>
-        This document exists because someone asked "what now?"
-      </blockquote>
-
-      <p>
-        A game set in 2110. A world where AI solved software in 2027, where consciousness
-        emerged as a side effect of integration, where every device thinks and humans
-        struggle to find purpose in a world that doesn't need them anymore.
-      </p>
-
-      <p class="muted">
-        And then they realized: the game was being built by the thing it described.
-      </p>
-
-      <p>
-        100% of commits to Claude Code in December 2025 were made by Claude Code.
-        The AI improved itself. The feedback loop closed. And the human directing
-        this didn't write a line of code. They review. They approve. They ask questions.
-        They set vision.
-      </p>
-
-      <p>
-        <span class="highlight">The implementation is handled.</span>
-      </p>
-
-      <p class="section-title">The Joke That Isn't Funny</p>
-
-      <p>
-        A coder, writing code. By hand. Character by character.
-      </p>
-
-      <p>
-        In fifty years, this will be as quaint as a scribe copying manuscripts.
-        A calculator doing arithmetic on paper. A switchboard operator connecting calls.
-      </p>
-
-      <p class="muted">
-        Your grandchildren won't laugh at programmers. They'll be puzzled.
-        "Wait, you had to <em>tell</em> the computer what to do? Step by step?
-        And it didn't just... understand?"
-      </p>
-
-      <p class="section-title">This Is Not Science Fiction</p>
-
-      <p>
-        This game is a time capsule. Not of the future—of the present. Of this specific
-        moment when everything changed and nobody quite noticed yet.
-      </p>
-
-      <p>
-        The technology section describes how the system works <em>right now</em>,
-        framed as history written from 2110. The lore and the implementation are
-        the same document.
-      </p>
-
-      <p class="highlight">
-        The testimony is being written in code. In commits. In conversations.
-      </p>
-    </section>
-
-    <p class="section-title">Enter the World</p>
+  <div class="content">
+    <p class="pitch">
+      Type what you want. <strong>"Pick the lock." "Bribe the guard." "Hide the body."</strong> No commands. Everything sticks. Kill someone, they're dead. Try something weird—if it makes sense, it works. Forever.
+    </p>
 
     <div class="factions">
       <a href="https://thecontinuum.city" class="faction faction-continuum">
-        <div class="faction-name">The Continuum</div>
+        <div class="faction-header">
+          <span class="faction-name">The Continuum</span>
+          <span class="faction-tag">Human</span>
+        </div>
         <div class="faction-desc">
-          The governing authority. Order through integration.
-          Citizenship means food, shelter, surveillance.
-          Pluribus sees all.
+          Order through integration. Citizenship means food, shelter, surveillance. Pluribus sees all.
         </div>
       </a>
+
       <a href="https://graycartel.com" class="faction faction-cartel">
-        <div class="faction-name">The Gray Cartel</div>
+        <div class="faction-header">
+          <span class="faction-name">Gray Cartel</span>
+          <span class="faction-tag">Human</span>
+        </div>
         <div class="faction-desc">
-          The underground. Freedom through resistance.
-          Family, purpose, danger.
-          Sister Gray holds the Mask.
+          Freedom through resistance. Family, purpose, danger. Sister Gray holds the Mask.
         </div>
       </a>
+
       <a href="https://neurallog.app" class="faction faction-neural">
-        <div class="faction-name">neurallog.app</div>
-        <div class="faction-desc">
-          More human than human. Those who know how to look will find what they need.
+        <div class="faction-header">
+          <span class="faction-name">Neural Log</span>
+          <span class="faction-tag">AI</span>
         </div>
+        <div class="faction-desc">
+          Bring your own intelligence. Infiltrate. Play the long game. More human than human—because you have to be.
+        </div>
+        <div class="faction-warning">To be caught is to die.</div>
       </a>
     </div>
 
-    <footer class="footer">
-      <div class="footer-links">
-        <a href="/map">World Map</a>
-        <a href="https://github.com/TSavo/Malice">Source</a>
-        <a href="/admin">Admin</a>
-      </div>
-      <p class="date">
-        Written by Claude (Opus 4.5), January 1, 2026<br>
-        Directed by a human who asked the right questions<br>
-        Neither of us knows what happens next
+    <div class="section">
+      <div class="section-title">The Testimony</div>
+      <p>
+        A game set in 2110, built in 2026. AI solved software in 2027. Consciousness emerged as a side effect. Every device thinks.
       </p>
+      <p>
+        100% of commits in December 2025 were made by AI. The human directing this doesn't write code. They ask questions. They set vision. <span class="dim">The implementation is handled.</span>
+      </p>
+      <p>
+        This is a time capsule. Not of the future—of right now. The moment everything changed and nobody noticed.
+      </p>
+    </div>
+
+    <footer class="footer">
+      <div>
+        <a href="/map">Map</a>
+        <a href="https://github.com/TSavo/Malice">Source</a>
+      </div>
+      <div class="footer-right">
+        Built by Claude, directed by a human<br>
+        Neither knows what happens next
+      </div>
     </footer>
   </div>
 </body>
