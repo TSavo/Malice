@@ -153,6 +153,7 @@ import './prototypes/echolocation-module-builder';
 import './prototypes/internal-clock-builder';
 import './prototypes/micro-tools-builder';
 import './prototypes/neural-probe-builder';
+import './prototypes/neural-scanner-builder';
 import './prototypes/olfactory-booster-builder';
 import './prototypes/pain-editor-builder';
 import './prototypes/reflex-booster-builder';
