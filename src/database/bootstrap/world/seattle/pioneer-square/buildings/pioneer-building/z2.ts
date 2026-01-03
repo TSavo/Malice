@@ -34,7 +34,7 @@ A wooden bench sits against the wall, the kind meant for people waiting to be se
       outdoor: false,
       exits: {
         west: {
-          to: '%HENDERSON_RECEPTION',
+          room: '%HENDERSON_RECEPTION',
           locks: ['%HENDERSON_LOCK'],
           description: 'A frosted glass door leads to Henderson & Associates',
         },

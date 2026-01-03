@@ -47,7 +47,7 @@ Through the reinforced glass, the executive suite beyond is visible—richer, mo
       outdoor: false,
       exits: {
         west: {
-          to: '%EXEC_RECEPTION',
+          room: '%EXEC_RECEPTION',
           locks: ['%EXEC_LOCK'],
           description: 'A reinforced door with biometric scanner leads to the executive suite',
         },
