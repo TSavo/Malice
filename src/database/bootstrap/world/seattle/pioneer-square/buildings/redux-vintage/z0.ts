@@ -7,7 +7,7 @@ export const building = {
   y: 4,
   width: 2,
   height: 2,
-  floors: 1,
+  floors: 2,
 
   rooms: {
     // ═══════════════════════════════════════════════════════════════════
@@ -170,6 +170,8 @@ A battered couch sits against one wall, the kind employees use for breaks. The u
 
 The smell back here is distinctly vintage: mothballs, old fabric, the ghost of perfumes that stopped being manufactured decades ago. It's not unpleasant exactly—more archaeological, the scent of time preserved in fiber.
 
+A metal ladder in the corner leads up through a hatch to the roof. Someone painted it the same beige as the walls, trying to make it less industrial. The attempt failed.
+
 A small desk in the corner holds a laptop that won't turn on, a pricing gun with a jammed mechanism, and a calculator with faded buttons. The business side of nostalgia, frozen when business stopped.`,
       x: -16,
       y: 5,
@@ -181,6 +183,7 @@ A small desk in the corner holds a laptop that won't turn on, a pricing gun with
       outdoor: false,
       exits: {
         south: '%BACKROOM',
+        up: { room: '%ROOF_NW', locks: ['%ROOF_HATCH_LOCK'] },
       },
       objects: [
         {
