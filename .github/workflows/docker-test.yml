@@ -18,9 +18,21 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            image=moby/buildkit:master
+            network=host
 
-      - name: Build game container
-        run: docker compose build game
+      - name: Build game container with cache
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          tags: malice-game:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Start MongoDB
         run: |
