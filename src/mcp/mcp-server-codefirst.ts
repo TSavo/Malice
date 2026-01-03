@@ -2138,6 +2138,18 @@ Core Objects:
           return;
         }
 
+        // Health check endpoint
+        if (req.url === '/health') {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({
+            status: 'ok',
+            service: 'mcp-codefirst',
+            sessions: this.sessions.size,
+            timestamp: new Date().toISOString(),
+          }));
+          return;
+        }
+
         if (req.url !== '/mcp') {
           res.writeHead(404);
           res.end('Not Found');
