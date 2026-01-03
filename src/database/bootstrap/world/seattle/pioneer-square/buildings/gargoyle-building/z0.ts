@@ -11,6 +11,47 @@ export const building = {
 
   rooms: {
     // ═══════════════════════════════════════════════════════════════════
+    // DOORS AND LOCKS
+    // ═══════════════════════════════════════════════════════════════════
+
+    '%FRONT_LOCK': {
+      prototype: 'lock',
+      name: 'Pioneer Mutual Front Lock',
+      description:
+        'A massive brass lock mechanism set into the heavy wooden doors. Victorian engineering—intricate but well-maintained despite its age.',
+      difficulty: 5,
+    },
+    '%FRONT_DOOR': {
+      prototype: 'door',
+      name: 'Heavy Wooden Doors',
+      description:
+        'Double doors of solid oak, darkened with age and carved with geometric patterns. Brass handles worn smooth by a century of hands. The doors stand open, wedged with a brick that someone placed there long ago.',
+      locked: false,
+      open: true,
+      locks: ['%FRONT_LOCK'],
+      material: 'wood',
+      durability: 85,
+    },
+    '%SHOP_LOCK': {
+      prototype: 'lock',
+      name: 'Shop Alley Lock',
+      description:
+        'A simple deadbolt on the shop\'s alley entrance. The kind of lock meant to deter casual theft, not determined entry.',
+      difficulty: 4,
+    },
+    '%SHOP_DOOR': {
+      prototype: 'door',
+      name: 'Cracked Glass Door',
+      description:
+        'A door with a large glass panel, now held together by a spider-web of cracks. The glass fractures haven\'t fallen out yet, but they will. The door is locked from inside.',
+      locked: true,
+      open: false,
+      locks: ['%SHOP_LOCK'],
+      material: 'glass',
+      durability: 25,
+    },
+
+    // ═══════════════════════════════════════════════════════════════════
     // GROUND FLOOR (z=0) - LOBBY AND SHOPS
     // ═══════════════════════════════════════════════════════════════════
 
@@ -33,6 +74,7 @@ A brass mailbox bank lines one wall, each box labeled with suite numbers and nam
         east: {
           to: 'yesler-way/x-17.ts',
           description: 'Heavy wooden doors lead back to Yesler Way',
+          door: '%FRONT_DOOR',
         },
         west: '%BACK_HALL',
         up: '%STAIRWELL',
@@ -124,10 +166,15 @@ A separate entrance opens onto the alley to the south, its door locked but its g
       outdoor: false,
       exits: {
         north: '%BACK_HALL',
+        south: {
+          to: null, // Alley exit not implemented
+          description: 'A cracked glass door leads to the alley',
+          door: '%SHOP_DOOR',
+        },
       },
       objects: [
         {
-          prototype: 'describable',
+          prototype: 'furniture',
           name: 'three-way mirror',
           aliases: ['mirror', 'mirrors'],
           description: `A three-way mirror, the kind that lets you see yourself from all angles when trying on clothes. The glass is dusty but unbroken, its brass frame tarnished. The reflections show the empty shop from multiple angles, multiplying the abandonment. In better days, customers stood here and watched themselves transformed by tailored clothing.`,
@@ -139,7 +186,7 @@ A separate entrance opens onto the alley to the south, its door locked but its g
           description: `A large worktable designed for cutting fabric and making alterations, its surface a patchwork of pin marks, chalk lines, and cutting guides worn into the wood. A pair of fabric shears lies on the table, their blades rusted shut. Pins are scattered in the corners, their heads forming tiny constellations. The tailor's tools remain. The tailor's hands are gone.`,
         },
         {
-          prototype: 'describable',
+          prototype: 'furniture',
           name: 'dress form',
           aliases: ['mannequin', 'form', 'dummy'],
           description: `A headless, armless dress form stands in the corner, its adjustable sections set for someone's measurements. Measuring tape hangs across its torso like a sash, the inches and centimeters still legible. A half-finished alteration—pinned but never sewn—clings to the form: a jacket waiting to have its sleeves shortened. The customer never came back for it.`,

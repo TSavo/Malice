@@ -11,6 +11,29 @@ export const building = {
 
   rooms: {
     // ═══════════════════════════════════════════════════════════════════
+    // DOORS AND LOCKS
+    // ═══════════════════════════════════════════════════════════════════
+
+    '%FRONT_LOCK': {
+      prototype: 'lock',
+      name: 'Morrison & Kline Front Lock',
+      description:
+        'A heavy brass mortise lock set into the frosted glass door. The mechanism is solid, built for a business that valued security.',
+      difficulty: 6,
+    },
+    '%FRONT_DOOR': {
+      prototype: 'door',
+      name: 'Frosted Glass Door',
+      description:
+        'A heavy door of frosted glass set in a brass frame. The glass is etched with the firm name in an elegant serif font. The door is unlocked—whoever left last expected to return.',
+      locked: false,
+      open: true,
+      locks: ['%FRONT_LOCK'],
+      material: 'glass',
+      durability: 60,
+    },
+
+    // ═══════════════════════════════════════════════════════════════════
     // GROUND FLOOR (z=0) - LAW OFFICES
     // ═══════════════════════════════════════════════════════════════════
 
@@ -33,6 +56,7 @@ The waiting area offers leather chairs arranged around a coffee table stacked wi
         east: {
           to: '1st-ave-s/y7.ts',
           description: 'Frosted glass doors lead back to 1st Ave S',
+          door: '%FRONT_DOOR',
         },
         west: '%OFFICE_MAIN',
         north: '%CONFERENCE',
@@ -167,6 +191,12 @@ A credenza against the wall holds a coffee service—carafe, cups, sugar and cre
           description: `A large whiteboard mounted on the wall, its surface covered in blue and red marker. Boxes contain names: "Plaintiff - Matsuda Shipping," "Defendant - Pacific Stevedoring," "Insurer - Lloyd's of London." Arrows connect the boxes in patterns that made sense to the attorneys who drew them. The case number is written in the corner: 2019-CV-4477. Whatever dispute this represented, the statute of limitations has run. The diagram persists.`,
         },
         {
+          prototype: 'furniture',
+          name: 'credenza',
+          aliases: ['sideboard'],
+          description: `A mahogany credenza against the wall, its surface holding the coffee service for client meetings. The wood matches the conference table—purchased as a set, meant to project prosperity and permanence. Cabinet doors below conceal legal files, extra legal pads, and the decanters of whiskey that lubricated difficult negotiations.`,
+        },
+        {
           prototype: 'describable',
           name: 'coffee service',
           aliases: ['coffee', 'carafe'],
@@ -229,7 +259,7 @@ The room smells of old paper and leather bindings, the distinct scent of accumul
           description: `Legal pads covered in handwritten research notes, citations in blue ink, questions in red. "See also: Pacific S.S. Co. v. Calmaquip Engineering Corp." "Distinguish from: Carriage of Goods by Sea Act §4(2)." The research was thorough, the citations precise. The case was never argued. The research remains, meticulous preparation for an argument no one will make.`,
         },
         {
-          prototype: 'describable',
+          prototype: 'furniture',
           name: 'card catalog',
           aliases: ['catalog', 'index'],
           description: `A wooden card catalog stands against one wall, its small drawers labeled alphabetically—an anachronism even before everything ended. The cards inside cross-reference cases and topics, handwritten in fountain pen by librarians who retired decades ago. Someone maintained the system out of tradition rather than necessity. The tradition outlived its practitioners.`,
