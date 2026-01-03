@@ -99,7 +99,7 @@ The waiting area offers leather chairs arranged around a coffee table stacked wi
 Filing cabinets line one wall, their labels identifying decades of maritime cases: CARGO DAMAGE 1990-1995, CHARTER DISPUTES, INSURANCE CLAIMS. The paper trail of commerce, meticulously organized and utterly obsolete. The statutes of limitations have run out on everything stored here.
 
 A model ship sits in a glass case on the credenza—a container vessel rendered in exacting detail, the kind of gift clients gave to attorneys who saved them millions. The ship is dusty but intact, frozen in its eternal voyage across a sea of polished wood.`,
-      x: -16,
+      x: -15,
       y: 7,
       z: 0,
       population: 0,
@@ -218,7 +218,7 @@ A credenza against the wall holds a coffee service—carafe, cups, sugar and cre
 A research table occupies the center of the room, surrounded by wooden chairs with worn leather seats. Legal pads and pencils are scattered across the surface, notes from research that was never completed. The Westlaw terminal is dark, its subscription long since lapsed.
 
 The room smells of old paper and leather bindings, the distinct scent of accumulated legal knowledge. The knowledge remains. The lawyers who might have applied it are gone.`,
-      x: -16,
+      x: -15,
       y: 8,
       z: 0,
       population: 0,
