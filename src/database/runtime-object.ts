@@ -521,10 +521,20 @@ export class RuntimeObjectImpl implements RuntimeObject {
   }
 
   /**
-   * Wait for all queued writes to complete
+   * Wait for all queued writes to complete.
+   * Loops until the queue is stable (no new writes added during await).
    */
   async flushQueue(): Promise<void> {
-    await this.writeQueue;
+    // Keep draining until queue is stable - new writes may be queued
+    // while we're awaiting, which extends the chain beyond what we captured
+    while (true) {
+      const current = this.writeQueue;
+      await current;
+      // If no new writes were queued during our await, we're done
+      if (this.writeQueue === current) {
+        break;
+      }
+    }
   }
 
   /**
