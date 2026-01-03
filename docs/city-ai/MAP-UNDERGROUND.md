@@ -134,14 +134,14 @@ y=+6                               │                            WEST SPINE    
   │                                │                            (x=-14, y=+10 to -8)            │
 y=+5                               ●                            THE JUNCTION                    │
   │                                │                                                            │
-y=+4                               ●───●───●───●               GRAND CENTRAL ARCADE            │
-  │                                │                            (x=-14 to -10, y=4)             │
-y=+3                                   ●───●                    ARCADE SOUTH WING               │
-  │                                │                            (x=-12 to -11, y=3)             │
-y=+2                               │                                           ◆ E3             │
-  │                                │                                           │PARK            │
-y=+1                               │                                           │           ⊗    │
-  │                                │                                           │          SEALED│
+y=+4                               ●───●───●───●───●───●───●───●   GRAND CENTRAL & PARK        │
+  │                                │                       ▓   ▓   (x=-14 to -4, y=+4)          │
+y=+3                               ●───●───●───●───●───●───●───●   OCCIDENTAL PARK              │
+  │                                │                       ▓   ▓   (x=-10 to -4, y=+3)          │
+y=+2                               │                   ●───●───●───◆E3                          │
+  │                                │                   ▓   ▓       PARK                         │
+y=+1                               │                   ●───●───●───●                       ⊗    │
+  │                                │                   ▓   ▓   ▓   ▓                      SEALED│
 y=0   ●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●    │
   │  SEAWALL                    MAIN                                    S. MAIN  2ND AVE        │
   │  x=-21                      CROSSING                               CORRIDOR  BASEMENT       │
@@ -158,12 +158,12 @@ y=-5   ◆──●───●───●───●───●───●�
   │    E4                       SUPPLY                          (y=-5, x=-20 to -14)            │
   │    SUPPLY                   JUNCTION                                                        │
   │    DEPOT                       │                                                            │
-y=-6                               │                            SOUTHERN EXTENSION              │
-  │                                │                            (sinkhole approach)             │
-y=-7                               │                                                            │
-  │                                │                                                            │
-y=-8                               ⊗                            FLOODED TERMINUS                │
-  │                             FLOODED                         (dead end - sinkhole water)     │
+y=-6                   ●───●       │                            SOUTHERN EXTENSION              │
+  │                               │                            (sinkhole approach)             │
+y=-7                   ●───●       │                            SINKHOLE PERIMETER              │
+  │                   EDGE         │                            (x=-16 to -15, y=-6 to -8)      │
+y=-8                       ●       ⊗                            FLOODED ZONES                   │
+  │                     DROWNED  FLOODED                        (dead end - sinkhole water)     │
   └──────────────────────────────────────────────────────────────────────────────────────────────┘
 
 Legend:
@@ -190,11 +190,18 @@ Legend:
 | Northern Extension East | E-W | (-13, +11) | (-12, +11) | 2 |
 | Yesler Crossing | E-W | (-14, +12) | (-13, +12) | 2 |
 | Grand Central Arcade Main | E-W | (-14, +4) | (-10, +4) | 5 |
+| Grand Central to Park | E-W | (-10, +4) | (-4, +4) | 7 |
+| Park Connection y=3 | E-W | (-10, +3) | (-4, +3) | 7 |
 | Arcade South Wing | E-W | (-12, +3) | (-11, +3) | 2 |
 | Waterfront Corridor North | N-S | (-20, -2) | (-20, +5) | 8 |
 | Park Access | N-S | (-3, +1) | (-3, +2) | 2 |
+| Occidental Park Underground North | N-S | (-6, +1) | (-6, +4) | 4 |
+| Occidental Park Underground East | N-S | (-5, +1) | (-5, +4) | 4 |
+| Occidental Park Underground Center | N-S | (-4, +1) | (-4, +4) | 4 |
+| Sinkhole Perimeter West | N-S | (-16, -6) | (-16, -7) | 2 |
+| Sinkhole Approach | N-S | (-15, -6) | (-15, -8) | 3 |
 
-**Total z=-2 rooms: 72** (49 original + 23 new expansion rooms)
+**Total z=-2 rooms: 93** (72 previous + 21 new expansion rooms)
 
 ### Named Locations (z=-2)
 
@@ -215,6 +222,12 @@ Legend:
 | 2nd Avenue Basement | (0, 0) | Old commercial space, sealed door to street |
 | Sealed Passage | (0, +1) | Blocked by Corp Construction's concrete wall |
 | Flooded Terminus | (-14, -8) | Dead end - sinkhole water blocks passage south |
+| Merchant Vault | (-5, +1) | Old storage vault with faded inventory codes |
+| Cistern Approach | (-5, +2) | Passage to abandoned cistern below |
+| Plaza Foundation | (-5, +3) | Shared basement revealing old property disputes |
+| Collapsed Section | (-16, -6) | Partial ceiling failure near sinkhole, barely navigable |
+| Sinkhole Edge | (-16, -7) | The edge of the void - passage ends at 15m deep flooded pit |
+| Drowned Corridor | (-15, -8) | Fully submerged passage with rope anchor into darkness |
 
 ### Generic Passage Types
 
