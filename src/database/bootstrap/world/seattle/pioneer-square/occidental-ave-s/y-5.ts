@@ -15,5 +15,9 @@ Cafe tables lie scattered across the bricks like debris from an explosion of lei
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
 };

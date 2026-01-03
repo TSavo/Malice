@@ -18,4 +18,12 @@ The courthouse steps are visible to the south, leading up to doors that dispense
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  sittables: [
+    {
+      name: 'courthouse steps',
+      capacity: 4,
+      emptyMsg: 'Broad stone steps lead up to the courthouse doors.',
+      occupiedMsg: '%s sitting on the courthouse steps',
+    },
+  ],
 };

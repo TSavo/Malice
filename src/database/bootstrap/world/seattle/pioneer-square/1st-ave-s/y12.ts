@@ -18,4 +18,8 @@ Traffic signals hang dark and useless above the intersection. The last time they
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

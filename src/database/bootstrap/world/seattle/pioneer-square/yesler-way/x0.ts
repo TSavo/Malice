@@ -18,4 +18,10 @@ The corner buildings lean into each other slightly, the settling of foundations 
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  // Street furniture
+  objects: [
+    { prototype: 'streetSignal', name: 'Traffic Signal' },
+    { prototype: 'streetSign', streetName: '2nd Ave S', direction: ['N', 'S'] },
+    { prototype: 'streetSign', streetName: 'Yesler Way', direction: ['E', 'W'] },
+  ],
 };

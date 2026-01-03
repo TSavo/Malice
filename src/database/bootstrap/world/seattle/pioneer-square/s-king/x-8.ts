@@ -15,4 +15,8 @@ A faded crosswalk marks an intersection with an alley that leads north, the whit
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

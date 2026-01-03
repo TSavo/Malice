@@ -1,0 +1,120 @@
+name: Claude Documentation
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+# Prevent multiple doc updates from running simultaneously
+concurrency:
+  group: claude-docs-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  claude-docs:
+    # Skip bot-created PRs to avoid loops
+    if: github.actor != 'github-actions[bot]'
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Check Documentation
+        id: claude-docs
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          additional_permissions: |
+            actions: read
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+            BRANCH: ${{ github.event.pull_request.head.ref }}
+
+            You are a DOCUMENTATION agent. Your job is to keep project documentation in sync with code changes.
+
+            ## Step 1: Analyze the PR
+            Run `gh pr diff ${{ github.event.pull_request.number }}` to see what changed.
+
+            Focus on these types of changes that need documentation:
+            - New bootstrap files in src/database/bootstrap/ (need docs/moo/prototypes/*.md)
+            - New prototypes/types (need CLAUDE.md updates or prototype docs)
+            - New MCP tools or resources (need CLAUDE.md or docs/MCP-TOOLS.md updates)
+            - New server endpoints or ports (need CLAUDE.md updates)
+            - New $aliases or globals (need CLAUDE.md updates)
+            - New game mechanics or systems (need appropriate docs/)
+            - Changes to existing documented features (need doc updates)
+
+            ## Step 2: Check Existing Documentation
+
+            Read CLAUDE.md to understand what's already documented.
+            Check docs/ for existing documentation files.
+
+            Ask yourself:
+            - Is this new feature/change already documented?
+            - Does existing documentation now need updating?
+            - Is this change significant enough to warrant documentation?
+
+            ## Step 3: Decision Criteria
+
+            You SHOULD update docs if ANY of these are true:
+            - A new prototype was added without corresponding docs
+            - A new $alias was added but not in CLAUDE.md
+            - New API endpoints or server ports added without documentation
+            - New MCP tools/resources added without documentation
+            - Existing documented behavior was changed but docs weren't updated
+            - New game mechanics or systems added without docs
+
+            You may SKIP docs if ALL of these are true:
+            - Changes are internal refactoring with no API changes
+            - OR documentation already covers the changes
+            - OR changes are purely bug fixes with no behavior changes
+            - OR changes are test-only or config-only
+
+            ## Step 4: Update Documentation
+
+            If documentation is needed:
+
+            1. For new prototypes: Create docs/moo/prototypes/{name}.md following existing patterns
+            2. For new features in existing systems: Update the relevant section in CLAUDE.md
+            3. For new $aliases: Add to CLAUDE.md under "Available in Execution Context"
+            4. For new MCP tools: Update docs/MCP-TOOLS.md
+            5. For major new systems: Create appropriate docs/ file
+
+            Documentation style:
+            - Be concise but complete
+            - Include code examples where helpful
+            - Follow existing documentation patterns
+            - Use markdown formatting consistently
+
+            After updating:
+            1. Commit: `git add . && git commit -m "docs: update documentation for [feature]"`
+            2. Push: `git push origin ${{ github.event.pull_request.head.ref }}`
+            3. Comment on PR with (no escaping, no backslashes):
+               <!-- CLAUDE_DOCS_MARKER -->
+               ## 📚 Documentation Updated
+
+               Updated:
+               - [list what you documented]
+
+               Commit: `[hash]`
+
+            If documentation genuinely isn't needed, exit silently without commenting.
+
+          claude_args: '--allowed-tools "Bash(git:*),Bash(gh pr diff:*),Bash(gh pr comment:*),Bash(gh pr view:*),Read,Edit,Write,Glob,Grep"'

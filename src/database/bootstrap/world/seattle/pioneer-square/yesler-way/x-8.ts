@@ -15,4 +15,8 @@ A historic marker is mounted on one building, commemorating Yesler's original sa
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

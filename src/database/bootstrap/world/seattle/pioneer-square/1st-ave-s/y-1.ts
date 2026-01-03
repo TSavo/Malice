@@ -15,4 +15,8 @@ A street lamp leans at a slight angle, its pole bent by some long-ago impact—v
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

@@ -15,4 +15,8 @@ A street corner that once hosted a flower vendor's cart shows the wear pattern o
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

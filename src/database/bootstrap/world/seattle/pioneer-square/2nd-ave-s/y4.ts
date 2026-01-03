@@ -15,4 +15,8 @@ Water stains mark the asphalt where something leaked from above. The source isn'
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

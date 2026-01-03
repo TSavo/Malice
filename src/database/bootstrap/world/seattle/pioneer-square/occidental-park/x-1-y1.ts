@@ -15,5 +15,17 @@ S. Main Street is visible to the south, the storefronts along its edge dark and 
   ambientNoise: 15, // Open plaza, wind across brick
   lighting: 100, // Full daylight (open space)
   waterLevel: 0, // Dry
-  outdoor: true, // Open plaza
+  outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
+  sittables: [
+    {
+      name: 'a wooden bench',
+      capacity: 2,
+      emptyMsg: 'A wooden bench faces west toward the setting sun.',
+      occupiedMsg: '%s sitting on the wooden bench',
+    },
+  ],
 };

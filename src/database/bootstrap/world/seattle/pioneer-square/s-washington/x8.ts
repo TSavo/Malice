@@ -16,4 +16,8 @@ A row of dark storefronts faces the rubble, their plate glass long since broken 
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

@@ -48,6 +48,9 @@ Someone scratched initials into the metal bed frame: JK + TM, surrounded by a he
       exits: {
         west: '%HALL_2',
       },
+      objects: [
+        { prototype: 'bed', name: 'a metal bed', description: 'A metal bed frame with scratched initials stands against the wall.', quality: 'cheap' },
+      ],
     },
   },
 

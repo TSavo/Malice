@@ -15,4 +15,8 @@ A former dim sum restaurant occupies the corner, its red awning faded to pink, i
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

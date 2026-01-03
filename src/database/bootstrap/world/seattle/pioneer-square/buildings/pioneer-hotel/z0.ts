@@ -112,6 +112,14 @@ A rate card is taped to the glass: BY THE HOUR, BY THE NIGHT, BY THE WEEK. The p
       exits: {
         west: '%LOBBY',
       },
+      sittables: [
+        {
+          name: 'a narrow cot',
+          capacity: 1,
+          emptyMsg: 'A cot wedged in the corner suggests someone sleeps here.',
+          occupiedMsg: '%s lying on the cot',
+        },
+      ],
     },
   },
 

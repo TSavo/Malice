@@ -17,6 +17,10 @@ The market stretches west behind you. The park opens to the south.`,
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
   sittables: [
     {
       name: 'a entrance bench',

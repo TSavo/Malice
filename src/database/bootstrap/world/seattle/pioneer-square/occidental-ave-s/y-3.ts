@@ -15,5 +15,17 @@ Pigeons have colonized the rafters, their cooing a constant murmur like distant 
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
+  sittables: [
+    {
+      name: 'the pergola corner nest',
+      capacity: 2,
+      emptyMsg: 'A makeshift camp sits tucked in the pergola corner.',
+      occupiedMsg: '%s sitting in the pergola alcove',
+    },
+  ],
 };

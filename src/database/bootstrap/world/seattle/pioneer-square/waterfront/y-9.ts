@@ -15,4 +15,8 @@ Gulls circle overhead, the only consistent life along this stretch. They've adap
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

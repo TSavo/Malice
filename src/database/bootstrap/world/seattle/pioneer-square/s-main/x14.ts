@@ -19,4 +19,10 @@ This is as far east as you can go on Main Street.`,
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  // Street furniture
+  objects: [
+    { prototype: 'streetSignal', name: 'Traffic Signal' },
+    { prototype: 'streetSign', streetName: '4th Ave S', direction: ['N', 'S'] },
+    { prototype: 'streetSign', streetName: 'S. Main St', direction: ['E', 'W'] },
+  ],
 };

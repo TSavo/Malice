@@ -15,4 +15,8 @@ The smell of old fire lingers in the debris, decades of rain unable to wash away
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

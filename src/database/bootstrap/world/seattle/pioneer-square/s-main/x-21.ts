@@ -17,4 +17,10 @@ IVAR'S ACRES OF CLAMS occupies the corner building, a Seattle institution since 
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  // Street furniture
+  objects: [
+    { prototype: 'streetSignal', name: 'Traffic Signal' },
+    { prototype: 'streetSign', streetName: 'Alaskan Way', direction: ['N', 'S'] },
+    { prototype: 'streetSign', streetName: 'S. Main St', direction: ['E', 'W'] },
+  ],
 };

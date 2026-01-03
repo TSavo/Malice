@@ -19,5 +19,17 @@ The park extends in all cardinal directions from here.`,
   ambientNoise: 12, // Pergola slightly muffles wind
   lighting: 90, // Slight shade from pergola
   waterLevel: 0, // Dry
-  outdoor: true, // Open plaza with pergola
+  outdoor: true,
+  // Park furniture
+  objects: [
+    { prototype: 'parkLamp', name: 'Park Lamp' },
+  ],
+  sittables: [
+    {
+      name: 'a pergola bench',
+      capacity: 2,
+      emptyMsg: 'Benches line the pergola structure, facing the path.',
+      occupiedMsg: '%s sitting on a pergola bench',
+    },
+  ],
 };

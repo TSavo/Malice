@@ -15,4 +15,8 @@ The street surface here is concrete rather than asphalt, heavy-duty paving desig
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

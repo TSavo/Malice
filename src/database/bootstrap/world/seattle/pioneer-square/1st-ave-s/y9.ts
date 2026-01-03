@@ -16,4 +16,8 @@ To the west, City Services occupies what was once a bank building—the kind of 
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

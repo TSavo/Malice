@@ -184,14 +184,10 @@ Personal effects are absent, but the room shows signs of occupation at various p
       exits: {
         out: { room: '%GC_HALL_2S', door: '%GC_D_5', locks: ['%GC_RL_5'] },
       },
+      objects: [
+        { prototype: 'bed', name: 'an iron bed frame', description: 'An iron bed frame sits against the wall, its mattress long since rotted to springs and stuffing.', quality: 'cheap' },
+      ],
       sittables: [
-        {
-          name: 'an iron bed frame',
-          capacity: 2,
-          emptyMsg:
-            'An iron bed frame sits against the wall, its mattress long since rotted to springs and stuffing.',
-          occupiedMsg: '%s resting on the bed frame',
-        },
         {
           name: 'a wooden chair',
           capacity: 1,
@@ -219,13 +215,10 @@ A transom window above the door provided ventilation; it's jammed open now, lett
       exits: {
         out: { room: '%GC_HALL_2S', door: '%GC_D_6', locks: ['%GC_RL_6'] },
       },
+      objects: [
+        { prototype: 'bed', name: 'an iron bed', description: 'An iron-framed bed sits against the interior wall.', quality: 'standard' },
+      ],
       sittables: [
-        {
-          name: 'an iron bed',
-          capacity: 2,
-          emptyMsg: 'An iron-framed bed sits against the interior wall.',
-          occupiedMsg: '%s on the bed',
-        },
         {
           name: 'a writing desk chair',
           capacity: 1,
@@ -257,13 +250,8 @@ Strangely, this room is in better condition than its neighbors. The wallpaper is
       exits: {
         out: { room: '%GC_HALL_2', door: '%GC_D_3', locks: ['%GC_RL_3'] },
       },
-      sittables: [
-        {
-          name: 'a narrow bed',
-          capacity: 1,
-          emptyMsg: 'A narrow iron bed occupies most of the room.',
-          occupiedMsg: '%s lying on the narrow bed',
-        },
+      objects: [
+        { prototype: 'bed', name: 'a narrow bed', description: 'A narrow iron bed occupies most of the room.', quality: 'standard' },
       ],
     },
 
@@ -310,13 +298,8 @@ Despite the damage, the room is fundamentally sound. The floor is solid, the cei
       exits: {
         out: { room: '%GC_HALL_2', door: '%GC_D_4', locks: ['%GC_RL_4'] },
       },
-      sittables: [
-        {
-          name: 'a damaged bed',
-          capacity: 2,
-          emptyMsg: 'A bent iron bed frame sits at an angle, one leg broken.',
-          occupiedMsg: '%s on the tilted bed',
-        },
+      objects: [
+        { prototype: 'bed', name: 'a damaged bed', description: 'A bent iron bed frame sits at an angle, one leg broken.', quality: 'cheap' },
       ],
     },
 
@@ -372,6 +355,9 @@ Crown molding decorates the ceiling, water-stained but intact. This was where bu
       exits: {
         out: { room: '%GC_HALL_2N', door: '%GC_D_1', locks: ['%GC_RL_1'] },
       },
+      objects: [
+        { prototype: 'bed', name: 'an iron bed', description: "A larger iron bed frame occupies the room's center.", quality: 'standard' },
+      ],
       sittables: [
         {
           name: 'a rotted settee',
@@ -386,12 +372,6 @@ Crown molding decorates the ceiling, water-stained but intact. This was where bu
           emptyMsg:
             'A spindly chair with a hole in its cane seat sits by the window.',
           occupiedMsg: '%s perched carefully on the broken chair',
-        },
-        {
-          name: 'an iron bed',
-          capacity: 2,
-          emptyMsg: "A larger iron bed frame occupies the room's center.",
-          occupiedMsg: '%s on the bed',
         },
       ],
     },

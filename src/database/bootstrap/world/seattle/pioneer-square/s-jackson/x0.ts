@@ -17,4 +17,10 @@ The buildings at this intersection are newer construction, built during the stad
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  // Street furniture
+  objects: [
+    { prototype: 'streetSignal', name: 'Traffic Signal' },
+    { prototype: 'streetSign', streetName: '2nd Ave S', direction: ['N', 'S'] },
+    { prototype: 'streetSign', streetName: 'S. Jackson St', direction: ['E', 'W'] },
+  ],
 };

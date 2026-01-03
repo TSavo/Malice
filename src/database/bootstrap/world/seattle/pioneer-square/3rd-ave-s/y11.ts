@@ -15,4 +15,8 @@ Third Avenue ends here, at least for practical purposes. The route continues on 
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

@@ -15,4 +15,8 @@ Buildings on the west side show Victorian brick and warehouse architecture. The 
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

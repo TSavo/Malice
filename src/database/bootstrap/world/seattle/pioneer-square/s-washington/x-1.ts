@@ -15,4 +15,8 @@ A row of young trees was planted along this block in the 1990s, intended to soft
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

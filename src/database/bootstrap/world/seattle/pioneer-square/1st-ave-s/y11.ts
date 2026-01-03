@@ -16,4 +16,8 @@ A few hardy weeds have pushed through cracks in the sidewalk, the only living th
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

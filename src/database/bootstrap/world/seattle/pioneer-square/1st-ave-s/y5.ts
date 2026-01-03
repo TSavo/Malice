@@ -15,4 +15,8 @@ A fire escape zigzags down the adjacent building's face, its metal stairs ending
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

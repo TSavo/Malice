@@ -15,4 +15,8 @@ A dragon lamp post stands at the corner, one of a series installed in the 1970s 
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };

@@ -17,4 +17,10 @@ The buildings at this intersection represent different eras of Seattle developme
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  // Street furniture
+  objects: [
+    { prototype: 'streetSignal', name: 'Traffic Signal' },
+    { prototype: 'streetSign', streetName: '1st Ave S', direction: ['N', 'S'] },
+    { prototype: 'streetSign', streetName: 'S. Jackson St', direction: ['E', 'W'] },
+  ],
 };

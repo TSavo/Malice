@@ -15,4 +15,8 @@ A faded poster clings to a lamp post, advertising an event from before—a conce
   lighting: 100,
   waterLevel: 0,
   outdoor: true,
+  // Street furniture
+  objects: [
+    { prototype: 'lamppost', name: 'Street Lamp' },
+  ],
 };
