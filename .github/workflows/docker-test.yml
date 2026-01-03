@@ -26,7 +26,11 @@ jobs:
         run: |
           docker compose up -d mongodb
           echo "Waiting for MongoDB to be healthy..."
-          timeout 60 bash -c 'until docker compose ps mongodb | grep -q healthy; do sleep 2; done'
+          timeout 60 bash -c 'until docker compose ps mongodb | grep -q healthy; do sleep 2; done' || {
+            echo "ERROR: MongoDB timed out"
+            docker compose logs mongodb --tail=20
+            exit 1
+          }
           echo "MongoDB is healthy"
 
       - name: Drop database
@@ -41,7 +45,11 @@ jobs:
         run: |
           docker compose up -d
           echo "Waiting for game server to be healthy..."
-          timeout 120 bash -c 'until docker compose ps game | grep -q healthy; do sleep 3; done'
+          timeout 120 bash -c 'until docker compose ps game | grep -q healthy; do sleep 3; done' || {
+            echo "ERROR: Game server timed out"
+            docker compose logs game --tail=50
+            exit 1
+          }
           echo "Game server is healthy"
 
       - name: Verify services
