@@ -16,4 +16,10 @@ The park above is empty now, its dead trees and silent fountain a memorial to th
   lighting: 15,
   waterLevel: 0,
   outdoor: false,
+  exits: {
+    down: {
+      locked: true,
+      description: 'A concealed trapdoor blends with the brick floor. A padlock secures its iron ring.',
+    },
+  },
 };

@@ -16,4 +16,10 @@ Chalk marks cluster in the corners—directional symbols, territorial indicators
   lighting: 20,
   waterLevel: 0,
   outdoor: false,
+  exits: {
+    down: {
+      locked: true,
+      description: 'A heavy iron grate covers a vertical shaft. A padlock secures the hasp.',
+    },
+  },
 };

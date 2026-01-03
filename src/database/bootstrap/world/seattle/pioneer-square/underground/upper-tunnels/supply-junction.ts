@@ -16,4 +16,10 @@ Scratched into the southwest corner is a symbol: a scale balanced over crossed k
   lighting: 20,
   waterLevel: 0,
   outdoor: false,
+  exits: {
+    down: {
+      locked: true,
+      description: 'A reinforced hatch is set into the floor. A combination padlock dangles from its hasp.',
+    },
+  },
 };
