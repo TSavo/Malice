@@ -55,7 +55,7 @@ export const building = {
 Behind the bar, bottles line the mirrored shelves in neat rows—whiskey, bourbon, gin, the amber and clear spirits that fueled the neighborhood's evenings. The bottles are dusty but full, their labels faded, their contents still potent. A brass cash register sits at one end, its keys frozen, its drawer slightly open.
 
 Bar stools with torn leather seats line the mahogany counter, their chrome bases dulled, their cushions cracked. Someone sat on each of these stools. Someone drank and talked and laughed. The stools remember even if no one else does.`,
-      x: -14,
+      x: -16,
       y: -2,
       z: 0,
       population: 0,
@@ -171,7 +171,7 @@ A fireplace occupies one wall, its hearth cold, its mantle displaying trophies a
 The walk-in cooler hums quietly in the corner—someone left the power on, and the compressor still cycles, keeping whatever remains inside at temperature. The door is heavy steel with a latch that opens from inside, a safety feature for the staff who once worked here.
 
 Prep tables line the center of the room, their surfaces stained with the history of vegetables chopped and meat portioned and plates assembled. The menu board on the wall still lists the day's specials in chalk. The chalk has faded. The specials expired long ago.`,
-      x: -14,
+      x: -16,
       y: -3,
       z: 0,
       population: 0,
