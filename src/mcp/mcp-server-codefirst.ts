@@ -36,7 +36,13 @@ interface SessionState {
   server: McpServer;
   transport: StreamableHTTPServerTransport;
   playerId?: ObjId; // Authenticated player ID (undefined = unauthenticated)
+  lastActivity: number; // Timestamp of last activity (Date.now())
 }
+
+// Session TTL: 30 minutes of inactivity
+const SESSION_TTL_MS = 30 * 60 * 1000;
+// Cleanup interval: check every 5 minutes
+const SESSION_CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
 
 /**
  * Code-First MCP Server
@@ -45,6 +51,7 @@ interface SessionState {
 export class MaliceMCPServer {
   private httpServer: ReturnType<typeof createServer> | null = null;
   private sessions = new Map<string, SessionState>();
+  private cleanupInterval: ReturnType<typeof setInterval> | null = null;
   private port: number;
   private host: string;
 
@@ -54,6 +61,24 @@ export class MaliceMCPServer {
   ) {
     this.port = config.port ?? 3010;
     this.host = config.host ?? '127.0.0.1';
+  }
+
+  /**
+   * Clean up stale sessions that haven't had activity within SESSION_TTL_MS
+   */
+  private cleanupStaleSessions(): void {
+    const now = Date.now();
+    let cleaned = 0;
+    for (const [sessionId, session] of this.sessions) {
+      if (now - session.lastActivity > SESSION_TTL_MS) {
+        session.transport.close();
+        this.sessions.delete(sessionId);
+        cleaned++;
+      }
+    }
+    if (cleaned > 0) {
+      console.log(`[MCP] Cleaned up ${cleaned} stale session(s)`);
+    }
   }
 
   /**
@@ -2145,11 +2170,19 @@ Core Objects:
             res.end('Method Not Allowed');
             return;
           }
+          const now = Date.now();
+          const activeSessions = Array.from(this.sessions.values()).filter(
+            (s) => now - s.lastActivity <= SESSION_TTL_MS
+          ).length;
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({
             status: 'ok',
             service: 'mcp-codefirst',
-            sessions: this.sessions.size,
+            sessions: {
+              total: this.sessions.size,
+              active: activeSessions,
+            },
+            sessionTtlMinutes: SESSION_TTL_MS / 60000,
             timestamp: new Date().toISOString(),
           }));
           return;
@@ -2187,6 +2220,12 @@ Core Objects:
         `🔮 MCP server (code-first) listening on http://${this.host}:${this.port}/mcp`,
       );
     });
+
+    // Start periodic cleanup of stale sessions
+    this.cleanupInterval = setInterval(
+      () => this.cleanupStaleSessions(),
+      SESSION_CLEANUP_INTERVAL_MS,
+    );
   }
 
   private async handlePost(
@@ -2199,6 +2238,7 @@ Core Objects:
 
     if (sessionId && this.sessions.has(sessionId)) {
       const session = this.sessions.get(sessionId)!;
+      session.lastActivity = Date.now(); // Update activity timestamp
       await session.transport.handleRequest(req, res, message);
     } else if (message.method === 'initialize') {
       // Authenticate user via HTTP Basic Auth
@@ -2209,7 +2249,7 @@ Core Objects:
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: () => crypto.randomUUID(),
         onsessioninitialized: (newSessionId) => {
-          this.sessions.set(newSessionId, { server, transport, playerId });
+          this.sessions.set(newSessionId, { server, transport, playerId, lastActivity: Date.now() });
           if (playerId) {
             console.log(
               `[MCP] Authenticated session ${newSessionId} as player #${playerId}`,
@@ -2235,7 +2275,7 @@ Core Objects:
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: () => sessionId,
         onsessioninitialized: (newSessionId) => {
-          this.sessions.set(newSessionId, { server, transport, playerId });
+          this.sessions.set(newSessionId, { server, transport, playerId, lastActivity: Date.now() });
         },
       });
       await server.connect(transport);
@@ -2293,6 +2333,7 @@ Core Objects:
       return;
     }
     const session = this.sessions.get(sessionId)!;
+    session.lastActivity = Date.now(); // Update activity timestamp
     await session.transport.handleRequest(req, res);
   }
 
@@ -2318,10 +2359,19 @@ Core Objects:
   }
 
   async stop(): Promise<void> {
+    // Stop cleanup interval
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = null;
+    }
+
+    // Close all sessions
     for (const [id, session] of this.sessions) {
       session.transport.close();
       this.sessions.delete(id);
     }
+
+    // Close HTTP server
     if (this.httpServer) {
       await new Promise<void>((resolve, reject) => {
         this.httpServer?.close((err) => (err ? reject(err) : resolve()));
