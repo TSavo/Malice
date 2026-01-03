@@ -112,55 +112,59 @@ y=-5   ●                                                │  SUPPLY BASEMENT
 The original 1889 street level. All rooms at adjacent coordinates for auto-connection.
 
 ```
-    x=-20 -19 -18 -17 -16 -15 -14 -13 -12 -11 -10  -9  -8  -7  -6  -5  -4  -3  -2  -1   0
-       │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │
-  ┌────┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴────┐
-  │                                                                                          │
-y=+10  ◆───●───●───●───●───●───●                            FABRICATION BRANCH              │
-  │    E2                      │                            (y=+10, x=-20 to -14)           │
-  │                            │                                                            │
-y=+9                           ●───◆E1                      SMITH CONNECTION                │
-  │                            │   SMITH                    (y=+9, x=-14 to -13)            │
-  │                            │   TOWER                                                    │
-y=+8                           │                                                            │
-  │                            │                                                            │
-y=+7                           │                                                            │
-  │                            │                                                            │
-y=+6                           │                            WEST SPINE                      │
-  │                            │                            (x=-14, y=+10 to -8)            │
-y=+5                           ●  THE JUNCTION                                              │
-  │                            │                                                            │
-y=+4                           │                                                            │
-  │                            │                                                            │
-y=+3                           │                                                            │
-  │                            │                                                            │
-y=+2                           │                                           ◆ E3             │
-  │                            │                                           │PARK            │
-y=+1                           │                                           │           ⊗    │
-  │                            │                                           │          SEALED│
-y=0                            ●───●───●───●───●───●───●───●───●───●───●───●───●───●───●    │
-  │                         MAIN                                    S. MAIN  2ND AVE        │
-  │                         CROSSING                               CORRIDOR  BASEMENT       │
-  │                            │                            (y=0, x=-14 to 0)               │
-y=-1                           │                                                            │
-  │                            │                                                            │
-y=-2                           │                                                            │
-  │                            │                                                            │
-y=-3                           │                                                            │
-  │                            │                                                            │
-y=-4                           │                                                            │
-  │                            │                                                            │
-y=-5   ◆───●───●───●───●───●───●                            SUPPLY BRANCH                   │
-  │    E4                   SUPPLY                          (y=-5, x=-20 to -14)            │
-  │    SUPPLY               JUNCTION                                                        │
-  │    DEPOT                   │                                                            │
-y=-6                           │                            SOUTHERN EXTENSION              │
-  │                            │                            (sinkhole approach)             │
-y=-7                           │                                                            │
-  │                            │                                                            │
-y=-8                           ⊗                            FLOODED TERMINUS                │
-  │                         FLOODED                         (dead end - sinkhole water)     │
-  └──────────────────────────────────────────────────────────────────────────────────────────┘
+    x=-21 -20 -19 -18 -17 -16 -15 -14 -13 -12 -11 -10  -9  -8  -7  -6  -5  -4  -3  -2  -1   0
+       │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │
+  ┌────┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴────┐
+  │                                                                                              │
+y=+12                              ●───●                        YESLER CROSSING                 │
+  │                                │   │                        (x=-14 to -13, y=12)            │
+y=+11                              ●───●───●                    NORTHERN EXTENSION              │
+  │                                │                            (approaching Yesler)            │
+y=+10  ◆───●───●───●───●───●───●───●───●───●───●───●           FABRICATION BRANCH              │
+  │    E2                          │                            (y=+10, x=-20 to -11)           │
+  │                                │                                                            │
+y=+9                               ●───●───●───◆E1              SMITH TOWER FOUNDATIONS         │
+  │                                │           SMITH            (y=+9, x=-14 to -12)            │
+  │                                │           TOWER                                            │
+y=+8                               │                                                            │
+  │                                │                                                            │
+y=+7                               │                                                            │
+  │                                │                                                            │
+y=+6                               │                            WEST SPINE                      │
+  │                                │                            (x=-14, y=+10 to -8)            │
+y=+5                               ●                            THE JUNCTION                    │
+  │                                │                                                            │
+y=+4                               ●───●───●───●               GRAND CENTRAL ARCADE            │
+  │                                │                            (x=-14 to -10, y=4)             │
+y=+3                                   ●───●                    ARCADE SOUTH WING               │
+  │                                │                            (x=-12 to -11, y=3)             │
+y=+2                               │                                           ◆ E3             │
+  │                                │                                           │PARK            │
+y=+1                               │                                           │           ⊗    │
+  │                                │                                           │          SEALED│
+y=0   ●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●    │
+  │  SEAWALL                    MAIN                                    S. MAIN  2ND AVE        │
+  │  x=-21                      CROSSING                               CORRIDOR  BASEMENT       │
+  │                                │                            (y=0, x=-21 to 0)               │
+y=-1      ●                        │                                                            │
+  │       │                        │                                                            │
+y=-2      ●                        │                            WATERFRONT CORRIDOR             │
+  │       │                        │                            (y=-2 to +5, x=-20)             │
+y=-3      │                        │                                                            │
+  │       │                        │                                                            │
+y=-4      │                        │                                                            │
+  │       │                        │                                                            │
+y=-5   ◆──●───●───●───●───●───●───●                            SUPPLY BRANCH                   │
+  │    E4                       SUPPLY                          (y=-5, x=-20 to -14)            │
+  │    SUPPLY                   JUNCTION                                                        │
+  │    DEPOT                       │                                                            │
+y=-6                               │                            SOUTHERN EXTENSION              │
+  │                                │                            (sinkhole approach)             │
+y=-7                               │                                                            │
+  │                                │                                                            │
+y=-8                               ⊗                            FLOODED TERMINUS                │
+  │                             FLOODED                         (dead end - sinkhole water)     │
+  └──────────────────────────────────────────────────────────────────────────────────────────────┘
 
 Legend:
   ◆  = Entry point (building connection)
@@ -173,22 +177,35 @@ Legend:
 
 | Corridor | Direction | Start | End | Room Count |
 |----------|-----------|-------|-----|------------|
-| West Spine | N-S | (-14, +10) | (-14, -8) | 19 |
-| Fabrication Branch | E-W | (-20, +10) | (-15, +10) | 6 |
-| Supply Branch | E-W | (-20, -5) | (-15, -5) | 6 |
-| S. Main Corridor | E-W | (-13, 0) | (-3, 0) | 11 |
+| West Spine | N-S | (-14, +12) | (-14, -8) | 21 |
+| Fabrication Branch | E-W | (-20, +10) | (-11, +10) | 10 |
+| Supply Branch | E-W | (-20, -5) | (-14, -5) | 7 |
+| S. Main Corridor | E-W | (-21, 0) | (-3, 0) | 19 |
 | Eastern Extension | E-W | (-2, 0) | (0, 0) | 3 |
 | Sealed Passage | N-S | (0, 0) | (0, +1) | 2 |
-| Smith Connection | E-W | (-14, +9) | (-13, +9) | 1 |
+| Smith Tower Foundations | E-W | (-14, +9) | (-12, +9) | 3 |
+| Smith Tower East Extension | N-S | (-13, +9) | (-13, +10) | 2 |
+| Smith Tower North Extension | E-W | (-12, +10) | (-11, +10) | 2 |
+| Northern Extension | N-S | (-14, +11) | (-14, +12) | 2 |
+| Northern Extension East | E-W | (-13, +11) | (-12, +11) | 2 |
+| Yesler Crossing | E-W | (-14, +12) | (-13, +12) | 2 |
+| Grand Central Arcade Main | E-W | (-14, +4) | (-10, +4) | 5 |
+| Arcade South Wing | E-W | (-12, +3) | (-11, +3) | 2 |
+| Waterfront Corridor North | N-S | (-20, -2) | (-20, +5) | 8 |
 | Park Access | N-S | (-3, +1) | (-3, +2) | 2 |
 
-**Total z=-2 rooms: 49** (with shared coordinates at junctions)
+**Total z=-2 rooms: 72** (49 original + 23 new expansion rooms)
 
 ### Named Locations (z=-2)
 
 | Name | Coordinates | Description |
 |------|-------------|-------------|
 | Tunnel Mouth | (-14, +9) | Where Smith Tower escape meets underground |
+| Tower Subbasement | (-11, +10) | Datacenter servers in converted coal storage beneath Smith Tower |
+| Tower Foundation | (-12, +10) | Massive concrete columns supporting Smith Tower |
+| Yesler Crossing | (-14, +12) | Chaotic junction where Maynard and Denny street grids collide |
+| Arcade Basement | (-11, +4) | Grand Central's shopping arcade basement with vaulted ceilings |
+| Seawall Passage | (-21, 0) | Western edge of underground network at the old seawall |
 | The Junction | (-14, +5) | Main hub on West Spine |
 | Main Crossing | (-14, 0) | Where spine meets S. Main corridor |
 | Fabrication Access | (-20, +10) | Entry from Fabrication basement |
