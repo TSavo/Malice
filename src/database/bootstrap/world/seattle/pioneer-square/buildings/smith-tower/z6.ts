@@ -1,5 +1,5 @@
-// Smith Tower - Condo Floor (z=6)
-// Condo layout repeated across floors 4–33
+// Smith Tower - 6th Floor Condos
+// Mid-century modern restoration - sleek lines, teak, atomic-age aesthetics, architect's vision abandoned
 
 export const building = {
   rooms: {
@@ -80,7 +80,7 @@ export const building = {
 
     '%A1_z6': {
       name: 'Smith Tower - 6th Floor - North Suite - Living Room',
-      description: 'A corner unit with tall windows and pale wood floors.',
+      description: 'A corner unit with tall windows and pale wood floors. A kitchenette occupies one wall, its appliances dark and silent. Built-in shelving holds the remnants of someone\'s life—books, decorative objects, a dead potted plant.',
       x: -13,
       y: 11,
       z: 6,
@@ -95,13 +95,24 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'table', name: 'a teak coffee table', description: 'A low teak coffee table with tapered legs and a kidney-bean shape. Classic mid-century design, still beautiful despite scratches.', boltedDown: false },
+        { prototype: 'furniture', name: 'a minimalist kitchenette', description: 'The kitchenette features clean lines, stainless steel, and teak cabinetry. An Atomic-era Sunbeam toaster sits on the counter.', boltedDown: true },
+        { prototype: 'furniture', name: 'a Danish wall unit', description: 'A modular teak wall unit spans the room, its shelves holding a Eames House bird, art books, and a dusty Noguchi lamp.', boltedDown: true },
+        { prototype: 'furniture', name: 'a sunburst clock', description: 'A George Nelson sunburst clock hangs on the wall, its brass rays tarnished. The hands are frozen at 4:20.', boltedDown: true },
+      ],
       sittables: [
         {
-          name: 'a worn couch',
-          capacity: 3,
-          emptyMsg:
-            'A faded couch sits against the wall, cushions compressed from years of use.',
-          occupiedMsg: '%s sprawled on the couch.',
+          name: 'an Eames lounge',
+          capacity: 1,
+          emptyMsg: 'A genuine Eames lounge chair and ottoman in black leather and rosewood waits by the window.',
+          occupiedMsg: '%s reclined in the Eames lounge.',
+        },
+        {
+          name: 'a Barcelona sofa',
+          capacity: 2,
+          emptyMsg: 'A Mies van der Rohe Barcelona sofa in white leather sits against the wall.',
+          occupiedMsg: '%s seated on the Barcelona sofa.',
         },
       ],
     },
@@ -109,7 +120,7 @@ export const building = {
     '%A2_z6': {
       name: 'Smith Tower - 6th Floor - North Suite - Bedroom',
       description:
-        'A bright one-bedroom overlooking the skyline, hall-facing door to the south.',
+        'A bright one-bedroom overlooking the skyline, hall-facing door to the south. A built-in closet with mirrored doors dominates one wall, its reflection multiplying the dusty light.',
       x: -12,
       y: 11,
       z: 6,
@@ -128,13 +139,18 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'bed', name: 'a platform bed', description: 'A low teak platform bed with clean lines. The headboard integrates floating nightstands. White linen bedding is grey with dust.', quality: 'nice' },
+        { prototype: 'furniture', name: 'teak sliding closet', description: 'Sliding closet doors in teak with recessed pulls. Inside, a few suits hang on wooden hangers, mothballs scattered on the floor.', boltedDown: true },
+        { prototype: 'furniture', name: 'a Nakashima dresser', description: 'A George Nakashima-style dresser in walnut with live-edge drawer fronts. A masterpiece of woodworking, dusty but intact.', boltedDown: false },
+        { prototype: 'furniture', name: 'a pendant lamp', description: 'A white Artichoke pendant lamp hangs over the bed, its leaves slightly askew. Danish design at its finest.', boltedDown: true },
+      ],
       sittables: [
         {
-          name: 'a dusty bed',
+          name: 'the platform bed',
           capacity: 2,
-          emptyMsg:
-            'A queen bed sits against the wall, sheets grey with age but still intact.',
-          occupiedMsg: '%s resting on the bed.',
+          emptyMsg: 'The low platform bed waits, its integrated nightstands empty.',
+          occupiedMsg: '%s resting on the teak platform bed.',
         },
       ],
     },
@@ -142,7 +158,7 @@ export const building = {
     '%A3_z6': {
       name: 'Smith Tower - 6th Floor - North Suite - Studio',
       description:
-        'A long studio with exposed brick and a narrow galley kitchen.',
+        'A long studio with exposed brick and a narrow galley kitchen. The space is multipurpose—work area, living space, kitchen all compressed into one room.',
       x: -11,
       y: 11,
       z: 6,
@@ -157,13 +173,24 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'furniture', name: 'a streamlined kitchen', description: 'The galley kitchen is all clean lines and stainless steel, with teak cabinet fronts. A vintage Jetsons-style blender sits on the counter.', boltedDown: true },
+        { prototype: 'table', name: 'an Aalto desk', description: 'An Alvar Aalto desk in birch with curved legs sits beneath the window. An Anglepoise lamp perches on one corner.', boltedDown: false },
+        { prototype: 'furniture', name: 'a daybed', description: 'A teak daybed with clean lines serves as both couch and bed. The original wool upholstery has faded but holds together.', boltedDown: false },
+        { prototype: 'furniture', name: 'an Arco lamp', description: 'A Castiglioni Arco floor lamp arches over the seating area, its marble base anchoring the stainless steel arc.', boltedDown: true },
+      ],
       sittables: [
         {
-          name: 'a threadbare futon',
+          name: 'the daybed',
           capacity: 2,
-          emptyMsg:
-            'A futon frame holds a thin mattress, serving as both couch and bed.',
-          occupiedMsg: '%s lounging on the futon.',
+          emptyMsg: 'The teak daybed waits, a single Marimekko pillow at one end.',
+          occupiedMsg: '%s lounging on the daybed.',
+        },
+        {
+          name: 'an Eames DCW chair',
+          capacity: 1,
+          emptyMsg: 'A molded plywood DCW chair sits at the desk.',
+          occupiedMsg: '%s seated at the Aalto desk.',
         },
       ],
     },
@@ -171,7 +198,7 @@ export const building = {
     '%B1_z6': {
       name: 'Smith Tower - 6th Floor - East Suite - Loft',
       description:
-        'A lofted corner with sloped ceiling beams and a compact mezzanine.',
+        'A lofted corner with sloped ceiling beams and a compact mezzanine. The high ceilings make the small footprint feel larger. A wooden ladder leads up to the sleeping loft.',
       x: -10,
       y: 11,
       z: 6,
@@ -186,20 +213,25 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'furniture', name: 'a steel ship ladder', description: 'A steep industrial ship ladder in brushed steel leads to the mezzanine. The perforated treads are slip-resistant.', boltedDown: true },
+        { prototype: 'bed', name: 'a Japanese futon', description: 'A traditional Japanese futon rests on a low teak platform in the loft. Minimalist and intentional.', quality: 'standard' },
+        { prototype: 'furniture', name: 'an Egg chair', description: 'An Arne Jacobsen Egg chair in orange wool sits beneath the loft, its curved shell inviting.', boltedDown: false },
+        { prototype: 'table', name: 'a Noguchi coffee table', description: 'An Isamu Noguchi coffee table with its distinctive curved wood base and glass top. Dusty but undamaged.', boltedDown: false },
+        { prototype: 'furniture', name: 'a mobile sculpture', description: 'A Calder-style mobile hangs from the ceiling, its shapes gently rotating in any breeze.', boltedDown: true },
+      ],
       sittables: [
         {
-          name: 'a sagging couch',
-          capacity: 3,
-          emptyMsg:
-            'A couch sits beneath the mezzanine, fabric worn smooth at the armrests.',
-          occupiedMsg: '%s settled into the couch.',
+          name: 'the Egg chair',
+          capacity: 1,
+          emptyMsg: 'The orange Egg chair curves invitingly.',
+          occupiedMsg: '%s cocooned in the Egg chair.',
         },
         {
-          name: 'a loft bed',
-          capacity: 1,
-          emptyMsg:
-            'A narrow bed occupies the mezzanine above, accessible by ladder.',
-          occupiedMsg: '%s up in the loft bed.',
+          name: 'the loft futon',
+          capacity: 2,
+          emptyMsg: 'The Japanese futon is visible in the loft above.',
+          occupiedMsg: '%s resting on the futon.',
         },
       ],
     },
@@ -207,7 +239,7 @@ export const building = {
     '%C1_z6': {
       name: 'Smith Tower - 6th Floor - South Suite - Alcove',
       description:
-        'A snug unit tucked behind the shaft, with one frosted window.',
+        'A snug unit tucked behind the shaft, with one frosted window. The space is barely larger than a closet, intimate or claustrophobic depending on your temperament.',
       x: -13,
       y: 10,
       z: 6,
@@ -222,13 +254,18 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'bed', name: 'a built-in sleeping niche', description: 'A sleeping niche is recessed into the wall, Japanese-style. The thin mattress fits precisely, a single reading light recessed above.', quality: 'standard' },
+        { prototype: 'furniture', name: 'a Shaker peg rail', description: 'A long peg rail in the Shaker style runs the length of one wall. Elegant hooks hold nothing now.', boltedDown: true },
+        { prototype: 'furniture', name: 'floating shelves', description: 'Teak floating shelves project from the wall in an asymmetric arrangement. A few small sculptures remain.', boltedDown: true },
+        { prototype: 'furniture', name: 'rice paper panels', description: 'Shoji-style rice paper panels cover the window, filtering light softly. Some panels are torn.', boltedDown: true },
+      ],
       sittables: [
         {
-          name: 'a narrow cot',
+          name: 'the sleeping niche',
           capacity: 1,
-          emptyMsg:
-            'A military-style cot is wedged into the corner, blanket folded at the foot.',
-          occupiedMsg: '%s lying on the cot.',
+          emptyMsg: 'The recessed sleeping niche is intimate, almost womb-like.',
+          occupiedMsg: '%s curled in the sleeping niche.',
         },
       ],
     },
@@ -236,7 +273,7 @@ export const building = {
     '%B2_z6': {
       name: 'Smith Tower - 6th Floor - East Suite - Living Room',
       description:
-        'A two-room suite with a west-facing door toward the elevator.',
+        'A two-room suite with a west-facing door toward the elevator. This is clearly the main living space, larger than the other units on the floor.',
       x: -11,
       y: 10,
       z: 6,
@@ -256,13 +293,25 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'furniture', name: 'a modular sofa', description: 'A modular sofa in burnt orange wool can be reconfigured at will. Currently arranged in a loose conversation grouping.', boltedDown: false },
+        { prototype: 'table', name: 'a stone slab table', description: 'A massive stone slab rests on a simple metal frame, serving as a coffee table. Brutalist and beautiful.', boltedDown: false },
+        { prototype: 'furniture', name: 'a media credenza', description: 'A long teak credenza with sliding doors hides a vintage hi-fi system. The turntable still has a record on it.', boltedDown: false },
+        { prototype: 'furniture', name: 'a built-in bar', description: 'A compact bar is built into one corner, its mirrored back reflecting dusty bottles of vintage spirits.', boltedDown: true },
+        { prototype: 'furniture', name: 'a Saarinen tulip table', description: 'A small Saarinen tulip dining table with matching chairs occupies the window bay.', boltedDown: false },
+      ],
       sittables: [
         {
-          name: 'a faded sectional',
+          name: 'the modular sofa',
           capacity: 4,
-          emptyMsg:
-            'A large sectional sofa dominates the main room, cushions sunken but serviceable.',
-          occupiedMsg: '%s sunk into the sectional.',
+          emptyMsg: 'The orange modular sofa invites rearrangement.',
+          occupiedMsg: '%s settled into the modular sofa.',
+        },
+        {
+          name: 'tulip chairs',
+          capacity: 2,
+          emptyMsg: 'White tulip chairs surround the matching table.',
+          occupiedMsg: '%s seated at the tulip table.',
         },
       ],
     },
@@ -270,7 +319,7 @@ export const building = {
     '%B3_z6': {
       name: 'Smith Tower - 6th Floor - East Suite - Den',
       description:
-        'A narrow end unit with a bay of small windows and built-ins.',
+        'A narrow end unit with a bay of small windows and built-ins. This was clearly a home office or study, the walls lined with shelving.',
       x: -10,
       y: 10,
       z: 6,
@@ -285,20 +334,32 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'furniture', name: 'teak bookshelves', description: 'Built-in teak bookshelves hold architecture monographs, design magazines, and a few Penguin classics with orange spines.', boltedDown: true },
+        { prototype: 'table', name: 'a partners desk', description: 'A large partners desk in teak with leather inlay seats two. Architectural drawings are rolled in a brass stand.', boltedDown: false },
+        { prototype: 'chair', name: 'a Swan chair', description: 'An Arne Jacobsen Swan chair in grey wool sits angled toward the bay window. Sculptural and comfortable.', boltedDown: false },
+        { prototype: 'furniture', name: 'a Sputnik chandelier', description: 'A brass Sputnik chandelier hangs from the ceiling, its many arms radiating outward. Half the bulbs are burned out.', boltedDown: true },
+        { prototype: 'furniture', name: 'a drafting table', description: 'An adjustable drafting table with a built-in light stands by the window. A T-square rests on its surface.', boltedDown: false },
+      ],
       sittables: [
         {
-          name: 'a reading chair',
+          name: 'the Swan chair',
           capacity: 1,
-          emptyMsg:
-            'A wingback chair sits by the window bay, upholstery cracked but comfortable.',
-          occupiedMsg: '%s curled up in the reading chair.',
+          emptyMsg: 'The sculptural Swan chair invites contemplation.',
+          occupiedMsg: '%s curved into the Swan chair.',
+        },
+        {
+          name: 'desk chairs',
+          capacity: 2,
+          emptyMsg: 'Matching teak desk chairs wait at the partners desk.',
+          occupiedMsg: '%s working at the partners desk.',
         },
       ],
     },
 
     '%C2_z6': {
       name: 'Smith Tower - 6th Floor - South Suite - Living Room',
-      description: 'A corner unit with western exposure and aged carpeting.',
+      description: 'A corner unit with western exposure and aged carpeting. The afternoon sun has bleached everything near the windows to a uniform pale.',
       x: -13,
       y: 9,
       z: 6,
@@ -313,13 +374,19 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'furniture', name: 'a Womb chair', description: 'An Eero Saarinen Womb chair in persimmon wool with its matching ottoman. Enveloping and sculptural.', boltedDown: false },
+        { prototype: 'table', name: 'a boomerang table', description: 'A boomerang-shaped side table in walnut and formica. Peak atomic age design.', boltedDown: false },
+        { prototype: 'furniture', name: 'a modern radiator', description: 'A sleek panel radiator has replaced the old steam unit. Still functional, still warm.', boltedDown: true },
+        { prototype: 'furniture', name: 'floor-to-ceiling drapes', description: 'Simple linen drapes in off-white run floor to ceiling. The fabric is faded but the hardware is polished brass.', boltedDown: true },
+        { prototype: 'furniture', name: 'a Nelson bench', description: 'A George Nelson platform bench in birch and steel serves as a coffee table and display surface.', boltedDown: false },
+      ],
       sittables: [
         {
-          name: 'an old loveseat',
-          capacity: 2,
-          emptyMsg:
-            'A compact loveseat faces the window, fabric faded to an indeterminate beige.',
-          occupiedMsg: '%s squeezed onto the loveseat.',
+          name: 'the Womb chair',
+          capacity: 1,
+          emptyMsg: 'The persimmon Womb chair invites curling up.',
+          occupiedMsg: '%s enveloped in the Womb chair.',
         },
       ],
     },
@@ -327,7 +394,7 @@ export const building = {
     '%C3_z6': {
       name: 'Smith Tower - 6th Floor - South Suite - Foyer',
       description:
-        'The single entrance to the C block, with a stout fire door to the elevator.',
+        'The single entrance to the C block, with a stout fire door to the elevator. A small entryway opens into the rest of the unit.',
       x: -12,
       y: 9,
       z: 6,
@@ -346,13 +413,19 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'bench', name: 'a slatted bench', description: 'A simple slatted bench in teak lines one wall, its design echoing Scandinavian spa furniture.', boltedDown: false },
+        { prototype: 'furniture', name: 'a teak closet', description: 'A closet with teak slatted doors conceals storage. The interior is lined with cedar.', boltedDown: true },
+        { prototype: 'furniture', name: 'a mail slot', description: 'A sleek brushed steel mail slot is set into the door. Minimalist and modern.', boltedDown: true },
+        { prototype: 'furniture', name: 'a Bertoia sculpture', description: 'A small Harry Bertoia metal sculpture sits on a walnut pedestal, its wires catching light.', boltedDown: false },
+        { prototype: 'furniture', name: 'terrazzo flooring', description: 'The floor is polished terrazzo with brass dividers. Original to the building but beautifully restored.', boltedDown: true },
+      ],
       sittables: [
         {
-          name: 'a checkered couch',
-          capacity: 3,
-          emptyMsg:
-            'A couch with a faded checkered pattern sits against the wall.',
-          occupiedMsg: '%s relaxing on the checkered couch.',
+          name: 'the teak bench',
+          capacity: 2,
+          emptyMsg: 'The slatted teak bench offers minimal seating.',
+          occupiedMsg: '%s perched on the teak bench.',
         },
       ],
     },
@@ -360,7 +433,7 @@ export const building = {
     '%C4_z6': {
       name: 'Smith Tower - 6th Floor - South Suite - Bedroom',
       description:
-        'A deep plan with a recessed alcove and polished concrete floors.',
+        'A deep plan with a recessed alcove and polished concrete floors. The industrial aesthetic is softened by remnants of personal touches.',
       x: -11,
       y: 9,
       z: 6,
@@ -375,13 +448,19 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'bed', name: 'a cantilevered bed', description: 'A platform bed cantilevered from the wall, appearing to float. The effect is dramatic, the engineering sound.', quality: 'nice' },
+        { prototype: 'furniture', name: 'a walnut wardrobe', description: 'A freestanding wardrobe in walnut with butterfly joints. The doors open to reveal a cedar-lined interior.', boltedDown: false },
+        { prototype: 'furniture', name: 'a floor-to-ceiling mirror', description: 'A frameless mirror runs floor to ceiling, making the room feel twice its size.', boltedDown: true },
+        { prototype: 'table', name: 'floating nightstands', description: 'Floating nightstands in walnut bracket the bed. A ceramic Akari lamp sits on one.', boltedDown: true },
+        { prototype: 'furniture', name: 'wool carpet', description: 'A large wool area rug in cream with geometric patterns softens the concrete floor.', boltedDown: false },
+      ],
       sittables: [
         {
-          name: 'an alcove bed',
+          name: 'the floating bed',
           capacity: 2,
-          emptyMsg:
-            'A bed fills the recessed alcove, half-hidden by a moth-eaten curtain.',
-          occupiedMsg: '%s tucked away in the alcove bed.',
+          emptyMsg: 'The cantilevered bed appears to hover above the floor.',
+          occupiedMsg: '%s resting on the floating bed.',
         },
       ],
     },
@@ -389,7 +468,7 @@ export const building = {
     '%B4_z6': {
       name: 'Smith Tower - 6th Floor - East Suite - Bedroom',
       description:
-        'A compact end-cap with a single long window and built-in shelving.',
+        'A compact end-cap with a single long window and built-in shelving. Every inch is utilized, the room a study in efficient living.',
       x: -10,
       y: 9,
       z: 6,
@@ -404,13 +483,19 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'bed', name: 'a built-in captain bed', description: 'A captain bed is built into the wall, drawers beneath for storage. The teak frame is integrated seamlessly.', quality: 'standard' },
+        { prototype: 'furniture', name: 'integrated storage', description: 'Floor-to-ceiling storage with teak fronts conceals everything. Recessed pulls maintain clean lines.', boltedDown: true },
+        { prototype: 'furniture', name: 'clerestory shelving', description: 'High shelving runs above the window, holding a collection of pottery and small sculptures.', boltedDown: true },
+        { prototype: 'table', name: 'a drop-leaf desk', description: 'A drop-leaf desk in walnut folds from the wall. When extended, it provides generous workspace.', boltedDown: true },
+        { prototype: 'furniture', name: 'a wire dresser', description: 'A low dresser with wire frame and walnut top. Industrial materials, refined execution.', boltedDown: false },
+      ],
       sittables: [
         {
-          name: 'a Murphy bed',
+          name: 'the captain bed',
           capacity: 2,
-          emptyMsg:
-            'A Murphy bed folds down from the wall, its mechanism still functional.',
-          occupiedMsg: '%s stretched out on the Murphy bed.',
+          emptyMsg: 'The built-in captain bed offers efficient comfort.',
+          occupiedMsg: '%s resting on the captain bed.',
         },
       ],
     },

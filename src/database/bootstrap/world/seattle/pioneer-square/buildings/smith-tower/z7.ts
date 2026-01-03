@@ -1,5 +1,5 @@
-// Smith Tower - Condo Floor (z=7)
-// Condo layout repeated across floors 4–33
+// Smith Tower - 7th Floor Condos
+// Victorian grandeur, faded elegance - ornate furnishings, velvet, crystal, moth-eaten splendor
 
 export const building = {
   rooms: {
@@ -80,7 +80,7 @@ export const building = {
 
     '%A1_z7': {
       name: 'Smith Tower - 7th Floor - North Suite - Living Room',
-      description: 'A corner unit with tall windows and pale wood floors.',
+      description: 'A corner unit with tall windows and pale wood floors. A kitchenette occupies one wall, its appliances dark and silent. Built-in shelving holds the remnants of someone\'s life—books, decorative objects, a dead potted plant.',
       x: -13,
       y: 11,
       z: 7,
@@ -95,13 +95,19 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'table', name: 'a marble-topped parlor table', description: 'An ornate parlor table with carved mahogany legs and a grey-veined marble top. The marble is cracked but still elegant, a testament to Victorian craftsmanship.', boltedDown: false },
+        { prototype: 'furniture', name: 'an antiquated kitchenette', description: 'A kitchenette with dark oak cabinetry and brass hardware, clearly retrofitted into what was once a butler\'s pantry. The porcelain sink is stained with age.', boltedDown: true },
+        { prototype: 'furniture', name: 'a curio cabinet', description: 'A tall glass-fronted curio cabinet displays dusty porcelain figurines, tarnished silver spoons, and a collection of ceramic thimbles.', boltedDown: true },
+        { prototype: 'furniture', name: 'an ornate radiator cover', description: 'A cast-iron radiator is concealed behind an elaborate brass grille with scrollwork patterns. Heat still seeps through its decorative openings.', boltedDown: true },
+      ],
       sittables: [
         {
-          name: 'a worn couch',
-          capacity: 3,
+          name: 'a fainting couch',
+          capacity: 2,
           emptyMsg:
-            'A faded couch sits against the wall, cushions compressed from years of use.',
-          occupiedMsg: '%s sprawled on the couch.',
+            'A burgundy velvet fainting couch curves elegantly against the wall, its tufted upholstery moth-eaten in places.',
+          occupiedMsg: '%s draped across the fainting couch.',
         },
       ],
     },
@@ -109,7 +115,7 @@ export const building = {
     '%A2_z7': {
       name: 'Smith Tower - 7th Floor - North Suite - Bedroom',
       description:
-        'A bright one-bedroom overlooking the skyline, hall-facing door to the south.',
+        'A bright one-bedroom overlooking the skyline, hall-facing door to the south. A built-in closet with mirrored doors dominates one wall, its reflection multiplying the dusty light.',
       x: -12,
       y: 11,
       z: 7,
@@ -128,13 +134,26 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'bed', name: 'a four-poster bed', description: 'A massive mahogany four-poster bed dominates the room, its canopy frame draped with tattered damask curtains. The mattress is horsehair, lumpy but surprisingly resilient.', quality: 'nice' },
+        { prototype: 'furniture', name: 'a wardrobe armoire', description: 'A towering oak armoire with beveled mirrors and carved acanthus details serves as the closet. Its doors creak dramatically when opened.', boltedDown: true },
+        { prototype: 'table', name: 'a marble-topped washstand', description: 'An antique washstand with a marble top holds a chipped porcelain basin and pitcher. A tarnished brass towel bar is attached to the side.', boltedDown: false },
+        { prototype: 'furniture', name: 'a dressing screen', description: 'A three-panel dressing screen with faded silk panels depicts pastoral scenes. The wooden frame is worm-eaten but standing.', boltedDown: false },
+      ],
       sittables: [
         {
-          name: 'a dusty bed',
+          name: 'the four-poster bed',
           capacity: 2,
           emptyMsg:
-            'A queen bed sits against the wall, sheets grey with age but still intact.',
-          occupiedMsg: '%s resting on the bed.',
+            'The canopied bed waits like a throne, its damask curtains pooling on the floor.',
+          occupiedMsg: '%s ensconced in the four-poster bed.',
+        },
+        {
+          name: 'a tufted vanity stool',
+          capacity: 1,
+          emptyMsg:
+            'A small velvet stool with carved cabriole legs sits before a dark vanity mirror.',
+          occupiedMsg: '%s perched on the vanity stool.',
         },
       ],
     },
@@ -142,7 +161,7 @@ export const building = {
     '%A3_z7': {
       name: 'Smith Tower - 7th Floor - North Suite - Studio',
       description:
-        'A long studio with exposed brick and a narrow galley kitchen.',
+        'A long studio with exposed brick and a narrow galley kitchen. The space is multipurpose—work area, living space, kitchen all compressed into one room.',
       x: -11,
       y: 11,
       z: 7,
@@ -157,13 +176,26 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'furniture', name: 'a cast-iron stove', description: 'A retrofitted Victorian coal stove has been converted for gas, its ornate black iron body decorated with scrollwork. The flue pipe runs up through the brick.', boltedDown: true },
+        { prototype: 'table', name: 'a secretary desk', description: 'A mahogany secretary desk with a drop-front writing surface and pigeonhole compartments. Yellowed letters and dried ink bottles remain inside.', boltedDown: false },
+        { prototype: 'furniture', name: 'a brass coal scuttle', description: 'A decorative brass coal scuttle sits beside the stove, now holding dried flowers and forgotten keys.', boltedDown: false },
+        { prototype: 'furniture', name: 'a pier mirror', description: 'A tall pier mirror in a gilded frame hangs between the windows, its glass foxed with age but still reflective.', boltedDown: true },
+      ],
       sittables: [
         {
-          name: 'a threadbare futon',
+          name: 'a horsehair settee',
           capacity: 2,
           emptyMsg:
-            'A futon frame holds a thin mattress, serving as both couch and bed.',
-          occupiedMsg: '%s lounging on the futon.',
+            'A narrow horsehair settee with carved rosewood trim waits primly against the wall.',
+          occupiedMsg: '%s seated stiffly on the horsehair settee.',
+        },
+        {
+          name: 'a balloon-back chair',
+          capacity: 1,
+          emptyMsg:
+            'A delicate balloon-back chair with worn velvet upholstery sits at the desk.',
+          occupiedMsg: '%s writing at the secretary desk.',
         },
       ],
     },
@@ -171,7 +203,7 @@ export const building = {
     '%B1_z7': {
       name: 'Smith Tower - 7th Floor - East Suite - Loft',
       description:
-        'A lofted corner with sloped ceiling beams and a compact mezzanine.',
+        'A lofted corner with sloped ceiling beams and a compact mezzanine. The high ceilings make the small footprint feel larger. A wooden ladder leads up to the sleeping loft.',
       x: -10,
       y: 11,
       z: 7,
@@ -186,20 +218,26 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'furniture', name: 'an ornate spiral stair', description: 'A narrow cast-iron spiral staircase with fleur-de-lis balusters leads to the mezzanine. The treads are worn concave from a century of footsteps.', boltedDown: true },
+        { prototype: 'bed', name: 'a brass sleigh bed', description: 'A small brass sleigh bed with an oxidized patina fills the mezzanine. The mattress is thin but the frame is gorgeous.', quality: 'standard' },
+        { prototype: 'furniture', name: 'a crystal chandelier', description: 'A small crystal chandelier hangs from the exposed beams, its pendants clouded and dusty. A few are missing entirely.', boltedDown: true },
+        { prototype: 'table', name: 'a whatnot shelf', description: 'A corner whatnot shelf displays a collection of dusty daguerreotypes, a broken pocket watch, and a taxidermied songbird under glass.', boltedDown: true },
+      ],
       sittables: [
         {
-          name: 'a sagging couch',
+          name: 'a Chesterfield sofa',
           capacity: 3,
           emptyMsg:
-            'A couch sits beneath the mezzanine, fabric worn smooth at the armrests.',
-          occupiedMsg: '%s settled into the couch.',
+            'A cracked leather Chesterfield sofa with deep button tufting sits beneath the mezzanine, springs complaining audibly.',
+          occupiedMsg: '%s sunk into the Chesterfield.',
         },
         {
-          name: 'a loft bed',
+          name: 'the brass sleigh bed',
           capacity: 1,
           emptyMsg:
-            'A narrow bed occupies the mezzanine above, accessible by ladder.',
-          occupiedMsg: '%s up in the loft bed.',
+            'The brass bed gleams dully in the mezzanine above.',
+          occupiedMsg: '%s resting in the sleigh bed.',
         },
       ],
     },
@@ -207,7 +245,7 @@ export const building = {
     '%C1_z7': {
       name: 'Smith Tower - 7th Floor - South Suite - Alcove',
       description:
-        'A snug unit tucked behind the shaft, with one frosted window.',
+        'A snug unit tucked behind the shaft, with one frosted window. The space is barely larger than a closet, intimate or claustrophobic depending on your temperament.',
       x: -13,
       y: 10,
       z: 7,
@@ -222,13 +260,19 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'bed', name: 'a servant\'s cot', description: 'A narrow iron cot with a thin straw mattress, the kind once used by household servants. A faded quilt provides the only softness.', quality: 'cheap' },
+        { prototype: 'furniture', name: 'a brass hat stand', description: 'A tall brass hat stand with multiple arms stands sentinel by the door, one arm still holding a moth-eaten bowler.', boltedDown: true },
+        { prototype: 'furniture', name: 'a corner washstand', description: 'A small corner washstand with a porcelain bowl is built into the alcove. A cracked shaving mirror hangs above.', boltedDown: true },
+        { prototype: 'furniture', name: 'a prayer kneeler', description: 'A worn velvet prayer kneeler with carved oak armrests is tucked against the wall, testament to the faith of a former occupant.', boltedDown: false },
+      ],
       sittables: [
         {
-          name: 'a narrow cot',
+          name: 'the servant\'s cot',
           capacity: 1,
           emptyMsg:
-            'A military-style cot is wedged into the corner, blanket folded at the foot.',
-          occupiedMsg: '%s lying on the cot.',
+            'The narrow cot awaits with monastic simplicity.',
+          occupiedMsg: '%s resting on the servant\'s cot.',
         },
       ],
     },
@@ -236,7 +280,7 @@ export const building = {
     '%B2_z7': {
       name: 'Smith Tower - 7th Floor - East Suite - Living Room',
       description:
-        'A two-room suite with a west-facing door toward the elevator.',
+        'A two-room suite with a west-facing door toward the elevator. This is clearly the main living space, larger than the other units on the floor.',
       x: -11,
       y: 10,
       z: 7,
@@ -256,13 +300,26 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'furniture', name: 'a parlor grand piano', description: 'A small parlor grand piano with an elaborately carved rosewood case sits shrouded in dust. The ivory keys are yellowed, several missing entirely.', boltedDown: true },
+        { prototype: 'table', name: 'an inlaid tea table', description: 'A delicate tea table with mother-of-pearl inlay and spindly turned legs. A tarnished silver tea service sits upon it, still waiting for guests.', boltedDown: false },
+        { prototype: 'furniture', name: 'a fireplace mantel', description: 'An ornate marble fireplace mantel frames a bricked-up hearth. Candelabras and a stopped ormolu clock adorn the mantelpiece.', boltedDown: true },
+        { prototype: 'furniture', name: 'a tall case clock', description: 'A grandfather clock with a painted moon phase dial and carved finials stands in the corner. Its pendulum is frozen mid-swing.', boltedDown: true },
+      ],
       sittables: [
         {
-          name: 'a faded sectional',
-          capacity: 4,
+          name: 'a medallion-back sofa',
+          capacity: 3,
           emptyMsg:
-            'A large sectional sofa dominates the main room, cushions sunken but serviceable.',
-          occupiedMsg: '%s sunk into the sectional.',
+            'A curved medallion-back sofa upholstered in faded rose silk presides over the parlor.',
+          occupiedMsg: '%s arranged elegantly on the medallion sofa.',
+        },
+        {
+          name: 'the piano bench',
+          capacity: 2,
+          emptyMsg:
+            'A tapestry-cushioned piano bench waits before the silent instrument.',
+          occupiedMsg: '%s seated at the piano.',
         },
       ],
     },
@@ -270,7 +327,7 @@ export const building = {
     '%B3_z7': {
       name: 'Smith Tower - 7th Floor - East Suite - Den',
       description:
-        'A narrow end unit with a bay of small windows and built-ins.',
+        'A narrow end unit with a bay of small windows and built-ins. This was clearly a home office or study, the walls lined with shelving.',
       x: -10,
       y: 10,
       z: 7,
@@ -285,20 +342,33 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'furniture', name: 'a barrister bookcase', description: 'A walnut barrister bookcase with glass-fronted sections and brass hinges. Leather-bound volumes on law, medicine, and natural philosophy fill its shelves.', boltedDown: true },
+        { prototype: 'table', name: 'a partners desk', description: 'A massive partners desk with green leather writing surfaces on both sides. The drawers are carved with grape clusters and acanthus leaves.', boltedDown: false },
+        { prototype: 'furniture', name: 'a globe stand', description: 'An antique terrestrial globe on a mahogany tripod shows political boundaries that ceased to exist decades ago. The oceans have faded to brown.', boltedDown: false },
+        { prototype: 'furniture', name: 'a library ladder', description: 'A brass library ladder on rails allows access to the upper shelves. The rails are slightly corroded but the ladder still rolls.', boltedDown: true },
+      ],
       sittables: [
         {
-          name: 'a reading chair',
+          name: 'a tufted library chair',
           capacity: 1,
           emptyMsg:
-            'A wingback chair sits by the window bay, upholstery cracked but comfortable.',
-          occupiedMsg: '%s curled up in the reading chair.',
+            'A deep tufted leather library chair with brass studs awaits a reader.',
+          occupiedMsg: '%s ensconced in the library chair.',
+        },
+        {
+          name: 'the desk chair',
+          capacity: 1,
+          emptyMsg:
+            'A swivel chair with carved armrests sits at the partners desk.',
+          occupiedMsg: '%s working at the partners desk.',
         },
       ],
     },
 
     '%C2_z7': {
       name: 'Smith Tower - 7th Floor - South Suite - Living Room',
-      description: 'A corner unit with western exposure and aged carpeting.',
+      description: 'A corner unit with western exposure and aged carpeting. The afternoon sun has bleached everything near the windows to a uniform pale.',
       x: -13,
       y: 9,
       z: 7,
@@ -313,13 +383,19 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'table', name: 'a marble-topped console', description: 'A serpentine console table with cabriole legs and a white marble top. The gilt has worn from the carved apron, revealing gesso beneath.', boltedDown: false },
+        { prototype: 'furniture', name: 'a tiled fireplace', description: 'A small fireplace with blue Delft tiles depicting windmills and ships. The grate is cold, filled with decades of ash.', boltedDown: true },
+        { prototype: 'furniture', name: 'velvet draperies', description: 'Heavy velvet draperies in faded burgundy frame the windows, their fringe tattered and moth-eaten. Dust motes swirl in the light.', boltedDown: true },
+        { prototype: 'furniture', name: 'a canterbury', description: 'A mahogany canterbury with turned spindles once held sheet music. Now it contains yellowed newspapers from 1969.', boltedDown: false },
+      ],
       sittables: [
         {
-          name: 'an old loveseat',
+          name: 'a cameo-back settee',
           capacity: 2,
           emptyMsg:
-            'A compact loveseat faces the window, fabric faded to an indeterminate beige.',
-          occupiedMsg: '%s squeezed onto the loveseat.',
+            'A small cameo-back settee with needlepoint upholstery faces the fireplace.',
+          occupiedMsg: '%s perched on the cameo-back settee.',
         },
       ],
     },
@@ -327,7 +403,7 @@ export const building = {
     '%C3_z7': {
       name: 'Smith Tower - 7th Floor - South Suite - Foyer',
       description:
-        'The single entrance to the C block, with a stout fire door to the elevator.',
+        'The single entrance to the C block, with a stout fire door to the elevator. A small entryway opens into the rest of the unit.',
       x: -12,
       y: 9,
       z: 7,
@@ -346,13 +422,19 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'furniture', name: 'a hall tree', description: 'An ornate hall tree with a beveled mirror, brass hooks, and a marble-topped bench. Umbrellas and walking sticks fill the stand below.', boltedDown: true },
+        { prototype: 'furniture', name: 'a coat closet', description: 'A small built-in closet with a carved oak door. Inside hang moth-eaten coats and a collapsed top hat.', boltedDown: true },
+        { prototype: 'furniture', name: 'an etched glass transom', description: 'Above the door, an etched glass transom depicts intertwined vines. The afternoon light casts leaf-shadows across the floor.', boltedDown: true },
+        { prototype: 'table', name: 'a card receiver', description: 'A small silver tray on a marble pedestal once received calling cards. A few yellowed cards remain, names of people long dead.', boltedDown: false },
+      ],
       sittables: [
         {
-          name: 'a checkered couch',
-          capacity: 3,
+          name: 'the hall tree bench',
+          capacity: 2,
           emptyMsg:
-            'A couch with a faded checkered pattern sits against the wall.',
-          occupiedMsg: '%s relaxing on the checkered couch.',
+            'The velvet-cushioned bench of the hall tree awaits visitors.',
+          occupiedMsg: '%s seated on the hall tree bench.',
         },
       ],
     },
@@ -360,7 +442,7 @@ export const building = {
     '%C4_z7': {
       name: 'Smith Tower - 7th Floor - South Suite - Bedroom',
       description:
-        'A deep plan with a recessed alcove and polished concrete floors.',
+        'A deep plan with a recessed alcove and polished concrete floors. The industrial aesthetic is softened by remnants of personal touches.',
       x: -11,
       y: 9,
       z: 7,
@@ -375,13 +457,19 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'bed', name: 'an alcove daybed', description: 'A built-in daybed fills the alcove, its heavy brocade curtains drawn back with tasseled cords. The featherbed is surprisingly well-preserved.', quality: 'nice' },
+        { prototype: 'furniture', name: 'a cheval mirror', description: 'A full-length cheval mirror on a mahogany swivel frame. The glass is spotted with age, reflecting the room in fragments.', boltedDown: false },
+        { prototype: 'furniture', name: 'a gentleman\'s wardrobe', description: 'A massive gentleman\'s wardrobe with drawers, shelves, and a mirror inside the door. Cedar-lined, it still faintly perfumes the air.', boltedDown: true },
+        { prototype: 'table', name: 'a bow-fronted nightstand', description: 'A small bow-fronted nightstand with brass pulls. A porcelain chamber pot peeks from its lower shelf.', boltedDown: false },
+      ],
       sittables: [
         {
-          name: 'an alcove bed',
+          name: 'the alcove daybed',
           capacity: 2,
           emptyMsg:
-            'A bed fills the recessed alcove, half-hidden by a moth-eaten curtain.',
-          occupiedMsg: '%s tucked away in the alcove bed.',
+            'The curtained daybed awaits like a secret bower.',
+          occupiedMsg: '%s nestled in the alcove daybed.',
         },
       ],
     },
@@ -389,7 +477,7 @@ export const building = {
     '%B4_z7': {
       name: 'Smith Tower - 7th Floor - East Suite - Bedroom',
       description:
-        'A compact end-cap with a single long window and built-in shelving.',
+        'A compact end-cap with a single long window and built-in shelving. Every inch is utilized, the room a study in efficient living.',
       x: -10,
       y: 9,
       z: 7,
@@ -404,13 +492,27 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'bed', name: 'a half-tester bed', description: 'A single half-tester bed with a carved headboard and partial canopy. The silk canopy is tattered, but the carved cherubs still smile down.', quality: 'standard' },
+        { prototype: 'furniture', name: 'a bonheur-du-jour', description: 'A petite lady\'s writing desk with brass gallery and multiple secret compartments. Its marquetry depicts birds among blossoms.', boltedDown: false },
+        { prototype: 'furniture', name: 'a corner cabinet', description: 'A bow-fronted corner cabinet with glass doors displays dusty china figurines and a collection of snuff boxes.', boltedDown: true },
+        { prototype: 'furniture', name: 'a needlepoint firescreen', description: 'A decorative firescreen on a tripod base, its needlepoint panel depicting a hunting scene. It stands before a long-cold grate.', boltedDown: false },
+        { prototype: 'table', name: 'a cabriole-leg nightstand', description: 'A small nightstand with curved cabriole legs and brass sabots. A tarnished candlestick sits upon it.', boltedDown: false },
+      ],
       sittables: [
         {
-          name: 'a Murphy bed',
+          name: 'the half-tester bed',
           capacity: 2,
           emptyMsg:
-            'A Murphy bed folds down from the wall, its mechanism still functional.',
-          occupiedMsg: '%s stretched out on the Murphy bed.',
+            'The canopied bed waits beneath its carved cherubs.',
+          occupiedMsg: '%s resting beneath the tattered silk canopy.',
+        },
+        {
+          name: 'a slipper chair',
+          capacity: 1,
+          emptyMsg:
+            'A low slipper chair with worn brocade upholstery sits in the corner.',
+          occupiedMsg: '%s perched on the slipper chair.',
         },
       ],
     },

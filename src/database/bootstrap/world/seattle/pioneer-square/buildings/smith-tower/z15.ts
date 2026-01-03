@@ -1,5 +1,5 @@
 // Smith Tower - Condo Floor (z=15)
-// Condo layout repeated across floors 4–33
+// Industrial loft - exposed pipes, metal, reclaimed wood, factory fixtures
 
 export const building = {
   rooms: {
@@ -80,7 +80,7 @@ export const building = {
 
     '%A1_z15': {
       name: 'Smith Tower - 15th Floor - North Suite - Living Room',
-      description: 'A corner unit with tall windows and pale wood floors.',
+      description: 'A corner unit with tall windows and pale wood floors. A kitchenette occupies one wall, its appliances dark and silent. Built-in shelving holds the remnants of someone\'s life—books, decorative objects, a dead potted plant.',
       x: -13,
       y: 11,
       z: 15,
@@ -95,13 +95,26 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'table', name: 'a factory cart coffee table', description: 'An old factory cart has been repurposed as a coffee table, its cast iron wheels rusted but decorative. The wooden planks on top are scarred with industrial history.', boltedDown: false },
+        { prototype: 'furniture', name: 'an industrial kitchenette', description: 'A kitchenette with brushed steel countertops and open pipe shelving runs along one wall. The exposed plumbing adds to the industrial aesthetic.', boltedDown: true },
+        { prototype: 'furniture', name: 'pipe shelving unit', description: 'Floor-to-ceiling shelving made from black iron pipes and reclaimed barn wood holds an assortment of mechanical parts, old tools, and dusty mason jars.', boltedDown: true },
+        { prototype: 'furniture', name: 'exposed ductwork', description: 'Large galvanized ductwork snakes across the ceiling, exposed and industrial. The metal is dented and patinated with age.', boltedDown: true },
+      ],
       sittables: [
         {
-          name: 'a worn couch',
+          name: 'a distressed leather sofa',
           capacity: 3,
           emptyMsg:
-            'A faded couch sits against the wall, cushions compressed from years of use.',
-          occupiedMsg: '%s sprawled on the couch.',
+            'A distressed brown leather sofa sits on hairpin legs, its cushions cracked but supple.',
+          occupiedMsg: '%s lounging on the leather sofa.',
+        },
+        {
+          name: 'a metal stool',
+          capacity: 1,
+          emptyMsg:
+            'A swiveling metal shop stool sits near the kitchenette, its seat worn smooth.',
+          occupiedMsg: '%s perched on the metal stool.',
         },
       ],
     },
@@ -109,7 +122,7 @@ export const building = {
     '%A2_z15': {
       name: 'Smith Tower - 15th Floor - North Suite - Bedroom',
       description:
-        'A bright one-bedroom overlooking the skyline, hall-facing door to the south.',
+        'A bright one-bedroom overlooking the skyline, hall-facing door to the south. A built-in closet with mirrored doors dominates one wall, its reflection multiplying the dusty light.',
       x: -12,
       y: 11,
       z: 15,
@@ -128,13 +141,19 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'bed', name: 'a steel frame bed', description: 'A queen bed with an industrial steel pipe frame sits against exposed brick. The mattress is dressed in grey linen, utilitarian but comfortable.', quality: 'standard' },
+        { prototype: 'furniture', name: 'a metal wardrobe', description: 'A tall metal wardrobe with mesh doors stands against the wall, the kind once used in factory locker rooms. A few garments hang inside.', boltedDown: false },
+        { prototype: 'table', name: 'a reclaimed wood nightstand', description: 'A nightstand made from salvaged factory floor planks holds a gooseneck lamp with an Edison bulb and a few scattered coins.', boltedDown: false },
+        { prototype: 'furniture', name: 'cast iron radiator', description: 'An ornate cast iron radiator stands beneath the window, its pipes exposed and painted matte black. It still radiates warmth.', boltedDown: true },
+      ],
       sittables: [
         {
-          name: 'a dusty bed',
+          name: 'the steel frame bed',
           capacity: 2,
           emptyMsg:
-            'A queen bed sits against the wall, sheets grey with age but still intact.',
-          occupiedMsg: '%s resting on the bed.',
+            'The industrial bed frame holds a surprisingly comfortable mattress.',
+          occupiedMsg: '%s resting on the steel frame bed.',
         },
       ],
     },
@@ -142,7 +161,7 @@ export const building = {
     '%A3_z15': {
       name: 'Smith Tower - 15th Floor - North Suite - Studio',
       description:
-        'A long studio with exposed brick and a narrow galley kitchen.',
+        'A long studio with exposed brick and a narrow galley kitchen. The space is multipurpose—work area, living space, kitchen all compressed into one room.',
       x: -11,
       y: 11,
       z: 15,
@@ -157,13 +176,26 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'furniture', name: 'an industrial galley kitchen', description: 'A galley kitchen with stainless steel counters and open shelving runs along one wall. Commercial-grade fixtures hang from a ceiling-mounted pot rack.', boltedDown: true },
+        { prototype: 'table', name: 'a workbench desk', description: 'A heavy workbench serves as a desk, its maple top scarred from decades of use. Metal drawers hang beneath, filled with miscellaneous hardware.', boltedDown: false },
+        { prototype: 'furniture', name: 'a daybed frame', description: 'A daybed with a welded steel frame and canvas cushions serves as seating by day. The canvas is faded olive drab, military surplus perhaps.', boltedDown: false },
+        { prototype: 'furniture', name: 'factory pendant lights', description: 'Green enamel factory pendant lights hang from the ceiling on black cords, their shades dented and chipped.', boltedDown: true },
+      ],
       sittables: [
         {
-          name: 'a threadbare futon',
+          name: 'the daybed',
           capacity: 2,
           emptyMsg:
-            'A futon frame holds a thin mattress, serving as both couch and bed.',
-          occupiedMsg: '%s lounging on the futon.',
+            'The canvas daybed offers industrial comfort beneath the pendant lights.',
+          occupiedMsg: '%s stretched out on the daybed.',
+        },
+        {
+          name: 'a shop stool',
+          capacity: 1,
+          emptyMsg:
+            'A wooden shop stool sits at the workbench, its legs splattered with old paint.',
+          occupiedMsg: '%s hunched over the workbench.',
         },
       ],
     },
@@ -171,7 +203,7 @@ export const building = {
     '%B1_z15': {
       name: 'Smith Tower - 15th Floor - East Suite - Loft',
       description:
-        'A lofted corner with sloped ceiling beams and a compact mezzanine.',
+        'A lofted corner with sloped ceiling beams and a compact mezzanine. The high ceilings make the small footprint feel larger. A wooden ladder leads up to the sleeping loft.',
       x: -10,
       y: 11,
       z: 15,
@@ -186,20 +218,27 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'furniture', name: 'a steel mezzanine ladder', description: 'A welded steel ladder with crosshatched treads leads up to the sleeping mezzanine. The handrails are cold pipe.', boltedDown: true },
+        { prototype: 'bed', name: 'a platform loft bed', description: 'A mattress rests on a steel-grate platform in the mezzanine, surrounded by exposed I-beams. Industrial and intimate.', quality: 'cheap' },
+        { prototype: 'furniture', name: 'a Chesterfield sofa', description: 'A tufted leather Chesterfield sits beneath the mezzanine, incongruously elegant against the raw industrial space. The leather is cracked but dignified.', boltedDown: false },
+        { prototype: 'table', name: 'a steel drum side table', description: 'A cleaned oil drum with a glass top serves as a side table, mechanical parts visible through the glass.', boltedDown: false },
+        { prototype: 'furniture', name: 'exposed ceiling beams', description: 'Heavy timber ceiling beams are left exposed, their surfaces weathered and bolted together with industrial hardware.', boltedDown: true },
+      ],
       sittables: [
         {
-          name: 'a sagging couch',
+          name: 'the Chesterfield',
           capacity: 3,
           emptyMsg:
-            'A couch sits beneath the mezzanine, fabric worn smooth at the armrests.',
-          occupiedMsg: '%s settled into the couch.',
+            'The leather Chesterfield offers unexpected refinement beneath the industrial beams.',
+          occupiedMsg: '%s sunk into the Chesterfield.',
         },
         {
-          name: 'a loft bed',
+          name: 'the platform loft bed',
           capacity: 1,
           emptyMsg:
-            'A narrow bed occupies the mezzanine above, accessible by ladder.',
-          occupiedMsg: '%s up in the loft bed.',
+            'The loft bed platform is visible above, accessible by steel ladder.',
+          occupiedMsg: '%s up on the mezzanine bed.',
         },
       ],
     },
@@ -207,7 +246,7 @@ export const building = {
     '%C1_z15': {
       name: 'Smith Tower - 15th Floor - South Suite - Alcove',
       description:
-        'A snug unit tucked behind the shaft, with one frosted window.',
+        'A snug unit tucked behind the shaft, with one frosted window. The space is barely larger than a closet, intimate or claustrophobic depending on your temperament.',
       x: -13,
       y: 10,
       z: 15,
@@ -222,13 +261,19 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'bed', name: 'a pallet bed', description: 'A mattress rests on stacked wooden shipping pallets, the industrial equivalent of a bed frame. A wool army blanket is folded at the foot.', quality: 'cheap' },
+        { prototype: 'furniture', name: 'pipe coat hooks', description: 'Black iron pipe fittings form an industrial coat rack mounted to the wall, various hooks at different heights for bags and clothing.', boltedDown: true },
+        { prototype: 'furniture', name: 'a mesh locker', description: 'A narrow wire mesh locker is bolted to the wall, the kind once used in factories. A padlock hangs open from the hasp.', boltedDown: true },
+        { prototype: 'furniture', name: 'exposed conduit', description: 'Electrical conduit runs visibly along the walls, junction boxes exposed. Someone painted it all matte black.', boltedDown: true },
+      ],
       sittables: [
         {
-          name: 'a narrow cot',
+          name: 'the pallet bed',
           capacity: 1,
           emptyMsg:
-            'A military-style cot is wedged into the corner, blanket folded at the foot.',
-          occupiedMsg: '%s lying on the cot.',
+            'The pallet bed offers bare-bones industrial sleeping.',
+          occupiedMsg: '%s sprawled on the pallet bed.',
         },
       ],
     },
@@ -236,7 +281,7 @@ export const building = {
     '%B2_z15': {
       name: 'Smith Tower - 15th Floor - East Suite - Living Room',
       description:
-        'A two-room suite with a west-facing door toward the elevator.',
+        'A two-room suite with a west-facing door toward the elevator. This is clearly the main living space, larger than the other units on the floor.',
       x: -11,
       y: 10,
       z: 15,
@@ -256,13 +301,20 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'furniture', name: 'a modular leather sectional', description: 'A massive modular sectional in worn cognac leather dominates the space, its steel legs bolted to reclaimed wood blocks.', boltedDown: false },
+        { prototype: 'table', name: 'a pallet coffee table', description: 'A sanded shipping pallet on casters serves as a coffee table, its surface bearing the stamps of distant ports.', boltedDown: false },
+        { prototype: 'furniture', name: 'an industrial media console', description: 'A console made from angle iron and barn wood holds a dead television and vintage stereo equipment. Vacuum tubes glow faintly in the components.', boltedDown: true },
+        { prototype: 'furniture', name: 'a rolling garment rack', description: 'A chrome garment rack on wheels stands near the entrance, holding jackets and a few vintage work shirts.', boltedDown: false },
+        { prototype: 'furniture', name: 'exposed brick wall', description: 'One wall is exposed brick, the mortar crumbling in places, industrial and raw.', boltedDown: true },
+      ],
       sittables: [
         {
-          name: 'a faded sectional',
+          name: 'the leather sectional',
           capacity: 4,
           emptyMsg:
-            'A large sectional sofa dominates the main room, cushions sunken but serviceable.',
-          occupiedMsg: '%s sunk into the sectional.',
+            'The massive leather sectional offers industrial luxury.',
+          occupiedMsg: '%s sunk deep into the leather sectional.',
         },
       ],
     },
@@ -270,7 +322,7 @@ export const building = {
     '%B3_z15': {
       name: 'Smith Tower - 15th Floor - East Suite - Den',
       description:
-        'A narrow end unit with a bay of small windows and built-ins.',
+        'A narrow end unit with a bay of small windows and built-ins. This was clearly a home office or study, the walls lined with shelving.',
       x: -10,
       y: 10,
       z: 15,
@@ -285,20 +337,33 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'furniture', name: 'pipe and plank shelving', description: 'Industrial shelving made from black iron pipes and reclaimed scaffold planks lines the walls, holding technical manuals, old blueprints, and mechanical curiosities.', boltedDown: true },
+        { prototype: 'table', name: 'a drafting table', description: 'A vintage drafting table with a cast iron base sits in the window bay, its surface adjustable. Architectural drawings are pinned to the surface.', boltedDown: false },
+        { prototype: 'furniture', name: 'an articulated task lamp', description: 'A massive articulated task lamp clamps to the drafting table, its multiple joints allowing precise positioning.', boltedDown: false },
+        { prototype: 'furniture', name: 'a factory floor lamp', description: 'A repurposed factory inspection lamp on a wheeled tripod stands in the corner, its cone shade directing light downward.', boltedDown: false },
+      ],
       sittables: [
         {
-          name: 'a reading chair',
+          name: 'a drafting stool',
           capacity: 1,
           emptyMsg:
-            'A wingback chair sits by the window bay, upholstery cracked but comfortable.',
-          occupiedMsg: '%s curled up in the reading chair.',
+            'A tall drafting stool with a footrest ring sits at the table.',
+          occupiedMsg: '%s perched at the drafting table.',
+        },
+        {
+          name: 'a butterfly chair',
+          capacity: 1,
+          emptyMsg:
+            'A leather butterfly chair on a welded frame offers casual seating.',
+          occupiedMsg: '%s reclined in the butterfly chair.',
         },
       ],
     },
 
     '%C2_z15': {
       name: 'Smith Tower - 15th Floor - South Suite - Living Room',
-      description: 'A corner unit with western exposure and aged carpeting.',
+      description: 'A corner unit with western exposure and aged carpeting. The afternoon sun has bleached everything near the windows to a uniform pale.',
       x: -13,
       y: 9,
       z: 15,
@@ -313,13 +378,20 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'furniture', name: 'a vintage factory bench', description: 'A long wooden bench salvaged from a factory break room sits against the wall, its surface worn smooth by generations of workers.', boltedDown: false },
+        { prototype: 'table', name: 'a cable spool table', description: 'A large wooden cable spool serves as a side table, its industrial origins stamped into the wood.', boltedDown: false },
+        { prototype: 'furniture', name: 'a steam radiator', description: 'An exposed cast iron steam radiator clanks and hisses beneath the window, its pipes running visibly along the baseboard.', boltedDown: true },
+        { prototype: 'furniture', name: 'steel cable curtain rods', description: 'Aircraft cable stretched between wall-mounted cleats serves as curtain rods, holding canvas drop cloths instead of proper curtains.', boltedDown: true },
+        { prototype: 'furniture', name: 'a metal storage trunk', description: 'A battered metal storage trunk sits beneath the window, its corners reinforced with riveted steel. Old shipping labels cover one side.', boltedDown: false },
+      ],
       sittables: [
         {
-          name: 'an old loveseat',
-          capacity: 2,
+          name: 'the factory bench',
+          capacity: 3,
           emptyMsg:
-            'A compact loveseat faces the window, fabric faded to an indeterminate beige.',
-          occupiedMsg: '%s squeezed onto the loveseat.',
+            'The factory bench offers utilitarian seating along the wall.',
+          occupiedMsg: '%s seated on the factory bench.',
         },
       ],
     },
@@ -327,7 +399,7 @@ export const building = {
     '%C3_z15': {
       name: 'Smith Tower - 15th Floor - South Suite - Foyer',
       description:
-        'The single entrance to the C block, with a stout fire door to the elevator.',
+        'The single entrance to the C block, with a stout fire door to the elevator. A small entryway opens into the rest of the unit.',
       x: -12,
       y: 9,
       z: 15,
@@ -346,13 +418,20 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'furniture', name: 'a canvas director\'s chair', description: 'A heavy-duty director\'s chair with a steel frame and black canvas sits near the entrance, the kind used on film sets.', boltedDown: false },
+        { prototype: 'furniture', name: 'a gym locker', description: 'A narrow vintage gym locker is bolted to the wall, its vented door slightly ajar. The interior smells faintly of old metal.', boltedDown: true },
+        { prototype: 'furniture', name: 'an industrial mail slot', description: 'A heavy brass mail slot with a steel flap is set into the fire door, industrial and functional.', boltedDown: true },
+        { prototype: 'table', name: 'a sawbuck table', description: 'A small sawbuck table made from crossed wooden legs and a thick plank serves as a console, holding a tray of old keys and spare hardware.', boltedDown: false },
+        { prototype: 'furniture', name: 'a coat hook board', description: 'A piece of reclaimed barn wood with mismatched vintage hooks serves as a coat rack, mounted at eye level.', boltedDown: true },
+      ],
       sittables: [
         {
-          name: 'a checkered couch',
-          capacity: 3,
+          name: 'the director\'s chair',
+          capacity: 1,
           emptyMsg:
-            'A couch with a faded checkered pattern sits against the wall.',
-          occupiedMsg: '%s relaxing on the checkered couch.',
+            'The canvas director\'s chair offers a place to sit while removing boots.',
+          occupiedMsg: '%s seated in the director\'s chair.',
         },
       ],
     },
@@ -360,7 +439,7 @@ export const building = {
     '%C4_z15': {
       name: 'Smith Tower - 15th Floor - South Suite - Bedroom',
       description:
-        'A deep plan with a recessed alcove and polished concrete floors.',
+        'A deep plan with a recessed alcove and polished concrete floors. The industrial aesthetic is softened by remnants of personal touches.',
       x: -11,
       y: 9,
       z: 15,
@@ -375,13 +454,19 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'bed', name: 'a platform bed', description: 'A low platform bed made from welded steel angle iron and reclaimed timber fills the alcove. Heavy canvas curtains on a pipe rod can close off the sleeping area.', quality: 'standard' },
+        { prototype: 'furniture', name: 'a pipe clothing rack', description: 'A freestanding clothing rack made from black iron pipes and industrial fittings serves as an open closet. Work shirts and denim hang from the crossbar.', boltedDown: false },
+        { prototype: 'furniture', name: 'a factory window mirror', description: 'An old factory window frame with mirror glass mounted behind it hangs on the wall, the panes creating a grid of reflections.', boltedDown: true },
+        { prototype: 'table', name: 'a machinist\'s cabinet', description: 'A small machinist\'s cabinet with tiny labeled drawers serves as a nightstand, each drawer meant for storing small parts. Now holds personal items.', boltedDown: false },
+      ],
       sittables: [
         {
-          name: 'an alcove bed',
+          name: 'the platform bed',
           capacity: 2,
           emptyMsg:
-            'A bed fills the recessed alcove, half-hidden by a moth-eaten curtain.',
-          occupiedMsg: '%s tucked away in the alcove bed.',
+            'The low platform bed waits in its alcove, industrial curtains drawn back.',
+          occupiedMsg: '%s resting on the platform bed.',
         },
       ],
     },
@@ -389,7 +474,7 @@ export const building = {
     '%B4_z15': {
       name: 'Smith Tower - 15th Floor - East Suite - Bedroom',
       description:
-        'A compact end-cap with a single long window and built-in shelving.',
+        'A compact end-cap with a single long window and built-in shelving. Every inch is utilized, the room a study in efficient living.',
       x: -10,
       y: 9,
       z: 15,
@@ -404,13 +489,27 @@ export const building = {
         onAnnounce:
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
+      objects: [
+        { prototype: 'bed', name: 'a wall-mounted fold-down bed', description: 'A heavy-duty fold-down bed on gas struts descends from a steel-framed wall cabinet. The mechanism is industrial, meant for a factory infirmary perhaps.', quality: 'standard' },
+        { prototype: 'furniture', name: 'the bed cabinet', description: 'The bed folds up into a riveted steel cabinet painted industrial grey. Stenciled numbers mark the side.', boltedDown: true },
+        { prototype: 'furniture', name: 'wire basket shelving', description: 'Industrial wire basket shelving is mounted to the walls, the kind used in warehouse storage. Various items are sorted into the mesh containers.', boltedDown: true },
+        { prototype: 'table', name: 'a drop-leaf work table', description: 'A wall-mounted drop-leaf table with steel brackets serves as a desk when extended. Folded flat, it\'s nearly invisible.', boltedDown: true },
+        { prototype: 'furniture', name: 'a steel tool cabinet', description: 'A narrow steel tool cabinet with many small drawers sits in the corner, each drawer labeled with embossed metal tags.', boltedDown: false },
+      ],
       sittables: [
         {
-          name: 'a Murphy bed',
+          name: 'the fold-down bed',
           capacity: 2,
           emptyMsg:
-            'A Murphy bed folds down from the wall, its mechanism still functional.',
-          occupiedMsg: '%s stretched out on the Murphy bed.',
+            'The industrial fold-down bed is lowered, ready for use.',
+          occupiedMsg: '%s stretched out on the fold-down bed.',
+        },
+        {
+          name: 'a machinist stool',
+          capacity: 1,
+          emptyMsg:
+            'A low machinist stool on casters sits near the work table.',
+          occupiedMsg: '%s perched on the machinist stool.',
         },
       ],
     },
