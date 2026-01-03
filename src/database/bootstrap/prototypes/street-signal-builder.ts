@@ -352,6 +352,10 @@ on separate power.`,
   async registerAliases(): Promise<void> {
     console.log("[StreetSignalBuilder] Type 'streetSignal' auto-aliased");
   }
+
+  getObject(): RuntimeObject | null {
+    return this.obj;
+  }
 }
 
 // Self-register

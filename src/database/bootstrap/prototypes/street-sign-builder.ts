@@ -238,6 +238,10 @@ a city that no longer exists—street names that outlived the streets.`,
   async registerAliases(): Promise<void> {
     console.log("[StreetSignBuilder] Type 'streetSign' auto-aliased");
   }
+
+  getObject(): RuntimeObject | null {
+    return this.obj;
+  }
 }
 
 // Self-register

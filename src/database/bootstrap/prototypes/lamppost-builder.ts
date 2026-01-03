@@ -296,6 +296,10 @@ the fire department. It knows when it's broken. That's about it.`,
   async registerAliases(): Promise<void> {
     console.log("[LamppostBuilder] Type 'lamppost' auto-aliased");
   }
+
+  getObject(): RuntimeObject | null {
+    return this.obj;
+  }
 }
 
 // Self-register

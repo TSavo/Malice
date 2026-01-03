@@ -76,6 +76,10 @@ some effort, unlike the smooth street lampposts.`,
   async registerAliases(): Promise<void> {
     console.log("[ParkLampBuilder] Type 'parkLamp' auto-aliased");
   }
+
+  getObject(): RuntimeObject | null {
+    return this.obj;
+  }
 }
 
 // Self-register
