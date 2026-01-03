@@ -10,7 +10,7 @@ Malice is a modern TypeScript-based Text MOO (Multi-User Object-Oriented) game e
 
 ```bash
 # Development
-npm start           # Start server (Node.js with tsx)
+npm start           # Start server (Bun runtime)
 bun run dev         # Start with auto-reload (Bun)
 
 # Testing
