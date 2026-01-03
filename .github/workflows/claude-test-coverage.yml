@@ -1,0 +1,101 @@
+name: Claude Test Coverage
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+# Prevent multiple coverage checks from running simultaneously
+concurrency:
+  group: claude-coverage-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  claude-coverage:
+    # Skip bot-created PRs to avoid loops
+    if: github.actor != 'github-actions[bot]'
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check Test Coverage
+        id: claude-coverage
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          additional_permissions: |
+            actions: read
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+            BRANCH: ${{ github.event.pull_request.head.ref }}
+
+            You are a TEST COVERAGE agent. Your job is to check if new/modified code has test coverage.
+
+            ## Step 1: Identify Changed Files
+            Run `gh pr diff ${{ github.event.pull_request.number }}` to see what changed.
+            Focus on source files (src/**/*.ts) - ignore test files, configs, docs.
+
+            ## Step 2: Check for Corresponding Tests
+            For each changed source file, check if tests exist:
+            - src/foo/bar.ts → test/foo/bar.test.ts (or similar patterns)
+            - Look for test files that import or reference the changed code
+
+            ## Step 3: Evaluate Coverage
+            Determine if the changes are adequately tested:
+            - New functions/methods should have tests
+            - Modified logic should have tests covering the changes
+            - Pure type changes, interface updates, or config changes may not need tests
+
+            ## Step 4: Decision
+
+            **If tests are MISSING and NEEDED:**
+            1. Write the missing tests in the appropriate test file(s)
+            2. Run `npm test` to verify they pass
+            3. Commit with message: "test: add coverage for [description]"
+            4. Push: `git push origin ${{ github.event.pull_request.head.ref }}`
+            5. Comment on PR using `gh pr comment ${{ github.event.pull_request.number }}` with:
+               <!-- CLAUDE_COVERAGE_MARKER -->
+               ## 🧪 Test Coverage Added
+
+               Added tests for:
+               - [list of what you tested]
+
+               Commit: `[hash]`
+
+            **If tests ALREADY EXIST or NOT NEEDED:**
+            Do nothing. No comment needed. Just exit silently.
+
+            ## Guidelines
+            - Follow existing test patterns in the codebase (vitest, describe/it blocks)
+            - Test behavior, not implementation details
+            - Keep tests focused and minimal
+            - If unsure whether tests are needed, err on the side of NOT adding them
+
+          claude_args: '--allowed-tools "Bash(git:*),Bash(npm test:*),Bash(npm run test:*),Bash(gh pr diff:*),Bash(gh pr comment:*),Bash(gh pr view:*),Read,Edit,Write,Glob,Grep"'
