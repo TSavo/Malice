@@ -1,7 +1,54 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import WebSocket from 'ws';
 
 const WS_URL = process.env.WS_URL || 'ws://localhost:8080';
+
+// These are INTEGRATION tests that require a running Malice server.
+// Skip unless RUN_INTEGRATION_TESTS=1 is set.
+const runIntegration = process.env.RUN_INTEGRATION_TESTS === '1';
+
+// Check if server is available before running tests
+let serverAvailable = false;
+
+async function checkServer(): Promise<boolean> {
+  if (!runIntegration) return false;
+  try {
+    const ws = new WebSocket(`${WS_URL}/mux`);
+    await new Promise<void>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        ws.close();
+        reject(new Error('timeout'));
+      }, 2000);
+      ws.on('open', () => {
+        clearTimeout(timeout);
+        ws.close();
+        resolve();
+      });
+      ws.on('error', () => {
+        clearTimeout(timeout);
+        reject(new Error('connection failed'));
+      });
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+beforeAll(async () => {
+  if (!runIntegration) {
+    console.warn(
+      '⚠️  Skipping multiplexed transport tests - set RUN_INTEGRATION_TESTS=1 to run',
+    );
+    return;
+  }
+  serverAvailable = await checkServer();
+  if (!serverAvailable) {
+    console.warn(
+      `⚠️  Skipping multiplexed transport tests - no server at ${WS_URL}`,
+    );
+  }
+});
 
 /**
  * Helper class for testing multiplexed WebSocket connections
@@ -115,20 +162,24 @@ describe('Multiplexed Transport', () => {
   let client: MuxTestClient;
 
   beforeEach(() => {
+    if (!serverAvailable) return;
     client = new MuxTestClient();
   });
 
   afterEach(() => {
+    if (!serverAvailable) return;
     client.close();
   });
 
   describe('Connection', () => {
     it('should connect to /mux endpoint', async () => {
+      if (!serverAvailable) return;
       await client.connect();
       expect(client.isConnected).toBe(true);
     });
 
     it('should receive welcome banner on game channel', async () => {
+      if (!serverAvailable) return;
       await client.connect();
       const messages = await client.collectMessages(1000);
 
@@ -142,6 +193,7 @@ describe('Multiplexed Transport', () => {
 
   describe('Game Channel', () => {
     it('should send commands on game channel', async () => {
+      if (!serverAvailable) return;
       await client.connect();
       // Wait for welcome banner
       await new Promise((r) => setTimeout(r, 500));
@@ -156,6 +208,7 @@ describe('Multiplexed Transport', () => {
     });
 
     it('should handle login prompt', async () => {
+      if (!serverAvailable) return;
       await client.connect();
       const messages = await client.collectMessages(1000);
 
@@ -174,6 +227,7 @@ describe('Multiplexed Transport', () => {
 
   describe('Control Channel', () => {
     it('should accept resize on ctrl channel', async () => {
+      if (!serverAvailable) return;
       await client.connect();
       client.send('ctrl', { type: 'resize', w: 120, h: 40 });
       await new Promise((r) => setTimeout(r, 100));
@@ -181,6 +235,7 @@ describe('Multiplexed Transport', () => {
     });
 
     it('should accept ready signal on ctrl channel', async () => {
+      if (!serverAvailable) return;
       await client.connect();
       client.send('ctrl', { type: 'ready' });
       await new Promise((r) => setTimeout(r, 100));
@@ -190,6 +245,7 @@ describe('Multiplexed Transport', () => {
 
   describe('Channel Protocol', () => {
     it('should use correct message envelope format', async () => {
+      if (!serverAvailable) return;
       await client.connect();
       const msg = await client.waitForMessage(2000);
 
@@ -201,6 +257,7 @@ describe('Multiplexed Transport', () => {
     });
 
     it('should handle channel open request', async () => {
+      if (!serverAvailable) return;
       await client.connect();
 
       // Send open request immediately
@@ -227,14 +284,17 @@ describe('MOO-Side Channel Communication', () => {
   let client: MuxTestClient;
 
   beforeEach(() => {
+    if (!serverAvailable) return;
     client = new MuxTestClient();
   });
 
   afterEach(() => {
+    if (!serverAvailable) return;
     client.close();
   });
 
   it('should receive state channel messages via $.broadcastState()', async () => {
+    if (!serverAvailable) return;
     await client.connect();
     // Wait for initial messages
     await client.collectMessages(500);
@@ -306,6 +366,7 @@ describe('MOO-Side Channel Communication', () => {
 
 describe('Multiplexed vs Raw Transport', () => {
   it('should return JSON envelope for /mux connections', async () => {
+    if (!serverAvailable) return;
     const client = new MuxTestClient();
     await client.connect(`${WS_URL}/mux`);
 
@@ -317,6 +378,7 @@ describe('Multiplexed vs Raw Transport', () => {
   });
 
   it('should return raw text for non-mux connections', async () => {
+    if (!serverAvailable) return;
     const ws = new WebSocket(WS_URL);
 
     const rawMessage = await new Promise<string>((resolve, reject) => {

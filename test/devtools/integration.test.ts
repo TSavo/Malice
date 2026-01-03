@@ -138,11 +138,16 @@ describe.sequential('DevTools Integration', () => {
       client1 = await connectClient();
       client2 = await connectClient();
 
-      // Client 2 waits for notification
+      // Client 2 waits for object.created notification (may receive property.changed first)
       const notificationPromise = new Promise<any>((resolve) => {
-        client2.once('message', (data) => {
-          resolve(JSON.parse(data.toString()));
-        });
+        const handler = (data: Buffer) => {
+          const msg = JSON.parse(data.toString());
+          if (msg.method === 'object.created') {
+            client2.off('message', handler);
+            resolve(msg);
+          }
+        };
+        client2.on('message', handler);
       });
 
       // Client 1 creates object
