@@ -45,7 +45,7 @@ The books remain organized by subject and author, appreciated by no one. Looters
 
 A checkout counter near the entrance holds a cash register, a stack of bookmarks, and a handwritten sign: "STAFF PICKS" with arrows pointing to a nearby display. The picks were never collected. The staff moved on to more pressing concerns.`,
       x: -14,
-      y: 12,
+      y: 13,
       z: 0,
       population: 0,
       ambientNoise: 2,
@@ -53,7 +53,7 @@ A checkout counter near the entrance holds a cash register, a stack of bookmarks
       waterLevel: 0,
       outdoor: false,
       exits: {
-        east: {
+        south: {
           to: 'yesler-way/x-14.ts',
           description: 'The glass door leads back to Yesler Way',
           door: '%FRONT_DOOR',
