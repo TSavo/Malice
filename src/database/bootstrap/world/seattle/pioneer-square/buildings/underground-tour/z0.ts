@@ -38,6 +38,39 @@ A sandwich board lies face-down near the door, its chalkboard message hidden. Th
         west: '%STAGING',
         down: '%DESCENT',
       },
+      objects: [
+        {
+          prototype: 'describable',
+          name: 'display rack',
+          description: `A rotating wire rack holds t-shirts in faded plastic bags. The shirts read I SURVIVED THE UNDERGROUND TOUR in blocky letters, the fabric stiff with age and dust. The sizes are mixed—small, medium, XXL—abandoned inventory that never found its buyers. The price tags still dangle: $24.95.`,
+        },
+        {
+          prototype: 'describable',
+          name: 'snow globe shelf',
+          description: `A shelf of snow globes, each containing a tiny Pioneer Square streetscape—miniature brick buildings, a totem pole the size of a toothpick, a pergola no bigger than a thimble. Shake one and the fake snow still falls, swirling around frozen Seattle in eternal winter. The globes are dusty but intact, their liquid slightly yellowed with age.`,
+        },
+        {
+          prototype: 'describable',
+          name: 'rat mug display',
+          description: `Novelty coffee mugs shaped like rats—the unofficial mascot of Seattle's underground. The rats are ceramic, cartoonish, their tails forming the handles. A sign reads: "The REAL residents of Underground Seattle!" Twenty dollars each. Nobody's buying.`,
+        },
+        {
+          prototype: 'sign',
+          name: 'tour schedule',
+          description: `A laminated poster showing tour departure times:
+
+UNDERGROUND TOUR SCHEDULE
+━━━━━━━━━━━━━━━━━━━━━━━━
+11:00 AM
+ 1:00 PM
+ 3:00 PM
+
+Tours last approximately 75 minutes.
+No refunds. No cameras. No wandering.
+
+The schedule is eternal. The tours stopped.`,
+        },
+      ],
     },
 
     '%STAGING': {
@@ -68,6 +101,30 @@ A door to the south leads to what was once the staff office. A stairwell in the 
           occupiedMsg: '%s sitting in one of the folding chairs',
         },
       ],
+      objects: [
+        {
+          prototype: 'describable',
+          name: 'podium',
+          description: `A wooden podium where tour guides once stood to deliver the opening spiel—the Great Fire of 1889, the decision to rebuild one story higher, the rats and the toilets and the ghost stories. A binder lies open on the lectern, its pages yellowed, containing bullet points and bad jokes that guides were supposed to memorize. "Remember: ENTHUSIASM sells tickets!"`,
+        },
+        {
+          prototype: 'describable',
+          name: 'flashlight basket',
+          description: `A wicker basket near the door holds a dozen flashlights—the cheap plastic kind that take D batteries. The batteries have long since corroded, leaking acid that has eaten through the plastic casings. White crystalline residue coats everything. These flashlights will never light again.`,
+        },
+        {
+          prototype: 'sign',
+          name: 'safety signs',
+          description: `A cluster of laminated safety signs mounted to the brick wall:
+
+WATCH YOUR HEAD - Low clearances ahead
+UNEVEN SURFACES - Watch your step
+STAY WITH YOUR GROUP - No wandering
+EMERGENCY EXIT - Follow guide instructions
+
+The warnings are still valid. The guides are gone.`,
+        },
+      ],
     },
 
     '%OFFICE': {
@@ -88,6 +145,23 @@ A door in the back wall is marked EMPLOYEES ONLY - SERVICE CORRIDOR. Through the
       exits: {
         north: '%STAGING',
       },
+      objects: [
+        {
+          prototype: 'desk',
+          name: 'staff desk',
+          description: `A battered metal desk buried under paperwork—scheduling printouts, employee timesheets, a half-finished incident report about someone who fainted in the tunnels. A time clock on the wall still holds punch cards in their slots, the last punches dated years ago. The employees never clocked out. The end came between shifts.`,
+        },
+        {
+          prototype: 'cabinet',
+          name: 'filing cabinet',
+          description: `A gray metal filing cabinet, three drawers deep, stuffed with liability waivers signed by tourists who wanted to see the underground. Each form releases Bill Speidel's Underground Tour from responsibility for "injury, illness, or psychological distress." Thousands of signatures. Thousands of people who went down and came back up. Until the day everyone stopped coming.`,
+        },
+        {
+          prototype: 'describable',
+          name: 'candy jar',
+          description: `A glass jar that once held hard candies—the kind offices kept for visitors. The candies have fused into a single geological mass, a stratum of butterscotch and peppermint compressed by time and humidity into something that is no longer food. The jar is decorative now. A fossil.`,
+        },
+      ],
     },
   },
 };

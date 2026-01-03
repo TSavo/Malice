@@ -46,6 +46,37 @@ Coffee cups are stacked in neat pyramids beside the espresso machine, white cera
           occupiedMsg: '%s sitting at the coffee counter',
         },
       ],
+      objects: [
+        {
+          prototype: 'describable',
+          name: 'espresso machine',
+          description: `A La Marzocco Strada—Italian engineering at its finest, a chrome beast of brass fittings and pressure gauges that probably cost more than some cars. The boiler is drained, the steam wands dry, but the craftsmanship remains undeniable. Someone loved this machine once. Cleaned it daily. Calibrated the grind. Now it sits cold, a monument to caffeine culture that outlived its context.`,
+        },
+        {
+          prototype: 'sign',
+          name: 'chalkboard menu',
+          description: `A chalkboard mounted above the counter, the handwriting smeared but legible:
+
+═══════════════════════
+     ZEITGEIST COFFEE
+═══════════════════════
+CORTADO............$4.50
+CHEMEX POUR-OVER...$5.00
+COLD BREW..........$4.00
+AVOCADO TOAST.....$12.00
+GRAIN BOWL........$14.00
+═══════════════════════
+   * Ask about our
+    SINGLE ORIGIN *
+
+The prices seem quaint now. Relics of an economy that traded in dollars.`,
+        },
+        {
+          prototype: 'describable',
+          name: 'tip jar',
+          description: `A mason jar repurposed as a tip jar, a hand-lettered sign taped to its side: TIPS = KARMA. The jar is empty now—no coins, no crumpled bills, no evidence that anyone ever believed in cosmic reciprocity for their spare change. The sign remains, a statement of faith in a transaction that stopped happening.`,
+        },
+      ],
     },
 
     '%SEATING': {
@@ -83,6 +114,18 @@ Art still hangs on the brick walls, pieces by local artists that were for sale w
           occupiedMsg: '%s lounging on the velvet couch',
         },
       ],
+      objects: [
+        {
+          prototype: 'describable',
+          name: 'abstract canvas',
+          description: `A large canvas—maybe four feet square—dominated by violent slashes of red and black against a white ground. The paint is thick, applied with palette knives or maybe bare hands. A small placard identifies it as "Dissolution III" by a local artist whose name means nothing now. The price tag reads $2,400. The tag dangles by a thread.`,
+        },
+        {
+          prototype: 'describable',
+          name: 'coffee grounds sculpture',
+          description: `A sculpture made of coffee grounds bound in clear resin—an abstract form that might be a human figure or might be nothing at all. It sits on a wooden pedestal, catching light in the amber matrix of fossilized caffeine. The artist statement taped to the base explains something about "the preservation of daily ritual." The resin has yellowed slightly. The ritual stopped.`,
+        },
+      ],
     },
 
     '%BACK': {
@@ -104,6 +147,36 @@ The employee schedule still hangs on a corkboard, shifts assigned to people who 
         north: '%SEATING',
         east: '%COUNTER',
       },
+      objects: [
+        {
+          prototype: 'cabinet',
+          name: 'storage shelves',
+          description: `Industrial metal shelving holding the unglamorous necessities of coffee shop operation: bags of beans that have long since gone stale, their one-way valves exhaling into emptiness; cases of paper cups in three sizes; wooden stir sticks by the thousand; sugar packets in brown and white. The inventory outlived the demand.`,
+        },
+        {
+          prototype: 'describable',
+          name: 'refrigerator',
+          description: `A small commercial refrigerator hums in the corner—somehow still running after all this time, drawing power from a grid that refuses to die. The door is closed. The contents are best left uninvestigated. Whatever's in there has had years to evolve. Some mysteries are better left unsolved.`,
+        },
+        {
+          prototype: 'sign',
+          name: 'employee schedule',
+          description: `A corkboard with the employee schedule pinned to it:
+
+WEEK OF [date illegible]
+━━━━━━━━━━━━━━━━━━━━━━
+MON: Sarah (open), Jake (close)
+TUE: Taylor (open), Maria (close)
+WED: Jake (open), Sarah (close)
+THU: Maria (open), Taylor (close)
+FRI: ALL HANDS - inventory
+━━━━━━━━━━━━━━━━━━━━━━
+BEARD NETS ARE MANDATORY
+    IN FOOD PREP AREA
+
+Taylor was supposed to open on Tuesday. Tuesday never quite arrived.`,
+        },
+      ],
     },
   },
 };
