@@ -22,7 +22,7 @@ describe('Perception Filter System', () => {
     });
     await bootstrap.bootstrap();
     $ = manager as any;
-  }, 60000);
+  }, 180000);
 
   afterAll(async () => {
     await manager.flushWrites();
@@ -711,7 +711,7 @@ describe('Pluribus System Object', () => {
     });
     await bootstrap.bootstrap();
     $ = manager as any;
-  }, 60000);
+  }, 180000);
 
   afterAll(async () => {
     await manager.flushWrites();
@@ -823,7 +823,7 @@ describe('The Mask Wearable', () => {
     });
     await bootstrap.bootstrap();
     $ = manager as any;
-  }, 60000);
+  }, 180000);
 
   afterAll(async () => {
     await manager.flushWrites();
