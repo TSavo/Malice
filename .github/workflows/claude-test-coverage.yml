@@ -3,10 +3,17 @@ name: Claude Test Coverage
 on:
   pull_request:
     types: [opened, synchronize]
+  # Allow fixer to re-trigger after pushing fixes
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to check coverage'
+        required: true
+        type: string
 
 # Prevent multiple coverage checks from running simultaneously
 concurrency:
-  group: claude-coverage-${{ github.event.pull_request.number }}
+  group: claude-coverage-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
   cancel-in-progress: true
 
 jobs:
@@ -20,11 +27,31 @@ jobs:
       actions: read
 
     steps:
+      - name: Get PR details for workflow_dispatch
+        id: pr-info
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_DATA=$(gh pr view ${{ github.event.inputs.pr_number }} --repo ${{ github.repository }} --json headRefName)
+          echo "branch=$(echo $PR_DATA | jq -r '.headRefName')" >> $GITHUB_OUTPUT
+
+      - name: Set PR context
+        id: pr-context
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
+            echo "branch=${{ steps.pr-info.outputs.branch }}" >> $GITHUB_OUTPUT
+          else
+            echo "number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+            echo "branch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.ref }}
+          ref: ${{ steps.pr-context.outputs.branch }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure git
@@ -50,13 +77,13 @@ jobs:
             actions: read
           prompt: |
             REPO: ${{ github.repository }}
-            PR NUMBER: ${{ github.event.pull_request.number }}
-            BRANCH: ${{ github.event.pull_request.head.ref }}
+            PR NUMBER: ${{ steps.pr-context.outputs.number }}
+            BRANCH: ${{ steps.pr-context.outputs.branch }}
 
             You are an AGGRESSIVE TEST COVERAGE agent. Your job is to ensure all new code has test coverage.
 
             ## Step 1: Identify Changed Source Files
-            Run `gh pr diff ${{ github.event.pull_request.number }}` to see what changed.
+            Run `gh pr diff ${{ steps.pr-context.outputs.number }}` to see what changed.
             Focus on source files in src/**/*.ts - ignore test files, configs, markdown, workflows.
 
             ## Step 2: Check for Existing Tests
@@ -89,7 +116,7 @@ jobs:
             4. For HTTP endpoints: test request/response, status codes, error cases
             5. Run `npm test -- [your-test-file]` to verify tests pass
             6. Commit: `git add . && git commit -m "test: add coverage for [description]"`
-            7. Push: `git push origin ${{ github.event.pull_request.head.ref }}`
+            7. Push: `git push origin ${{ steps.pr-context.outputs.branch }}`
             8. Comment on PR with (no escaping, no backslashes):
                <!-- CLAUDE_COVERAGE_MARKER -->
                ## 🧪 Test Coverage Added

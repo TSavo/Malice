@@ -3,10 +3,17 @@ name: Claude Documentation
 on:
   pull_request:
     types: [opened, synchronize]
+  # Allow fixer to re-trigger after pushing fixes
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to check docs'
+        required: true
+        type: string
 
 # Prevent multiple doc updates from running simultaneously
 concurrency:
-  group: claude-docs-${{ github.event.pull_request.number }}
+  group: claude-docs-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
   cancel-in-progress: true
 
 jobs:
@@ -20,11 +27,31 @@ jobs:
       actions: read
 
     steps:
+      - name: Get PR details for workflow_dispatch
+        id: pr-info
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_DATA=$(gh pr view ${{ github.event.inputs.pr_number }} --repo ${{ github.repository }} --json headRefName)
+          echo "branch=$(echo $PR_DATA | jq -r '.headRefName')" >> $GITHUB_OUTPUT
+
+      - name: Set PR context
+        id: pr-context
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
+            echo "branch=${{ steps.pr-info.outputs.branch }}" >> $GITHUB_OUTPUT
+          else
+            echo "number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+            echo "branch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.ref }}
+          ref: ${{ steps.pr-context.outputs.branch }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure git
@@ -41,13 +68,13 @@ jobs:
             actions: read
           prompt: |
             REPO: ${{ github.repository }}
-            PR NUMBER: ${{ github.event.pull_request.number }}
-            BRANCH: ${{ github.event.pull_request.head.ref }}
+            PR NUMBER: ${{ steps.pr-context.outputs.number }}
+            BRANCH: ${{ steps.pr-context.outputs.branch }}
 
             You are a DOCUMENTATION agent. Your job is to keep project documentation in sync with code changes.
 
             ## Step 1: Analyze the PR
-            Run `gh pr diff ${{ github.event.pull_request.number }}` to see what changed.
+            Run `gh pr diff ${{ steps.pr-context.outputs.number }}` to see what changed.
 
             Focus on these types of changes that need documentation:
             - New bootstrap files in src/database/bootstrap/ (need docs/moo/prototypes/*.md)
@@ -102,7 +129,7 @@ jobs:
 
             After updating:
             1. Commit: `git add . && git commit -m "docs: update documentation for [feature]"`
-            2. Push: `git push origin ${{ github.event.pull_request.head.ref }}`
+            2. Push: `git push origin ${{ steps.pr-context.outputs.branch }}`
             3. Comment on PR with (no escaping, no backslashes):
                <!-- CLAUDE_DOCS_MARKER -->
                ## 📚 Documentation Updated
