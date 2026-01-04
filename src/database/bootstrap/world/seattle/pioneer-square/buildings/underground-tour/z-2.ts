@@ -34,6 +34,12 @@ A rope barrier that once kept tourists in line lies coiled on the ground, its br
         up: '%DESCENT',
         south: '%TOUR_MID',
         east: '%STOREFRONT_ROW',
+        north: {
+          to: 'buildings/merchants-cafe/z-1.ts',
+          room: '%OLD_FOUNDATION',
+          description: 'A rough passage leads north toward an old basement',
+          hidden: true,
+        },
       },
       objects: [
         { prototype: 'furniture', name: 'prism glass skylights', description: 'Glass prisms set into the ceiling once allowed light to filter down from the street above. The prisms are dark now—the sidewalk above them replaced with solid concrete decades ago.', boltedDown: true },

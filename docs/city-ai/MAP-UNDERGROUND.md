@@ -249,7 +249,88 @@ Rail tunnel connections and deep eastern passages.
 ### Chinatown Deep (NEW)
 Ancient tunnels and cistern access beneath the International District.
 
-**Total z=-3 rooms: ~77** (29 original + 22 waterfront + 18 eastside + 6 yesler + 2 chinatown)
+### North-South Arterial Tunnel (NEW)
+A major vertical corridor running from Yesler Way (y=+10) to King Street (y=-9) at z=-3. This WPA-era (1937) tunnel was built during Depression-era public works but never officially completed. It provides an express route bypassing the congested z=-2 level.
+
+```
+    x=-2  -1   0  +1  +2
+       │   │   │   │   │
+  ┌────┴───┴───┴───┴───┴────┐
+y=+10  ●  NORTHERN ACCESS    │  (connects to Yesler Underground z=-2)
+y=+9   │                     │
+y=+8   ●                     │
+y=+7   │                     │
+y=+6   ●                     │
+y=+5   │                     │
+y=+4   ●                     │
+y=+3   │                     │
+y=+2   ●═══════●  ARTERIAL HUB (connects to Transit Corridor, Occidental z=0)
+y=+1   │       │             │
+y=0    ●       ●             │  (connects to underground-east z=-3)
+y=-1   │       │             │
+y=-2   ●       ●             │
+y=-3   │       │             │
+y=-4   ●       ●             │  (connects to Deep Connector z=-4)
+y=-5   │       │             │
+y=-6   ●       ●             │
+y=-7   │       │             │
+y=-8   ●       ●             │
+y=-9   ●  ARTERIAL TERMINUS  │  (connects to King Street z=-2)
+  └──────────────────────────┘
+```
+
+Key locations:
+- **Northern Arterial Access** (0, +10, -3): Entry from Yesler Underground
+- **Arterial Hub** (0, +2, -3): Central intersection with Transit Corridor
+- **Arterial Terminus** (0, -9, -3): Southern terminus connecting to King Street
+
+**Total: 17 rooms**
+
+### East-West Transit Corridor (NEW)
+A horizontal express route at z=-3 connecting Gray Cartel western territory to the eastern steam tunnel network. Runs through a neutral zone at the hub.
+
+```
+    x=-16 -14 -12 -10  -8  -6  -4  -2   0  +2  +4  +6  +8
+       │   │   │   │   │   │   │   │   │   │   │   │   │
+  ┌────┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴────┐
+y=+2  ●───●───●───●───●═══●═══●═══●═══●───●───●───●  TRANSIT│
+      W1  W2  W3  W4  W5 CTR  E1  E2  E3  E4  E5 TERM      │
+      ↑                  ↑                        ↑        │
+      (Cartel z=-4)   (Arterial Hub)     (Eastside z=-2)   │
+  └────────────────────────────────────────────────────────┘
+```
+
+Key locations:
+- **Western Transit Access** (-16, +2, -3): Entry from Gray Cartel territory
+- **Transit Hub** (-4, +2, -3): Neutral zone, connects to Arterial Hub
+- **Transit Terminus** (+8, +2, -3): Eastern end, connects to Eastside z=-2
+
+**Total: 12 rooms**
+
+### Deep Connector (NEW)
+A z=-4 corridor linking previously isolated zones: Gray Cartel operational territory, Victorian cisterns, and flooded sewers. Built on Seattle Water Co. 1887 cistern network infrastructure.
+
+```
+    x=-8  -6  -4  -2   0  +2  +4  +6  +8 +10 +12 +14
+       │   │   │   │   │   │   │   │   │   │   │   │
+  ┌────┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴────┐
+y=-4  ●───●───●───●───●═══●═══●═══●───●───●───●───●  DEEP│
+      W1  W2  W3  JCT  W4 CTR  E1  E2  E3  E4 IND ACC    │
+      ↑           ↑       ↑               ↑   ↑        │
+   (Cartel)  (Arterial) (Cisterns)   (Flooded) (King St)│
+  └────────────────────────────────────────────────────────┘
+```
+
+Key locations:
+- **Deep Western Access** (-8, -4, -4): Entry from Gray Cartel z=-4
+- **Deep Junction** (-2, -4, -4): Connects to Arterial Tunnel via shaft
+- **Central Cistern** (+2, -4, -4): Seattle Water Co. 1887 infrastructure
+- **Sewer Access** (+10, -4, -4): Connects to Flooded Sewers z=-4
+- **Industrial Deep** (+14, -4, -4): Connects to King Street z=-2
+
+**Total: 16 rooms**
+
+**Total z=-3 rooms: ~122** (29 original + 22 waterfront + 18 eastside + 6 yesler + 2 chinatown + 17 arterial + 12 transit + 16 deep-connector)
 
 ---
 
@@ -344,14 +425,14 @@ Ultra-secure chamber below water table. Pluribus cannot see here.
 
 ## Network Statistics
 
-| Level | Original | Waterfront | Eastside | Yesler | King Street | Eastern | Chinatown | Industrial | Deep Cisterns | Tour | Total |
-|-------|----------|------------|----------|--------|-------------|---------|-----------|------------|---------------|------|-------|
-| z=-2 | 88 | 29 | 35 | 36 | 39 | 40 | 22 | 14 | 0 | 6 | **309** |
-| z=-3 | 29 | 22 | 18 | 6 | 0 | 0 | 2 | 0 | 0 | 0 | **77** |
-| z=-4 | 43 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 16 | 0 | **59** |
-| z=-5 | 16 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **16** |
-| z=-6 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **1** |
-| **Total** | **177** | **51** | **53** | **42** | **39** | **40** | **24** | **14** | **16** | **6** | **462** |
+| Level | Original | Waterfront | Eastside | Yesler | King Street | Eastern | Chinatown | Industrial | Deep Cisterns | Tour | Southeast | Arterial | Transit | Deep Conn | Total |
+|-------|----------|------------|----------|--------|-------------|---------|-----------|------------|---------------|------|-----------|----------|---------|-----------|-------|
+| z=-2 | 88 | 29 | 35 | 36 | 39 | 40 | 22 | 14 | 0 | 6 | 11 | 0 | 0 | 0 | **320** |
+| z=-3 | 29 | 22 | 18 | 6 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 17 | 12 | 0 | **106** |
+| z=-4 | 43 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 16 | 0 | 0 | 0 | 0 | 16 | **75** |
+| z=-5 | 16 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **16** |
+| z=-6 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **1** |
+| **Total** | **177** | **51** | **53** | **42** | **39** | **40** | **24** | **14** | **16** | **6** | **11** | **17** | **12** | **16** | **518** |
 
 ---
 
