@@ -302,6 +302,11 @@ The chamber is maintained by people who come through official channels, entering
       exits: {
         south: '%CABLE_RUN',
         west: '%YESLER_EAST',
+        north: {
+          to: 'buildings/yesler-underground/z-2.ts',
+          room: '%FOURTH_NORTH',
+          description: 'A passage leads north toward Yesler Way',
+        },
       },
       objects: [
         { prototype: 'cabinet', name: 'a fiber junction cabinet', description: 'A large metal cabinet filled with fiber optic patch panels. Status lights blink in patterns—green, green, amber, red—a language only technicians understand.', boltedDown: true },
@@ -330,6 +335,11 @@ The shaft is maintained, the ladder rungs solid, the route used by those who nee
           hidden: true,
         },
         south: '%EAST_PASSAGE',
+        north: {
+          to: 'buildings/yesler-underground/z-2.ts',
+          room: '%SLOPE_PASSAGE',
+          description: 'A passage leads north toward the Yesler underground',
+        },
       },
     },
 
@@ -411,7 +421,11 @@ Debris litters the floor: fragments of the building that once stood here, materi
       exits: {
         north: '%STEAM_MAIN',
         west: '%STEAM_S1',
-        south: '%STEAM_S4',
+        south: {
+          to: 'buildings/southeast-underground/z-2.ts',
+          room: '%DRAINAGE_CHAMBER',
+          description: 'A passage leads south toward the drainage system',
+        },
       },
     },
 
@@ -448,7 +462,11 @@ Debris litters the floor: fragments of the building that once stood here, materi
         north: '%STEAM_S2',
         west: '%STEAM_S3',
         east: '%4TH_S2',
-        south: '%UTILITY_SOUTH',
+        south: {
+          to: 'buildings/southeast-underground/z-2.ts',
+          room: '%STEAM_CONNECTOR',
+          description: 'A passage leads south toward the transit infrastructure',
+        },
       },
     },
 
@@ -501,7 +519,11 @@ Debris litters the floor: fragments of the building that once stood here, materi
       exits: {
         north: '%4TH_S2',
         west: '%UTILITY_SOUTH',
-        south: '%4TH_S4',
+        south: {
+          to: 'buildings/southeast-underground/z-2.ts',
+          room: '%4TH_JUNCTION',
+          description: 'A passage leads south toward the transit tunnels',
+        },
       },
     },
 

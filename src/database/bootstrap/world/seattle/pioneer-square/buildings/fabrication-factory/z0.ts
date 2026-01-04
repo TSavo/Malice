@@ -144,6 +144,12 @@ The counter is unstaffed. A speaker grille handles customer inquiries. The AI's 
       y: 10,
       z: 0,
       exits: {
+        down: {
+          to: 'buildings/waterfront-underground/z-2.ts',
+          room: '%FAB_BASEMENT',
+          description: 'A maintenance door conceals stairs to the basement',
+          hidden: true,
+        },
         west: {
           to: 'waterfront/y10.ts',
           prototype: 'guardedExit',

@@ -390,7 +390,7 @@ The walls show the accumulated markings of decades—territorial claims overlapp
         south: {
           to: 'buildings/eastside-underground/z-2.ts',
           room: '%JUNCTION_BOX',
-          description: 'A passage leads south toward the utility network',
+          description: 'A passage leads south toward the junction box chamber',
         },
       },
     },
@@ -627,7 +627,7 @@ Storage rooms branch off the main space, their doors hanging open on rusted hing
         south: {
           to: 'buildings/eastside-underground/z-2.ts',
           room: '%YESLER_EAST',
-          description: 'A passage leads south toward the eastern network',
+          description: 'A passage leads south toward the eastern Yesler access',
         },
       },
     },

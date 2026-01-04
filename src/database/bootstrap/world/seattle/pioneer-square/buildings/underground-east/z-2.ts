@@ -38,6 +38,11 @@ The passage branches here—north toward the pergola and the park, south toward 
           to: 'underground/upper-tunnels/main-crossing.ts',
           description: 'A brick passage leads west toward 1st Ave',
         },
+        up: {
+          to: 'buildings/occidental-square/z0.ts',
+          room: '%GALLERY',
+          description: 'A trapdoor leads up toward the gallery above',
+        },
       },
     },
 
@@ -182,13 +187,12 @@ A vertical shaft rises toward street level, its ladder rungs showing the wear of
       waterLevel: 15,
       outdoor: false,
       exits: {
-        north: '%OCC_CROSS',
-        south: '%OCC_S2',
-        west: {
+        north: {
           to: 'buildings/trinity-nightclub/z-2.ts',
           room: '%UNDERGROUND_EXIT',
           description: 'A steel fire door leads to Trinity Nightclub',
         },
+        south: '%OCC_S2',
       },
     },
 

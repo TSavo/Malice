@@ -8,7 +8,7 @@ export const building = {
   y: -8,
   width: 15,
   height: 14,
-  floors: 2,
+  floors: 1,
 
   rooms: {
     // ═══════════════════════════════════════════════════════════════════════
@@ -114,7 +114,7 @@ The construction is more elaborate here, the ceiling higher, the space larger. T
       name: 'Jackson Street Underground East',
       description: `The passage reaches its eastern extent, where the underground meets the foundations of more recent buildings. The construction here is a patchwork—original tunneling joined by basement connections, the network adapting to the buildings constructed above.
 
-A sealed passage once continued east, but development has blocked it with concrete and rebar. The underground ends here, against a wall that wasn't always there.`,
+A doorway that was sealed with concrete in 1962 has been breached—a rough opening cut through the "PROGRESS" that once blocked this route. Beyond lies utility infrastructure from a later era.`,
       x: 7,
       y: -8,
       z: -2,
@@ -126,9 +126,14 @@ A sealed passage once continued east, but development has blocked it with concre
       exits: {
         west: '%JACKSON_MID_E',
         south: '%LAUNDRY_BASEMENT',
+        east: {
+          to: 'buildings/southeast-underground/z-2.ts',
+          room: '%JACKSON_EXTENSION',
+          description: 'A rough opening leads east into utility corridors',
+        },
       },
       objects: [
-        { prototype: 'sign', name: 'a sealed doorway', description: 'An arched doorway has been filled with concrete, sealing whatever lay beyond. Scratched into the concrete before it set: "1962 - PROGRESS".', boltedDown: true },
+        { prototype: 'sign', name: 'a breached doorway', description: 'An arched doorway was filled with concrete, "1962 - PROGRESS" scratched into the wet cement. Someone has since cut through it with power tools.', boltedDown: true },
       ],
     },
 
