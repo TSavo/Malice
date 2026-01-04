@@ -16,4 +16,11 @@ The building's upper floors hold apartments, their windows curtained or bare, th
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  exits: {
+    north: {
+      to: '../buildings/second-chance-thrift/z0.ts#MAIN_FLOOR',
+      door: '../buildings/second-chance-thrift/z0.ts#FRONT_DOOR',
+      description: 'The entrance to Second Chance Thrift',
+    },
+  },
 };
