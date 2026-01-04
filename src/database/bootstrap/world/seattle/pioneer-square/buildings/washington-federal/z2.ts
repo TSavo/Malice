@@ -106,7 +106,12 @@ The view from the roof encompasses Pioneer Square and beyond—other rooftops, t
       waterLevel: 0,
       outdoor: true,
       exits: {
-        east: '%ROOF_EDGE',
+        east: {
+          description: 'The roof access door leads back inside',
+          door: '%ROOF_DOOR',
+          to: '%ROOF_ACCESS',
+        },
+        west: '%ROOF_EDGE',
         south: '%CLOCK_TOWER',
       },
       sittables: [
