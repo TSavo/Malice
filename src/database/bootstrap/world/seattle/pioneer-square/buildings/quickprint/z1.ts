@@ -4,8 +4,8 @@
 
 export const building = {
   name: 'QuickPrint',
-  x: -12,
-  y: 4,
+  x: -13,
+  y: 2,
   width: 2,
   height: 3,
   floors: 3,

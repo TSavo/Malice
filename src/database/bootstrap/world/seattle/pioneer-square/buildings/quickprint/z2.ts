@@ -4,8 +4,8 @@
 
 export const building = {
   name: 'QuickPrint',
-  x: -12,
-  y: 4,
+  x: -13,
+  y: 2,
   width: 2,
   height: 3,
   floors: 3,
@@ -14,14 +14,6 @@ export const building = {
     // ═══════════════════════════════════════════════════════════════════
     // ROOF LEVEL (z=2) - ROOFTOP
     // ═══════════════════════════════════════════════════════════════════
-
-    '%ROOF_HATCH_LOCK': {
-      prototype: 'lock',
-      name: 'Roof Hatch Lock',
-      description:
-        'A simple padlock securing the roof hatch from below. The key is probably on a hook somewhere in the apartment.',
-      difficulty: 3,
-    },
 
     '%ROOF_NORTH': {
       name: 'QuickPrint Roof - North Side',
