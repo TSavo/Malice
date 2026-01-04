@@ -2,22 +2,27 @@
 
 export const room = {
   name: '3rd Ave S',
-  description: `The King County Courthouse annex occupies the eastern side of the avenue, a newer building connected to the main courthouse by a skybridge. The skybridge is intact, its glass walls offering glimpses of the interior—empty corridors, abandoned security checkpoints, the infrastructure of justice suspended in amber.
+  description: `The King County Courthouse dominates the eastern side of the avenue, its brutalist concrete facade rising five stories above the street. The building was designed to inspire respect for the law—or perhaps fear of it. The massive bronze doors stand slightly ajar, someone having wedged them open with a fire extinguisher.
 
 The Corp Construction fence continues west, but here it's been decorated. Someone hung photographs on the chain-link, pictures of people. Missing persons flyers, maybe, or memorials. The rain has faded them to ghosts, faces barely visible, names illegible. The fence has become a wall of the forgotten.
 
 A newspaper box stands at the corner, still holding copies of the Seattle Times from months ago. The headline announces something that seemed important then. The newsprint has yellowed. The importance has evaporated.
 
-The courthouse steps are visible to the south, leading up to doors that dispense nothing.`,
+The courthouse steps lead up to the entrance, broad stone worn smooth by decades of lawyers and defendants and the curious.`,
   x: 7,
   y: 2,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
+  exits: {
+    east: {
+      to: 'buildings/county-courthouse/z0.ts:%LOBBY',
+      description: 'Broad steps lead up to the courthouse entrance',
+    },
+  },
   sittables: [
     {
       name: 'courthouse steps',
