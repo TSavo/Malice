@@ -141,6 +141,7 @@ Display windows face the arcade, their glass clouded with fifty-five years of gr
           name: 'grandfather clock',
           aliases: ['clock', 'pendulum'],
           description: `A grandfather clock in dark walnut, its case rising nearly eight feet, its brass pendulum frozen mid-swing at 2:47. The clock was made in the 1890s, survived two world wars, kept time for five generations. It stopped when the power grid failed—the pendulum needed no electricity, but the owner who wound it every Sunday never came back. The chimes are silent. The hours pass unannounced.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',
@@ -153,6 +154,7 @@ Display windows face the arcade, their glass clouded with fifty-five years of gr
           name: 'secretary desk',
           aliases: ['desk', 'secretary'],
           description: `A secretary desk with a drop-front writing surface and dozens of small compartments—the kind designed to hold correspondence, accounts, the paper business of a pre-digital life. The compartments are empty now, whatever secrets they held removed or rotted. The desk surface is stained with ink from pens that dried out decades ago.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -202,12 +204,14 @@ The smell here is of old wood and dust, the ghost of furniture polish overwhelme
           name: 'suit of armor',
           aliases: ['armor', 'knight'],
           description: `A decorative suit of armor, probably 19th century, manufactured for wealthy collectors who wanted medieval aesthetics without medieval warfare. The armor is dusty but intact, visor down, gauntlets at its sides. It guards an empty antique store now, which is more than it ever guarded before.`,
+          boltedDown: true,
         },
         {
           prototype: 'furniture',
           name: 'armoires',
           aliases: ['wardrobes', 'cabinets'],
           description: `A row of armoires and wardrobes, their doors hanging open, their interiors empty. Each once held someone's clothes, someone's linens, the textile accumulation of a life. The clothes were sold or donated before the furniture came here. The armoires hold only dust and the smell of cedar that has almost faded.`,
+          boltedDown: true,
         },
         {
           prototype: 'desk',
@@ -270,6 +274,7 @@ Office furniture fills one section: oak desks with green leather tops, swivel ch
           name: 'bedroom set',
           aliases: ['bed', 'dresser', 'vanity'],
           description: `A complete bedroom set arranged as it might appear in a home: bed frame, matching dresser, vanity with mirror, paired nightstands. The mattress has collapsed and stained, the mirror spotted with age, the dresser drawers empty. The set represents a domestic vision from another era—here is how you were supposed to live. No one lives this way anymore.`,
+          boltedDown: true,
         },
         {
           prototype: 'desk',
@@ -322,6 +327,7 @@ A delivery door leads to the back alley, wide enough to admit the largest furnit
           name: 'stacked furniture',
           aliases: ['furniture', 'pile'],
           description: `Furniture stacked three deep, an impossible puzzle of chairs and tables and dressers. The stacking was efficient once—a system for maximizing storage space. The system is frozen now, no one remaining to disassemble it. The furniture at the bottom has been supporting the weight for fifty-five years.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',

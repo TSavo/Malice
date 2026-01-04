@@ -123,6 +123,7 @@ The floor is concrete, stained with decades of coal dust and oil. A drain in the
           aliases: ['boiler', 'furnace'],
           description:
             'A massive cast iron boiler, its riveted construction a monument to Victorian engineering. The firebox door hangs open, revealing decades of accumulated ash. Steam pipes radiate from the top like metal tentacles, disappearing into the ceiling above.',
+          boltedDown: true,
         },
         {
           prototype: 'crate',

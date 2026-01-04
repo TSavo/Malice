@@ -160,6 +160,7 @@ A sign-in sheet lies on the counter, the last entries dated months ago. People c
           name: 'service counter',
           aliases: ['counter'],
           description: `A long laminate counter with brass rails and signs explaining fees and procedures. FILING FEE: $200. CERTIFIED COPIES: $5/PAGE. The fees were important once—revenue for the county, barriers to frivolous litigation. The fees are meaningless now. The barriers remain.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',
@@ -339,6 +340,7 @@ A back door leads to the loading dock, where supplies were once delivered and ga
           name: 'commercial stove',
           aliases: ['stove', 'range', 'burners'],
           description: `A commercial gas range, six burners and a griddle and two ovens. The burners are clean, the griddle scraped, the ovens empty. The range could still cook if someone brought fuel and food and the knowledge of how to use it. The range waits, patient, its pilot lights extinguished.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',
@@ -351,6 +353,7 @@ A back door leads to the loading dock, where supplies were once delivered and ga
           name: 'commercial dishwasher',
           aliases: ['dishwasher'],
           description: `A commercial dishwasher, the kind that can blast clean a hundred plates in an hour. A rack of plates sits inside, loaded but never run. The plates are dusty now, their need for washing moot. The dishwasher holds them in limbo between dirty and clean.`,
+          boltedDown: true,
         },
       ],
     },

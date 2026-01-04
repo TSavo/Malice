@@ -67,12 +67,14 @@ A checkout counter near the entrance holds a cash register, a stack of bookmarks
           name: 'checkout counter',
           aliases: ['counter', 'register', 'desk'],
           description: `A wooden checkout counter worn smooth by decades of transactions—books slid across its surface, credit cards swiped, receipts torn from the register. The cash register is mechanical, its buttons faded, its drawer closed. A cup holds pens and bookmarks. A handwritten sign points to STAFF PICKS. The staff picked. The customers never collected.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',
           name: 'fiction shelves',
           aliases: ['fiction', 'novels', 'books'],
           description: `Towering shelves of fiction organized alphabetically by author—Atwood through Zola, every letter represented. Paperbacks with cracked spines, hardcovers with dust jackets intact, mass market editions and trade paperbacks jumbled together in the democracy of alphabetization. The stories wait inside, patient, ready to be read by eyes that may never find them.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -135,6 +137,7 @@ A coffee table holds scattered magazines—literary journals, The New Yorker, pu
           name: 'rare books case',
           aliases: ['case', 'glass case', 'rare books'],
           description: `A glass display case holds the store's treasures: first editions, signed copies, books too valuable to leave on open shelves. A handwritten card identifies each: "Hemingway, The Sun Also Rises, 1st Ed - $4,500." "Kerouac, On the Road, signed - $2,800." The case is locked. The key is probably in the drawer of the checkout counter. The books wait, preserved in climate-controlled twilight.`,
+          boltedDown: true,
         },
         {
           prototype: 'furniture',
@@ -182,12 +185,14 @@ A small desk in the corner was the staff's workspace—inventory lists, special 
           name: 'philosophy section',
           aliases: ['philosophy', 'philosophy books'],
           description: `Shelves of philosophy texts, organized by tradition and era—ancient Greeks, medieval scholastics, German idealists, continental thinkers, analytical philosophers. Plato and Aristotle at eye level, Kant and Hegel requiring a reach, Derrida and Foucault on the highest shelf as if their difficulty earned them altitude. The books contain arguments about the nature of existence. Existence continues, unargued.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',
           name: 'architecture section',
           aliases: ['architecture', 'architecture books'],
           description: `Books about buildings—histories of architectural movements, monographs on famous architects, technical volumes on construction and design. Seattle's own architecture is documented here: Pike Place Market, the Space Needle, the buildings of Pioneer Square itself. The neighborhood's history is recorded on these shelves, available to anyone who cares to read it.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -200,6 +205,7 @@ A small desk in the corner was the staff's workspace—inventory lists, special 
           name: 'staff desk',
           aliases: ['desk', 'office desk'],
           description: `A small desk tucked into the corner, cluttered with the paperwork of running a bookstore: inventory sheets, special order forms, publisher catalogues. A computer sits dark, its screen dusty. Post-it notes cling to the monitor's frame with reminders that will never be acted upon: "Call about Murakami order." "Check poetry restock." The tasks remain undone.`,
+          boltedDown: true,
         },
       ],
     },

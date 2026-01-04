@@ -109,6 +109,7 @@ The walls are covered in photographs and memorabilia: Seattle when it was a fron
           name: 'mahogany bar',
           aliases: ['bar', 'counter'],
           description: `The bar is a survivor—salvaged from the original J&M before the Great Fire, it's been in continuous use since 1889. The mahogany is dark, almost black in places, stained by a century and a half of spilled drinks and resting elbows. Brass rails run along the base and edge, worn smooth by countless feet and hands. This bar has outlasted everyone who ever drank at it. It will probably outlast everyone who drinks at it now.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',
@@ -176,6 +177,7 @@ The menu board on the wall lists simple food at simple prices: BURGER $8. FISH &
           name: 'Wurlitzer jukebox',
           aliases: ['jukebox', 'wurlitzer'],
           description: `A Wurlitzer jukebox from the 1960s, chrome and colored plastic, its bubble tubes dark but its charm intact. The song selection is visible through the curved glass: Sinatra's "In the Wee Small Hours," Bennett's "I Left My Heart in San Francisco," Mathis's "Chances Are." The songs are frozen in time, as unplayable as the memories they'd evoke.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -224,6 +226,7 @@ The walls are bare except for posted rules (HOUSE TAKES 5%) and a few photograph
           name: 'poker tables',
           aliases: ['tables', 'felt'],
           description: `Professional poker tables with green felt surfaces, padded rails for resting arms, and chip wells at each position. The felt is worn in spots where elbows rested and cards were dealt thousands of times. Some tables still have chips stacked—reds and blues and whites in neat columns, the currency of games that stopped mid-hand.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -270,12 +273,14 @@ The back door leads to the alley, its multiple locks all disengaged. Someone lef
           name: 'flat-top grill',
           aliases: ['grill', 'griddle'],
           description: `A commercial flat-top grill, its surface seasoned by years of burgers and eggs and whatever else the J&M served. The grill is cold now, its burners off, but the accumulated seasoning remains—a layer of carbonized flavor that no amount of scraping would remove. The grill could cook again, if anyone turned it on.`,
+          boltedDown: true,
         },
         {
           prototype: 'furniture',
           name: 'deep fryer',
           aliases: ['fryer'],
           description: `A commercial deep fryer, its baskets still lowered into oil that has long since congealed. The oil is solid now, a waxy mass that trapped whatever was last fried—probably french fries, based on the shapes visible in the grease. The fryer is a time capsule of one last order that was never served.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -325,6 +330,7 @@ A narrow stairway continues up to the roof access, its steps worn by decades of 
           name: 'vintage gambling equipment',
           aliases: ['roulette', 'slots', 'gambling'],
           description: `Antique gambling equipment clusters in one corner: a roulette wheel with a mahogany frame, slot machines from the 1930s when they were briefly legal in Seattle, card tables too worn for the downstairs room. The equipment is worth money to collectors—or was, when money meant something different. Now it's just furniture with history.`,
+          boltedDown: true,
         },
       ],
     },
@@ -405,6 +411,7 @@ From here you can see the neighborhood laid out like a map—the grid of streets
           name: 'satellite dish',
           aliases: ['dish', 'satellite'],
           description: `A satellite dish bolted to a concrete pad, pointed at a sky that still contains satellites—whether they're still broadcasting is another question. The dish was installed for sports broadcasts, letting the bar show games that cable couldn't reach. The games have stopped. The dish keeps pointing.`,
+          boltedDown: true,
         },
       ],
     },
@@ -434,6 +441,7 @@ The parapet here is low enough to look over comfortably—or low enough to fall 
           name: 'rusted AC unit',
           aliases: ['ac', 'air conditioner', 'unit'],
           description: `An air conditioning unit in advanced stages of decay—housing rusted through, compressor seized, fan frozen in place. The unit cooled the bar below once, making summer drinking tolerable. Now it's just a rust sculpture, slowly returning to the iron ore from which it came.`,
+          boltedDown: true,
         },
       ],
     },

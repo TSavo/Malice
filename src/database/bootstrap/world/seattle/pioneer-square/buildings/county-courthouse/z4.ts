@@ -31,6 +31,7 @@ The atmosphere is hushed, preserved by walls designed to contain confidential co
           name: 'security desk',
           aliases: ['desk', 'guard'],
           description: `A security desk with a visitor log, a phone for calling chambers, and a coffee mug that reads "I'D RATHER BE FISHING." The guard who sat here knew everyone by face. Strangers were questioned. Now everyone is a stranger. No one is questioned.`,
+          boltedDown: true,
         },
       ],
     },
@@ -104,6 +105,7 @@ A window offers a view of the city—the rooftops of Pioneer Square, downtown in
           name: 'judges desk',
           aliases: ['desk', 'mahogany'],
           description: `A massive mahogany desk, the kind that says "I am permanent." Case files cover the surface, each one marked with the judge's notes: "RECIDIVISM CONCERNS," "CREDIBILITY ISSUES," "MITIGATING FACTORS." The analysis is thorough, the reasoning careful, the conclusion never reached.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',
@@ -144,6 +146,7 @@ A family photograph sits on the desk—Judge Chen with a partner and two childre
           name: 'minimalist desk',
           aliases: ['desk'],
           description: `A desk organized with precision: inbox containing cases to be reviewed, outbox containing completed orders, reference books arranged by subject. The system is visible, logical, efficient. The system continues to exist. The work does not.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -206,6 +209,7 @@ A librarian's desk sits empty, its surface covered in requested materials never 
           name: 'librarian desk',
           aliases: ['desk'],
           description: `The law librarian's desk, covered in requests never fulfilled: "Need 1983 Washington Reports volume 42." "Looking for treatise on water rights." The librarian knew where everything was. The librarian is gone. The requests remain, unanswered.`,
+          boltedDown: true,
         },
       ],
     },

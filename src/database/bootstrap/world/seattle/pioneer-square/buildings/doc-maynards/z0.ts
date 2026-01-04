@@ -111,6 +111,7 @@ Old photographs cover the walls: Seattle in the 1890s, the waterfront before the
           name: 'mahogany bar',
           aliases: ['bar', 'counter'],
           description: `A massive mahogany bar, the centerpiece of the establishment. The wood is dark with age, polished to a shine in places, scarred by cigarette burns and glass rings in others. Brass rails run along the base and edge, worn smooth by feet and hands. This bar has served drinks through Prohibition (quietly), the Depression (grimly), and every decade since (steadily). It will probably outlast everything else in the building.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',
@@ -212,6 +213,7 @@ A narrow stairway leads up to the second floor, where the building's original ho
           name: 'stacked kegs',
           aliases: ['kegs', 'barrels'],
           description: `Stainless steel kegs stacked three high in the corner—the inventory of a bar that expected to reopen. The kegs are probably still pressurized, their contents preserved by the same technology that keeps beer drinkable for months. Whether that beer is still drinkable after years is a question someone might eventually answer.`,
+          boltedDown: true,
         },
         {
           prototype: 'desk',
@@ -275,6 +277,7 @@ The cinderblock seal that once closed the old tour entrance has been broken thro
           name: 'ancient refrigerator',
           aliases: ['fridge', 'refrigerator', 'cooler'],
           description: `An ancient refrigeration unit, probably older than anyone who worked here, still humming in the corner. The compressor rattles. The seals are cracked. The temperature gauge reads 40°F, which is close enough to food-safe. The unit runs on the same mysterious power that keeps certain systems functioning when they shouldn't. Nobody questions it. The beer stays cold.`,
+          boltedDown: true,
         },
       ],
     },
@@ -401,12 +404,14 @@ A weathered wooden deck suggests someone used this space for breaks or parties�
           name: 'rooftop deck',
           aliases: ['deck', 'boards'],
           description: `A wooden deck covering part of the roof, its boards weathered grey and stained with the residue of spilled drinks and old parties. The deck was someone's project—an attempt to make the rooftop usable, a space for staff breaks or private gatherings. The attempt succeeded, for a while.`,
+          boltedDown: true,
         },
         {
           prototype: 'furniture',
           name: 'HVAC equipment',
           aliases: ['hvac', 'units'],
           description: `Commercial HVAC units squat on concrete pads, their housings weathered, their fans frozen. The equipment cooled the bar below, maintaining the comfortable temperature that drinking establishments require. The cooling has stopped. The bar below is whatever temperature the building achieves on its own.`,
+          boltedDown: true,
         },
       ],
     },

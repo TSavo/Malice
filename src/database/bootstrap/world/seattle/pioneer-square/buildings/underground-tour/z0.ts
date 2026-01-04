@@ -150,11 +150,13 @@ A door in the back wall is marked EMPLOYEES ONLY - SERVICE CORRIDOR. Through the
           prototype: 'desk',
           name: 'staff desk',
           description: `A battered metal desk buried under paperwork—scheduling printouts, employee timesheets, a half-finished incident report about someone who fainted in the tunnels. A time clock on the wall still holds punch cards in their slots, the last punches dated years ago. The employees never clocked out. The end came between shifts.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',
           name: 'filing cabinet',
           description: `A gray metal filing cabinet, three drawers deep, stuffed with liability waivers signed by tourists who wanted to see the underground. Each form releases Bill Speidel's Underground Tour from responsibility for "injury, illness, or psychological distress." Thousands of signatures. Thousands of people who went down and came back up. Until the day everyone stopped coming.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',

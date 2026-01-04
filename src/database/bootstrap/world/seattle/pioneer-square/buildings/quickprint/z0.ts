@@ -112,6 +112,7 @@ Finished orders sit in cubbies behind the counter, organized alphabetically, wra
           name: 'service counter',
           aliases: ['counter', 'register'],
           description: `A Formica counter separating staff from customers, its surface covered in order forms and business cards and the everyday clutter of commerce. The cash register is mechanical, a vintage NCR that the owner kept because it worked and because it looked good. The drawer is open, emptied of bills but still holding coins. The last sale was $47.50.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',
@@ -130,6 +131,7 @@ Finished orders sit in cubbies behind the counter, organized alphabetically, wra
           name: 'window letterpress',
           aliases: ['letterpress', 'window', 'display'],
           description: `A vintage letterpress positioned in the shop window, its forme locked with wooden type spelling SATURDAY NIGHT in reverse—ready to print, never printed. The press was decorative and functional, a demonstration of craft that also produced actual work. The type is dusty now, the ink dried in its well, but the letters still spell their message for anyone who can read backward.`,
+          boltedDown: true,
         },
       ],
     },
@@ -169,18 +171,21 @@ Band posters cover every wall, the shop's portfolio and decoration combined: SOU
           name: 'offset press',
           aliases: ['press', 'offset', 'printer'],
           description: `A Heidelberg offset press, vintage 1970s, the workhorse that produced thousands of posters and flyers over the decades. The rollers have dried and cracked, the ink in the fountains turned to tar, but the machinery is still beautiful in its industrial complexity. Someone knew how to run this. That knowledge is probably gone.`,
+          boltedDown: true,
         },
         {
           prototype: 'furniture',
           name: 'digital printer',
           aliases: ['digital', 'color printer'],
           description: `A large-format digital printer from the 2010s, the technology that made offset obsolete for short runs. Paper is still loaded in the tray. A test print is stuck in the output—color bars and registration marks, the diagnostics of a machine testing itself. The test passed. No one came to see the results.`,
+          boltedDown: true,
         },
         {
           prototype: 'furniture',
           name: 'paper cutter',
           aliases: ['cutter', 'guillotine'],
           description: `A commercial paper cutter, the guillotine type with a heavy blade and a safety guard that's been disabled for convenience. The blade is still sharp—these things stay sharp for decades. A stack of paper sits on the bed, measured and marked for cutting. The cut never happened.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -259,6 +264,7 @@ The alley connects to streets at both ends, a through-passage for those who know
           name: 'paper dumpster',
           aliases: ['dumpster', 'garbage'],
           description: `A dumpster overflowing with paper scraps—misprints, test sheets, the shredded remains of jobs gone wrong. The paper has composted into a solid mass after years of weather, unrecognizable as individual sheets. PRINTERS NEVER DIE is spray-painted on the side in silver letters. Whether that's true is debatable.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
