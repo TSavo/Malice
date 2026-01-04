@@ -255,7 +255,7 @@ A model of the Seattle waterfront circa 1897 fills a display case, tiny ships at
 
 The Park Service aesthetic continues here: government-issue furniture, motivational posters featuring national parks ("Find Your Park!"), a coffee maker that's been empty so long the carafe has cracked. A window looks out onto an airshaft, providing no view and minimal light.
 
-A narrow stairway leads up to what used to be storage or additional office space. A door to the north opens onto the back alley—the staff entrance, away from visitors.`,
+A narrow stairway leads up to what used to be storage or additional office space. A reinforced door marked COLLECTION STORAGE leads down to the basement. A door to the north opens onto the back alley—the staff entrance, away from visitors.`,
       x: -13,
       y: -1,
       z: 0,
@@ -269,6 +269,12 @@ A narrow stairway leads up to what used to be storage or additional office space
         up: {
           description: 'A narrow stairway leads up',
           to: '%STORAGE',
+        },
+        down: {
+          to: 'z-1.ts:%COLLECTION_STORAGE',
+          description: 'A reinforced door leads down to collection storage',
+          door: 'z-1.ts:%BASEMENT_DOOR',
+          locks: ['z-1.ts:%BASEMENT_LOCK'],
         },
       },
       objects: [
