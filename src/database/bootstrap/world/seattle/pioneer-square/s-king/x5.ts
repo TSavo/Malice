@@ -16,4 +16,10 @@ A wedding photo studio occupies the second floor, HAPPY DAY PHOTOGRAPHY accordin
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  exits: {
+    north: {
+      to: '../buildings/golden-gate-bakery/z0.ts#STOREFRONT',
+      description: 'The glass door of Golden Gate Bakery',
+    },
+  },
 };
