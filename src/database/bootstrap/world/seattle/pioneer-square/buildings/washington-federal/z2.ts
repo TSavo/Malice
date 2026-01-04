@@ -65,7 +65,7 @@ The door to the roof stands open, someone having forced the padlock at some poin
 
 A window in the door offers a preview of the roof—gravel and tar paper, HVAC equipment, the back of the clock tower that faces the street below.`,
       x: -1,
-      y: -2,
+      y: -3,
       z: 2,
       population: 0,
       ambientNoise: 15,
@@ -98,7 +98,7 @@ The clock tower rises from the building's eastern facade, its back visible from 
 
 The view from the roof encompasses Pioneer Square and beyond—other rooftops, the waterfront visible to the west, Smith Tower rising to the south. The perspective is commanding. There is no one left to command.`,
       x: -2,
-      y: -2,
+      y: -3,
       z: 2,
       population: 0,
       ambientNoise: 25,
@@ -193,7 +193,7 @@ Someone has left a camp chair here, weathered and stained, its fabric torn. The 
 
 A fire escape ladder is bolted to the parapet, providing emergency egress to the alley below. The ladder is rusted but structurally sound—tested by whoever left the chair, probably.`,
       x: -1,
-      y: -2,
+      y: -3,
       z: 2,
       population: 0,
       ambientNoise: 30,

@@ -67,7 +67,7 @@ The door to the executive floor is marked with brass letters: EXECUTIVE OFFICES.
 
 Above, the stairs continue to the roof access.`,
       x: -1,
-      y: -2,
+      y: -3,
       z: 1,
       population: 0,
       ambientNoise: 2,
@@ -101,7 +101,7 @@ The walls display the same motivational art found in offices everywhere—abstra
 
 Doors lead to the conference room and the executive offices beyond. The carpet is plush enough to silence footsteps. The silence is complete.`,
       x: -1,
-      y: -2,
+      y: -3,
       z: 1,
       population: 0,
       ambientNoise: 1,
@@ -152,7 +152,7 @@ Floor-to-ceiling windows offer a view of 2nd Avenue below, the glass tinted to r
 
 A sidebar holds coffee carafes and water pitchers, the contents long since evaporated or grown strange things. A whiteboard on one wall is covered with handwritten notes in dry-erase marker, the strategic planning of people who could not have planned for this.`,
       x: -2,
-      y: -2,
+      y: -3,
       z: 1,
       population: 0,
       ambientNoise: 1,
@@ -306,7 +306,7 @@ The room smells of old paper and the particular mustiness of archived informatio
 
 The records here span decades of financial transactions—births and deaths expressed in debits and credits, lives summarized in account numbers and interest rates. The records are complete, organized, utterly meaningless.`,
       x: -1,
-      y: -2,
+      y: -3,
       z: 1,
       population: 0,
       ambientNoise: 1,
