@@ -4,10 +4,10 @@
 
 export const building = {
   name: 'Chinatown Underground',
-  x: 7,
-  y: -8,
+  x: -7,
+  y: -14,
   width: 15,
-  height: 14,
+  height: 8,
   floors: 1,
 
   rooms: {
@@ -373,7 +373,7 @@ The community that built this space built it from necessity. They are gone now. 
       description: `The passage runs south from the inhabited areas into territory that was never developed for use—a tunnel that was started and abandoned, perhaps intended to connect to something that was never built. The construction grows rougher, the passage narrower, the light dimmer.
 
 The tunnel ends at a cave-in. Beyond it, who knows.`,
-      x: -3,
+      x: -1,
       y: -11,
       z: -2,
       population: 0,
