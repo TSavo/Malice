@@ -72,7 +72,7 @@ A heavy metal door leads up to the ground floor. The door was built for security
 The cells were temporary holding, the building's documentation claims. Temporary meaning hours or days while paperwork was processed, while decisions were made, while fates were determined by men in offices above. Some people stayed longer. The scratches suggest weeks. Months. The records upstairs would know, if anyone cared to look.
 
 A breach in the far wall leads to the underground—stones removed, edges worn smooth by decades of passage.`,
-      x: -15,
+      x: -16,
       y: 10,
       z: -1,
       population: 0,

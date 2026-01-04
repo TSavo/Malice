@@ -79,7 +79,7 @@ Stairs lead up to the lobby. A maintenance corridor leads east toward the buildi
 A boiler sits cold in the corner, its pilot light extinguished. The hot water for six floors of residents came from this boiler. Now the residents use whatever water pressure remains, cold and getting colder.
 
 A section of wall in the eastern corner has been knocked through, revealing an older passage beyond—the underground that predates this building, the buried streets of old Seattle.`,
-      x: -15,
+      x: -16,
       y: 7,
       z: -1,
       population: 0,

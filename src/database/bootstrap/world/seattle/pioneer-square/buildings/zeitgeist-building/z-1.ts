@@ -81,7 +81,7 @@ The HVAC system cycles on and off, maintaining the climate control that protects
 
 A small workspace in the corner has maintenance logs, the last entries from months ago. Whoever kept this building running has stopped keeping it running, but the machinery continues on its own inertia.`,
       x: -13,
-      y: 2,
+      y: 1,
       z: -1,
       population: 0,
       ambientNoise: 15,

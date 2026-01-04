@@ -38,7 +38,7 @@ The gallery's section holds stretched canvases and bubble-wrapped sculptures. Th
 
 The ceiling is low, the floor unfinished concrete, the lighting dim emergency fixtures. The air is cool and slightly musty, the particular atmosphere of spaces built for storage rather than occupation.`,
       x: -8,
-      y: 1,
+      y: 0,
       z: -1,
       population: 0,
       ambientNoise: 3,

@@ -45,7 +45,7 @@ The heat is intense despite the industrial cooling systems. The machinery operat
 
 The noise is a constant roar, muffled only slightly by acoustic baffling. The air filtration struggles against the particulates. Warning signs about respiratory protection are posted everywhere, their advice unheeded by the machines that don't need to breathe.`,
       x: -20,
-      y: 10,
+      y: 8,
       z: -1,
       population: 0,
       ambientNoise: 35,
@@ -87,7 +87,7 @@ The floor is sand-covered, the traditional medium for casting that no amount of 
 
 A breach in the southern wall opens to the underground tunnels, the edges worn smooth. The connection predates the AI's control of the factory. Someone used this route before the machines took over. Perhaps they still do.`,
       x: -19,
-      y: 10,
+      y: 8,
       z: -1,
       population: 0,
       ambientNoise: 25,
@@ -129,7 +129,7 @@ Banks of batteries line one wall, storing power for peak demand or emergency use
 
 The room smells of diesel and ozone, the particular atmosphere of power waiting to be used. The generators are cold but maintained—the AI runs them periodically to ensure readiness. The factory's productivity is too important to risk to power fluctuations.`,
       x: -18,
-      y: 10,
+      y: 8,
       z: -1,
       population: 0,
       ambientNoise: 15,

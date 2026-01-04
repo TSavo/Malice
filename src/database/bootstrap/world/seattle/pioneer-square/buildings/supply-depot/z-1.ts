@@ -86,7 +86,7 @@ Banks of fluorescent lights cast harsh shadows across the sorting floor. The air
 Sealed crates marked EMERGENCY RATIONS. Cases of medical supplies. Water purification equipment. Radiation detection gear. The reserve tells a story about what the Continuum fears: contamination, starvation, systems failure, events that would overwhelm normal distribution.
 
 The room is colder than the sorting floor, the climate control more aggressive. These supplies are meant to last. A breach in the eastern wall opens to the underground—an unofficial access point that predates the Continuum's occupation of this building.`,
-      x: -19,
+      x: -20,
       y: -5,
       z: -1,
       population: 0,
