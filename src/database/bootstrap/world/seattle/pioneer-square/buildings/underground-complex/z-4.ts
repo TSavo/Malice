@@ -945,7 +945,15 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 16,
       waterLevel: 0,
       outdoor: false,
-      exits: { north: '%X8Y_3', west: '%X9Y_4' },
+      exits: {
+        north: '%X8Y_3',
+        west: '%X9Y_4',
+        east: {
+          to: 'buildings/deep-connector/z-4.ts',
+          room: '%DEEP_W1',
+          description: 'A narrow passage leads east into ancient tunnels',
+        },
+      },
     },
 
     // ═══════════════════════════════════════════════════════════════════════

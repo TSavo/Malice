@@ -233,7 +233,9 @@ A ventilation shaft rises toward the surface, its grating hidden somewhere in Oc
 
     '%ARTERY_CENTER_S1': {
       name: 'Central Arterial',
-      description: `The tunnel continues south from the hub, the passage returning to its standard dimensions. The walls show less traffic wear here—fewer people take the southern route, the attractions concentrated in the northern and central sections.`,
+      description: `The tunnel continues south from the hub, the passage returning to its standard dimensions. The walls show less traffic wear here—fewer people take the southern route, the attractions concentrated in the northern and central sections.
+
+An iron ladder descends through a shaft in the floor, leading to the cistern network below.`,
       x: 0,
       y: 1,
       z: -3,
@@ -245,12 +247,19 @@ A ventilation shaft rises toward the surface, its grating hidden somewhere in Oc
       exits: {
         north: '%ARTERY_HUB',
         south: '%ARTERY_CENTER_S2',
+        down: {
+          to: 'buildings/deep-connector/z-4.ts',
+          room: '%CISTERN_SHAFT',
+          description: 'An iron ladder descends to the cistern network',
+        },
       },
     },
 
     '%ARTERY_CENTER_S2': {
       name: 'Central Arterial',
-      description: `The passage runs through a section where the construction shows stress—the ceiling supported by additional beams, the walls showing cracks that have been repeatedly patched. Something happened here. The structure was compromised and repaired. The scars remain.`,
+      description: `The passage runs through a section where the construction shows stress—the ceiling supported by additional beams, the walls showing cracks that have been repeatedly patched. Something happened here. The structure was compromised and repaired. The scars remain.
+
+A rough shaft descends through the damaged section, leading to the cistern north passage below.`,
       x: 0,
       y: 0,
       z: -3,
@@ -262,6 +271,11 @@ A ventilation shaft rises toward the surface, its grating hidden somewhere in Oc
       exits: {
         north: '%ARTERY_CENTER_S1',
         south: '%ARTERY_CENTER_S3',
+        down: {
+          to: 'buildings/deep-connector/z-4.ts',
+          room: '%CISTERN_N_PASSAGE',
+          description: 'A rough shaft descends to the cistern passages',
+        },
       },
     },
 
@@ -284,7 +298,9 @@ A ventilation shaft rises toward the surface, its grating hidden somewhere in Oc
 
     '%ARTERY_CENTER_S4': {
       name: 'Central Arterial Junction',
-      description: `The passage opens into another junction, where the arterial meets routes connecting to the eastern and western underground networks. The intersection is smaller than the hub to the north, more functional, less communal. This is a transit point, not a gathering place.`,
+      description: `The passage opens into another junction, where the arterial meets routes connecting to the eastern and western underground networks. The intersection is smaller than the hub to the north, more functional, less communal. This is a transit point, not a gathering place.
+
+A natural shaft descends through a crack in the floor, leading to caverns below.`,
       x: 0,
       y: -2,
       z: -3,
@@ -300,6 +316,12 @@ A ventilation shaft rises toward the surface, its grating hidden somewhere in Oc
           to: 'buildings/chinatown-underground/z-2.ts',
           room: '%DEEP_PASSAGE',
           description: 'A passage leads east toward the Chinatown deep passage',
+        },
+        down: {
+          to: 'buildings/deep-connector/z-4.ts',
+          room: '%DEEP_CAVERN_N',
+          description: 'A natural shaft descends into caverns',
+          hidden: true,
         },
       },
       objects: [

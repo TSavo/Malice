@@ -707,7 +707,9 @@ Iron rungs line one wall, providing a climbing route for those willing to descen
 
     '%DEEP_KING_MID': {
       name: 'Deep King Street',
-      description: `The passage runs beneath King Street at the deepest accessible level, connecting the freight infrastructure to the rail tunnels. The construction is consistent—industrial scale, heavy reinforcement, the architecture of cargo movement.`,
+      description: `The passage runs beneath King Street at the deepest accessible level, connecting the freight infrastructure to the rail tunnels. The construction is consistent—industrial scale, heavy reinforcement, the architecture of cargo movement.
+
+A utility shaft descends from here, connecting to the deep connector network that spans the z=-4 level.`,
       x: 0,
       y: -10,
       z: -3,
@@ -720,6 +722,11 @@ Iron rungs line one wall, providing a climbing route for those willing to descen
         west: '%DEEP_FREIGHT_MAIN',
         east: '%DEEP_KING_EAST',
         north: '%DEEP_BAGGAGE',
+        down: {
+          to: 'buildings/deep-connector/z-4.ts',
+          room: '%INDUSTRIAL_DEEP',
+          description: 'A utility shaft descends to the deep connector',
+        },
       },
     },
 
