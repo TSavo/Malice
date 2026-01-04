@@ -129,6 +129,7 @@ Street ─ sidewalk ─ Building (3 tall) ─ sidewalk ─ Street
 | Grand Central | -13 to -10 | +2 to +4 | (-9, +2) | 4 floors, arcade |
 | Corp Construction | 0 to +6 | +1 to +4 | (+6, +1) | Unknown, armed guards, blocks 2nd Ave |
 | Supply Depot | -20 to -19 | -5 to -4 | W: (-21, -5) | Distribution center, sealed packages |
+| King Pharmacy | +3 to +5 | -12 to -11 | S: (+4, -12) | 3 floors + roof, hybrid Chinese/Western pharmacy, looted |
 
 ## Hazard Zones (Impassable)
 
