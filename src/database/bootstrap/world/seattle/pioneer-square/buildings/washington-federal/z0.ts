@@ -87,7 +87,7 @@ The teller windows line the east wall, their brass cages still gleaming despite 
 
 A circular information desk occupies the center of the hall, its marble surface cracked where something heavy fell. Deposit slips and withdrawal forms are scattered across the floor—the last transactions never completed, the last customers never served.`,
       x: -1,
-      y: -2,
+      y: -3,
       z: 0,
       population: 0,
       ambientNoise: 3,
@@ -149,7 +149,7 @@ Someone was looking for something. Cash probably, or maybe documents that might 
 
 The branch manager's office is visible through a frosted glass door, its interior dark. A nameplate on the wall reads "DAVID HARRISON - BRANCH MANAGER." David Harrison is probably dead. His office remains.`,
       x: -1,
-      y: -2,
+      y: -3,
       z: 0,
       population: 0,
       ambientNoise: 2,
@@ -289,7 +289,7 @@ The money is all here. Hundreds of thousands of dollars, perhaps millions, sitti
 
 A secondary door leads to a smaller room—the bank's most secure storage, for whatever required even more protection than the main vault. That door is also locked, its mechanism separate from the main vault's.`,
       x: -2,
-      y: -2,
+      y: -3,
       z: 0,
       population: 0,
       ambientNoise: 0,
@@ -329,7 +329,7 @@ The stairs wind upward to the executive floor, their treads worn at the center f
 
 The contrast with the banking hall is deliberate. Customers got marble and columns. Employees got this.`,
       x: -1,
-      y: -2,
+      y: -3,
       z: 0,
       population: 0,
       ambientNoise: 2,
@@ -337,6 +337,7 @@ The contrast with the banking hall is deliberate. Customers got marble and colum
       waterLevel: 0,
       outdoor: false,
       exits: {
+        down: '%LOBBY',
         up: 'z1.ts#STAIRWELL_1',
       },
       objects: [
