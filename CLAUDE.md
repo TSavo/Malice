@@ -809,6 +809,8 @@ The game features an extensive underground tunnel network beneath Pioneer Square
 - Pioneer Books basement → underground connection
 - Pioneer Hotel mechanical room (-15, 7, -1) → east to underground
 - Redux Vintage basement (-16, 4, -1) → underground smuggling route
+- Supply Depot emergency reserves (-20, -5, -1) → east to underground
+- Terra Nova Gallery art vault (-16, -5, -1) → north to underground
 - Zeitgeist Coffee basement (-10, 11, -1) → underground breach
 
 See `docs/city-ai/MAP-UNDERGROUND.md` for detailed maps, room coordinates, and territorial information.
