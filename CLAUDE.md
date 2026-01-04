@@ -790,7 +790,7 @@ The game features an extensive underground tunnel network beneath Pioneer Square
 
 **Surface entry points:**
 - Fabrication Factory (-21, +10) - Public Services → Fab Basement
-- Smith Tower (-12, +9) - Internal escape tunnel
+- Smith Tower (-2, +9) - Internal escape tunnel
 - Occidental Square (-3, +2) - Gallery trapdoor → Occ Cross
 - Supply Depot (-21, -5) - Loading floor hatch → South Tunnel
 - Yesler Way grating (-7, +12) - Hidden grating → shaft
