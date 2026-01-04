@@ -94,6 +94,12 @@ jobs:
             1. Review the PR diff thoroughly
             2. Check for: bugs, security issues, performance problems, code quality, test coverage
             3. Use CLAUDE.md for project conventions
+            4. For world/building files (src/database/bootstrap/world/**), verify:
+               - Room coordinates (x, y, z) fall within declared building footprint
+               - Building footprint formula: x ∈ [x - width + 1, x], y ∈ [y - height + 1, y]
+               - Exit bi-directionality: if room A exits north to room B, room B must exit south to room A
+               - Stair exits: stairs going up (z+1) must have corresponding stairs down (z-1)
+               - Street exits: rooms at z=0 with street exits must connect to valid street coordinates
 
             ## Response Format
             You MUST respond with a structured review comment using `gh pr comment`.
