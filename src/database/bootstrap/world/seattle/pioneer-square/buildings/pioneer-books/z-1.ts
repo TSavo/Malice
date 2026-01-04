@@ -47,7 +47,7 @@ A wooden ladder leads up to the back stacks above. The rungs are worn in the cen
       outdoor: false,
       exits: {
         up: {
-          to: 'z0.ts:%BACK',
+          to: 'z0.ts#%BACK',
           description: 'A ladder leads up to the back stacks',
           door: '%BASEMENT_HATCH',
           locks: ['%BASEMENT_LOCK'],

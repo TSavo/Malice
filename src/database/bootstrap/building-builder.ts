@@ -62,7 +62,38 @@ interface DeferredWorldExit {
 
 export class BuildingBuilder implements Builder {
   static provides: string[] = []; // Creates individual building room aliases, not a single alias
-  static depends = ['room', 'exit', 'recycler']; // Needs these prototypes
+  // All prototypes used in building definitions must be loaded before building
+  static depends = [
+    'room',
+    'exit',
+    'recycler',
+    // Furniture and containers used in buildings
+    'furniture',
+    'table',
+    'desk',
+    'cabinet',
+    'bed',
+    'chair',
+    'bench',
+    'couch',
+    'crate',
+    'trunk',
+    'safe',
+    'locker',
+    // Locks and doors
+    'door',
+    'lock',
+    'rentableLock',
+    'biometricLock',
+    'guardedExit',
+    // Other
+    'sign',
+    'elevator',
+    'telescope',
+    'incinerator',
+    'vendable',
+    'describable',
+  ];
 
   private buildings: Map<string, Map<string, RuntimeObject>> = new Map();
   private deferredWorldExits: DeferredWorldExit[] = [];
@@ -311,21 +342,39 @@ export class BuildingBuilder implements Builder {
           // Simple form
           destPlaceholder = exitDef;
         } else if (typeof exitDef === 'object' && exitDef !== null) {
-          // Check for world reference (to: path.ts)
-          if ((exitDef as any).to && typeof (exitDef as any).to === 'string') {
-            // Defer this exit - will be resolved after all buildings are built
-            this.deferredWorldExits.push({
-              sourceRoom,
-              direction,
-              toPath: (exitDef as any).to,
-              exitProps: exitDef,
-              description: (exitDef as any).description,
-            });
+          // Check for door-only exit (to: null) - exit has a door but no destination
+          if ((exitDef as any).to === null) {
+            // Skip this exit - it's a placeholder for a door with no implemented destination
             continue;
           }
-          // Complex form with room placeholder
-          destPlaceholder = (exitDef as any).room;
-          exitProps = exitDef;
+          // Check for world reference (to: path.ts) OR cross-floor reference (to: z1.ts#ROOM)
+          if ((exitDef as any).to && typeof (exitDef as any).to === 'string') {
+            const toPath = (exitDef as any).to;
+            // Check if this is a cross-floor reference (contains #)
+            if (toPath.includes('#')) {
+              // Extract room name from 'z1.ts#ROOM_NAME' format
+              const roomName = toPath.split('#')[1];
+              destPlaceholder = roomName.startsWith('%')
+                ? roomName
+                : `%${roomName}`;
+              exitProps = exitDef;
+              // Don't continue - fall through to normal exit creation
+            } else {
+              // Defer this exit - will be resolved after all buildings are built
+              this.deferredWorldExits.push({
+                sourceRoom,
+                direction,
+                toPath: toPath,
+                exitProps: exitDef,
+                description: (exitDef as any).description,
+              });
+              continue;
+            }
+          } else {
+            // Complex form with room placeholder
+            destPlaceholder = (exitDef as any).room;
+            exitProps = exitDef;
+          }
         } else {
           console.warn(
             `    Invalid exit definition in ${placeholder}.${direction}`,
@@ -333,10 +382,20 @@ export class BuildingBuilder implements Builder {
           continue;
         }
 
+        // Handle cross-floor reference format: 'z1.ts#ROOM_NAME' -> '%ROOM_NAME'
+        if (
+          destPlaceholder &&
+          destPlaceholder.includes('.ts#') &&
+          !destPlaceholder.startsWith('%')
+        ) {
+          const roomName = destPlaceholder.split('#')[1];
+          destPlaceholder = roomName.startsWith('%') ? roomName : `%${roomName}`;
+        }
+
         const destRoom = resolvePlaceholder(destPlaceholder);
         if (!destRoom) {
           // Defer cross-floor exits - placeholder might exist on a later floor
-          if (destPlaceholder.startsWith('%')) {
+          if (destPlaceholder && destPlaceholder.startsWith('%')) {
             postProcessors.push(async () => {
               const deferredDest = sharedPlaceholders.get(destPlaceholder);
               if (!deferredDest) {

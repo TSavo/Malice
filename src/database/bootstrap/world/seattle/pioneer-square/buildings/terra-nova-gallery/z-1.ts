@@ -47,7 +47,7 @@ A trapdoor in the ceiling leads up to the gallery office. The basement ceiling i
       outdoor: false,
       exits: {
         up: {
-          to: 'z0.ts:%OFFICE',
+          to: 'z0.ts#%OFFICE',
           description: 'A trapdoor leads up to the gallery office',
           door: '%BASEMENT_DOOR',
           locks: ['%BASEMENT_LOCK'],
@@ -90,7 +90,7 @@ A breach in the northern wall opens to the underground, the edges worn smooth by
       exits: {
         south: '%WORKSHOP',
         north: {
-          to: 'underground/upper-tunnels/x-15-y-5.ts:%PASSAGE',
+          to: 'underground/upper-tunnels/x-15-y-5.ts#%PASSAGE',
           description:
             'A breach in the wall leads to the underground tunnels',
         },

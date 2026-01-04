@@ -47,7 +47,7 @@ Stairs lead up to the lobby. A maintenance corridor leads east toward the buildi
       outdoor: false,
       exits: {
         up: {
-          to: 'z0.ts:%LOBBY',
+          to: 'z0.ts#%LOBBY',
           description: 'Stairs lead up to the lobby',
           door: '%BASEMENT_DOOR',
           locks: ['%BASEMENT_LOCK'],
@@ -90,7 +90,7 @@ A section of wall in the eastern corner has been knocked through, revealing an o
       exits: {
         west: '%LAUNDRY',
         east: {
-          to: 'underground/upper-tunnels/x-14-y7.ts:%PASSAGE',
+          to: 'underground/upper-tunnels/x-14-y7.ts#%PASSAGE',
           description: 'A breach in the wall leads to the underground',
         },
       },

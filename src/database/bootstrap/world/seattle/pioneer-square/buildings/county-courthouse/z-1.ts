@@ -59,7 +59,7 @@ Pipes run along the ceiling, carrying water and steam and whatever else building
       outdoor: false,
       exits: {
         up: {
-          to: 'z0.ts:%RECORDS_HALL',
+          to: 'z0.ts#%RECORDS_HALL',
           description: 'Stairs lead up to the Records Hall',
         },
         south: '%ARCHIVES',

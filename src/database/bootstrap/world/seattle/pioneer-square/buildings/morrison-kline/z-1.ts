@@ -61,7 +61,7 @@ The stairs continue down to a storage area that spans the building's footprint, 
       waterLevel: 0,
       outdoor: false,
       exits: {
-        up: { to: 'z0.ts:%RECEPTION', door: '%BASEMENT_DOOR', locks: ['%BASEMENT_LOCK'] },
+        up: { to: 'z0.ts#%RECEPTION', door: '%BASEMENT_DOOR', locks: ['%BASEMENT_LOCK'] },
         west: '%ARCHIVE_MAIN',
         north: '%MECHANICAL',
       },
@@ -172,7 +172,7 @@ In the corner, partially hidden behind the water heater, a floor drain sits lowe
         south: '%STAIRS',
         west: '%STORAGE',
         down: {
-          to: 'underground/upper-tunnels/x-14-y7.ts:%SHAFT',
+          to: 'underground/upper-tunnels/x-14-y7.ts#%SHAFT',
           description: 'A concealed hatch leads down into the underground',
         },
       },

@@ -47,7 +47,7 @@ Stairs lead up to the staff area, and a service corridor continues north into th
       outdoor: false,
       exits: {
         up: {
-          to: 'z0.ts:%STAFF_AREA',
+          to: 'z0.ts#%STAFF_AREA',
           description: 'Stairs lead up to the staff area',
           door: '%BASEMENT_DOOR',
           locks: ['%BASEMENT_LOCK'],
@@ -134,7 +134,7 @@ A breach in the western wall leads into darkness—the underground network that 
       exits: {
         east: '%COLLECTION_STORAGE',
         west: {
-          to: 'underground/upper-tunnels/x-14-y-3.ts:%PASSAGE',
+          to: 'underground/upper-tunnels/x-14-y-3.ts#%PASSAGE',
           description: 'A breach in the stone wall leads into the underground',
         },
       },

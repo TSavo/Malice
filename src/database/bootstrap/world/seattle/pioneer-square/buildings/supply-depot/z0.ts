@@ -39,10 +39,10 @@ To the east, the warehouse proper holds row after row of shelving. The scale of 
         east: '%WAREHOUSE',
         north: '%LOADING',
         down: {
-          to: 'z-1.ts:%SORTING',
+          to: 'z-1.ts#%SORTING',
           description: 'A reinforced door leads down to the basement',
-          door: 'z-1.ts:%BASEMENT_DOOR',
-          locks: ['z-1.ts:%BASEMENT_LOCK'],
+          door: 'z-1.ts#%BASEMENT_DOOR',
+          locks: ['z-1.ts#%BASEMENT_LOCK'],
         },
       },
       objects: [

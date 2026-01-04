@@ -190,10 +190,10 @@ Prep tables line the center of the room, their surfaces stained with the history
         },
         up: '%HALL_Z1',
         down: {
-          to: 'z-1.ts:%CELLAR',
+          to: 'z-1.ts#%CELLAR',
           description: 'A hatch in the floor leads down to the wine cellar',
-          door: 'z-1.ts:%CELLAR_HATCH',
-          locks: ['z-1.ts:%CELLAR_LOCK'],
+          door: 'z-1.ts#%CELLAR_HATCH',
+          locks: ['z-1.ts#%CELLAR_LOCK'],
         },
       },
       objects: [

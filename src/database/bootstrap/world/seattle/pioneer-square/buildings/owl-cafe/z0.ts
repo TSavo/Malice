@@ -200,10 +200,10 @@ A walk-in cooler hums in the corner—somehow still running, still maintaining t
         },
         north: '%BOOTHS',
         down: {
-          to: 'z-1.ts:%CELLAR',
+          to: 'z-1.ts#%CELLAR',
           description: 'A heavy cellar door leads down to cold storage',
-          door: 'z-1.ts:%CELLAR_DOOR',
-          locks: ['z-1.ts:%CELLAR_LOCK'],
+          door: 'z-1.ts#%CELLAR_DOOR',
+          locks: ['z-1.ts#%CELLAR_LOCK'],
         },
       },
       objects: [

@@ -52,7 +52,7 @@ A single bare bulb hangs at the bottom of the stairs, its pull-chain dangling. T
       waterLevel: 0,
       outdoor: false,
       exits: {
-        up: { to: 'z0.ts:%BACKROOM', door: '%BASEMENT_TRAPDOOR', locks: ['%BASEMENT_LOCK'] },
+        up: { to: 'z0.ts#%BACKROOM', door: '%BASEMENT_TRAPDOOR', locks: ['%BASEMENT_LOCK'] },
         north: '%OVERFLOW',
         east: '%MAIN_CELLAR',
       },

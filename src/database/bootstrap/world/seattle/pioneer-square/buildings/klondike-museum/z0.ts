@@ -275,10 +275,10 @@ A narrow stairway leads up to what used to be storage or additional office space
           to: '%STORAGE',
         },
         down: {
-          to: 'z-1.ts:%COLLECTION_STORAGE',
+          to: 'z-1.ts#%COLLECTION_STORAGE',
           description: 'A reinforced door leads down to collection storage',
-          door: 'z-1.ts:%BASEMENT_DOOR',
-          locks: ['z-1.ts:%BASEMENT_LOCK'],
+          door: 'z-1.ts#%BASEMENT_DOOR',
+          locks: ['z-1.ts#%BASEMENT_LOCK'],
         },
       },
       objects: [

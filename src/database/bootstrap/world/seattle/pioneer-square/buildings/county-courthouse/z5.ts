@@ -19,7 +19,7 @@ From here, the geography of justice is visible: the streets where police made ar
       waterLevel: 0,
       outdoor: true,
       exits: {
-        down: 'z4.ts:%ROOF_ACCESS',
+        down: 'z4.ts#%ROOF_ACCESS',
         north: '%ROOF_NORTH',
         south: '%ROOF_SOUTH',
       },

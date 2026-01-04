@@ -47,7 +47,7 @@ A heavy metal door leads up to the ground floor. The door was built for security
       outdoor: false,
       exits: {
         up: {
-          to: 'z0.ts:%SERVICES',
+          to: 'z0.ts#%SERVICES',
           description: 'A reinforced door leads up to the processing hall',
           door: '%BASEMENT_DOOR',
           locks: ['%BASEMENT_LOCK'],
@@ -83,7 +83,7 @@ A breach in the far wall leads to the underground—stones removed, edges worn s
       exits: {
         west: '%RECORDS',
         east: {
-          to: 'underground/upper-tunnels/x-14-y10.ts:%PASSAGE',
+          to: 'underground/upper-tunnels/x-14-y10.ts#%PASSAGE',
           description:
             'A breach in the wall leads to the underground tunnels',
         },

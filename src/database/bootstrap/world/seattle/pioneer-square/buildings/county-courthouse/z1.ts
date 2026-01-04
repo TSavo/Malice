@@ -23,8 +23,8 @@ The floors are worn in paths leading to the courtrooms, decades of lawyers and d
       waterLevel: 0,
       outdoor: false,
       exits: {
-        down: 'z0.ts:%LOBBY',
-        up: 'z2.ts:%STAIR_Z2',
+        down: 'z0.ts#%LOBBY',
+        up: 'z2.ts#%STAIR_Z2',
         north: '%COURTROOM_1',
         south: '%COURTROOM_2',
         east: '%HALLWAY_EAST',

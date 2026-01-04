@@ -92,10 +92,10 @@ The smell is mildew and bodies and the chemical attempts to mask both. The light
         },
         in: '%E',
         down: {
-          to: 'z-1.ts:%LAUNDRY',
+          to: 'z-1.ts#%LAUNDRY',
           description: 'A door leads down to the basement',
-          door: 'z-1.ts:%BASEMENT_DOOR',
-          locks: ['z-1.ts:%BASEMENT_LOCK'],
+          door: 'z-1.ts#%BASEMENT_DOOR',
+          locks: ['z-1.ts#%BASEMENT_LOCK'],
         },
       },
     },

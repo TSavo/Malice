@@ -47,7 +47,7 @@ The ceiling is low, the floor unfinished concrete, the lighting dim emergency fi
       outdoor: false,
       exits: {
         up: {
-          to: 'z0.ts:%COFFEE',
+          to: 'z0.ts#%COFFEE',
           description: 'A trapdoor leads up to the coffee shop',
           door: '%BASEMENT_DOOR',
           locks: ['%BASEMENT_LOCK'],
@@ -83,7 +83,7 @@ A breach in the southern wall opens into darkness—the underground tunnel netwo
       exits: {
         north: '%STORAGE',
         south: {
-          to: 'underground/upper-tunnels/x-8-y0.ts:%PASSAGE',
+          to: 'underground/upper-tunnels/x-8-y0.ts#%PASSAGE',
           description:
             'A breach in the old brick leads to the underground tunnels',
         },

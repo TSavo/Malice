@@ -54,7 +54,7 @@ The noise is a constant roar, muffled only slightly by acoustic baffling. The ai
       outdoor: false,
       exits: {
         up: {
-          to: 'z0.ts:%PUBLIC_SERVICES',
+          to: 'z0.ts#%PUBLIC_SERVICES',
           description: 'A freight elevator leads up to public services',
           door: '%BASEMENT_DOOR',
           locks: ['%BASEMENT_LOCK'],
@@ -98,7 +98,7 @@ A breach in the southern wall opens to the underground tunnels, the edges worn s
         west: '%PROCESSING',
         east: '%GENERATOR',
         south: {
-          to: 'underground/upper-tunnels/x-19-y10.ts:%PASSAGE',
+          to: 'underground/upper-tunnels/x-19-y10.ts#%PASSAGE',
           description:
             'A breach in the wall leads to the underground tunnels',
         },
