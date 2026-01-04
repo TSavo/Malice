@@ -543,7 +543,7 @@ A reinforced workbench occupies one corner, its surface scarred by cleaning and 
 
 The air smells of oil and solvent, the residue of constant maintenance. Weapons don't survive the underground without care. The Cartel cares.`,
       x: -16,
-      y: -5,
+      y: 5,
       z: -4,
       population: 0,
       ambientNoise: 10,
@@ -627,7 +627,7 @@ The walls show the marks of hasty construction—this space was carved from the 
 
 Stains on the floor have been scrubbed but not entirely eliminated. Operations have been performed here. Wounds have been treated. Not everyone survived.`,
       x: -12,
-      y: -6,
+      y: -4,
       z: -4,
       population: 0,
       ambientNoise: 15,
