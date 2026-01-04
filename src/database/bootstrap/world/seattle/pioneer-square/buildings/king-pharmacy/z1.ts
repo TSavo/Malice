@@ -4,8 +4,8 @@
 
 export const building = {
   name: 'King Pharmacy',
-  x: 4,
-  y: -12,
+  x: 5,
+  y: -10,
   width: 3,
   height: 3,
   floors: 3,
@@ -160,7 +160,7 @@ The refrigerator door is closed, mercifully—whatever was inside decomposed lon
 
 A small table with two chairs sits by the window, the breakfast nook where mornings began with rice porridge and tea before descending to open the pharmacy.`,
       x: 3,
-      y: -11,
+      y: -10,
       z: 1,
       population: 0,
       ambientNoise: 1,
