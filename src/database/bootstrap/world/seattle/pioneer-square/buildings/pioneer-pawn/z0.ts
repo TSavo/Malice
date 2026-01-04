@@ -7,7 +7,7 @@ export const building = {
   x: 5,
   y: 12,
   width: 2,
-  height: 1,
+  height: 3,
   floors: 2,
 
   rooms: {
