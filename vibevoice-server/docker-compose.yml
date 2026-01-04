@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  vibevoice:
+    build: .
+    container_name: vibevoice-tts
+    ports:
+      - "${PORT:-8880}:8880"
+    volumes:
+      - ./voices:/app/voices
+      - ./output:/app/output
+      - vibevoice-cache:/root/.cache/huggingface
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=${GPU_DEVICE_ID:-0}
+      - CUDA_VISIBLE_DEVICES=${GPU_DEVICE_ID:-0}
+      - MODEL_PATH=${MODEL_PATH:-DevParker/VibeVoice7b-low-vram/4bit}
+      - MODEL_DEVICE=${MODEL_DEVICE:-cuda}
+      - INFERENCE_STEPS=${INFERENCE_STEPS:-10}
+      - DEFAULT_VOICE=${DEFAULT_VOICE:-}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8880/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  vibevoice-cache:

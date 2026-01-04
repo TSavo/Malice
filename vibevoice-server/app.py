@@ -1,0 +1,453 @@
+"""
+VibeVoice FastAPI Server - 4-bit Quantized for 8GB VRAM (RTX 3070)
+OpenAI-compatible TTS API using DevParker/VibeVoice7b-low-vram/4bit
+"""
+
+import os
+import io
+import time
+import logging
+from typing import Optional, Literal
+from pathlib import Path
+
+import torch
+import numpy as np
+import soundfile as sf
+from fastapi import FastAPI, HTTPException, Response, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Environment config
+MODEL_PATH = os.getenv("MODEL_PATH", "microsoft/VibeVoice-1.5B")
+MODEL_DEVICE = os.getenv("MODEL_DEVICE", "cuda")
+INFERENCE_STEPS = int(os.getenv("INFERENCE_STEPS", "10"))
+VOICES_DIR = Path(os.getenv("VIBEVOICE_VOICES_DIR", "/opt/vibevoice/demo/voices/streaming_model"))
+OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", "/app/output"))
+
+# Cached voice prompts
+voice_cache = {}
+
+# Ensure directories exist
+VOICES_DIR.mkdir(parents=True, exist_ok=True)
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+app = FastAPI(
+    title="VibeVoice TTS API",
+    description="OpenAI-compatible TTS API using VibeVoice 7B 4-bit quantized model",
+    version="1.0.0",
+)
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Global model reference
+model = None
+processor = None
+
+# OpenAI voice mapping to VibeVoice voice presets
+OPENAI_VOICES = {
+    "alloy": "carter",
+    "echo": "wayne",
+    "fable": "emma",
+    "onyx": "frank",
+    "nova": "grace",
+    "shimmer": "mike",
+}
+
+
+def get_voice_preset(voice_name: str) -> Optional[dict]:
+    """Load a voice preset from .pt file"""
+    global voice_cache
+    
+    # Map OpenAI voice names to VibeVoice presets
+    voice_key = OPENAI_VOICES.get(voice_name.lower(), voice_name.lower())
+    
+    if voice_key in voice_cache:
+        return voice_cache[voice_key]
+    
+    # Look for voice file
+    voice_files = list(VOICES_DIR.glob(f"**/{voice_key}*.pt")) + \
+                  list(VOICES_DIR.glob(f"**/*{voice_key}*.pt"))
+    
+    if not voice_files:
+        # Try to find any voice file as default
+        voice_files = list(VOICES_DIR.glob("**/*.pt"))
+        if voice_files:
+            logger.warning(f"Voice '{voice_key}' not found, using default: {voice_files[0].name}")
+        else:
+            logger.error(f"No voice presets found in {VOICES_DIR}")
+            return None
+    
+    voice_path = voice_files[0]
+    logger.info(f"Loading voice preset from {voice_path}")
+    
+    try:
+        device = MODEL_DEVICE if MODEL_DEVICE != "cuda" else "cuda"
+        preset = torch.load(voice_path, map_location=device, weights_only=False)
+        voice_cache[voice_key] = preset
+        return preset
+    except Exception as e:
+        logger.error(f"Failed to load voice preset: {e}")
+        return None
+
+
+class SpeechRequest(BaseModel):
+    """OpenAI-compatible speech request"""
+    model: str = Field(default="tts-1", description="Model to use (ignored, uses VibeVoice)")
+    input: str = Field(..., description="Text to synthesize")
+    voice: str = Field(default="alloy", description="Voice to use")
+    response_format: Literal["mp3", "wav", "flac", "opus", "aac", "pcm"] = Field(
+        default="wav", description="Audio format"
+    )
+    speed: float = Field(default=1.0, ge=0.25, le=4.0, description="Speed multiplier")
+
+
+class VoiceInfo(BaseModel):
+    voice_id: str
+    name: str
+    preview_url: Optional[str] = None
+
+
+class VoicesResponse(BaseModel):
+    voices: list[VoiceInfo]
+
+
+def load_model():
+    """Load the VibeVoice model"""
+    global model, processor
+    
+    if model is not None:
+        return
+    
+    logger.info(f"Loading VibeVoice model from {MODEL_PATH}...")
+    start_time = time.time()
+    
+    try:
+        # Use VibeVoice Streaming modules (Realtime 0.5B)
+        from vibevoice import VibeVoiceStreamingForConditionalGenerationInference, VibeVoiceStreamingProcessor
+        
+        model = VibeVoiceStreamingForConditionalGenerationInference.from_pretrained(
+            MODEL_PATH,
+            device_map=MODEL_DEVICE,
+            torch_dtype=torch.bfloat16,
+            trust_remote_code=True,
+        )
+        processor = VibeVoiceStreamingProcessor.from_pretrained(
+            MODEL_PATH,
+            trust_remote_code=True,
+        )
+        
+        elapsed = time.time() - start_time
+        logger.info(f"Model loaded in {elapsed:.2f}s")
+        
+        # Log VRAM usage
+        if torch.cuda.is_available():
+            allocated = torch.cuda.memory_allocated() / 1e9
+            reserved = torch.cuda.memory_reserved() / 1e9
+            logger.info(f"VRAM: {allocated:.2f}GB allocated, {reserved:.2f}GB reserved")
+            
+    except Exception as e:
+        logger.error(f"Failed to load model: {e}")
+        raise
+
+
+def generate_speech(text: str, voice: Optional[str] = None, speed: float = 1.0) -> np.ndarray:
+    """Generate speech from text"""
+    global model, processor
+    
+    if model is None:
+        load_model()
+    
+    logger.info(f"Generating speech for {len(text)} chars, voice={voice}, speed={speed}")
+    start_time = time.time()
+    
+    try:
+        # Get voice preset
+        voice_name = voice or "alloy"
+        cached_prompt = get_voice_preset(voice_name)
+        
+        if cached_prompt is None:
+            raise HTTPException(status_code=400, detail=f"Voice preset not found for '{voice_name}'")
+        
+        # Make a deep copy to avoid modifying the cached version
+        import copy
+        cached_prompt_copy = copy.deepcopy(cached_prompt)
+        
+        # Prepare inputs using the streaming processor
+        inputs = processor.process_input_with_cached_prompt(
+            text=text,
+            cached_prompt=cached_prompt_copy,
+            padding=True,
+            return_tensors="pt",
+            return_attention_mask=True,
+        )
+        
+        # Move to device
+        device = next(model.parameters()).device
+        for k, v in inputs.items():
+            if torch.is_tensor(v):
+                inputs[k] = v.to(device)
+        
+        # Generate
+        with torch.no_grad():
+            output = model.generate(
+                **inputs,
+                max_new_tokens=None,
+                cfg_scale=1.3,
+                tokenizer=processor.tokenizer,
+                generation_config={'do_sample': False},
+                all_prefilled_outputs=cached_prompt_copy,
+            )
+        
+        # Extract audio from output
+        if hasattr(output, 'speech_outputs') and output.speech_outputs:
+            audio_tensor = output.speech_outputs[0]
+            # Convert bfloat16 to float32 before numpy
+            if audio_tensor.dtype == torch.bfloat16:
+                audio_tensor = audio_tensor.float()
+            audio = audio_tensor.cpu().numpy().squeeze()
+        elif hasattr(output, 'speech'):
+            audio_tensor = output.speech
+            if audio_tensor.dtype == torch.bfloat16:
+                audio_tensor = audio_tensor.float()
+            audio = audio_tensor.cpu().numpy().squeeze()
+        elif hasattr(output, 'audio'):
+            audio_tensor = output.audio
+            if audio_tensor.dtype == torch.bfloat16:
+                audio_tensor = audio_tensor.float()
+            audio = audio_tensor.cpu().numpy().squeeze()
+        else:
+            raise ValueError("No audio output in model response")
+        
+        # Ensure audio is 1D
+        if audio.ndim > 1:
+            audio = audio.flatten()
+        
+        # Apply speed adjustment if needed
+        if speed != 1.0:
+            import librosa
+            audio = librosa.effects.time_stretch(audio, rate=speed)
+        
+        elapsed = time.time() - start_time
+        duration = len(audio) / 24000  # 24kHz sample rate
+        rtf = elapsed / duration if duration > 0 else 0
+        logger.info(f"Generated {duration:.2f}s audio in {elapsed:.2f}s (RTF: {rtf:.2f}x)")
+        
+        return audio
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Generation failed: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+def audio_to_bytes(audio: np.ndarray, format: str, sample_rate: int = 24000) -> bytes:
+    """Convert numpy audio to bytes in specified format"""
+    buffer = io.BytesIO()
+    
+    # Ensure audio is in correct range
+    if audio.dtype == np.float32 or audio.dtype == np.float64:
+        audio = np.clip(audio, -1.0, 1.0)
+    
+    if format == "wav":
+        sf.write(buffer, audio, sample_rate, format="WAV")
+    elif format == "flac":
+        sf.write(buffer, audio, sample_rate, format="FLAC")
+    elif format in ["mp3", "opus", "aac"]:
+        # For compressed formats, write as WAV first then convert
+        # This requires ffmpeg - for now just return WAV
+        sf.write(buffer, audio, sample_rate, format="WAV")
+        logger.warning(f"Format {format} not fully supported, returning WAV")
+    elif format == "pcm":
+        # Raw PCM 16-bit
+        audio_int16 = (audio * 32767).astype(np.int16)
+        buffer.write(audio_int16.tobytes())
+    else:
+        sf.write(buffer, audio, sample_rate, format="WAV")
+    
+    buffer.seek(0)
+    return buffer.read()
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Pre-load model on startup"""
+    logger.info("Starting VibeVoice TTS server...")
+    try:
+        load_model()
+    except Exception as e:
+        logger.error(f"Failed to load model on startup: {e}")
+        # Don't crash - allow lazy loading
+
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint"""
+    gpu_available = torch.cuda.is_available()
+    model_loaded = model is not None
+    
+    status = {
+        "status": "healthy" if model_loaded else "initializing",
+        "model": MODEL_PATH,
+        "model_loaded": model_loaded,
+        "gpu_available": gpu_available,
+    }
+    
+    if gpu_available:
+        status["gpu_name"] = torch.cuda.get_device_name(0)
+        status["vram_allocated_gb"] = round(torch.cuda.memory_allocated() / 1e9, 2)
+        status["vram_reserved_gb"] = round(torch.cuda.memory_reserved() / 1e9, 2)
+    
+    return status
+
+
+@app.get("/v1/models")
+async def list_models():
+    """OpenAI-compatible models endpoint"""
+    return {
+        "object": "list",
+        "data": [
+            {
+                "id": "tts-1",
+                "object": "model",
+                "created": 1699000000,
+                "owned_by": "vibevoice",
+            },
+            {
+                "id": "tts-1-hd",
+                "object": "model",
+                "created": 1699000000,
+                "owned_by": "vibevoice",
+            },
+        ]
+    }
+
+
+@app.get("/v1/voices")
+@app.get("/v1/audio/voices")
+async def list_voices():
+    """List available voices"""
+    voices = []
+    
+    # Add OpenAI-compatible voices
+    for voice_id in OPENAI_VOICES.keys():
+        voices.append(VoiceInfo(voice_id=voice_id, name=voice_id.capitalize()))
+    
+    # Add custom voices from directory
+    for voice_file in VOICES_DIR.glob("*.wav"):
+        voice_id = voice_file.stem
+        if voice_id not in OPENAI_VOICES:
+            voices.append(VoiceInfo(voice_id=voice_id, name=voice_id))
+    
+    for voice_file in VOICES_DIR.glob("*.mp3"):
+        voice_id = voice_file.stem
+        if voice_id not in OPENAI_VOICES:
+            voices.append(VoiceInfo(voice_id=voice_id, name=voice_id))
+    
+    return VoicesResponse(voices=voices)
+
+
+@app.post("/v1/audio/speech")
+async def create_speech(request: SpeechRequest):
+    """OpenAI-compatible speech synthesis endpoint"""
+    
+    if not request.input or not request.input.strip():
+        raise HTTPException(status_code=400, detail="Input text is required")
+    
+    if len(request.input) > 10000:
+        raise HTTPException(status_code=400, detail="Input text too long (max 10000 chars)")
+    
+    # Map OpenAI voice to internal voice (for now, all use default)
+    voice = OPENAI_VOICES.get(request.voice, request.voice)
+    
+    # Generate audio
+    audio = generate_speech(request.input, voice, request.speed)
+    
+    # Convert to requested format
+    audio_bytes = audio_to_bytes(audio, request.response_format)
+    
+    # Determine content type
+    content_types = {
+        "mp3": "audio/mpeg",
+        "wav": "audio/wav",
+        "flac": "audio/flac",
+        "opus": "audio/opus",
+        "aac": "audio/aac",
+        "pcm": "audio/pcm",
+    }
+    content_type = content_types.get(request.response_format, "audio/wav")
+    
+    return Response(
+        content=audio_bytes,
+        media_type=content_type,
+        headers={
+            "Content-Disposition": f"attachment; filename=speech.{request.response_format}"
+        }
+    )
+
+
+@app.post("/v1/vibevoice/generate")
+async def generate_advanced(
+    text: str,
+    voice: Optional[str] = None,
+    speed: float = 1.0,
+    inference_steps: Optional[int] = None,
+):
+    """Advanced generation endpoint with more options"""
+    global INFERENCE_STEPS
+    
+    # Temporarily override inference steps if provided
+    original_steps = INFERENCE_STEPS
+    if inference_steps is not None:
+        INFERENCE_STEPS = inference_steps
+    
+    try:
+        audio = generate_speech(text, voice, speed)
+        audio_bytes = audio_to_bytes(audio, "wav")
+        
+        return Response(
+            content=audio_bytes,
+            media_type="audio/wav",
+        )
+    finally:
+        INFERENCE_STEPS = original_steps
+
+
+@app.post("/v1/voices/add")
+async def add_voice(name: str, file: UploadFile = File(...)):
+    """Upload a custom voice sample"""
+    if not file.filename.endswith(('.wav', '.mp3', '.flac', '.m4a')):
+        raise HTTPException(status_code=400, detail="Unsupported audio format")
+    
+    # Save voice file
+    voice_path = VOICES_DIR / f"{name}.wav"
+    
+    content = await file.read()
+    
+    # Convert to WAV if needed
+    try:
+        audio_data, sr = sf.read(io.BytesIO(content))
+        sf.write(voice_path, audio_data, sr, format="WAV")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to process audio: {e}")
+    
+    return {"status": "success", "voice_id": name, "path": str(voice_path)}
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8880)

@@ -1,0 +1,7 @@
+build.log
+.env
+__pycache__/
+*.pyc
+output/
+*.wav
+*.mp3
