@@ -220,7 +220,6 @@ A section of the eastern wall has been knocked through, revealing a narrow passa
       exits: {
         up: '%BACK_HALL',
         east: '%COAL_CELLAR',
-        south: '%STORAGE_VAULT',
       },
       objects: [
         {
@@ -256,7 +255,7 @@ A section of the eastern wall has been knocked through, revealing a narrow passa
 
 The coal bins are empty now, their wooden walls soft with age and damp. A coal chute in the ceiling is welded shut, its street-level access sealed decades ago. The iron door on the furnace side still works, though, creaking on hinges that could use oil.
 
-A narrow passage leads east toward the underground tunnels—a connection that predates the building's conversion to gas, perhaps used for deliveries when the streets above were at basement level.`,
+A narrow passage descends toward the underground tunnels—a connection that predates the building's conversion to gas, perhaps used for deliveries when the streets above were at basement level.`,
       x: -18,
       y: 12,
       z: -1,
@@ -267,7 +266,7 @@ A narrow passage leads east toward the underground tunnels—a connection that p
       outdoor: false,
       exits: {
         west: '%BASEMENT',
-        east: '%TUNNEL_ACCESS',
+        down: '%TUNNEL_ACCESS',
         south: '%STORAGE_VAULT',
       },
       objects: [
@@ -348,9 +347,9 @@ The passage opens into the larger tunnel network to the east, the buried streets
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: '%COAL_CELLAR',
+        up: '%COAL_CELLAR',
         east: {
-          to: 'underground/upper-tunnels/x-16-y11.ts',
+          to: 'underground/upper-tunnels/x-16-y12.ts',
           description: 'The passage opens into the underground tunnel network',
         },
       },

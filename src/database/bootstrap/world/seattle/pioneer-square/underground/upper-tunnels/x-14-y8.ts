@@ -49,3 +49,6 @@ The hatch at the top is heavy steel, installed to look like a floor drain from a
     },
   },
 };
+
+// Export main passage room for compatibility with WorldBuilder
+export const room = building.rooms['%PASSAGE'];
