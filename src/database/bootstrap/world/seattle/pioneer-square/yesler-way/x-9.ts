@@ -16,4 +16,10 @@ The buildings along this stretch maintain the scale that historic preservation r
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  exits: {
+    north: {
+      to: '../buildings/yesler-laundry/z0.ts#MAIN_FLOOR',
+      description: 'The glass door of Yesler Laundry',
+    },
+  },
 };
