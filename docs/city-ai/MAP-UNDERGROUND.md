@@ -215,7 +215,16 @@ Legend:
 
 The historic Underground Tour building at (-15, -3 to -4) preserves a section of the 1889 buried streets as they were presented to tourists. The tour route shows preserved storefronts (pharmacy, hardware store, dry goods), prism glass skylights, and interpretive signage. Beyond the former tour boundaries, hidden passages and alcoves connect to the wider underground network, including a route to the Yesler Underground tunnels.
 
-**Total z=-2 rooms: ~295** (88 original + 29 waterfront + 35 eastside + 36 yesler + 39 king + 40 eastern + 22 chinatown + 14 industrial + 6 tour)
+#### Southeast Underground (NEW)
+| Corridor | Direction | Start | End | Room Count |
+|----------|-----------|-------|-----|------------|
+| Jackson Extension | E-W | (+8, -6) | (+14, -6) | 4 |
+| Utility Connectors | N-S | (+12, -4) | (+14, -6) | 3 |
+| Special Locations | cluster | (+8, -4) | (+10, -3) | 4 |
+
+Utility tunnels and basements beneath the 4th Avenue S and S. Jackson Street intersection. This network connects the Chinatown underground to the eastside steam tunnels through 1970s-era municipal infrastructure built during urban renewal. Key locations include the Jackson Street Extension (breached 1962 concrete barrier), Light Rail Service Tunnel (International District station infrastructure), Station Utility Basement, Bank Vault (former financial building), and Parking Garage Basement (urban renewal era). The network serves as a critical east-west connector bridging historically distinct underground zones.
+
+**Total z=-2 rooms: ~306** (88 original + 29 waterfront + 35 eastside + 36 yesler + 39 king + 40 eastern + 22 chinatown + 14 industrial + 6 tour + 11 southeast)
 
 ---
 
@@ -344,14 +353,14 @@ Ultra-secure chamber below water table. Pluribus cannot see here.
 
 ## Network Statistics
 
-| Level | Original | Waterfront | Eastside | Yesler | King Street | Eastern | Chinatown | Industrial | Deep Cisterns | Tour | Total |
-|-------|----------|------------|----------|--------|-------------|---------|-----------|------------|---------------|------|-------|
-| z=-2 | 88 | 29 | 35 | 36 | 39 | 40 | 22 | 14 | 0 | 6 | **309** |
-| z=-3 | 29 | 22 | 18 | 6 | 0 | 0 | 2 | 0 | 0 | 0 | **77** |
-| z=-4 | 43 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 16 | 0 | **59** |
-| z=-5 | 16 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **16** |
-| z=-6 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **1** |
-| **Total** | **177** | **51** | **53** | **42** | **39** | **40** | **24** | **14** | **16** | **6** | **462** |
+| Level | Original | Waterfront | Eastside | Yesler | King Street | Eastern | Chinatown | Industrial | Deep Cisterns | Tour | Southeast | Total |
+|-------|----------|------------|----------|--------|-------------|---------|-----------|------------|---------------|------|-----------|-------|
+| z=-2 | 88 | 29 | 35 | 36 | 39 | 40 | 22 | 14 | 0 | 6 | 11 | **320** |
+| z=-3 | 29 | 22 | 18 | 6 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | **77** |
+| z=-4 | 43 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 16 | 0 | 0 | **59** |
+| z=-5 | 16 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **16** |
+| z=-6 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **1** |
+| **Total** | **177** | **51** | **53** | **42** | **39** | **40** | **24** | **14** | **16** | **6** | **11** | **473** |
 
 ---
 
