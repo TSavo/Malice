@@ -337,7 +337,6 @@ The contrast with the banking hall is deliberate. Customers got marble and colum
       waterLevel: 0,
       outdoor: false,
       exits: {
-        down: '%LOBBY',
         up: 'z1.ts#STAIRWELL_1',
       },
       objects: [
