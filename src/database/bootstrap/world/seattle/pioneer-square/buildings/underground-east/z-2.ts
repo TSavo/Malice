@@ -471,6 +471,11 @@ Gaps in the hasty masonry reveal darkness beyond—space that continues past the
       outdoor: false,
       exits: {
         east: '%OCC_S3',
+        west: {
+          to: 'buildings/underground-tour/z-2.ts',
+          room: '%STOREFRONT_ROW',
+          description: 'A gap in the masonry leads toward the old tour route',
+        },
       },
     },
 
@@ -748,6 +753,11 @@ But not all the equipment is dead. A newer pump hums quietly in the corner, its 
       outdoor: false,
       exits: {
         north: '%2ND_S2',
+        west: {
+          to: 'buildings/underground-tour/z-2.ts',
+          room: '%TOUR_END',
+          description: 'A passage leads west toward the old tour route',
+        },
         down: {
           to: 'buildings/underground-east/z-3.ts',
           description: 'A shaft descends to the deep pump station',

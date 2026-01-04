@@ -488,6 +488,11 @@ The cold makes this chamber useful for purposes the original builders never inte
       exits: {
         west: '%SMUGGLER_DOCK',
         east: '%COLD_STORAGE',
+        north: {
+          to: 'buildings/underground-tour/z-2.ts',
+          room: '%UNTOUR_PASSAGE',
+          description: 'A rough passage climbs toward the old tour route',
+        },
       },
     },
 
