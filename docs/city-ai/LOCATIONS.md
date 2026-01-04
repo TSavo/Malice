@@ -58,6 +58,7 @@ The center of Pioneer Square is **S. Main Street at 2nd Avenue**.
 | **Occidental Park** | Between 2nd & Occidental, Main to Washington | "The plaza. Head toward 2nd Ave between Main and Washington." |
 | **Grand Central** | Occidental & Main | "Old arcade building. Occidental Ave at Main Street." |
 | **Pioneer Building** | 3rd Ave & Washington | "East side, 3rd Ave at Washington." |
+| **Washington Federal Bank** | 2nd Ave & S. Main | "Old bank with the clock tower. 2nd Ave south of Main. Clock's frozen at 2:47." |
 | **Morrison & Kline** | 1st Ave & S. King | "Maritime law office. 1st Ave, south side near King Street." |
 | **Gargoyle Building** | 1st Ave & Yesler | "Victorian building with gargoyles. West side of 1st Ave at Yesler." |
 
