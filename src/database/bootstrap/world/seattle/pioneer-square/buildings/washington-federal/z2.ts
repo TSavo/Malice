@@ -4,10 +4,10 @@
 
 export const building = {
   name: 'Washington Federal Bank',
-  x: 0,
-  y: 0,
+  x: -1,
+  y: -2,
   width: 2,
-  height: 5,
+  height: 2,
   floors: 3,
 
   rooms: {
@@ -65,7 +65,7 @@ The door to the roof stands open, someone having forced the padlock at some poin
 
 A window in the door offers a preview of the roof—gravel and tar paper, HVAC equipment, the back of the clock tower that faces the street below.`,
       x: -1,
-      y: -1,
+      y: -2,
       z: 2,
       population: 0,
       ambientNoise: 15,
@@ -97,7 +97,7 @@ A window in the door offers a preview of the roof—gravel and tar paper, HVAC e
 The clock tower rises from the building's eastern facade, its back visible from here—a brick structure housing the clock mechanism, accessible through a small maintenance panel. The clock faces the street, its hands frozen at 2:47, a time that meant nothing when it happened and means nothing now.
 
 The view from the roof encompasses Pioneer Square and beyond—other rooftops, the waterfront visible to the west, Smith Tower rising to the south. The perspective is commanding. There is no one left to command.`,
-      x: 0,
+      x: -2,
       y: -2,
       z: 2,
       population: 0,
@@ -149,8 +149,8 @@ The view from the roof encompasses Pioneer Square and beyond—other rooftops, t
 Inside, the clockwork is visible: gears and springs and the careful engineering of mechanical timekeeping. The mechanism is frozen, its mainspring unwound, its escapement still. A small window looks out at the back of the clock face, the hands visible in reverse, forever pointing at 2:47.
 
 The clock ran on springs and gears, wound weekly by someone who understood the mechanism. That someone is gone. The clock keeps its last time, a monument to a moment that seemed ordinary when it happened.`,
-      x: 0,
-      y: -1,
+      x: -2,
+      y: -3,
       z: 2,
       population: 0,
       ambientNoise: 20,
@@ -193,8 +193,8 @@ The clock ran on springs and gears, wound weekly by someone who understood the m
 Someone has left a camp chair here, weathered and stained, its fabric torn. The chair faces north, positioned for watching the street below. Cigarette butts are scattered nearby, filtered and unfiltered, the accumulated evidence of someone who spent time here. Watching. Waiting. The watching ended. The chair remains.
 
 A fire escape ladder is bolted to the parapet, providing emergency egress to the alley below. The ladder is rusted but structurally sound—tested by whoever left the chair, probably.`,
-      x: 0,
-      y: -1,
+      x: -1,
+      y: -3,
       z: 2,
       population: 0,
       ambientNoise: 30,
@@ -250,8 +250,8 @@ A fire escape ladder is bolted to the parapet, providing emergency egress to the
 The parapet here is more substantial, a decorative balustrade that matches the neoclassical facade below. Stone urns that once held decorative plants now hold rainwater and dead leaves. The architectural flourishes continue even here, where visitors were never meant to see.
 
 A drainage gutter runs along the parapet, channeling rainwater to downspouts at the corners. The gutter is clogged with debris—leaves, feathers, the accumulated detritus of seasons without maintenance. Water pools instead of draining.`,
-      x: 0,
-      y: -3,
+      x: -1,
+      y: -2,
       z: 2,
       population: 0,
       ambientNoise: 25,

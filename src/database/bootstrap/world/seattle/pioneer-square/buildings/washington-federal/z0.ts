@@ -4,10 +4,10 @@
 
 export const building = {
   name: 'Washington Federal Bank',
-  x: 0,
-  y: 0,
+  x: -1,
+  y: -2,
   width: 2,
-  height: 5,
+  height: 2,
   floors: 3,
 
   rooms: {
@@ -86,7 +86,7 @@ export const building = {
 The teller windows line the east wall, their brass cages still gleaming despite decades of neglect. Glass partitions, bulletproof probably, separate the customers from the money. The money is still back there somewhere. Bundles of currency in locked drawers, coins in counted rolls, all of it as worthless as the paper it's printed on.
 
 A circular information desk occupies the center of the hall, its marble surface cracked where something heavy fell. Deposit slips and withdrawal forms are scattered across the floor—the last transactions never completed, the last customers never served.`,
-      x: 0,
+      x: -1,
       y: -2,
       z: 0,
       population: 0,
@@ -243,7 +243,7 @@ A window looks out onto an air shaft, grey light filtering through dirty glass. 
 Safe deposit boxes line the walls—hundreds of them, numbered brass doors each holding whatever people considered valuable enough to store in a bank. Some boxes have been drilled open, their contents removed by someone with the right tools and the wrong intentions. Most remain sealed, their contents unknown, their owners gone.
 
 The vault door dominates the south wall—a circular steel behemoth with a combination dial and time lock. The door is closed. The time lock's digital display is dark. Whatever is inside will stay inside.`,
-      x: 0,
+      x: -2,
       y: -3,
       z: 0,
       population: 0,
@@ -288,8 +288,8 @@ The vault door dominates the south wall—a circular steel behemoth with a combi
 The money is all here. Hundreds of thousands of dollars, perhaps millions, sitting in neat piles under emergency lighting that has long since failed. The currency is technically still legal tender. The society that would honor it is not.
 
 A secondary door leads to a smaller room—the bank's most secure storage, for whatever required even more protection than the main vault. That door is also locked, its mechanism separate from the main vault's.`,
-      x: 0,
-      y: -4,
+      x: -2,
+      y: -2,
       z: 0,
       population: 0,
       ambientNoise: 0,
@@ -329,7 +329,7 @@ The stairs wind upward to the executive floor, their treads worn at the center f
 
 The contrast with the banking hall is deliberate. Customers got marble and columns. Employees got this.`,
       x: -1,
-      y: -1,
+      y: -2,
       z: 0,
       population: 0,
       ambientNoise: 2,

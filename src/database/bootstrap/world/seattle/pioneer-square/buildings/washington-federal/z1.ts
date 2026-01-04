@@ -4,10 +4,10 @@
 
 export const building = {
   name: 'Washington Federal Bank',
-  x: 0,
-  y: 0,
+  x: -1,
+  y: -2,
   width: 2,
-  height: 5,
+  height: 2,
   floors: 3,
 
   rooms: {
@@ -67,7 +67,7 @@ The door to the executive floor is marked with brass letters: EXECUTIVE OFFICES.
 
 Above, the stairs continue to the roof access.`,
       x: -1,
-      y: -1,
+      y: -2,
       z: 1,
       population: 0,
       ambientNoise: 2,
@@ -100,8 +100,8 @@ Above, the stairs continue to the roof access.`,
 The walls display the same motivational art found in offices everywhere—abstract prints in corporate colors, landscapes that offend no one, the visual equivalent of elevator music. A flat-screen TV, now dark, once showed market updates and financial news.
 
 Doors lead to the conference room and the executive offices beyond. The carpet is plush enough to silence footsteps. The silence is complete.`,
-      x: 0,
-      y: -1,
+      x: -1,
+      y: -2,
       z: 1,
       population: 0,
       ambientNoise: 1,
@@ -151,7 +151,7 @@ Doors lead to the conference room and the executive offices beyond. The carpet i
 Floor-to-ceiling windows offer a view of 2nd Avenue below, the glass tinted to reduce glare on the presentation screen at the far end. The presentation screen still displays the last PowerPoint—quarterly earnings, projected growth, charts that slope optimistically upward. The quarter never ended. The growth never happened.
 
 A sidebar holds coffee carafes and water pitchers, the contents long since evaporated or grown strange things. A whiteboard on one wall is covered with handwritten notes in dry-erase marker, the strategic planning of people who could not have planned for this.`,
-      x: 0,
+      x: -2,
       y: -2,
       z: 1,
       population: 0,
@@ -206,7 +206,7 @@ A sidebar holds coffee carafes and water pitchers, the contents long since evapo
 The executives' assistants sat in alcoves along the hall, their desks positioned to intercept visitors and manage access. The desks are neat, organized, awaiting assistants who will never return. Family photos sit next to computer monitors, personal touches in a professional space.
 
 Doors at the end of the hall lead to the corner office—the largest, the brightest, the most impressive. Other doors lead to smaller offices, a hierarchy expressed in square footage and window access.`,
-      x: 0,
+      x: -2,
       y: -3,
       z: 1,
       population: 0,
@@ -242,8 +242,8 @@ Doors at the end of the hall lead to the corner office—the largest, the bright
 The office belongs—belonged—to the Regional Vice President. The nameplate on the desk reads "PATRICIA CHEN, REGIONAL VP - PACIFIC NORTHWEST." Her diploma from Stanford hangs on the wall. Her MBA from Wharton beside it. Her family photos are face-down on the credenza.
 
 The desk is obsessively clean, every item aligned, every surface dust-free. Patricia Chen ran a tight operation. The operation ended. The tidiness persists.`,
-      x: 0,
-      y: -4,
+      x: -1,
+      y: -3,
       z: 1,
       population: 0,
       ambientNoise: 1,
@@ -305,8 +305,8 @@ The desk is obsessively clean, every item aligned, every surface dust-free. Patr
 The room smells of old paper and the particular mustiness of archived information. A single desk sits in the center, equipped with a lamp and a magnifying glass for examining documents. A rolling ladder provides access to the highest shelves.
 
 The records here span decades of financial transactions—births and deaths expressed in debits and credits, lives summarized in account numbers and interest rates. The records are complete, organized, utterly meaningless.`,
-      x: 0,
-      y: 0,
+      x: -1,
+      y: -2,
       z: 1,
       population: 0,
       ambientNoise: 1,
