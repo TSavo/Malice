@@ -9,7 +9,7 @@ on:
 
 jobs:
   docker-reset:
-    runs-on: [self-hosted, malice]
+    runs-on: ubuntu-latest
     timeout-minutes: 15
 
     steps:

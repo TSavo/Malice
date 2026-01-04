@@ -579,7 +579,7 @@ The air smells of oil and solvent, the residue of constant maintenance. Weapons 
       name: 'Lower Passage',
       description: `The passage continues east toward specialized operational areas, the corridor showing the marks of heavy traffic—carts, equipment, the logistics of underground operations.`,
       x: -12,
-      y: -5,
+      y: 5,
       z: -4,
       population: 0,
       ambientNoise: 18,
@@ -599,7 +599,7 @@ A central console dominates the space, its multiple screens showing data flows, 
 
 Antenna cables run upward through conduit, connecting to hidden receivers on the surface. The Cartel's ears extend throughout Pioneer Square, hearing what others think is private.`,
       x: -11,
-      y: -5,
+      y: 5,
       z: -4,
       population: 0,
       ambientNoise: 35,
@@ -627,7 +627,7 @@ The walls show the marks of hasty construction—this space was carved from the 
 
 Stains on the floor have been scrubbed but not entirely eliminated. Operations have been performed here. Wounds have been treated. Not everyone survived.`,
       x: -12,
-      y: -4,
+      y: 6,
       z: -4,
       population: 0,
       ambientNoise: 15,
@@ -945,7 +945,15 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 16,
       waterLevel: 0,
       outdoor: false,
-      exits: { north: '%X8Y_3', west: '%X9Y_4' },
+      exits: {
+        north: '%X8Y_3',
+        west: '%X9Y_4',
+        east: {
+          to: 'buildings/deep-connector/z-4.ts',
+          room: '%DEEP_W1',
+          description: 'A narrow passage leads east into ancient tunnels',
+        },
+      },
     },
 
     // ═══════════════════════════════════════════════════════════════════════

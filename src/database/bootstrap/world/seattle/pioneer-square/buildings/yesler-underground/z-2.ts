@@ -244,7 +244,9 @@ The walls show the accumulated markings of decades—territorial claims overlapp
 
     '%SECOND_YESLER': {
       name: 'Second Avenue-Yesler Junction',
-      description: `The passage reaches the junction where the Yesler Way underground meets the routes beneath Second Avenue. The intersection is a natural gathering point, the space cleared and maintained despite the lack of official attention.`,
+      description: `The passage reaches the junction where the Yesler Way underground meets the routes beneath Second Avenue. The intersection is a natural gathering point, the space cleared and maintained despite the lack of official attention.
+
+A concealed opening behind what appears to be collapsed rubble leads to a deeper passage—the northern access to the arterial tunnel that runs the length of Pioneer Square.`,
       x: 0,
       y: 10,
       z: -2,
@@ -258,6 +260,12 @@ The walls show the accumulated markings of decades—territorial claims overlapp
         south: '%SECOND_NORTH',
         east: '%HOTEL_BASEMENT',
         west: '%BASEMENT_ROW',
+        down: {
+          to: 'buildings/arterial-tunnel/z-3.ts',
+          room: '%ARTERY_N1',
+          description: 'A concealed shaft descends into the arterial tunnel',
+          hidden: true,
+        },
       },
     },
 
