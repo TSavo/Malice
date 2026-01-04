@@ -64,9 +64,6 @@ export const building = {
 The door to the roof stands open, someone having forced the padlock at some point. The lock hangs uselessly from the hasp. Beyond the door, grey Seattle sky is visible, and the sound of wind carries into the vestibule.
 
 A window in the door offers a preview of the roof—gravel and tar paper, HVAC equipment, the back of the clock tower that faces the street below.`,
-      x: -1,
-      y: -3,
-      z: 2,
       population: 0,
       ambientNoise: 15,
       lighting: 50,
@@ -77,7 +74,7 @@ A window in the door offers a preview of the roof—gravel and tar paper, HVAC e
         west: {
           description: 'The roof access door leads outside',
           door: '%ROOF_DOOR',
-          to: '%ROOF_MAIN',
+          to: '%ROOF_EDGE',
         },
       },
       objects: [
@@ -106,12 +103,7 @@ The view from the roof encompasses Pioneer Square and beyond—other rooftops, t
       waterLevel: 0,
       outdoor: true,
       exits: {
-        east: {
-          description: 'The roof access door leads back inside',
-          door: '%ROOF_DOOR',
-          to: '%ROOF_ACCESS',
-        },
-        west: '%ROOF_EDGE',
+        north: '%ROOF_EDGE',
         south: '%CLOCK_TOWER',
       },
       sittables: [
@@ -153,7 +145,7 @@ Inside, the clockwork is visible: gears and springs and the careful engineering 
 
 The clock ran on springs and gears, wound weekly by someone who understood the mechanism. That someone is gone. The clock keeps its last time, a monument to a moment that seemed ordinary when it happened.`,
       x: -2,
-      y: -3,
+      y: -2,
       z: 2,
       population: 0,
       ambientNoise: 20,
@@ -206,8 +198,13 @@ A fire escape ladder is bolted to the parapet, providing emergency egress to the
       waterLevel: 0,
       outdoor: true,
       exits: {
-        west: '%ROOF_MAIN',
-        south: '%ROOF_CORNER',
+        east: {
+          description: 'The roof access door leads back inside',
+          door: '%ROOF_DOOR',
+          to: '%ROOF_ACCESS',
+        },
+        south: '%ROOF_MAIN',
+        west: '%ROOF_CORNER',
         down: null, // Fire escape to alley - could be implemented
       },
       sittables: [
@@ -256,7 +253,7 @@ The parapet here is more substantial, a decorative balustrade that matches the n
 
 A drainage gutter runs along the parapet, channeling rainwater to downspouts at the corners. The gutter is clogged with debris—leaves, feathers, the accumulated detritus of seasons without maintenance. Water pools instead of draining.`,
       x: -1,
-      y: -3,
+      y: -2,
       z: 2,
       population: 0,
       ambientNoise: 25,
@@ -265,7 +262,7 @@ A drainage gutter runs along the parapet, channeling rainwater to downspouts at 
       outdoor: true,
       exits: {
         west: '%CLOCK_TOWER',
-        north: '%ROOF_EDGE',
+        east: '%ROOF_EDGE',
       },
       sittables: [
         {
