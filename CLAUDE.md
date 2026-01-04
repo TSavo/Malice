@@ -624,6 +624,11 @@ The MCP server provides moo:// resources for querying game state:
 - `moo://city-ai` - List all city AI documentation files
 - `moo://city-ai/{name}` - Get city AI doc (e.g., moo://city-ai/context)
 
+**Greeter/Onboarding Resources:**
+- `moo://docs/greeter/00-overview` - Two paths overview, pacing, path detection
+- `moo://docs/greeter/continuum/{stage}` - Continuum path stages (01-07)
+- `moo://docs/greeter/underground/{stage}` - Underground path stages (01-07)
+
 ### Using MCP
 
 **Prefer direct MOO code**:
