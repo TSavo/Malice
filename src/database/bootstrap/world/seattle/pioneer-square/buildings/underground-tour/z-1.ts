@@ -31,10 +31,7 @@ A handrail runs along one wall, worn smooth by thousands of tourist hands. Safet
       outdoor: false,
       exits: {
         up: '%ENTRY',
-        down: {
-          to: 'underground/upper-tunnels/x-15-y-3.ts',
-          description: 'The stairs continue down into the buried streets',
-        },
+        down: '%TOUR_START',
       },
     },
   },

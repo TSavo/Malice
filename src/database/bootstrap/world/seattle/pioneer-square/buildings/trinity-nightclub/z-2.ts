@@ -200,7 +200,11 @@ A map is painted on the wall beside the door, faded but readable: the passages t
       outdoor: false,
       exits: {
         north: '%PRIVATE_ROOMS',
-        // Could connect to underground-complex if desired
+        south: {
+          to: 'buildings/underground-east/z-2.ts',
+          room: '%OCC_S1',
+          description: 'The fire exit opens into the Seattle Underground',
+        },
       },
       sittables: [
         {
