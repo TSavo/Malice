@@ -258,7 +258,7 @@ A computer terminal sits dead on the counter, its screen grey, its database of p
 
 One section is clearly for Western pharmaceuticals: manufacturer boxes with product names and lot numbers, the industrial packaging of modern medicine. Another section holds the supplies for traditional practice: empty glass jars that once held bulk herbs, bamboo steamers for preparing certain ingredients, the specialized equipment of Chinese pharmacy.
 
-A steel door leads to the back alley, heavily locked, showing scratches where someone tried and failed to force entry. Stairs in the corner lead up to the second floor.`,
+A steel door leads to the back alley, heavily locked, showing scratches where someone tried and failed to force entry.`,
       x: 3,
       y: -11,
       z: 0,
@@ -275,7 +275,6 @@ A steel door leads to the back alley, heavily locked, showing scratches where so
           door: '%BACK_DOOR',
           to: null, // Alley not implemented
         },
-        up: 'z1.ts#UPSTAIRS_HALL',
       },
       objects: [
         {
