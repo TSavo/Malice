@@ -286,13 +286,13 @@ The space is clean, bare, echoing. Modern but hollow. Functional but unwelcoming
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: {
+        east: {
           to: '2nd-ave-s/y10.ts',
           description: 'Glass doors open onto 2nd Ave S',
         },
         north: '%1',
-        east: '%5',
         south: '%8',
+        in: '%5',
       },
     },
 
@@ -326,7 +326,7 @@ The floor is polished marble. The walls are white composite with Continuum brand
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: '%4',
+        out: '%4',
         east: '%6',
         in: '%E',
       },

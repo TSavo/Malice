@@ -19,7 +19,7 @@ Orange plastic fencing stretches across the northern part of the street, zip-tie
   exits: {
     north: '2nd-ave-s/y11.ts',
     south: '2nd-ave-s/y9.ts',
-    east: {
+    west: {
       to: 'buildings/smith-tower/z0.ts',
       room: '%4',
       description: 'Glass doors lead into Smith Tower',
