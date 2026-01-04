@@ -51,6 +51,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: Rebase on master
+        run: |
+          git fetch origin master
+          git rebase origin/master
+          git push --force-with-lease origin ${{ steps.pr-details.outputs.branch }}
+
       - name: Run Claude Code Fixer
         id: claude-fixer
         uses: anthropics/claude-code-action@v1
