@@ -532,6 +532,11 @@ The walls show the marks of past contents: scuffs and scratches at consistent he
       exits: {
         west: '%SOUTH_CAVE',
         east: '%SOUTH_JUNCTION',
+        up: {
+          to: 'buildings/supply-depot/z0.ts',
+          room: '%WAREHOUSE',
+          description: 'A steel hatch leads up to the Supply Depot',
+        },
       },
     },
 

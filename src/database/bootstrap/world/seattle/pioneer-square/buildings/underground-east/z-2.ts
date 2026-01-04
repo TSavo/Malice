@@ -184,6 +184,11 @@ A vertical shaft rises toward street level, its ladder rungs showing the wear of
       exits: {
         north: '%OCC_CROSS',
         south: '%OCC_S2',
+        west: {
+          to: 'buildings/trinity-nightclub/z-2.ts',
+          room: '%UNDERGROUND_EXIT',
+          description: 'A steel fire door leads to Trinity Nightclub',
+        },
       },
     },
 
