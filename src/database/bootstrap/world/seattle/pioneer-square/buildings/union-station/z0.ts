@@ -202,7 +202,7 @@ Doors on either side lead to the platform stairs, their brass handles worn smoot
         south: '%GRAND_HALL_C',
         west: '%RESTAURANT',
         east: '%NEWS_STAND',
-        down: { room: '%PLATFORM_C', locks: ['%PLATFORM_LOCK'] },
+        down: { room: '%PLATFORM_STAIRS', locks: ['%PLATFORM_LOCK'] },
       },
       objects: [
         {
