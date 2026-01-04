@@ -121,6 +121,7 @@ Street ─ sidewalk ─ Building (3 tall) ─ sidewalk ─ Street
 
 | Name | X Range | Y Range | Door Location | Notes |
 |------|---------|---------|---------------|-------|
+| Yesler Laundry | -10 to -9 | +12 to +13 | S: (-9, +12) | 3 floors (ground laundromat + apartment + roof), abandoned with rotted clothes |
 | Smith Tower | -13 to -10 | +9 to +11 | N: (-12, +12), W: (-14, +10) | 38 floors, historic landmark |
 | Immigration Services | -16 to -15 | +10 to +11 | E: (-14, +10) | 2 floors (ground + roof), repurposed federal building |
 | City Services | -16 to -15 | +8 to +9 | E: (-14, +9) | 3 floors + roof, sanitation/water/power/operations |
