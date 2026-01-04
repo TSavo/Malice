@@ -16,7 +16,7 @@ export const building = {
     '%RH1': {
       name: 'Smith Tower - Roof - Northwest Corner',
       description: `Tar and gravel run to a low parapet stained by a century of rain. Wind up here tastes of salt, diesel, and ozone from the old radio kit below. Rusted conduit stubs jut from the deck where antenna masts once bristled.`,
-      x: -13,
+      x: -3,
       y: 11,
       z: 39,
       population: 0,
@@ -33,7 +33,7 @@ export const building = {
     '%RH2': {
       name: 'Smith Tower - Roof - North Run',
       description: `A narrow run of roof between the crown's terracotta ribs. The drop to the street canyons is dizzying; buses creep like toy models below. Pigeons explode away when you set foot here, leaving dusty feathers stuck to the tar.`,
-      x: -12,
+      x: -2,
       y: 11,
       z: 39,
       population: 0,
@@ -51,7 +51,7 @@ export const building = {
     '%RH3': {
       name: 'Smith Tower - Roof - Northeast Corner',
       description: `The parapet here overlooks the old viaduct traces and the bay beyond. A lightning rod, bent at its base, leans seaward with slack copper strap coiled beside it.`,
-      x: -11,
+      x: -1,
       y: 11,
       z: 39,
       population: 0,
@@ -69,7 +69,7 @@ export const building = {
     '%RH4': {
       name: 'Smith Tower - Roof - West Walk',
       description: `A tight walk along the crown wall. Terracotta tiles here are crazed with hairline cracks and patched with mismatched caulk. Condensation beads on metal service boxes bolted to the parapet, trickling rust down the face.`,
-      x: -13,
+      x: -3,
       y: 10,
       z: 39,
       population: 0,
@@ -87,7 +87,7 @@ export const building = {
     '%RH5': {
       name: 'Smith Tower - Roof - Central Deck',
       description: `The central expanse between the crown faces. Fresh tar smears around a square hatch, layered over decades of older patches. From here the white terracotta pyramid rises above you, its seams stained and its glass cap catching stray light.`,
-      x: -12,
+      x: -2,
       y: 10,
       z: 39,
       population: 0,
@@ -107,7 +107,7 @@ export const building = {
     '%RH6': {
       name: 'Smith Tower - Roof - East Walk',
       description: `A narrow strip pressed against the eastern crown wall. The brick parapet is streaked dark by decades of runoff and moss. Wind whistles through a gap where a railing segment sheared away long ago.`,
-      x: -11,
+      x: -1,
       y: 10,
       z: 39,
       population: 0,
@@ -126,7 +126,7 @@ export const building = {
     '%RH7': {
       name: 'Smith Tower - Roof - Southwest Corner',
       description: `The roof sags slightly here. A drain choked with leaves and pigeon feathers holds a shallow puddle that mirrors the crown above in ripples.`,
-      x: -13,
+      x: -3,
       y: 9,
       z: 39,
       population: 0,
@@ -143,7 +143,7 @@ export const building = {
     '%RH8': {
       name: 'Smith Tower - Roof - South Run',
       description: `A south-facing strip with a long view toward the stadium roofs and freight yards. On sunny days, heat shimmers off the tar; now, it holds footprints in soft black. The parapet is chest-high, chipped, and cold to the touch.`,
-      x: -12,
+      x: -2,
       y: 9,
       z: 39,
       population: 0,
@@ -161,7 +161,7 @@ export const building = {
     '%RH9': {
       name: 'Smith Tower - Roof - Southeast Corner',
       description: `The southeastern corner peers down toward Occidental and the waterfront cranes. A bent safety rail rattles in the wind until you brace it. Initials are scratched into the tar at your feet, half-filled with grit.`,
-      x: -11,
+      x: -1,
       y: 9,
       z: 39,
       population: 0,
@@ -183,7 +183,7 @@ export const building = {
     '%RH10': {
       name: 'Smith Tower - Roof - Far Northeast Edge',
       description: `The outermost edge of the roof, where the parapet drops away to a sheer fall. The view here is unobstructed - ferries crossing the grey sound, container ships at anchor, the distant Olympics lost in haze. Wind howls up the building face.`,
-      x: -10,
+      x: 0,
       y: 11,
       z: 39,
       population: 0,
@@ -200,7 +200,7 @@ export const building = {
     '%RH11': {
       name: 'Smith Tower - Roof - East Ledge',
       description: `A precarious strip along the building's eastern face. The parapet here is barely knee-high, eroded by weather. Pigeon droppings coat the stone. The wind is relentless, pulling at loose clothing.`,
-      x: -10,
+      x: 0,
       y: 10,
       z: 39,
       population: 0,
@@ -218,7 +218,7 @@ export const building = {
     '%RH12': {
       name: 'Smith Tower - Roof - Far Southeast Edge',
       description: `The extreme southeastern corner of the roof. From here you can see the stadium roofs, the rail yards, and the grey industrial sprawl stretching south. A rusted maintenance ladder is bolted to the parapet, leading nowhere - its lower rungs long since removed.`,
-      x: -10,
+      x: 0,
       y: 9,
       z: 39,
       population: 0,

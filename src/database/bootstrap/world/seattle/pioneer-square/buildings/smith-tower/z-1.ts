@@ -16,7 +16,7 @@ export const building = {
 There are no workstations here. No chairs. No terminals for human hands. Robotic maintenance arms hang motionless from ceiling tracks, waiting. The equipment is old—pre-Burning corporate hardware—but meticulously maintained. Faded logos are barely visible: ORACLE. IBM. CISCO.
 
 You feel watched. Not by cameras, though those exist. By something vast and patient that considers your presence. The darkness seems to breathe.`,
-      x: -12,
+      x: -2,
       y: 11,
       z: -1,
       population: 0,
@@ -41,7 +41,7 @@ You feel watched. Not by cameras, though those exist. By something vast and pati
 A faded safety poster reads: CRITICAL INFRASTRUCTURE - AUTHORIZED PERSONNEL ONLY. The personnel never came back after The Burning. The AI manages everything now.
 
 Thick cables snake across the raised floor, feeding power to the facility above. Backup batteries line one wall, their charge indicators all green. Whatever happens outside, this place will keep running.`,
-      x: -13,
+      x: -3,
       y: 10,
       z: -1,
       population: 0,
@@ -62,7 +62,7 @@ Thick cables snake across the raised floor, feeding power to the facility above.
 Biometric scanners flank the inner door, their red lights steady. A faded sign reads: LEVEL 5 CLEARANCE REQUIRED. The clearance system still works. The people who had that clearance are long gone.
 
 Dim security lighting casts harsh shadows. This is the only way in or out. The facility was designed to survive anything—and it did.`,
-      x: -12,
+      x: -2,
       y: 10,
       z: -1,
       population: 0,
@@ -85,7 +85,7 @@ Dim security lighting casts harsh shadows. This is the only way in or out. The f
 Pipes run along the ceiling, carrying chilled water to heat exchangers. Condensation drips steadily into floor drains. The humidity is controlled to the decimal point.
 
 Everything is automated. Robotic arms occasionally emerge from maintenance ports to replace filters or adjust flow rates. The system has been self-maintaining for decades.`,
-      x: -11,
+      x: -1,
       y: 10,
       z: -1,
       population: 0,
@@ -110,7 +110,7 @@ Everything is automated. Robotic arms occasionally emerge from maintenance ports
 No chairs. No desks. The NOC was designed for human operators that never arrived. Now the AI monitors itself, the displays purely diagnostic. Status indicators blink in rhythmic patterns: routing tables, bandwidth utilization, node health.
 
 A clicking sound comes from somewhere—relays switching, connections routing. The city's digital nervous system runs through this room.`,
-      x: -13,
+      x: -3,
       y: 9,
       z: -1,
       population: 0,
@@ -132,7 +132,7 @@ A clicking sound comes from somewhere—relays switching, connections routing. T
 Cable trays run overhead, thick bundles of fiber optic and power lines feeding the surrounding rooms. The air is cold and dry, filtered and recycled. A faint ozone smell lingers.
 
 This is the spine of the facility. Everything connects here. A floor hatch leads down to the utility level below.`,
-      x: -12,
+      x: -2,
       y: 9,
       z: -1,
       population: 0,
@@ -156,7 +156,7 @@ This is the spine of the facility. Everything connects here. A floor hatch leads
 These servers process everything: citizen records, resource allocation, surveillance feeds, behavioral predictions. The Continuum's mind is distributed across thousands of blades, each one replaceable, the whole irreplaceable.
 
 Robotic arms move silently between racks, swapping failed drives, cleaning dust, maintaining the endless computation. The process never stops.`,
-      x: -11,
+      x: -1,
       y: 9,
       z: -1,
       population: 0,

@@ -63,7 +63,7 @@ export const building = {
       name: 'Smith Tower - 24th Floor - Elevator Landing',
       description:
         'A compact landing with scuffed brass trim and a single call panel.',
-      x: -12,
+      x: -2,
       y: 10,
       z: 24,
       exits: {
@@ -81,7 +81,7 @@ export const building = {
     '%A1_z24': {
       name: 'Smith Tower - 24th Floor - North Suite - Living Room',
       description: 'A corner unit with tall windows and pale wood floors. A kitchenette occupies one wall, its appliances dark and silent. Built-in shelving holds the remnants of someone\'s life—books, decorative objects, a dead potted plant.',
-      x: -13,
+      x: -3,
       y: 11,
       z: 24,
       exits: { east: '%A2_z24' },
@@ -116,7 +116,7 @@ export const building = {
       name: 'Smith Tower - 24th Floor - North Suite - Bedroom',
       description:
         'A bright one-bedroom overlooking the skyline, hall-facing door to the south. A built-in closet with mirrored doors dominates one wall, its reflection multiplying the dusty light.',
-      x: -12,
+      x: -2,
       y: 11,
       z: 24,
       exits: {
@@ -154,7 +154,7 @@ export const building = {
       name: 'Smith Tower - 24th Floor - North Suite - Studio',
       description:
         'A long studio with exposed brick and a narrow galley kitchen. The space is multipurpose—work area, living space, kitchen all compressed into one room.',
-      x: -11,
+      x: -1,
       y: 11,
       z: 24,
       exits: { west: '%A2_z24' },
@@ -195,7 +195,7 @@ export const building = {
       name: 'Smith Tower - 24th Floor - East Suite - Loft',
       description:
         'A lofted corner with sloped ceiling beams and a compact mezzanine. The high ceilings make the small footprint feel larger. A wooden ladder leads up to the sleeping loft.',
-      x: -10,
+      x: 0,
       y: 11,
       z: 24,
       exits: { south: '%B2_z24' },
@@ -237,7 +237,7 @@ export const building = {
       name: 'Smith Tower - 24th Floor - South Suite - Alcove',
       description:
         'A snug unit tucked behind the shaft, with one frosted window. The space is barely larger than a closet, intimate or claustrophobic depending on your temperament.',
-      x: -13,
+      x: -3,
       y: 10,
       z: 24,
       exits: { south: '%C2_z24', east: '%EL_z24' },
@@ -271,7 +271,7 @@ export const building = {
       name: 'Smith Tower - 24th Floor - East Suite - Living Room',
       description:
         'A two-room suite with a west-facing door toward the elevator. This is clearly the main living space, larger than the other units on the floor.',
-      x: -11,
+      x: -1,
       y: 10,
       z: 24,
       exits: {
@@ -311,7 +311,7 @@ export const building = {
       name: 'Smith Tower - 24th Floor - East Suite - Den',
       description:
         'A narrow end unit with a bay of small windows and built-ins. This was clearly a home office or study, the walls lined with shelving.',
-      x: -10,
+      x: 0,
       y: 10,
       z: 24,
       exits: { west: '%B2_z24' },
@@ -351,7 +351,7 @@ export const building = {
     '%C2_z24': {
       name: 'Smith Tower - 24th Floor - South Suite - Living Room',
       description: 'A corner unit with western exposure and aged carpeting. The afternoon sun has bleached everything near the windows to a uniform pale.',
-      x: -13,
+      x: -3,
       y: 9,
       z: 24,
       exits: { north: '%C1_z24', east: '%C3_z24' },
@@ -386,7 +386,7 @@ export const building = {
       name: 'Smith Tower - 24th Floor - South Suite - Foyer',
       description:
         'The single entrance to the C block, with a stout fire door to the elevator. A small entryway opens into the rest of the unit.',
-      x: -12,
+      x: -2,
       y: 9,
       z: 24,
       exits: {
@@ -425,7 +425,7 @@ export const building = {
       name: 'Smith Tower - 24th Floor - South Suite - Bedroom',
       description:
         'A deep plan with a recessed alcove and polished concrete floors. The industrial aesthetic is softened by remnants of personal touches.',
-      x: -11,
+      x: -1,
       y: 9,
       z: 24,
       exits: { west: '%C3_z24' },
@@ -460,7 +460,7 @@ export const building = {
       name: 'Smith Tower - 24th Floor - East Suite - Bedroom',
       description:
         'A compact end-cap with a single long window and built-in shelving. Every inch is utilized, the room a study in efficient living.',
-      x: -10,
+      x: 0,
       y: 9,
       z: 24,
       exits: { north: '%B2_z24' },

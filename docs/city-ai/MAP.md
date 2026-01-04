@@ -50,13 +50,13 @@ Street ─ sidewalk ─ Building (3 tall) ─ sidewalk ─ Street
       ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
 +12   │ ●──●──●──●──●──●──●──●──●──D──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──● │ YESLER
       │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
-+11   │ D ╔════════╗|╔════╗  ●  ╔══════════╗│  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ● │
-      │   ║FABRICA ║|║IMMI║  │  ║ SMITH    ║│  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
-+10   │ D ║ TION   ║|╚════╝D D  ║ TOWER    ║│  │  ●  │  │  │  │  │  │  ●  ╔═══════════════╗ ●  │  │  │  │  |  │  ● │
-      │   ║FACTORY ║|╔════╗  │  ║          ║│  │  │  │  │  │  │  │  │  │  ║               ║ │  │  │  │  │  │  │  | │
- +9   │   ║        ║|║CITY║D ●  ╚══════════╝│  │  ●  │  │  │  │  │  │  ●  ║    PIONEER    ║ ●  │  │  │  │  |  │  ● │
-      │   ║        ║|║SVCS║  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  ║    BUILDING   ║ │  │  │  │  │  │  |  │ │
- +8   │   ╚════════╝ ╚════╝  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  ╚═══════════════╝ ●  │  │  │  |  ╔═══════════╗
++11   │ D ╔════════╗|╔════╗  ●  │  │  │  │  │  │  ●  │  │  │  │  ╔══════════╗ ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ● │
+      │   ║FABRICA ║|║IMMI║  │  │  │  │  │  │  │  │  │  │  │  │  ║ SMITH    ║ │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
++10   │ D ║ TION   ║|╚════╝D ●  │  │  │  │  │  │  ●  │  │  │  │  ║ TOWER    ║D╔═══════════════╗ ●  │  │  │  │  |  │  ● │
+      │   ║FACTORY ║|╔════╗  │  │  │  │  │  │  │  │  │  │  │  │  ║          ║ ║               ║ │  │  │  │  │  │  │  | │
+ +9   │   ║        ║|║CITY║D ●  │  │  │  │  │  │  ●  │  │  │  │  ╚══════════╝ ║    PIONEER    ║ ●  │  │  │  │  |  │  ● │
+      │   ║        ║|║SVCS║  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  ║    BUILDING   ║ │  │  │  │  │  │  |  │ │
+ +8   │   ╚════════╝ ╚════╝  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  │  ●  ╚═══════════════╝ ●  │  │  │  |  ╔═══════════╗
       │ │ ╔═ STRIP═╗│╔HOTL╗  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  ║ COLLAPSED ║
  +7   │ ● ╚══MALL══╝│╚════╝  ●  │  │  │  │  │  │  ●  │  │  │  │  ╔══╗  ●  │  │  │  │  │  │  ●  │  │  │  │  ║  (rubble) ║
       │ │  D  D  D  │  D  │  │  │  │  │  │  │  │  │  │  │  │  ║  ║  │  │  │  │  │  │  │  │  │  │  │  │  │  │  ╚═══════════╝
@@ -122,7 +122,7 @@ Street ─ sidewalk ─ Building (3 tall) ─ sidewalk ─ Street
 | Name | X Range | Y Range | Door Location | Notes |
 |------|---------|---------|---------------|-------|
 | Yesler Laundry | -10 to -9 | +12 to +13 | S: (-9, +12) | 3 floors (ground laundromat + apartment + roof), abandoned with rotted clothes |
-| Smith Tower | -13 to -10 | +9 to +11 | N: (-12, +12), W: (-14, +10) | 38 floors, historic landmark |
+| Smith Tower | -3 to 0 | +9 to +11 | N: (-2, +12), W: (0, +10) | 38 floors, historic landmark, 2nd Ave & Yesler |
 | Immigration Services | -16 to -15 | +10 to +11 | E: (-14, +10) | 2 floors (ground + roof), repurposed federal building |
 | City Services | -16 to -15 | +8 to +9 | E: (-14, +9) | 3 floors + roof, sanitation/water/power/operations |
 | Fabrication Factory | -20 to -18 | +8 to +11 | W: (-21, +11), W: (-21, +10) | Infrastructure manufacturing, old transport warehouse |
@@ -161,7 +161,7 @@ Hidden beneath Smith Tower, accessible only through the Digital Vault on z=0. Th
 
 ```
 z=-1 (Datacenter Level)
-      -13      -12       -11
+       -3       -2        -1
       ─────────────────────────
 +11   │                       │
       │        CORE           │
@@ -171,7 +171,7 @@ z=-1 (Datacenter Level)
       ─────────────────────────
 
 z=-2 (Utility Level)
-      -13      -12       -11
+       -3       -2        -1
       ─────────────────────────
  +9   │ TUNNEL UTILITY  MAINT │
       ─────────────────────────

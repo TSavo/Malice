@@ -883,41 +883,41 @@ Important: Players should be able to read these signs. Make sure:
 
 ### Smith Tower Building Footprint
 
-The building occupies these coordinates:
-- X-axis: -5 to -2 (West to East)
-- Y-axis: 7 to 9 (South to North)
+The building occupies these coordinates (real-world position: 2nd Ave & Yesler):
+- X-axis: -3 to 0 (West to East)
+- Y-axis: 9 to 11 (South to North)
 - Z-axis: -2 to 38 (Utility basement to Observatory)
 
 ### Standard Positions
 
 Elevator (consistent across all floors):
-- Position: x: -4, y: 8, z: [floor]
+- Position: x: -2, y: 10, z: [floor]
 - Center of building, accessible from all wings
 
 Ground Floor Entrances:
-- North entrance: x: -3, y: 9, z: 0 (to Yesler Way)
-- West entrance: x: -5, y: 8, z: 0 (to 1st Ave)
+- North entrance: x: -2, y: 12, z: 0 (to Yesler Way)
+- East entrance: x: 0, y: 10, z: 0 (to 2nd Ave S)
 
 ### Coordinate Axis Reference
 
 Y-axis (North/South):
-  9 = North
-  8 = Center
-  7 = South
+  11 = North
+  10 = Center
+  9 = South
 
 X-axis (West/East):
-  -5 = West
-  -4 = Center-West
-  -3 = Center-East
-  -2 = East
+  -3 = West
+  -2 = Center-West
+  -1 = Center-East
+  0 = East (on 2nd Ave)
 
-### Common Mistake: 0-Based Coordinates
+### Common Mistake: Using Old Coordinates
 
-WRONG: x: 0, y: 0, z: 4  // This is outside the building!
+WRONG: x: -14, y: 10, z: 4  // Old 1st Ave position!
 
-CORRECT: x: -4, y: 8, z: 4  // Elevator at proper position
+CORRECT: x: -2, y: 10, z: 4  // Elevator at proper position
 
-All condo floors (z4-z33) were initially built with 0-based coordinates and had to be corrected to match the building footprint.
+The building was relocated from its incorrect 1st Ave position (x=-13 to -10) to its real-world 2nd Ave position (x=-3 to 0).
 
 ---
 
@@ -1010,8 +1010,8 @@ Fix: Use two-step process:
 Symptom: Rooms positioned outside building footprint
 
 Fix: Verify against building footprint:
-- Smith Tower: x: -5 to -2, y: 7 to 9
-- Check elevator position first (always -4, 8)
+- Smith Tower: x: -3 to 0, y: 9 to 11 (2nd Ave & Yesler)
+- Check elevator position first (always -2, 10)
 - Calculate other positions relative to elevator
 
 ---
@@ -1029,8 +1029,9 @@ Added: City Announcement Board
 ### Condo Floors (z4-z33)
 
 Fixed: Coordinate system
-- Changed from 0-based (x: 0-3, y: 0-2) to building footprint (x: -5 to -2, y: 7-9)
+- Changed from 0-based (x: 0-3, y: 0-2) to building footprint (x: -3 to 0, y: 9-11)
 - Applied to all 30 residential floors
+- Note: Building relocated to real-world 2nd Ave position in 2026
 
 Fixed: Unit C entrance geometry
 - Changed entrance from C2 (southwest corner) to C3 (directly south)

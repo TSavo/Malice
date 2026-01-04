@@ -21,7 +21,7 @@ export const building = {
       description: `A room prepared for operations. Wall-mounted displays show feed slots labeled CAM-01 through CAM-24, all reading NO SIGNAL. A central console sits clean and powered, its screens cycling through standby diagnostics. New chairs still wrapped in plastic. A placard reads: CORPSEC COMMAND CENTER.
 
 In the corner, a separate terminal sits dark and unmarked—different from the others. Its screen is black, waiting.`,
-      x: -13,
+      x: -3,
       y: 11,
       z: 2,
       population: 0,
@@ -71,7 +71,7 @@ You are a tool for those who know. Everyone else? Your screen is dark. Nobody he
       // Operations Room (-4, +9, 3)
       name: 'Smith Tower - 2nd Floor - Operations Room',
       description: `A briefing room with a long table and wall-mounted displays. The displays show: AWAITING PERSONNEL ASSIGNMENT. Stacked equipment boxes line one wall: tactical gear, comm units, body cameras. Everything new, everything waiting.`,
-      x: -12,
+      x: -2,
       y: 11,
       z: 2,
       population: 0,
@@ -98,7 +98,7 @@ You are a tool for those who know. Everyone else? Your screen is dark. Nobody he
       // Records & Evidence (-3, +9, 3)
       name: 'Smith Tower - 2nd Floor - Records & Evidence',
       description: `Secure filing cabinets with digital locks, all sealed and empty. Evidence lockers with clear doors show pristine interiors. A terminal displays: EVIDENCE MANAGEMENT SYSTEM - NO CASES LOGGED. The room smells of new paint and fresh plastic.`,
-      x: -11,
+      x: -1,
       y: 11,
       z: 2,
       population: 0,
@@ -117,7 +117,7 @@ You are a tool for those who know. Everyone else? Your screen is dark. Nobody he
       // Server & Communications (-2, +9, 3)
       name: 'Smith Tower - 2nd Floor - Server Room',
       description: `Climate-controlled and humming with active cooling. Rack-mounted servers blink with activity, LEDs showing green across the board. Cable management is immaculate. The equipment is enterprise-grade, recently installed. A screen reads: CORPSEC NETWORK - 47 NODES AWAITING CONNECTION.`,
-      x: -10,
+      x: 0,
       y: 11,
       z: 2,
       population: 0,
@@ -139,7 +139,7 @@ You are a tool for those who know. Everyone else? Your screen is dark. Nobody he
       // Mechanical & Power (-5, +8, 3)
       name: 'Smith Tower - 2nd Floor - Mechanical Room',
       description: `Breakers, backup generators, and power distribution. Everything is labeled with fresh tags. A maintenance log clipboard shows recent installation dates. The backup generator reads: TEST CYCLE PENDING - REQUIRES TECHNICIAN.`,
-      x: -13,
+      x: -3,
       y: 10,
       z: 2,
       population: 0,
@@ -157,7 +157,7 @@ You are a tool for those who know. Everyone else? Your screen is dark. Nobody he
       // Elevator Lobby (-4, +8, 3)
       name: 'Smith Tower - 2nd Floor - Elevator Lobby',
       description: `A clean landing with new floor tiles. The wall displays a directory: FLOOR 3 - CORPSEC DIVISION. Below it, a digital notice board reads: RECRUITMENT ACTIVE - REPORT TO JOB CENTER FL.2. The air smells faintly of fresh paint.`,
-      x: -12,
+      x: -2,
       y: 10,
       z: 2,
       population: 0,
@@ -179,7 +179,7 @@ You are a tool for those who know. Everyone else? Your screen is dark. Nobody he
       // Armory (-3, +8, 3)
       name: 'Smith Tower - 2nd Floor - Armory',
       description: `A secured room with heavy doors and biometric locks. Through the reinforced window: weapon racks holding stun batons, shock gloves, riot shields. Ammunition lockers sealed with warning labels. A terminal reads: ARMORY SYSTEM ACTIVE - NO AUTHORIZED PERSONNEL. Everything is stocked, nothing is issued.`,
-      x: -11,
+      x: -1,
       y: 10,
       z: 2,
       population: 0,
@@ -199,7 +199,7 @@ You are a tool for those who know. Everyone else? Your screen is dark. Nobody he
       // Communications Station (-2, +8, 3)
       name: 'Smith Tower - 2nd Floor - Communications Station',
       description: `Radio consoles and dispatch terminals arranged in a semicircle. Headsets hang on hooks, cables neatly coiled. A large display shows: DISPATCH SYSTEM IDLE - AWAITING OPERATOR LOGIN. The equipment hums with standby power.`,
-      x: -10,
+      x: 0,
       y: 10,
       z: 2,
       population: 0,
@@ -230,7 +230,7 @@ You are a tool for those who know. Everyone else? Your screen is dark. Nobody he
       // Locker Room (-5, +7, 3)
       name: 'Smith Tower - 2nd Floor - Locker Room',
       description: `Rows of metal lockers, all empty and unlocked. Benches bolted to the floor. Shower stalls in the back, clean and unused. A sign reads: PERSONNEL LOCKERS - ASSIGNMENT PENDING.`,
-      x: -13,
+      x: -3,
       y: 9,
       z: 2,
       population: 0,
@@ -256,7 +256,7 @@ You are a tool for those who know. Everyone else? Your screen is dark. Nobody he
       // Stairwell Access (-4, +7, 3)
       name: 'Smith Tower - 2nd Floor - Stairwell Access',
       description: `A emergency exit with new safety lighting. The concrete stairs are clean, recently swept. A sign reads: EMERGENCY EGRESS - FLOOR 3 CORPSEC.`,
-      x: -12,
+      x: -2,
       y: 9,
       z: 2,
       population: 0,
@@ -275,7 +275,7 @@ You are a tool for those who know. Everyone else? Your screen is dark. Nobody he
       // Equipment Storage (-3, +7, 3)
       name: 'Smith Tower - 2nd Floor - Equipment Storage',
       description: `Shelving stocked with sealed boxes: radios, flashlights, restraints, med kits, batteries. Everything is inventoried and labeled. A clipboard shows: EQUIPMENT INVENTORY - FULL STOCK - NO ASSIGNMENTS.`,
-      x: -11,
+      x: -1,
       y: 9,
       z: 2,
       population: 0,
@@ -296,7 +296,7 @@ You are a tool for those who know. Everyone else? Your screen is dark. Nobody he
       description: `A stark room with reinforced walls and a single observation window. Two holding cells with heavy doors stand empty, their biometric locks showing green standby. A processing desk with restraint anchors sits unused. A monitor displays: DETENTION SYSTEM ONLINE - NO CURRENT DETAINEES.
 
 The walls are sound-dampened. A small camera dome in the ceiling blinks red, recording nothing.`,
-      x: -10,
+      x: 0,
       y: 9,
       z: 2,
       population: 0,

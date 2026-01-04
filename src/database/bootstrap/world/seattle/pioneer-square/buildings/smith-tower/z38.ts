@@ -47,7 +47,7 @@ export const building = {
       // Observation Deck Landing (-12, +10, 38)
       name: 'Smith Tower - 38th Floor - Observation Deck Landing',
       description: `A cramped landing tucked just under the glass crown. Brass plaques listing emergency numbers are gouged by pocketknives. The air is cool and smells of stale liquor and metal polish. A chain-link gate blocks the stair down, and the elevator doors here are scarred by pry marks and boot dents.`,
-      x: -12,
+      x: -2,
       y: 10,
       z: 38,
       population: 0,
@@ -69,7 +69,7 @@ export const building = {
       // Observation Deck (-13, +10, 38)
       name: 'Smith Tower - 38th Floor - Observation Deck',
       description: `Tall glass panes arc around a slim walkway, offering a vertigo-inducing view of rooftops and freeways far below. Sun-faded placards point out landmarks that no longer match the skyline. Several cracked panes are backed by plywood screwed in from the inside. A coin-operated telescope is mounted near the western window.`,
-      x: -13,
+      x: -3,
       y: 10,
       z: 38,
       population: 0,
@@ -103,7 +103,7 @@ export const building = {
       // Temperance Bar remnant (-11, +10, 38)
       name: 'Smith Tower - 38th Floor - Shuttered Speakeasy',
       description: `A narrow barroom with a curved counter and a shuttered backbar that still smells faintly of bitters. A fractured mirror clouds the wall behind it. Tap handles are zip-tied in place; an undercounter fridge hums weakly off a jury-rigged battery pack.`,
-      x: -11,
+      x: -1,
       y: 10,
       z: 38,
       population: 0,
@@ -123,7 +123,7 @@ export const building = {
       // Penthouse Landing (-12, +9, 38)
       name: 'Smith Tower - 38th Floor - Penthouse Landing',
       description: `A narrow landing wrapped in scuffed brass trim. A heavy oak door leads west into the penthouse, its handle worn to bright metal. Overhead, a square hatch labeled ROOF ACCESS sits flush with the plaster; a recessed ladder disappears into it. The air is warm and carries the scent of old polish and trapped heat.`,
-      x: -12,
+      x: -2,
       y: 9,
       z: 38,
       population: 0,
@@ -143,7 +143,7 @@ export const building = {
       // Penthouse Suite (-5, +7, 38)
       name: 'Smith Tower - 38th Floor - Penthouse Suite',
       description: `A low-ceilinged suite pressed under the pyramid roof. Dark wood paneling wraps the room; a built-in bar of dull brass and glass sits dry and dusty. A narrow view slit is cut into the terracotta skin, framing a sliver of skyline. Most furniture is draped in canvas sheets. A tight spiral stair winds up toward the dome framing.`,
-      x: -13,
+      x: -3,
       y: 9,
       z: 38,
       population: 0,
@@ -161,7 +161,7 @@ export const building = {
       // Dome Service (-12, +11, 38) – inside the glass dome
       name: 'Smith Tower - 38th Floor - Glass Dome Catwalk',
       description: `A narrow metal catwalk circles the inside of the glass dome, every step ringing against the frame. A string of tired blue LEDs washes the beams in cold light. An access panel hums softly, and through the glass the city glitters in distorted reflections. A spiral stair descends through the floor.`,
-      x: -12,
+      x: -2,
       y: 11,
       z: 38,
       population: 0,
@@ -184,7 +184,7 @@ export const building = {
     '%DOME_MECH': {
       name: 'Smith Tower - 38th Floor - Dome Mechanics',
       description: `A cramped service nook tucked against the dome's western frame. Electrical panels are bolted to the wall, their breakers labeled in faded marker. Conduits snake up into the dome structure. A toolbox sits open, half its contents missing. The hum of the dome lights is louder here.`,
-      x: -13,
+      x: -3,
       y: 11,
       z: 38,
       population: 0,
@@ -201,7 +201,7 @@ export const building = {
     '%DOME_VIEW': {
       name: 'Smith Tower - 38th Floor - Northeast Observation Niche',
       description: `A small alcove pressed against the dome's eastern curve. The glass here is cleaner, offering an unobstructed view toward the bay and the ferries that crawl across its grey surface. A narrow bench is built into the frame. Initials are scratched into the metal railing.`,
-      x: -11,
+      x: -1,
       y: 11,
       z: 38,
       population: 0,
@@ -227,7 +227,7 @@ export const building = {
     '%SERVICE': {
       name: 'Smith Tower - 38th Floor - Service Closet',
       description: `A tight utility closet with cleaning supplies stacked on wire shelves. A mop bucket sits in the corner, dry and dusty. Spare light tubes lean against the wall. The air is stale and smells of old disinfectant. A clipboard hangs on a hook, its maintenance log years out of date.`,
-      x: -11,
+      x: -1,
       y: 9,
       z: 38,
       population: 0,
@@ -249,7 +249,7 @@ export const building = {
     '%EAST_TERRACE': {
       name: 'Smith Tower - 38th Floor - East Terrace',
       description: `A narrow enclosed terrace pressed against the eastern crown. Floor-to-ceiling windows offer views of the waterfront and the grey expanse of Elliott Bay. The glass is old, slightly warped, giving the city a dreamlike quality. Built-in seating runs along the windows.`,
-      x: -10,
+      x: 0,
       y: 11,
       z: 38,
       population: 0,
@@ -274,7 +274,7 @@ export const building = {
     '%EAST_NOOK': {
       name: 'Smith Tower - 38th Floor - East Nook',
       description: `A small windowed alcove tucked into the building's eastern corner. The view stretches from the stadium district to the distant Cascades on clear days. Today, grey clouds blur the horizon. A single chair faces the window.`,
-      x: -10,
+      x: 0,
       y: 10,
       z: 38,
       population: 0,
@@ -300,7 +300,7 @@ export const building = {
     '%EAST_ALCOVE': {
       name: 'Smith Tower - 38th Floor - Southeast Alcove',
       description: `The building's southeastern corner, where two walls of windows meet. The view sweeps from the industrial waterfront to the distant hills. A small table and chairs occupy the space, positioned for the panorama. The glass here is cleaner than elsewhere.`,
-      x: -10,
+      x: 0,
       y: 9,
       z: 38,
       population: 0,
