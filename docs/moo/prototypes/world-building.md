@@ -382,13 +382,29 @@ Full room definition:
   lighting: 100,
   waterLevel: 0,
   outdoor: false,
-  
+
   // Exits object
   exits: {
     north: '%1',
     south: '%2',
     // etc.
   },
+
+  // Sittable positions (optional)
+  sittables: [
+    {
+      name: 'a wooden chair',
+      capacity: 1,
+      emptyMsg: 'A wooden chair sits in the corner.',
+      occupiedMsg: '%s sitting on the chair',
+    },
+    {
+      name: 'a long bench',
+      capacity: 4,
+      emptyMsg: 'A bench lines the wall.',
+      occupiedMsg: '%s on the bench',
+    },
+  ],
   
   // Elevator-specific (if prototype: 'elevator')
   elevator: {
@@ -598,6 +614,77 @@ Security: Biometric locks on floors 35, 42
 - `floorRooms` map connects elevator to each floor's lobby
 - Locked exits prevent unauthorized access
 - Coordinates align with street grid at (-4, 8)
+
+## Sittable Positions
+
+Rooms can define **sittables** - specific locations where agents can sit, stand, or position themselves. This adds spatial detail beyond just being "in the room."
+
+### Defining Sittables
+
+Add to room definition:
+
+```typescript
+'%LOBBY': {
+  name: 'Lobby',
+  description: '...',
+  x: 0, y: 0, z: 1,
+
+  sittables: [
+    {
+      name: 'a leather couch',
+      capacity: 4,
+      emptyMsg: 'A leather couch lines the wall.',
+      occupiedMsg: '%s on the couch',
+    },
+    {
+      name: 'the reception desk',
+      capacity: 1,
+      emptyMsg: 'A reception desk stands empty.',
+      occupiedMsg: '%s at the desk',
+    },
+    {
+      name: 'floor cushions',
+      capacity: 6,
+      emptyMsg: 'Colorful cushions are scattered on the floor.',
+      occupiedMsg: '%s lounging on cushions',
+    },
+  ],
+}
+```
+
+### Sittable Properties
+
+- **name** - Display name for the position (e.g., "a wooden chair")
+- **capacity** - Maximum number of agents (1 for single chair, 4+ for benches/couches)
+- **emptyMsg** - Description shown when no one is there
+- **occupiedMsg** - Template shown when occupied (`%s` replaced with agent names)
+
+### How It Works
+
+When a room is described:
+1. Empty sittables show their `emptyMsg`
+2. Occupied sittables show `occupiedMsg` with agent names
+3. Names are automatically formatted (e.g., "Alice and Bob are on the bench")
+
+**Example output:**
+```
+Trinity - VIP Lounge
+
+The VIP lounge exists in its own reality, two stories below street level...
+
+A curved leather banquette commands the center of the room.
+Alice and Bob are in the VIP seating.
+A corner booth with its own curtain.
+
+Obvious exits: up, east, south, west
+```
+
+### Best Practices
+
+1. **Match room theme** - Sittables should fit the environment (bar stools in bars, office chairs in offices)
+2. **Appropriate capacity** - Single chairs = 1, benches = 3-4, large couches = 6-8
+3. **Descriptive messages** - Use active verbs ("sitting on", "at", "lounging on")
+4. **Vary positions** - Mix different types in larger rooms for spatial variety
 
 ## Tips & Best Practices
 
