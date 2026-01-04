@@ -131,7 +131,7 @@ A door to the south leads to the processing area. A sign reads: AUTHORIZED PERSO
 
 A heavy door on the east wall is marked INCINERATOR - AUTHORIZED PERSONNEL ONLY. The door is steel, heat-resistant, with a biometric scanner mounted beside it. Through a small window, you can see the glow of something hot.
 
-The room smells of industrial cleaner layered over older, more organic odors. Sanitation work leaves traces.`,
+The room smells of industrial cleaner layered over older, more organic odors. Sanitation work leaves traces. A stairwell in the corner leads down to the building's mechanical systems.`,
       x: -16,
       y: 8,
       z: 0,
@@ -147,6 +147,12 @@ The room smells of industrial cleaner layered over older, more organic odors. Sa
           to: 'alley/y8.ts',
           locks: ['%ALLEY_LOCK'],
           description: 'A steel door leads to the alley',
+        },
+        down: {
+          to: 'z-1.ts:%MECHANICAL',
+          description: 'Stairs lead down to the mechanical room',
+          door: 'z-1.ts:%BASEMENT_DOOR',
+          locks: ['z-1.ts:%BASEMENT_LOCK'],
         },
       },
     },
