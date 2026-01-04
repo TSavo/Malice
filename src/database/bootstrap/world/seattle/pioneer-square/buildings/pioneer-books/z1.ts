@@ -142,7 +142,7 @@ A worn couch faces a window that looks out over Yesler Way. A reading lamp stand
 
 The smell of books is different up here—personal, lived-in, mixed with the other smells of a home: coffee, soap, the faint mustiness of old upholstery.`,
       x: -15,
-      y: 13,
+      y: 12,
       z: 1,
       population: 0,
       ambientNoise: 3,
@@ -232,7 +232,7 @@ The bed is unmade, the sheets twisted as if the occupant left in a hurry—or si
 
 A window faces north, its curtains drawn. Behind the curtains, the world continued without whoever lived here. The bedroom waits, patient, for a reader who will not return.`,
       x: -15,
-      y: 14,
+      y: 13,
       z: 1,
       population: 0,
       ambientNoise: 2,
