@@ -8,7 +8,7 @@ export const building = {
   y: -8,
   width: 15,
   height: 14,
-  floors: 1,
+  floors: 2,
 
   rooms: {
     // ═══════════════════════════════════════════════════════════════════════
@@ -286,7 +286,7 @@ Some rooms show signs of long habitation. Others appear untouched for decades.`,
         south: '%TUNNEL_SOUTH',
       },
       objects: [
-        { prototype: 'trunk', name: 'an abandoned chest', description: 'A wooden chest with Chinese brass fittings, locked but rattling when moved. Whatever is inside has been there for a very long time.', boltedDown: true },
+        { prototype: 'chest', name: 'an abandoned chest', description: 'A wooden chest with Chinese brass fittings, locked but rattling when moved. Whatever is inside has been there for a very long time.', boltedDown: true },
         { prototype: 'crate', name: 'stacked crates', description: 'Wooden crates stacked against the wall, their labels faded. Some are stamped with the names of import companies that no longer exist.', boltedDown: true },
       ],
     },
