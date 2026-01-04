@@ -2,6 +2,7 @@
 #
 # Usage:
 #   docker compose -f docker-compose.runner.yml up -d
+#   docker compose -f docker-compose.runner.yml up -d --scale github-runner=3
 #
 # Prerequisites:
 #   1. Create a GitHub Personal Access Token (PAT) with 'repo' scope
@@ -11,7 +12,7 @@
 #      - GITHUB_REPOSITORY=yourorg/Malice
 #
 # The runner will:
-#   - Register itself with GitHub on startup
+#   - Register itself with GitHub on startup (unique name per instance)
 #   - Execute workflow jobs with 'runs-on: self-hosted' or 'runs-on: [self-hosted, malice]'
 #   - Deregister cleanly on shutdown
 #
@@ -23,28 +24,20 @@ services:
     build:
       context: ./docker/github-runner
       dockerfile: Dockerfile
-    container_name: malice-runner
     restart: unless-stopped
     environment:
       # Required: GitHub authentication
       - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - GITHUB_REPOSITORY=${GITHUB_REPOSITORY:-anthropics/Malice}
-      # Optional: Runner configuration
-      - RUNNER_NAME=${RUNNER_NAME:-malice-prod}
+      - GITHUB_REPOSITORY=${GITHUB_REPOSITORY:-TSavo/Malice}
+      # Runner name will be auto-generated with hostname for uniqueness
+      - RUNNER_NAME_PREFIX=${RUNNER_NAME_PREFIX:-malice-runner}
       - RUNNER_LABELS=${RUNNER_LABELS:-self-hosted,Linux,X64,malice,production}
       - RUNNER_WORKDIR=${RUNNER_WORKDIR:-_work}
     volumes:
       # Docker socket for running containerized jobs
       - /var/run/docker.sock:/var/run/docker.sock
-      # Persistent work directory (survives restarts)
-      - runner_work:/home/runner/actions-runner/_work
     networks:
-      malice-network:
-        ipv4_address: 172.20.0.100
-
-volumes:
-  runner_work:
-    driver: local
+      - malice-network
 
 networks:
   malice-network:
