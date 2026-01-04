@@ -126,6 +126,12 @@ Fluorescent lights flicker overhead, retrofitted into fixtures meant for incande
       exits: {
         east: '%ENTRY',
         north: { room: '%STAFF', locks: ['%STAFF_LOCK'] },
+        down: {
+          to: 'z-1.ts:%RECORDS',
+          description: 'A reinforced door leads down to the basement',
+          door: 'z-1.ts:%BASEMENT_DOOR',
+          locks: ['z-1.ts:%BASEMENT_LOCK'],
+        },
       },
     },
 

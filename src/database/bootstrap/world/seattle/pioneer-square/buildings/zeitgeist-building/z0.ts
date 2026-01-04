@@ -216,7 +216,7 @@ A time clock on the wall has punch cards still in their slots. The last punches 
 
 A sealed loading dock door shows where deliveries once arrived. The chain hoist above it is rusted in place, the door itself bolted shut from the inside—someone decided to secure this entrance when security started to matter more than convenience.
 
-The air is cool and dry, climate-controlled even now—someone understood that art needs protecting from Seattle's humidity. Whether anyone knows how to maintain the system is another question.`,
+The air is cool and dry, climate-controlled even now—someone understood that art needs protecting from Seattle's humidity. A trapdoor in the floor leads to the basement storage below.`,
       x: -13,
       y: 1,
       z: 0,
@@ -228,6 +228,12 @@ The air is cool and dry, climate-controlled even now—someone understood that a
       exits: {
         east: '%LOBBY',
         north: { room: '%KITCHEN', door: '%SERVICE_DOOR', locks: ['%SERVICE_LOCK'], distance: 30 },
+        down: {
+          to: 'z-1.ts:%ART_STORAGE',
+          description: 'A trapdoor leads down to basement storage',
+          door: 'z-1.ts:%BASEMENT_DOOR',
+          locks: ['z-1.ts:%BASEMENT_LOCK'],
+        },
       },
     },
   },
