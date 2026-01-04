@@ -5,7 +5,7 @@
 export const building = {
   name: 'Pioneer Pawn & Loan',
   x: 5,
-  y: 12,
+  y: 14,
   width: 2,
   height: 3,
   floors: 2,
