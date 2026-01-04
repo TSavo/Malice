@@ -62,8 +62,7 @@ A ladder bolted to the wall leads up through a hatch in the ceiling to the roof.
       exits: {
         down: '%HALL_Z1',
         up: '%ROOF_NW',
-        west: '%ARCHIVES',
-        east: { room: '%OFFICE', door: '%OFFICE_DOOR', locks: ['%OFFICE_LOCK'] },
+        west: { room: '%OFFICE', door: '%OFFICE_DOOR', locks: ['%OFFICE_LOCK'] },
         south: { room: '%STORAGE', door: '%STORAGE_DOOR', locks: ['%STORAGE_LOCK'] },
       },
     },
@@ -84,7 +83,7 @@ A small safe sits in the corner, its door slightly ajar. Whatever was inside has
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: { room: '%HALL_Z2', door: '%OFFICE_DOOR', locks: ['%OFFICE_LOCK'] },
+        east: { room: '%HALL_Z2', door: '%OFFICE_DOOR', locks: ['%OFFICE_LOCK'] },
       },
       objects: [
         {
@@ -151,24 +150,5 @@ Boxes of preserved goods sit on the shelves—canned truffles, dried mushrooms, 
       ],
     },
 
-    '%ARCHIVES': {
-      name: "Merchant's Cafe - Archives",
-      description: `A small room tucked into the building's northeast corner, filled with the accumulated history of Seattle's oldest restaurant. Framed photographs cover the walls—the restaurant in various decades, famous diners, staff portraits, newspaper clippings celebrating anniversaries and awards.
-
-Boxes of memorabilia fill the shelves: menus from different eras, matchbooks with the restaurant's logo, commemorative plates, napkins with handwritten notes from celebrity guests. The collection spans the entire history of the restaurant, from its founding in 1890 to its final service.
-
-A window looks north toward where the debris wall now stands, blocking the view of downtown that once drew diners to this corner of the city.`,
-      x: -16,
-      y: -2,
-      z: 2,
-      population: 0,
-      ambientNoise: 2,
-      lighting: 30,
-      waterLevel: 0,
-      outdoor: false,
-      exits: {
-        east: '%HALL_Z2',
-      },
-    },
   },
 };
