@@ -191,6 +191,15 @@ src/database/bootstrap/world/seattle/pioneer-square/buildings/
 
 **File naming:** `z<floor>.ts` where `<floor>` is the z-coordinate.
 
+**Basements:** Use negative z-coordinates for basement levels:
+```
+buildings/my-building/
+├── z-2.ts        # Deep basement (z=-2)
+├── z-1.ts        # Basement (z=-1)
+├── z0.ts         # Ground floor (z=0)
+└── z1.ts         # First floor (z=1)
+```
+
 ### Building Metadata (z0.ts)
 
 The first file in a building directory is typically `z0.ts`, which contains **building metadata** in addition to ground-level rooms:
@@ -723,6 +732,178 @@ const exitOut = await $recycler.create($exit, {
 await street.addExit(exitIn);
 await building.addExit(exitOut);
 ```
+
+## Connecting Basements to Underground Tunnels
+
+### Overview
+
+Pioneer Square buildings often have basements (z=-1, z=-2) that connect to the underground tunnel network. The underground passages are in `underground/upper-tunnels/` and `underground/lower-passages/`.
+
+### Connection Pattern
+
+Building basements connect to underground rooms using **file path references**:
+
+```typescript
+// In building basement file (morrison-kline/z-1.ts)
+'%MECHANICAL': {
+  name: 'Mechanical Room',
+  description: '...',
+  x: -14,
+  y: 8,
+  z: -1,
+  exits: {
+    down: {
+      to: 'underground/upper-tunnels/x-14-y8.ts:%SHAFT',
+      description: 'A concealed hatch leads down into the underground',
+    },
+  },
+}
+```
+
+### Exit Syntax
+
+**Format:** `'path/to/file.ts'` or `'path/to/file.ts:%PLACEHOLDER'`
+
+- **Without placeholder**: Links to the first room in the target file
+- **With placeholder**: Links to a specific room in the target file (e.g., `:%SHAFT`, `:%TUNNEL`)
+
+### Example: Morrison & Kline Law Offices
+
+**Building basement** at (-14, 8, -1):
+
+```typescript
+// morrison-kline/z-1.ts
+'%MECHANICAL': {
+  x: -14, y: 8, z: -1,
+  exits: {
+    down: {
+      to: 'underground/upper-tunnels/x-14-y8.ts:%SHAFT',
+      description: 'A concealed hatch leads down into the underground',
+    },
+  },
+}
+```
+
+**Underground tunnel** at (-14, 8, -2):
+
+```typescript
+// underground/upper-tunnels/x-14-y8.ts
+'%SHAFT': {
+  name: 'Access Shaft',
+  description: 'A narrow shaft descending from the building above...',
+  x: -14, y: 8, z: -2,
+  exits: {
+    up: {
+      to: 'buildings/morrison-kline/z-1.ts:%MECHANICAL',
+      description: 'A ladder leads up to the building basement',
+    },
+    east: '%TUNNEL',  // Continue into tunnel network
+  },
+}
+```
+
+### Bi-Directional Connections
+
+**Always create both directions:**
+1. Building basement → Underground (down/east/south)
+2. Underground → Building basement (up/west/north)
+
+The `to:` path works in both directions - building files can reference underground files and vice versa.
+
+### Common Patterns
+
+**Coal cellars** (many buildings had coal delivery access to underground):
+```typescript
+'%COAL_CELLAR': {
+  name: 'Coal Cellar',
+  x: -18, y: 12, z: -1,
+  exits: {
+    east: {
+      to: 'underground/upper-tunnels/x-17-y12.ts',
+      description: 'A passage leads to the underground tunnel network',
+    },
+  },
+}
+```
+
+**Mechanical rooms with hidden access**:
+```typescript
+'%MECHANICAL': {
+  name: 'Mechanical Room',
+  exits: {
+    down: {
+      to: 'underground/upper-tunnels/x-14-y8.ts:%SHAFT',
+      description: 'A concealed hatch behind the water heater',
+    },
+  },
+}
+```
+
+**Storage vaults with smuggling routes**:
+```typescript
+'%HIDDEN_ROOM': {
+  name: 'Hidden Storage',
+  exits: {
+    down: {
+      to: 'underground/upper-tunnels/x-15-y4.ts',
+      description: 'A shaft drops into the underground smuggling network',
+      door: '%HIDDEN_PANEL',
+      locks: ['%HIDDEN_LOCK'],
+    },
+  },
+}
+```
+
+### Adding Basement Access from Ground Floor
+
+Don't forget to add the basement entrance from the ground floor:
+
+```typescript
+// In z0.ts (ground floor)
+'%RECEPTION': {
+  name: 'Reception',
+  x: -14, y: 7, z: 0,
+  exits: {
+    down: {
+      room: '%STAIRS',  // Links to basement in z-1.ts
+      door: '%BASEMENT_DOOR',
+      locks: ['%BASEMENT_LOCK'],
+    },
+  },
+}
+
+'%BASEMENT_DOOR': {
+  prototype: 'door',
+  name: 'Basement Door',
+  locked: true,
+  open: false,
+  locks: ['%BASEMENT_LOCK'],
+},
+
+'%BASEMENT_LOCK': {
+  prototype: 'lock',
+  name: 'Basement Door Lock',
+  difficulty: 4,
+},
+```
+
+### Real-World Examples
+
+**Gargoyle Building** - Coal cellar connects to z=-2 tunnels:
+- `buildings/gargoyle-building/z0.ts` - Basement with coal cellar
+- Connection at (-18, 12, -1) → `underground/upper-tunnels/x-16-y11.ts`
+
+**Morrison & Kline** - Mechanical room with concealed hatch:
+- `buildings/morrison-kline/z-1.ts` - Law office archives
+- Connection at (-14, 8, -1) → `underground/upper-tunnels/x-14-y8.ts:%SHAFT`
+
+**Redux Vintage** - Hidden smuggling room:
+- `buildings/redux-vintage/z-1.ts` - Vintage storage with secret passage
+- Connection at (-16, 4, -1) → `underground/upper-tunnels/x-16-y4.ts`
+
+**Zeitgeist Coffee** - Old foundation breach:
+- `buildings/zeitgeist-coffee/z-1.ts` - Bean storage and roasting
+- Connection at (-10, 11, -1) → `underground/upper-tunnels/x-10-y11.ts`
 
 ## Real-World Example: Smith Tower
 
