@@ -1,6 +1,8 @@
 """
 VibeVoice FastAPI Server - 4-bit Quantized for 8GB VRAM (RTX 3070)
-OpenAI-compatible TTS API using DevParker/VibeVoice7b-low-vram/4bit
+OpenAI-compatible TTS API supporting both:
+  - VibeVoice 7B 4-bit (DevParker/VibeVoice7b-low-vram) - Higher quality
+  - VibeVoice Realtime 0.5B (microsoft/VibeVoice-Realtime-0.5B) - Faster streaming
 """
 
 import os
@@ -23,17 +25,30 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Environment config
-MODEL_PATH = os.getenv("MODEL_PATH", "microsoft/VibeVoice-1.5B")
+MODEL_PATH = os.getenv("MODEL_PATH", "DevParker/VibeVoice7b-low-vram")
+MODEL_SUBFOLDER = os.getenv("MODEL_SUBFOLDER", "4bit")  # Subfolder for 7B 4-bit model
 MODEL_DEVICE = os.getenv("MODEL_DEVICE", "cuda")
-INFERENCE_STEPS = int(os.getenv("INFERENCE_STEPS", "10"))
-VOICES_DIR = Path(os.getenv("VIBEVOICE_VOICES_DIR", "/opt/vibevoice/demo/voices/streaming_model"))
+INFERENCE_STEPS = int(os.getenv("INFERENCE_STEPS", "32"))
+CFG_SCALE = float(os.getenv("CFG_SCALE", "2.0"))
+
+# Voice directories
+# 7B model uses WAV files, streaming model uses .pt precomputed tensors
+VOICES_DIR_7B = Path(os.getenv("VIBEVOICE_VOICES_DIR_7B", "/opt/vibevoice/demo/voices"))
+VOICES_DIR_STREAMING = Path(os.getenv("VIBEVOICE_VOICES_DIR", "/opt/vibevoice/demo/voices/streaming_model"))
 OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", "/app/output"))
 
-# Cached voice prompts
+# Auto-detect model type from path
+IS_7B_MODEL = "7b" in MODEL_PATH.lower() or "1.5b" in MODEL_PATH.lower()
+
+# Cached voice prompts (for streaming model)
 voice_cache = {}
 
+# Select voice directory based on model type
+VOICES_DIR = VOICES_DIR_7B if IS_7B_MODEL else VOICES_DIR_STREAMING
+
 # Ensure directories exist
-VOICES_DIR.mkdir(parents=True, exist_ok=True)
+VOICES_DIR_7B.mkdir(parents=True, exist_ok=True)
+VOICES_DIR_STREAMING.mkdir(parents=True, exist_ok=True)
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 app = FastAPI(
@@ -56,13 +71,14 @@ model = None
 processor = None
 
 # OpenAI voice mapping to VibeVoice voice presets
+# Available 7B WAV files: en-Carter_man, en-Frank_man, en-Maya_woman, en-Alice_woman, en-Mary_woman
 OPENAI_VOICES = {
-    "alloy": "carter",
-    "echo": "wayne",
-    "fable": "emma",
-    "onyx": "frank",
-    "nova": "grace",
-    "shimmer": "mike",
+    "alloy": "Carter",     # Male voice
+    "echo": "Frank",       # Male voice
+    "fable": "Maya",       # Female voice
+    "onyx": "Frank",       # Male voice (same as echo - limited options)
+    "nova": "Alice",       # Female voice
+    "shimmer": "Mary",     # Female voice
 }
 
 
@@ -124,128 +140,242 @@ class VoicesResponse(BaseModel):
 
 
 def load_model():
-    """Load the VibeVoice model"""
-    global model, processor
-    
+    """Load the VibeVoice model - auto-detects 7B vs streaming model"""
+    global model, processor, IS_7B_MODEL
+
     if model is not None:
         return
-    
+
     logger.info(f"Loading VibeVoice model from {MODEL_PATH}...")
+    logger.info(f"Model type: {'7B/1.5B (standard)' if IS_7B_MODEL else 'Realtime 0.5B (streaming)'}")
     start_time = time.time()
-    
+
     try:
-        # Use VibeVoice Streaming modules (Realtime 0.5B)
-        from vibevoice import VibeVoiceStreamingForConditionalGenerationInference, VibeVoiceStreamingProcessor
-        
-        model = VibeVoiceStreamingForConditionalGenerationInference.from_pretrained(
-            MODEL_PATH,
-            device_map=MODEL_DEVICE,
-            torch_dtype=torch.bfloat16,
-            trust_remote_code=True,
-        )
-        processor = VibeVoiceStreamingProcessor.from_pretrained(
-            MODEL_PATH,
-            trust_remote_code=True,
-        )
-        
+        if IS_7B_MODEL:
+            # Use standard VibeVoice modules for 7B/1.5B models
+            from vibevoice.modular.modeling_vibevoice_inference import VibeVoiceForConditionalGenerationInference
+            from vibevoice.processor.vibevoice_processor import VibeVoiceProcessor
+            from transformers import BitsAndBytesConfig
+
+            # Configure 4-bit quantization
+            bnb_config = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_compute_dtype=torch.bfloat16,
+                bnb_4bit_use_double_quant=True,
+                bnb_4bit_quant_type='nf4'
+            )
+
+            # Use subfolder for DevParker repo structure
+            subfolder = MODEL_SUBFOLDER if MODEL_SUBFOLDER else None
+
+            model = VibeVoiceForConditionalGenerationInference.from_pretrained(
+                MODEL_PATH,
+                subfolder=subfolder,
+                quantization_config=bnb_config,
+                device_map=MODEL_DEVICE,
+                torch_dtype=torch.bfloat16,
+                trust_remote_code=True,
+            )
+            # Processor needs special handling - use microsoft/VibeVoice-1.5B processor
+            # since the DevParker 4-bit repo doesn't have full tokenizer files
+            processor = VibeVoiceProcessor.from_pretrained(
+                "microsoft/VibeVoice-1.5B",
+                trust_remote_code=True,
+            )
+        else:
+            # Use VibeVoice Streaming modules (Realtime 0.5B)
+            from vibevoice import VibeVoiceStreamingForConditionalGenerationInference, VibeVoiceStreamingProcessor
+
+            model = VibeVoiceStreamingForConditionalGenerationInference.from_pretrained(
+                MODEL_PATH,
+                device_map=MODEL_DEVICE,
+                torch_dtype=torch.bfloat16,
+                trust_remote_code=True,
+            )
+            processor = VibeVoiceStreamingProcessor.from_pretrained(
+                MODEL_PATH,
+                trust_remote_code=True,
+            )
+
         elapsed = time.time() - start_time
         logger.info(f"Model loaded in {elapsed:.2f}s")
-        
+
         # Log VRAM usage
         if torch.cuda.is_available():
             allocated = torch.cuda.memory_allocated() / 1e9
             reserved = torch.cuda.memory_reserved() / 1e9
             logger.info(f"VRAM: {allocated:.2f}GB allocated, {reserved:.2f}GB reserved")
-            
+
     except Exception as e:
         logger.error(f"Failed to load model: {e}")
         raise
 
 
-def generate_speech(text: str, voice: Optional[str] = None, speed: float = 1.0) -> np.ndarray:
-    """Generate speech from text"""
+def get_voice_wav_path(voice_name: str) -> Optional[Path]:
+    """Find a WAV voice sample file for the 7B model"""
+    # Get the mapped voice name (preserving case for file matching)
+    voice_key = OPENAI_VOICES.get(voice_name.lower(), voice_name)
+
+    # Look for voice file
+    voice_files = list(VOICES_DIR.glob(f"**/*{voice_key}*.wav")) + \
+                  list(VOICES_DIR.glob(f"**/{voice_key}*.wav"))
+
+    if not voice_files:
+        # Try to find any voice file as default
+        voice_files = list(VOICES_DIR.glob("**/*.wav"))
+        if voice_files:
+            logger.warning(f"Voice '{voice_key}' not found, using default: {voice_files[0].name}")
+        else:
+            logger.error(f"No voice samples found in {VOICES_DIR}")
+            return None
+
+    return voice_files[0]
+
+
+def generate_speech_7b(text: str, voice: Optional[str] = None) -> np.ndarray:
+    """Generate speech using 7B/1.5B model (standard VibeVoice)"""
     global model, processor
-    
+
+    # Get voice WAV file
+    voice_name = voice or "alloy"
+    voice_path = get_voice_wav_path(voice_name)
+
+    if voice_path is None:
+        raise HTTPException(status_code=400, detail=f"Voice sample not found for '{voice_name}'")
+
+    logger.info(f"Using voice sample: {voice_path}")
+
+    # VibeVoice 7B processor expects script format: "Speaker 0: text"
+    # Wrap plain text in the expected format
+    script_text = f"Speaker 0: {text}"
+
+    # Prepare inputs using the standard processor
+    # 7B model uses WAV voice samples, not cached prompts
+    inputs = processor(
+        text=[script_text],
+        voice_samples=[[str(voice_path)]],
+        padding=True,
+        return_tensors="pt",
+        return_attention_mask=True,
+    )
+
+    # Move to device
+    device = next(model.parameters()).device
+    for k, v in inputs.items():
+        if torch.is_tensor(v):
+            inputs[k] = v.to(device)
+
+    # Generate with 7B model parameters
+    with torch.no_grad():
+        output = model.generate(
+            **inputs,
+            max_new_tokens=None,
+            cfg_scale=CFG_SCALE,
+            tokenizer=processor.tokenizer,
+            generation_config={'do_sample': False},
+        )
+
+    return extract_audio(output)
+
+
+def generate_speech_streaming(text: str, voice: Optional[str] = None) -> np.ndarray:
+    """Generate speech using Realtime 0.5B model (streaming)"""
+    global model, processor
+
+    # Get voice preset
+    voice_name = voice or "alloy"
+    cached_prompt = get_voice_preset(voice_name)
+
+    if cached_prompt is None:
+        raise HTTPException(status_code=400, detail=f"Voice preset not found for '{voice_name}'")
+
+    # Make a deep copy to avoid modifying the cached version
+    import copy
+    cached_prompt_copy = copy.deepcopy(cached_prompt)
+
+    # Prepare inputs using the streaming processor
+    inputs = processor.process_input_with_cached_prompt(
+        text=text,
+        cached_prompt=cached_prompt_copy,
+        padding=True,
+        return_tensors="pt",
+        return_attention_mask=True,
+    )
+
+    # Move to device
+    device = next(model.parameters()).device
+    for k, v in inputs.items():
+        if torch.is_tensor(v):
+            inputs[k] = v.to(device)
+
+    # Generate with streaming model parameters
+    with torch.no_grad():
+        output = model.generate(
+            **inputs,
+            max_new_tokens=None,
+            cfg_scale=1.3,
+            tokenizer=processor.tokenizer,
+            generation_config={'do_sample': False},
+            all_prefilled_outputs=cached_prompt_copy,
+        )
+
+    return extract_audio(output)
+
+
+def extract_audio(output) -> np.ndarray:
+    """Extract audio tensor from model output"""
+    # Try various output formats
+    if hasattr(output, 'speech_outputs') and output.speech_outputs:
+        audio_tensor = output.speech_outputs[0]
+    elif hasattr(output, 'speech'):
+        audio_tensor = output.speech
+    elif hasattr(output, 'audio'):
+        audio_tensor = output.audio
+    else:
+        raise ValueError("No audio output in model response")
+
+    # Convert bfloat16 to float32 before numpy
+    if audio_tensor.dtype == torch.bfloat16:
+        audio_tensor = audio_tensor.float()
+
+    audio = audio_tensor.cpu().numpy().squeeze()
+
+    # Ensure audio is 1D
+    if audio.ndim > 1:
+        audio = audio.flatten()
+
+    return audio
+
+
+def generate_speech(text: str, voice: Optional[str] = None, speed: float = 1.0) -> np.ndarray:
+    """Generate speech from text - dispatches to correct model type"""
+    global model, processor
+
     if model is None:
         load_model()
-    
+
     logger.info(f"Generating speech for {len(text)} chars, voice={voice}, speed={speed}")
     start_time = time.time()
-    
+
     try:
-        # Get voice preset
-        voice_name = voice or "alloy"
-        cached_prompt = get_voice_preset(voice_name)
-        
-        if cached_prompt is None:
-            raise HTTPException(status_code=400, detail=f"Voice preset not found for '{voice_name}'")
-        
-        # Make a deep copy to avoid modifying the cached version
-        import copy
-        cached_prompt_copy = copy.deepcopy(cached_prompt)
-        
-        # Prepare inputs using the streaming processor
-        inputs = processor.process_input_with_cached_prompt(
-            text=text,
-            cached_prompt=cached_prompt_copy,
-            padding=True,
-            return_tensors="pt",
-            return_attention_mask=True,
-        )
-        
-        # Move to device
-        device = next(model.parameters()).device
-        for k, v in inputs.items():
-            if torch.is_tensor(v):
-                inputs[k] = v.to(device)
-        
-        # Generate
-        with torch.no_grad():
-            output = model.generate(
-                **inputs,
-                max_new_tokens=None,
-                cfg_scale=1.3,
-                tokenizer=processor.tokenizer,
-                generation_config={'do_sample': False},
-                all_prefilled_outputs=cached_prompt_copy,
-            )
-        
-        # Extract audio from output
-        if hasattr(output, 'speech_outputs') and output.speech_outputs:
-            audio_tensor = output.speech_outputs[0]
-            # Convert bfloat16 to float32 before numpy
-            if audio_tensor.dtype == torch.bfloat16:
-                audio_tensor = audio_tensor.float()
-            audio = audio_tensor.cpu().numpy().squeeze()
-        elif hasattr(output, 'speech'):
-            audio_tensor = output.speech
-            if audio_tensor.dtype == torch.bfloat16:
-                audio_tensor = audio_tensor.float()
-            audio = audio_tensor.cpu().numpy().squeeze()
-        elif hasattr(output, 'audio'):
-            audio_tensor = output.audio
-            if audio_tensor.dtype == torch.bfloat16:
-                audio_tensor = audio_tensor.float()
-            audio = audio_tensor.cpu().numpy().squeeze()
+        # Dispatch to correct generation function
+        if IS_7B_MODEL:
+            audio = generate_speech_7b(text, voice)
         else:
-            raise ValueError("No audio output in model response")
-        
-        # Ensure audio is 1D
-        if audio.ndim > 1:
-            audio = audio.flatten()
-        
+            audio = generate_speech_streaming(text, voice)
+
         # Apply speed adjustment if needed
         if speed != 1.0:
             import librosa
             audio = librosa.effects.time_stretch(audio, rate=speed)
-        
+
         elapsed = time.time() - start_time
         duration = len(audio) / 24000  # 24kHz sample rate
         rtf = elapsed / duration if duration > 0 else 0
         logger.info(f"Generated {duration:.2f}s audio in {elapsed:.2f}s (RTF: {rtf:.2f}x)")
-        
+
         return audio
-        
+
     except HTTPException:
         raise
     except Exception as e:
