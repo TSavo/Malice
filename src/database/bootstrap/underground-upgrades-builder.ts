@@ -23,6 +23,7 @@ export class UndergroundUpgradesBuilder implements Builder {
   static depends = [
     'room',
     'recycler',
+    'spatial',
     'door',
     'lock',
     'biometricLock',
@@ -45,7 +46,7 @@ export class UndergroundUpgradesBuilder implements Builder {
     const $ = this.manager as any;
 
     // Check if already built - use a marker room's contents
-    const lowerJunction = await this.manager.load(4017);
+    const lowerJunction = await $.spatial.getRoomDataAt(-14, 5, -4);
     if (lowerJunction && lowerJunction.get('contents')?.length > 0) {
       console.log(
         '  ✅ Underground upgrades already applied (Lower Junction has contents)',
@@ -78,8 +79,8 @@ export class UndergroundUpgradesBuilder implements Builder {
     $: any,
     sisterGray: RuntimeObject,
   ): Promise<void> {
-    // 1. LOWER JUNCTION (#4017) - Entry from historic underground to Cartel territory
-    const lowerJunction = await this.manager.load(4017);
+    // 1. LOWER JUNCTION (x=-14, y=5, z=-4) - Entry from historic underground to Cartel territory
+    const lowerJunction = await $.spatial.getRoomDataAt(-14, 5, -4);
     if (lowerJunction) {
       const lock1 = await $.recycler.create($.biometricLock, {
         name: 'Cartel Palm Scanner',
@@ -118,8 +119,8 @@ OPENING: Gate swings outward. Makes noise when operated.`,
       await gate1.call('moveTo', lowerJunction);
     }
 
-    // 2. SUPPLY HUB (#4018) - Other entry from z=-2 to z=-4
-    const supplyHub = await this.manager.load(4018);
+    // 2. SUPPLY HUB (x=-14, y=-5, z=-4) - Other entry from z=-2 to z=-4
+    const supplyHub = await $.spatial.getRoomDataAt(-14, -5, -4);
     if (supplyHub) {
       const lock2 = await $.recycler.create($.biometricLock, {
         name: 'Logistics Scanner',
@@ -158,8 +159,8 @@ OPENING: Slides aside on rails. Rumbles loudly when moving.`,
       await gate2.call('moveTo', supplyHub);
     }
 
-    // 3. THE DESCENT (#4064) - Entry to Sister Gray's domain (z=-5)
-    const theDescent = await this.manager.load(4064);
+    // 3. THE DESCENT (x=-14, y=-5, z=-5) - Entry to Sister Gray's domain (z=-5)
+    const theDescent = await $.spatial.getRoomDataAt(-14, -5, -5);
     if (theDescent) {
       const lock3 = await $.recycler.create($.biometricLock, {
         name: 'Retinal Scanner',
@@ -198,8 +199,8 @@ OPENING: Retracts silently into the wall. Seals with a pneumatic hiss.`,
       await door3.call('moveTo', theDescent);
     }
 
-    // 4. THE VAULT (#4068) - Secondary security within Sister Gray's domain
-    const theVault = await this.manager.load(4068);
+    // 4. THE VAULT (x=-14, y=-1, z=-5) - Secondary security within Sister Gray's domain
+    const theVault = await $.spatial.getRoomDataAt(-14, -1, -5);
     if (theVault) {
       const lock4 = await $.recycler.create($.lock, {
         name: 'Vault Combination Lock',
@@ -238,8 +239,8 @@ OPENING: Swings outward on massive hinges. Takes effort to move even when unlock
       await door4.call('moveTo', theVault);
     }
 
-    // 5. CLONE LAB (#4071) - Restricted access
-    const cloneLab = await this.manager.load(4071);
+    // 5. CLONE LAB (x=-16, y=1, z=-5) - Restricted access
+    const cloneLab = await $.spatial.getRoomDataAt(-16, 1, -5);
     if (cloneLab) {
       const lock5 = await $.recycler.create($.biometricLock, {
         name: 'Cleanroom Scanner',
@@ -278,8 +279,8 @@ OPENING: Cycles through decontamination sequence. UV lights flash, air hisses. T
       await door5.call('moveTo', cloneLab);
     }
 
-    // 6. HOLDING CELLS (#4067) - Detention security
-    const holdingCells = await this.manager.load(4067);
+    // 6. HOLDING CELLS (x=-10, y=-3, z=-5) - Detention security
+    const holdingCells = await $.spatial.getRoomDataAt(-10, -3, -5);
     if (holdingCells) {
       const lock6 = await $.recycler.create($.lock, {
         name: 'Detention Lock',
@@ -323,8 +324,8 @@ OPENING: Swings inward. Hinges on the inside prevent removal from the corridor.`
    * Add furniture to key underground rooms
    */
   private async addFurniture($: any): Promise<void> {
-    // CUTTER BARRACKS (#4020) - Military-style sleeping quarters
-    const cutterBarracks = await this.manager.load(4020);
+    // CUTTER BARRACKS (x=-14, y=6, z=-4) - Military-style sleeping quarters
+    const cutterBarracks = await $.spatial.getRoomDataAt(-14, 6, -4);
     if (cutterBarracks) {
       const bunk1 = await $.recycler.create($.bed, {
         name: 'Metal Bunk Bed',
@@ -400,8 +401,8 @@ SURFACE: Can place items. Currently holds scattered playing cards and a tin asht
       await messTable.call('moveTo', cutterBarracks);
     }
 
-    // SPARK WORKSHOP (#4021) - Electronics/tech workshop
-    const sparkWorkshop = await this.manager.load(4021);
+    // SPARK WORKSHOP (x=-16, y=1, z=-4) - Electronics/tech workshop
+    const sparkWorkshop = await $.spatial.getRoomDataAt(-16, 1, -4);
     if (sparkWorkshop) {
       const workbench = await $.recycler.create($.table, {
         name: 'Electronics Workbench',
@@ -451,8 +452,8 @@ SEARCHING: Digging through reveals useful components, though most is junk.`,
       await partsCrate.call('moveTo', sparkWorkshop);
     }
 
-    // INTERROGATION (#4024) - Spartan, intimidating
-    const interrogation = await this.manager.load(4024);
+    // INTERROGATION (x=-14, y=-2, z=-4) - Spartan, intimidating
+    const interrogation = await $.spatial.getRoomDataAt(-14, -2, -4);
     if (interrogation) {
       const interrogationTable = await $.recycler.create($.table, {
         name: 'Steel Interrogation Table',
@@ -503,8 +504,8 @@ CONTENTS: Unknown. Could contain recording equipment, files, or other tools.`,
       await equipmentCabinet.call('moveTo', interrogation);
     }
 
-    // WAR ROOM (#4065) - Strategic planning center
-    const warRoom = await this.manager.load(4065);
+    // WAR ROOM (x=-14, y=-3, z=-5) - Strategic planning center
+    const warRoom = await $.spatial.getRoomDataAt(-14, -3, -5);
     if (warRoom) {
       const planningTable = await $.recycler.create($.table, {
         name: 'Planning Table',
@@ -555,8 +556,8 @@ CONTENTS: City maps, building schematics, operation plans, historical records.`,
       await mapCabinet.call('moveTo', warRoom);
     }
 
-    // COUNCIL CHAMBERS (#4069) - Deliberation space
-    const councilChambers = await this.manager.load(4069);
+    // COUNCIL CHAMBERS (x=-16, y=-1, z=-5) - Deliberation space
+    const councilChambers = await $.spatial.getRoomDataAt(-16, -1, -5);
     if (councilChambers) {
       const roundTable = await $.recycler.create($.table, {
         name: 'Round Council Table',
@@ -582,8 +583,8 @@ SEATING: Room for 12 around the circumference.`,
       await roundTable.call('moveTo', councilChambers);
     }
 
-    // SISTER'S QUARTERS (#4070) - Austere
-    const sistersQuarters = await this.manager.load(4070);
+    // SISTER'S QUARTERS (x=-14, y=1, z=-5) - Austere
+    const sistersQuarters = await $.spatial.getRoomDataAt(-14, 1, -5);
     if (sistersQuarters) {
       const cot = await $.recycler.create($.bed, {
         name: 'Narrow Cot',
@@ -617,8 +618,8 @@ CONTENTS: Minimal possessions. What does Sister Gray keep?`,
       await trunk.call('moveTo', sistersQuarters);
     }
 
-    // CLONE LAB (#4071) - Already has door, add equipment
-    const cloneLab2 = await this.manager.load(4071);
+    // CLONE LAB (x=-16, y=1, z=-5) - Already has door, add equipment
+    const cloneLab2 = await $.spatial.getRoomDataAt(-16, 1, -5);
     if (cloneLab2) {
       const examTable = await $.recycler.create($.table, {
         name: 'Examination Table',
@@ -658,8 +659,8 @@ WORK: Sample analysis, genetic research, clone development monitoring.`,
       await workstation.call('moveTo', cloneLab2);
     }
 
-    // ARCHIVE (#4066) - Information storage
-    const archive = await this.manager.load(4066);
+    // ARCHIVE (x=-16, y=-3, z=-5) - Information storage
+    const archive = await $.spatial.getRoomDataAt(-16, -3, -5);
     if (archive) {
       const shelf1 = await $.recycler.create($.cabinet, {
         name: 'Archive Shelving',
@@ -697,8 +698,8 @@ SURFACE: Space for spreading out documents and taking notes.`,
       await readingDesk.call('moveTo', archive);
     }
 
-    // HOLDING CELLS (#4067) - Already has door, add cell furniture
-    const holdingCells2 = await this.manager.load(4067);
+    // HOLDING CELLS (x=-10, y=-3, z=-5) - Already has door, add cell furniture
+    const holdingCells2 = await $.spatial.getRoomDataAt(-10, -3, -5);
     if (holdingCells2) {
       const cellBench = await $.recycler.create($.bench, {
         name: 'Cell Bench',
