@@ -92,39 +92,35 @@ def get_voice_preset(voice_name: str) -> Optional[dict]:
     # Map OpenAI voice names to VibeVoice presets
     voice_key = OPENAI_VOICES.get(voice_name.lower(), voice_name.lower())
 
-    # Check cache with lock
+    # Double-checked locking pattern
     with voice_cache_lock:
         if voice_key in voice_cache:
             return voice_cache[voice_key]
 
-    # Look for voice file
-    voice_files = list(VOICES_DIR.glob(f"**/{voice_key}*.pt")) + \
-                  list(VOICES_DIR.glob(f"**/*{voice_key}*.pt"))
+        # Still missing - load it while holding the lock
+        # (File I/O is slower, but prevents duplicate loads)
+        voice_files = list(VOICES_DIR.glob(f"**/{voice_key}*.pt")) + \
+                      list(VOICES_DIR.glob(f"**/*{voice_key}*.pt"))
 
-    if not voice_files:
-        # Try to find any voice file as default
-        voice_files = list(VOICES_DIR.glob("**/*.pt"))
-        if voice_files:
-            logger.warning(f"Voice '{voice_key}' not found, using default: {voice_files[0].name}")
-        else:
-            logger.error(f"No voice presets found in {VOICES_DIR}")
-            return None
+        if not voice_files:
+            voice_files = list(VOICES_DIR.glob("**/*.pt"))
+            if voice_files:
+                logger.warning(f"Voice '{voice_key}' not found, using default: {voice_files[0].name}")
+            else:
+                logger.error(f"No voice presets found in {VOICES_DIR}")
+                return None
 
-    voice_path = voice_files[0]
-    logger.info(f"Loading voice preset from {voice_path}")
+        voice_path = voice_files[0]
+        logger.info(f"Loading voice preset from {voice_path}")
 
-    try:
-        device = MODEL_DEVICE if MODEL_DEVICE != "cuda" else "cuda"
-        preset = torch.load(voice_path, map_location=device, weights_only=False)
-
-        # Store in cache with lock
-        with voice_cache_lock:
+        try:
+            device = MODEL_DEVICE if MODEL_DEVICE != "cuda" else "cuda"
+            preset = torch.load(voice_path, map_location=device, weights_only=False)
             voice_cache[voice_key] = preset
-
-        return preset
-    except Exception as e:
-        logger.error(f"Failed to load voice preset: {e}")
-        return None
+            return preset
+        except Exception as e:
+            logger.error(f"Failed to load voice preset: {e}")
+            return None
 
 
 class SpeechRequest(BaseModel):
