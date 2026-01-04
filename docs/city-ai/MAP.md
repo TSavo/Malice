@@ -58,9 +58,9 @@ Street ─ sidewalk ─ Building (3 tall) ─ sidewalk ─ Street
       │   ║        ║|║SVCS║  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  ║    BUILDING   ║ │  │  │  │  │  │  |  │ │
  +8   │   ╚════════╝ ╚════╝  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  ╚═══════════════╝ ●  │  │  │  |  ╔═══════════╗
       │ │ ╔═ STRIP═╗│╔HOTL╗  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  ║ COLLAPSED ║
- +7   │ ● ╚══MALL══╝│╚════╝  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  ║  (rubble) ║
-      │ │  D  D  D  │  D  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  ╚═══════════╝
- +6   │ ●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──● │ WASHINGTON
+ +7   │ ● ╚══MALL══╝│╚════╝  ●  │  │  │  │  │  │  ●  │  │  │  │  ╔══╗  ●  │  │  │  │  │  │  ●  │  │  │  │  ║  (rubble) ║
+      │ │  D  D  D  │  D  │  │  │  │  │  │  │  │  │  │  │  │  ║  ║  │  │  │  │  │  │  │  │  │  │  │  │  │  │  ╚═══════════╝
+ +6   │ ●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──D──╚══╝──●──●──●──●──●──●──●──●──●──●──●──●──●──● │ WASHINGTON
       │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
  +5   │ ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ● │
       │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
@@ -127,6 +127,7 @@ Street ─ sidewalk ─ Building (3 tall) ─ sidewalk ─ Street
 | City Services | -16 to -15 | +8 to +9 | E: (-14, +9) | 3 floors + roof, sanitation/water/power/operations |
 | Fabrication Factory | -20 to -18 | +8 to +11 | W: (-21, +11), W: (-21, +10) | Infrastructure manufacturing, old transport warehouse |
 | Pioneer Building | +1 to +4 | +8 to +10 | (+5, +9) | 6 floors, offices |
+| Pioneer Antiques | -4 to -3 | +6 to +7 | S: (-3, +6) | 2 floors + roof, double-wide antique store with grandfather clock frozen at 2:47, estate jewelry gallery |
 | Grand Central | -13 to -10 | +2 to +4 | (-9, +2) | 4 floors, arcade |
 | Corp Construction | 0 to +6 | +1 to +4 | (+6, +1) | Unknown, armed guards, blocks 2nd Ave |
 | Supply Depot | -20 to -19 | -5 to -4 | W: (-21, -5) | Distribution center, sealed packages |
