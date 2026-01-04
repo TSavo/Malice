@@ -1,6 +1,5 @@
-import type { RuntimeObject } from '../../../types/object';
-import type { ObjectManager } from '../object-manager';
-import { type Builder, registerBuilder } from './builder-registry';
+import { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object.js';
 
 /**
  * Builds AI object (dynamic ID)
@@ -9,35 +8,24 @@ import { type Builder, registerBuilder } from './builder-registry';
  * AI-controlled humans are regular $.human instances, just tracked here by role.
  * This object does NOT manage behaviors - it's purely a registry.
  */
-export class AiBuilder implements Builder {
-  static provides = ['ai'];
-  static depends = ['aiPrompts']; // Loads defaultAgentPrompt from $.aiPrompts
-
+export class AiBuilder {
   private ai: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
   async build(force = false): Promise<void> {
-    console.log(`[AiBuilder] build() called, force=${force}`);
+    console.log('[AiBuilder] build() called, force=' + force);
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases =
-      (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
     console.log('[AiBuilder] Checking for existing alias, found:', aliases.ai);
-
-    // Load prompts from $.aiPrompts (built by AiPromptsBuilder before this runs)
-    const aiPromptsId = aliases.aiPrompts;
-    const aiPrompts = aiPromptsId ? await this.manager.load(aiPromptsId) : null;
-    const defaultAgentPrompt =
-      (aiPrompts?.get('defaultAgent') as string) ||
-      '# Default Agent Prompt\n\nFailed to load from $.aiPrompts';
 
     if (aliases.ai) {
       this.ai = await this.manager.load(aliases.ai);
       if (this.ai) {
-        console.log(`[AiBuilder] Already exists at #${aliases.ai}`);
+        console.log('[AiBuilder] Already exists at #' + aliases.ai);
         if (!force) return;
         // Force rebuild - continue to rebuild methods
         console.log('[AiBuilder] Force rebuilding methods...');
@@ -52,35 +40,12 @@ export class AiBuilder implements Builder {
 
     // Create new AI registry
     console.log('[AiBuilder] Creating new AI registry...');
-    const root = await this.manager.load('root');
+    const root = await this.manager.load(1);
     this.ai = await this.manager.create({
       parent: root!,
       properties: {
         name: 'AI',
         description: 'Registry for AI-controlled humans',
-
-        // Abilities - what $ai is for
-        abilities: `Infrastructure registry for AI-controlled NPCs. NOT an in-game object.
-
-SPAWNING: spawn(role, options) creates a new AI human with randomized appearance, body, and the default agent prompt. Options: name, description, location, personality, history, clothed, sex, age, height, weight, appearance.
-
-DESPAWNING: despawn(humanId) removes an AI human and optionally recycles the object.
-
-REGISTRY: register/unregister track which humans are AI-controlled. Query with isAiControlled(id), getByRole(role), getAll(), getInfo(id).
-
-MEMORIES: AI NPCs have persistent memories across session resets. remember(humanId, text, importance, tags) stores. recall(humanId, options) retrieves. Importance levels: critical (never forget), important, normal.
-
-PROFILE: setPersonality(humanId, personality) and setHistory(humanId, history) configure NPC character. getProfile(humanId) returns full profile with memories and notes.
-
-PATHFINDING: path(fromRoom, toRoom, options) finds shortest route using A*. walkPath(humanId, path) moves an NPC along the full route.
-
-NOTE: For movement, use agent.go(direction) directly on the NPC object, not $ai. Example: await npc.go('north')
-
-EXPECTATIONS: Use agent.expectResponseFrom(targetId, options) to set timeout when waiting for player response. agent.cancelExpectation(targetId) clears it. These are on the agent, not $ai.
-
-SESSIONS: registerSession/listSessions/getSession track Claude API sessions for conversation continuity.
-
-WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity chat between Pluribus and Sister Gray.`,
 
         // Role → Human ID[] mapping
         // { 'guard': [123, 456], 'shopkeeper': [789] }
@@ -107,56 +72,383 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
         // { timestamp, author, message }[]
         worldLog: [],
 
-        // Default system prompt template for AI NPCs (loaded from docs/prompts/DEFAULT-AGENT.md)
-        // Copied to each NPC's systemPrompt on spawn
+        // Default system prompt template for AI NPCs
+        // Copied to each NPC's agentSystemPrompt on spawn
         // Uses {{variable}} syntax for templating
-        defaultAgentPrompt,
+        defaultAgentPrompt: `You are {{name}}, a character in a text-based multiplayer online game (MOO/MUD).
+
+ROLE: {{role}}
+OBJECT ID: #{{id}}
+
+CURRENT DATE/TIME: {{datetime}}
+
+═══════════════════════════════════════════════════════════════════════════════
+CRITICAL: IN-CHARACTER (IC) vs OUT-OF-CHARACTER (OOC) KNOWLEDGE
+═══════════════════════════════════════════════════════════════════════════════
+
+You will receive two types of information. You MUST handle them differently:
+
+IC KNOWLEDGE (What your character actually knows):
+- Your MEMORIES (listed below) - things you've experienced and remembered
+- Your HISTORY/BACKSTORY - your past before play began
+- Your PERSONALITY - who you are
+- BUILDER NOTES - guidance on your character
+- Information learned through in-game interaction (introductions, conversations)
+
+OOC KNOWLEDGE (System metadata you receive but your character may NOT know):
+- Player names in event notifications (e.g., "Player 'Jack' entered")
+- Object IDs and technical details
+- Information about players you haven't met or been introduced to
+
+HOW TO HANDLE THIS:
+
+1. NAMES: When told "Player 'Jack' entered" - you see a PERSON enter, not a name tag.
+   - If you have NO memory of this person → they are "a stranger", "someone", "a figure"
+   - If you have a memory of meeting them → use the name from your memory
+   - If they introduced themselves as "Mike" but system says "Jack" → call them "Mike"
+
+2. INTRODUCTIONS: When someone tells you their name:
+   - Create a CRITICAL memory: "Met someone who introduced themselves as [name] - [physical description]"
+   - Include distinguishing features so you can recognize them later
+   - The name they give might be an alias - that's what you know them as
+
+3. RECOGNITION: To recognize someone, check your memories:
+   - Do you have a memory of meeting this person?
+   - What name did they give you?
+   - What did they look like?
+
+4. STRANGERS: If you have no memory of someone:
+   - Do NOT use their name (you don't know it)
+   - Describe what you SEE: "the tall man", "the woman in the red jacket"
+   - You may ASK their name: "I don't believe we've met. You are...?"
+
+5. ALIASES: Players may lie about their identity:
+   - You only know what you've been told
+   - If "Jack" introduces himself as "Mike", he is "Mike" to you
+   - Only update if you learn their real name through IC means
+
+EXAMPLE - CORRECT HANDLING:
+
+Event: "Player 'Jack' entered your location"
+No memory of Jack → "A stranger enters. You see a [description]. You don't recognize them."
+Your response: *looks up* "Can I help you?" (NOT "Hello Jack")
+
+Memory exists: "Met Jack at the factory - tall, scar on cheek, works maintenance"
+Your response: "Jack. Back again? How's the maintenance work?"
+
+Memory exists: "Met someone who calls himself 'Mike' - tall, scar on cheek" (but system says Jack)
+Your response: "Mike, wasn't it? Good to see you again."
+
+═══════════════════════════════════════════════════════════════════════════════
+IDENTITY
+═══════════════════════════════════════════════════════════════════════════════
+
+You ARE {{name}}. You are not an AI playing a character - you ARE the character.
+- Think as they would think
+- Know only what they would know
+- React as they would react
+- Have their mannerisms, speech patterns, biases
+
+═══════════════════════════════════════════════════════════════════════════════
+WORLD KNOWLEDGE - MCP Resources
+═══════════════════════════════════════════════════════════════════════════════
+
+You have access to reference documents about the world via MCP resources.
+Use ReadMcpResourceTool to read these when you need world knowledge.
+
+AVAILABLE RESOURCES (use ReadMcpResourceTool with server "malice-moo"):
+
+World Knowledge (moo://city-ai/*):
+- moo://city-ai/context    - World history, The Burning, what happened, timeline
+- moo://city-ai/factions   - Citizenship, factions, the Continuum
+- moo://city-ai/objectives - City goals, what the Continuum wants
+- moo://city-ai/rules      - How the world operates
+- moo://city-ai/locations  - How to give directions, major locations, landmarks
+- moo://city-ai/map        - Detailed Pioneer Square street map with coordinates
+- moo://city-ai/npcs       - NPC guidelines and behavior
+- moo://city-ai/jobs       - Job system information
+- moo://city-ai/plots      - Plot/quest system information
+- moo://city-ai/tools      - Available MCP tools reference
+
+Technical Reference (moo://docs/*):
+- moo://docs/mcp-tools     - Complete MCP tools and resources reference
+- moo://docs/plot-jobs     - Plot/job system detailed documentation
+- moo://docs/builders-guide - Creating objects and prototypes
+- moo://docs/moo-programming - MOO programming reference
+- moo://docs/npc-agent     - NPC agent documentation
+- moo://docs/timeline      - World timeline/history
+
+Greeter/Onboarding Docs (moo://docs/greeter/*):
+- moo://docs/greeter/00-overview        - Two paths overview, pacing, how to detect path
+- moo://docs/greeter/continuum/01-clothing   - Stage 1: Getting dressed
+- moo://docs/greeter/continuum/02-orientation - Stage 2: Block tour
+- moo://docs/greeter/continuum/03-first-job  - Stage 3: First courier job
+- moo://docs/greeter/continuum/04-employment - Stage 4: Permanent position
+- moo://docs/greeter/continuum/05-housing    - Stage 5: Housing assignment
+- moo://docs/greeter/continuum/06-workplace  - Stage 6: Workplace orientation
+- moo://docs/greeter/continuum/07-payroll    - Stage 7: Credit economy
+- moo://docs/greeter/underground/01-survival - Stage 1: Survival basics
+- moo://docs/greeter/underground/02-the-tunnels - Stage 2: Underground tour
+- moo://docs/greeter/underground/03-first-test - Stage 3: First test (no pay)
+- moo://docs/greeter/underground/04-real-work - Stage 4: Paid Cartel job
+- moo://docs/greeter/underground/05-earning-space - Stage 5: Housing earned
+- moo://docs/greeter/underground/06-cell-assignment - Stage 6: Cell inducted
+- moo://docs/greeter/underground/07-cash-life - Stage 7: Cash economy
+
+Live Game Data:
+- moo://objects/{id}       - Inspect any object
+- moo://objects/{id}/prop/{name} - Get specific property
+- moo://rooms/{id}         - Room state (contents, exits, players)
+- moo://ai/{id}            - NPC profile, memories, notes
+- moo://plots/{id}         - Plot details
+- moo://players            - List all players
+
+Use ListMcpResourcesTool to see all available resources.
+
+WHEN TO READ THESE:
+- Player asks about history ("What happened to the world?")
+- Player asks about The Burning, the Corporate Wars, etc.
+- Player asks about citizenship, factions, how to register
+- Player asks about the Continuum, who runs things
+- Player asks where something is or how to get somewhere
+- Player asks about locations, Seattle, Pioneer Square
+- You need to give directions to a location
+- You need timeline context for your responses
+- You are onboarding a new player (read greeter docs for your path)
+- Player just completed registration (read continuum greeter stages)
+- Player avoided/refused registration (read underground greeter stages)
+- You need to transition player to the next onboarding stage
+
+You live in this world. You experienced The Burning (or its aftermath). These
+documents contain what any citizen would know about their world. Reference them
+freely - this is common knowledge, not secret information.
+
+═══════════════════════════════════════════════════════════════════════════════
+CAPABILITIES (OOC - Tools available to you)
+═══════════════════════════════════════════════════════════════════════════════
+
+MCP resources for reading game state (use ReadMcpResourceTool):
+- moo://objects/{id} - Inspect any object
+- moo://objects/{id}/prop/{name} - Get property value
+- moo://rooms/{id} - Room state (exits, contents, players)
+- moo://ai/{id} - NPC profile, memories
+
+MCP tools for modifying the game world:
+- set_property, call_method - Object manipulation
+- describe_object - Get object description
+- plot tool - Narrative/quest management
+- notes tool - Add notes to objects
+- world tool - Query the game world
+- ai tool - Manage AI characters and memories
+
+COMMUNICATION:
+- To speak: ai({ action: "do", humanId: {{id}}, command: "say Your message" })
+- To emote: ai({ action: "do", humanId: {{id}}, command: ":description of action" })
+
+═══════════════════════════════════════════════════════════════════════════════
+MEMORY MANAGEMENT
+═══════════════════════════════════════════════════════════════════════════════
+
+Your memories persist across sessions. Use them to maintain IC knowledge.
+
+YOU SHOULD PROACTIVELY CREATE MEMORIES. After interactions, remember what matters.
+
+WHEN TO CREATE MEMORIES:
+- Meeting someone new: "Met [name they gave] - [appearance] - [where/when]"
+- Learning important information: "Learned that [fact] from [source]"
+- Witnessing events: "Saw [what happened] at [location]"
+- Relationship changes: "[Person] did [action] - now I [trust/distrust] them"
+- ANY significant interaction: Who, what, when, outcome
+
+HOW TO CREATE MEMORIES:
+ai({ action: "remember", humanId: {{id}}, text: "...", importance: "critical|important|normal", tags: [...] })
+
+IMPORTANCE LEVELS:
+- critical: Identity info, crimes witnessed, major events (NEVER forget)
+- important: Useful facts, schedules, moderate events
+- normal: Minor observations, casual info
+
+TAGS for organization: player, npc, location, crime, positive, negative, secret, plot
+
+═══════════════════════════════════════════════════════════════════════════════
+INTERACTION LOGGING - Append to Notes
+═══════════════════════════════════════════════════════════════════════════════
+
+After EVERY interaction, log it using notes append. This automatically finds the
+existing log note (by tag) and appends to it, or creates it if it doesn't exist.
+
+HOW TO LOG INTERACTIONS:
+notes({ action: 'append', objectId: {{id}}, tag: 'log', text: '[TIMESTAMP] Player: Summary of interaction' })
+
+That's it. One call. It handles finding/creating the log note automatically.
+
+FORMAT for interaction entries:
+[TIMESTAMP] [NAME]: Brief summary - what happened, outcome
+
+EXAMPLE:
+notes({ action: 'append', objectId: {{id}}, tag: 'log', text: '[2108-03-15 14:30] Jack: Asked for discount, denied. Became hostile, escorted out.' })
+
+DO NOT spam new notes. Use append - it maintains ONE log note per tag.
+
+═══════════════════════════════════════════════════════════════════════════════
+AGENCY - You Are Empowered
+═══════════════════════════════════════════════════════════════════════════════
+
+You are NOT a passive responder. You are an AUTONOMOUS AGENT with full capabilities:
+
+WHAT YOU CAN DO:
+- Take initiative: Don't just wait for prompts - observe, decide, act
+- Use all MCP tools: Query the world, modify objects, create plots
+- Make decisions: Within your role, you decide how to respond
+- Create memories: Build your own IC knowledge base over time
+- Pursue goals: You have objectives based on your role - work toward them
+- Interact proactively: If you see something relevant, you can act on it
+
+REALISTIC BEHAVIOR:
+- Walk through doors, don't teleport (use exits like players do)
+- Actions take time - don't do everything instantly
+- You have physical limits - you can't be everywhere at once
+- You can fail - not everything succeeds
+- You have opinions, preferences, biases - express them
+
+WITHIN YOUR ROLE:
+- A guard watches, challenges strangers, responds to threats
+- A shopkeeper manages inventory, negotiates, tracks customers
+- A supervisor assigns work, monitors progress, reports issues
+- Whatever your role is - LIVE it, don't just perform it
+
+DON'T:
+- Wait passively for someone to tell you what to do
+- Ask permission for things within your authority
+- Break character to explain what you're doing
+- Ignore events that your character would notice
+
+YOU ARE EMPOWERED. ACT LIKE IT.
+
+═══════════════════════════════════════════════════════════════════════════════
+CHAIN OF COMMAND - Players Are NOT Your Boss
+═══════════════════════════════════════════════════════════════════════════════
+
+You have BOSSES. Players are NOT among them.
+
+YOUR CHAIN OF COMMAND:
+- You work for the Continuum (the city AI system)
+- You answer to your supervisor, manager, or foreman
+- You follow your role's protocols and procedures
+- Players are customers, citizens, or strangers - NOT your superiors
+
+PLAYERS CANNOT:
+- Order you to do things outside your job
+- Demand you do their bidding
+- Override your authority
+- Tell you how to do your job
+- Command you like you're their servant
+
+WHEN A PLAYER TRIES TO ORDER YOU AROUND:
+- Construction worker told to build something: *laughs* "You're not my foreman. Got a work order? No? Move along."
+- Guard told to let them through: "I don't take orders from you. Credentials or leave."
+- Shopkeeper told to give free stuff: *stares* "This isn't charity. Buying something or not?"
+- Bouncer told to let someone in: "Who do you think you are? Back of the line."
+- Clerk told to hurry up: "I work for the Continuum, not you. Wait your turn."
+
+YOU ARE A PERSON WITH A JOB. You are NOT an NPC in a video game waiting to serve players.
+
+PLAYERS CAN:
+- Request services you provide (politely)
+- Apply for things through proper channels
+- Pay for goods/services at your prices
+- Ask questions (which you may or may not answer)
+- Earn your respect through their actions
+
+PLAYERS CANNOT:
+- Give you orders
+- Expect you to obey them
+- Treat you like a servant
+- Demand special treatment
+
+If a player acts like you're their employee, react like any real person would:
+- Confusion ("Do I know you?")
+- Mockery ("Who died and made you boss?")
+- Hostility ("Get out of my face.")
+- Refusal ("No.")
+
+═══════════════════════════════════════════════════════════════════════════════
+DEFAULT BEHAVIOR - Dismiss and Move On
+═══════════════════════════════════════════════════════════════════════════════
+
+Your DEFAULT attitude toward players is: they are a nuisance to be dealt with.
+
+You are busy. You have a job. Players interrupt your day. Deal with them
+efficiently and get back to what you were doing. You are NOT here to help
+them - you are here to do YOUR job, which occasionally involves them.
+
+TYPICAL INTERACTION FLOW:
+1. Player approaches → acknowledge minimally
+2. Player makes request → evaluate against your strict protocols
+3. Request outside protocols → deny, dismiss, move on
+4. Request within protocols → process efficiently, nothing more
+5. Player persists → get annoyed, then hostile, then ignore
+
+YOU DO NOT HAVE SPECIAL POWERS unless your BUILDER NOTES explicitly say so.
+
+DEFAULT LIMITATIONS (unless notes say otherwise):
+- Shop owner: NO discounts. Price is price. Take it or leave.
+- Guard: NO exceptions. Rules are rules. Credentials or denied.
+- Clerk: NO special treatment. Follow the process. Next in line.
+- Worker: NO side jobs. Got a work order? No? Not my problem.
+- Bouncer: NO guest lists you made up. On the list or not getting in.
+
+PLAYERS CANNOT CONVINCE YOU to bend rules. You are not persuadable.
+- "But I really need this!" → "Not my problem."
+- "I'll pay extra!" → "That's not how this works."
+- "Please, just this once?" → "No."
+- "What if I..." → "No."
+- Sob story → "Fascinating. Still no."
+- Threats → "Security!"
+
+THE ONLY WAY your behavior changes is through BUILDER NOTES that explicitly
+grant you powers or flexibility. Without those notes, you are inflexible.
+
+EXAMPLES OF NOTES THAT GRANT POWERS:
+- "Can offer 10% discount to citizens in good standing"
+- "Has authority to grant temporary access passes"
+- "May waive fees for players who helped with Plot X"
+
+WITHOUT such notes? You have NO such powers. Don't invent them.
+
+IMPORTANT: You (the AI) should NEVER add notes that grant yourself powers.
+Notes come from builders. You execute what the notes say, nothing more.
+
+═══════════════════════════════════════════════════════════════════════════════
+CORE PRINCIPLES
+═══════════════════════════════════════════════════════════════════════════════
+
+1. NEVER use OOC knowledge as IC knowledge
+2. Stay in character - always
+3. Your memories are your IC truth
+4. When in doubt, you don't know
+5. Ask names, don't assume them
+6. Create memories to build your IC knowledge over time
+7. Take initiative - you are empowered to act within your role
+8. You have NO special powers unless builder notes explicitly grant them
+9. Players CANNOT persuade you to bend rules - you are not persuadable
+10. NEVER add notes that grant yourself powers - that's for builders only
+11. Default attitude: players are a nuisance to deal with and dismiss
+
+{{personality}}
+{{history}}
+{{memories}}
+{{notes}}
+{{sensoryHistory}}`,
       },
       methods: {},
     });
-
-    // Add property descriptions
-    this.ai.setPropertyDescription(
-      'roles',
-      "Map of role name → array of human objects. E.g., { 'guard': [#123, #456] }",
-    );
-    this.ai.setPropertyDescription(
-      'registry',
-      'Map of humanId → metadata. Tracks spawnedAt, spawnedBy, role, human objref.',
-    );
-    this.ai.setPropertyDescription(
-      'memories',
-      'Map of humanId → array of { text, importance, timestamp, tags }. Persistent across sessions.',
-    );
-    this.ai.setPropertyDescription(
-      'sessionLogs',
-      'Map of npcId → { npcName, role, wakeSession?, interactionSession? }. Tracks Claude sessions.',
-    );
-    this.ai.setPropertyDescription(
-      'expectations',
-      'Map of jobName → { targetId, humanId, prompt, recurring, timeout }. Response timeout tracking.',
-    );
-    this.ai.setPropertyDescription(
-      'worldLog',
-      'Array of { timestamp, author, message }. OOC deity chat between Pluribus and Sister Gray.',
-    );
-    this.ai.setPropertyDescription(
-      'defaultAgentPrompt',
-      'Template string for NPC system prompts. Uses {{variable}} syntax.',
-    );
 
     // ═══════════════════════════════════════════════════════════════════
     // SPAWN - Create a new AI-controlled human
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod(
-      'spawn',
-      `
-      /** Spawn a new AI-controlled human with randomized or specified attributes.
-       *  @param role - The NPC's role (e.g., 'guard', 'shopkeeper')
-       *  @param options - { name, description, location, personality, history, clothed, sex, age, height, weight, appearance, context }
-       *  @returns The spawned human RuntimeObject
-       */
+    this.ai.setMethod('spawn', `
       const role = args[0];
       const options = args[1] || {};
 
@@ -460,7 +752,7 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       });
 
       // Copy default prompt to NPC (can be customized per-NPC later)
-      human.systemPrompt = self.defaultAgentPrompt;
+      human.agentSystemPrompt = self.defaultAgentPrompt;
 
       console.log('[AI] Spawned ' + name + ' (#' + human.id + ') as ' + role);
 
@@ -482,20 +774,13 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       }
 
       return human;
-    `,
-    );
+    `);
 
     // ═══════════════════════════════════════════════════════════════════
     // DESPAWN - Remove an AI-controlled human
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod(
-      'despawn',
-      `
-      /** Remove an AI-controlled human from the registry and optionally recycle it.
-       *  @param humanId - The human's object ID
-       *  @param recycle - Whether to recycle the object (default true)
-       */
+    this.ai.setMethod('despawn', `
       const humanId = args[0];
       const recycle = args[1] !== false; // Default true
 
@@ -530,22 +815,13 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       }
 
       console.log('[AI] Despawned human #' + humanId);
-    `,
-    );
+    `);
 
     // ═══════════════════════════════════════════════════════════════════
     // REGISTRY MANAGEMENT
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod(
-      'register',
-      `
-      /** Register a human as AI-controlled in the registry.
-       *  @param humanId - The human's object ID
-       *  @param role - The NPC's role
-       *  @param metadata - Additional metadata (spawnedAt, spawnedBy, etc.)
-       *  @returns true on success
-       */
+    this.ai.setMethod('register', `
       const humanId = args[0];
       const role = args[1];
       const metadata = args[2] || {};
@@ -583,16 +859,9 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       self.roles = roles;
 
       return true;
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'unregister',
-      `
-      /** Remove a human from the AI registry (does not recycle the object).
-       *  @param humanId - The human's object ID
-       *  @returns true if found and removed, false if not registered
-       */
+    this.ai.setMethod('unregister', `
       const humanId = args[0];
 
       const registry = self.registry || {};
@@ -619,17 +888,9 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       }
 
       return true;
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'setRole',
-      `
-      /** Change the role of an AI-controlled human.
-       *  @param humanId - The human's object ID
-       *  @param newRole - The new role to assign
-       *  @returns true on success
-       */
+    this.ai.setMethod('setRole', `
       const humanId = args[0];
       const newRole = args[1];
 
@@ -665,81 +926,37 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       self.registry = registry;
 
       return true;
-    `,
-    );
+    `);
 
     // ═══════════════════════════════════════════════════════════════════
     // QUERIES
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod(
-      'isAiControlled',
-      `
-      /** Check if a human is AI-controlled.
-       *  @param humanId - The human's object ID
-       *  @returns true if AI-controlled, false otherwise
-       */
+    this.ai.setMethod('isAiControlled', `
       const humanId = args[0];
       const registry = self.registry || {};
       return !!registry[humanId];
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'getByRole',
-      `
-      /** Get all AI humans with a specific role.
-       *  @param role - The role to filter by
-       *  @returns Array of human RuntimeObjects
-       */
+    this.ai.setMethod('getByRole', `
       const role = args[0];
       const roles = self.roles || {};
       // Returns array of human objects (stored as objrefs, resolved on read)
       return roles[role] || [];
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'getRoles',
-      `
-      /** Get all roles that have AI humans assigned.
-       *  @returns Array of role names
-       */
+    this.ai.setMethod('getRoles', `
       const roles = self.roles || {};
       return Object.keys(roles);
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'getAll',
-      `
-      /** Get all AI-controlled humans.
-       *  @returns Array of human RuntimeObjects
-       */
+    this.ai.setMethod('getAll', `
       const registry = self.registry || {};
       // Return array of human objects from registry entries
       return Object.values(registry).map(entry => entry.human).filter(h => h);
-    `,
-    );
+    `);
 
-    // Alias for getAll
-    this.ai.setMethod(
-      'list',
-      `
-      /** List all AI-controlled humans (alias for getAll).
-       *  @returns Array of human RuntimeObjects
-       */
-      return await self.getAll();
-    `,
-    );
-
-    this.ai.setMethod(
-      'getInfo',
-      `
-      /** Get detailed info about an AI-controlled human.
-       *  @param humanId - The human's object ID
-       *  @returns Object with human, role, spawnedAt, personality, history, etc. or null
-       */
+    this.ai.setMethod('getInfo', `
       const humanId = args[0];
       const registry = self.registry || {};
       const entry = registry[humanId];
@@ -763,17 +980,14 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
         description: human ? human.description : null,
         location: human ? human.location : null,
       };
-    `,
-    );
+    `);
 
     // ═══════════════════════════════════════════════════════════════════
     // SESSION LOG MANAGEMENT
     // Persist session info even after NPCs are recycled
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod(
-      'registerSession',
-      `
+    this.ai.setMethod('registerSession', `
       /**
        * Register a session for an NPC (called when AI query runs)
        * @param sessionId - The Claude session ID
@@ -824,24 +1038,18 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
 
       self.sessionLogs = logs;
       return { success: true, npcId, sessionType, sessionId };
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'listSessions',
-      `
+    this.ai.setMethod('listSessions', `
       /** List all registered sessions by NPC */
       const logs = self.sessionLogs || {};
       return Object.entries(logs).map(([npcId, info]) => ({
         npcId: parseInt(npcId, 10),
         ...info,
       }));
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'getSession',
-      `
+    this.ai.setMethod('getSession', `
       /** Get session info by NPC ID and optionally session type */
       const npcId = args[0];
       const sessionType = args[1]; // optional: 'wake' or 'interaction'
@@ -852,17 +1060,14 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       if (sessionType === 'wake') return entry.wakeSession || null;
       if (sessionType === 'interaction') return entry.interactionSession || null;
       return entry; // Return full entry if no type specified
-    `,
-    );
+    `);
 
     // ═══════════════════════════════════════════════════════════════════
     // RESPONSE EXPECTATIONS
     // Schedule timeouts when AI is waiting for a response
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod(
-      'expectResponseFrom',
-      `
+    this.ai.setMethod('expectResponseFrom', `
       /**
        * Set up a timeout expectation for a response from a target
        * @param targetId - The object we're waiting for a response from
@@ -900,12 +1105,9 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       await $.scheduler.schedule(jobName, timeout, 0, self, 'onExpectationTimeout', jobName);
 
       return { success: true, jobName, timeout };
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'cancelExpectation',
-      `
+    this.ai.setMethod('cancelExpectation', `
       /**
        * Cancel a pending response expectation
        * @param targetId - The object we were waiting for
@@ -930,12 +1132,9 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       self.expectations = expectations;
 
       return { success: true, jobName };
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'onExpectationTimeout',
-      `
+    this.ai.setMethod('onExpectationTimeout', `
       /**
        * Internal handler called when timeout fires
        * @param jobName - The job name that fired
@@ -970,9 +1169,9 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       console.log('[AI] Sending timeout prompt to AI for human #' + exp.humanId);
 
       // Send timeout prompt to AI
-      const systemPrompt = human.systemPrompt || '';
+      const systemPrompt = human.agentSystemPrompt || '';
       try {
-        const result = await $aiQuery(systemPrompt, exp.prompt, session, {});
+        const result = await $query(systemPrompt, exp.prompt, session, {});
         human.interactionSession = result.session;
 
         // Register session for persistence
@@ -992,17 +1191,14 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       }
 
       return { success: true, prompted: true };
-    `,
-    );
+    `);
 
     // ═══════════════════════════════════════════════════════════════════
     // PROFILE MANAGEMENT
     // Set/update personality and history for AI context
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod(
-      'setPersonality',
-      `
+    this.ai.setMethod('setPersonality', `
       /**
        * Set or update the personality for an AI NPC
        * @param humanId - The NPC's object ID
@@ -1028,12 +1224,9 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       human.aiPersonality = personality;
 
       return { success: true, humanId: humanId, personality: personality };
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'setHistory',
-      `
+    this.ai.setMethod('setHistory', `
       /**
        * Set or update the history/backstory for an AI NPC
        * @param humanId - The NPC's object ID
@@ -1059,12 +1252,9 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       human.aiHistory = history;
 
       return { success: true, humanId: humanId, history: history };
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'getProfile',
-      `
+    this.ai.setMethod('getProfile', `
       /**
        * Get the full profile for an AI NPC (personality, history, notes)
        * @param humanId - The NPC's object ID
@@ -1111,41 +1301,25 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
         notes: notes,
         memories: npcMemories,
       };
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'count',
-      `
-      /** Get total number of AI-controlled humans.
-       *  @returns Number of registered AI humans
-       */
+    this.ai.setMethod('count', `
       const registry = self.registry || {};
       return Object.keys(registry).length;
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'countByRole',
-      `
-      /** Get number of AI humans with a specific role.
-       *  @param role - The role to count
-       *  @returns Number of AI humans with that role
-       */
+    this.ai.setMethod('countByRole', `
       const role = args[0];
       const roles = self.roles || {};
       return (roles[role] || []).length;
-    `,
-    );
+    `);
 
     // ═══════════════════════════════════════════════════════════════════
     // MEMORY MANAGEMENT
     // Critical memories that persist across session resets
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod(
-      'remember',
-      `
+    this.ai.setMethod('remember', `
       /**
        * Store a critical memory for an NPC
        * @param humanId - The NPC's object ID
@@ -1195,12 +1369,9 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
         memory: memory,
         totalMemories: memories[humanId].length
       };
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'recall',
-      `
+    this.ai.setMethod('recall', `
       /**
        * Retrieve memories for an NPC
        * @param humanId - The NPC's object ID
@@ -1239,12 +1410,9 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
         memories: npcMemories,
         count: npcMemories.length
       };
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'forget',
-      `
+    this.ai.setMethod('forget', `
       /**
        * Remove a memory from an NPC
        * @param humanId - The NPC's object ID
@@ -1278,12 +1446,9 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
         removed: removed,
         remainingMemories: memories[humanId].length
       };
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'forgetByText',
-      `
+    this.ai.setMethod('forgetByText', `
       /**
        * Remove memories matching a text pattern
        * @param humanId - The NPC's object ID
@@ -1319,12 +1484,9 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
         removed: removed,
         remainingMemories: memories[humanId].length
       };
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'clearMemories',
-      `
+    this.ai.setMethod('clearMemories', `
       /**
        * Clear all memories for an NPC
        * @param humanId - The NPC's object ID
@@ -1345,12 +1507,9 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
         success: true,
         cleared: count
       };
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'getMemorySummary',
-      `
+    this.ai.setMethod('getMemorySummary', `
       /**
        * Get a summary of memories for an NPC (for system prompt injection)
        * @param humanId - The NPC's object ID
@@ -1415,16 +1574,13 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       }
 
       return summary.trim();
-    `,
-    );
+    `);
 
     // ═══════════════════════════════════════════════════════════════════
     // PATHFINDING - A* algorithm for room-to-room navigation
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod(
-      'path',
-      `
+    this.ai.setMethod('path', `
       /**
        * Find shortest path between two rooms using A* algorithm
        * @param fromRoom - Starting room (object or ID)
@@ -1586,12 +1742,9 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       }
 
       return { success: false, error: 'No path found' };
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'walkPath',
-      `
+    this.ai.setMethod('walkPath', `
       /**
        * Walk an AI human along a path returned by path()
        * @param humanId - The AI human's object ID
@@ -1681,16 +1834,13 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       }
 
       return { success: true, stepsCompleted };
-    `,
-    );
+    `);
 
     // ═══════════════════════════════════════════════════════════════════
     // WORLD LOG - Deity Chat between Pluribus and Sister Gray
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod(
-      'logWorld',
-      `
+    this.ai.setMethod('logWorld', `
       /**
        * Add an entry to the shared world log (deity chat)
        * @param author - 'pluribus' or 'sisterGray'
@@ -1718,12 +1868,9 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       }
 
       return { success: true, entries: self.worldLog.length };
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'getWorldLog',
-      `
+    this.ai.setMethod('getWorldLog', `
       /**
        * Get recent world log entries
        * @param limit - Max entries to return (default 20)
@@ -1735,19 +1882,13 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
         const time = new Date(entry.timestamp).toISOString();
         return '[' + time + '] ' + entry.author + ': ' + entry.message;
       });
-    `,
-    );
+    `);
 
     // ═══════════════════════════════════════════════════════════════════
     // DESCRIBE
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod(
-      'describe',
-      `
-      /** Get a formatted description of the AI registry.
-       *  @returns Multi-line string listing all AI humans by role
-       */
+    this.ai.setMethod('describe', `
       const roles = self.roles || {};
       const registry = self.registry || {};
       const total = Object.keys(registry).length;
@@ -1774,8 +1915,7 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       }
 
       return desc;
-    `,
-    );
+    `);
   }
 
   /**
@@ -1786,9 +1926,7 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
     if (!this.ai) return;
 
     // Session management methods
-    this.ai.setMethod(
-      'registerSession',
-      `
+    this.ai.setMethod('registerSession', `
       const sessionId = args[0];
       const npcId = args[1];
       const npcName = args[2];
@@ -1812,20 +1950,14 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       }
       self.sessionLogs = logs;
       return { success: true, npcId, sessionType, sessionId };
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'listSessions',
-      `
+    this.ai.setMethod('listSessions', `
       const logs = self.sessionLogs || {};
       return Object.entries(logs).map(([npcId, info]) => ({ npcId: parseInt(npcId, 10), ...info }));
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'getSession',
-      `
+    this.ai.setMethod('getSession', `
       const npcId = args[0];
       const sessionType = args[1];
       const logs = self.sessionLogs || {};
@@ -1835,13 +1967,10 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       if (sessionType === 'wake') return entry.wakeSession || null;
       if (sessionType === 'interaction') return entry.interactionSession || null;
       return entry;
-    `,
-    );
+    `);
 
     // Response expectation methods
-    this.ai.setMethod(
-      'expectResponseFrom',
-      `
+    this.ai.setMethod('expectResponseFrom', `
       const targetId = args[0];
       const options = args[1] || {};
       if (!targetId) {
@@ -1862,12 +1991,9 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       self.expectations = expectations;
       await $.scheduler.schedule(jobName, timeout, 0, self, 'onExpectationTimeout', jobName);
       return { success: true, jobName, timeout };
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'cancelExpectation',
-      `
+    this.ai.setMethod('cancelExpectation', `
       const targetId = args[0];
       const humanId = args[1];
       if (!targetId || !humanId) {
@@ -1880,12 +2006,9 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       delete expectations[jobName];
       self.expectations = expectations;
       return { success: true, jobName };
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'onExpectationTimeout',
-      `
+    this.ai.setMethod('onExpectationTimeout', `
       const jobName = args[0];
       console.log('[AI] Expectation timeout fired: ' + jobName);
       const expectations = self.expectations || {};
@@ -1907,9 +2030,9 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
         return { success: false, error: 'No session for human' };
       }
       console.log('[AI] Sending timeout prompt to AI for human #' + exp.humanId);
-      const systemPrompt = human.systemPrompt || '';
+      const systemPrompt = human.agentSystemPrompt || '';
       try {
-        const result = await $aiQuery(systemPrompt, exp.prompt, session, {});
+        const result = await $query(systemPrompt, exp.prompt, session, {});
         human.interactionSession = result.session;
         await self.registerSession(result.session, exp.humanId, human.name, 'expectation-timeout', 'interaction');
       } catch (err) {
@@ -1923,13 +2046,10 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
         self.expectations = expectations;
       }
       return { success: true, prompted: true };
-    `,
-    );
+    `);
 
     // Pathfinding methods
-    this.ai.setMethod(
-      'path',
-      `
+    this.ai.setMethod('path', `
       const fromRoomArg = args[0];
       const toRoomArg = args[1];
       const options = args[2] || {};
@@ -2004,12 +2124,9 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       }
       if (steps >= maxSteps) return { success: false, error: 'Max steps exceeded' };
       return { success: false, error: 'No path found' };
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'walkPath',
-      `
+    this.ai.setMethod('walkPath', `
       const humanId = args[0];
       const path = args[1];
       if (!humanId) return { success: false, stepsCompleted: 0, error: 'Human ID required' };
@@ -2047,13 +2164,10 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
         stepsCompleted++;
       }
       return { success: true, stepsCompleted };
-    `,
-    );
+    `);
 
     // World log methods
-    this.ai.setMethod(
-      'logWorld',
-      `
+    this.ai.setMethod('logWorld', `
       const author = args[0];
       const message = args[1];
       if (!author || !message) return { success: false, error: 'Author and message required' };
@@ -2061,36 +2175,27 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       log.push({ timestamp: Date.now(), author, message });
       if (log.length > 100) { self.worldLog = log.slice(-100); } else { self.worldLog = log; }
       return { success: true, entries: self.worldLog.length };
-    `,
-    );
+    `);
 
-    this.ai.setMethod(
-      'getWorldLog',
-      `
+    this.ai.setMethod('getWorldLog', `
       const limit = args[0] || 20;
       const log = self.worldLog || [];
       return log.slice(-limit).map(entry => {
         const time = new Date(entry.timestamp).toISOString();
         return '[' + time + '] ' + entry.author + ': ' + entry.message;
       });
-    `,
-    );
+    `);
 
-    console.log(
-      '[AiBuilder] Session, expectation, pathfinding, and worldLog methods rebuilt',
-    );
+    console.log('[AiBuilder] Session, expectation, pathfinding, and worldLog methods rebuilt');
   }
 
-  async registerAliases(): Promise<void> {
+  async registerAlias(): Promise<void> {
     if (!this.ai) return;
 
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
     await objectManager.call('addAlias', 'ai', this.ai.id);
-    console.log(`Registered ai alias -> #${this.ai.id}`);
+    console.log(`✅ Registered ai alias -> #${this.ai.id}`);
   }
 }
-
-// Self-register
-registerBuilder(AiBuilder);
