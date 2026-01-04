@@ -153,7 +153,7 @@ Case files are stacked on every surface, the paper trail of legal work in progre
 
 A window looks out over Yesler Way, the view unchanged from a century of attorneys gazing out while clients waited for counsel.`,
       x: -18,
-      y: 13,
+      y: 11,
       z: 2,
       population: 0,
       ambientNoise: 1,
@@ -252,7 +252,7 @@ An adding machine sits on the desk, the mechanical kind with a hand crank, its t
 
 Filing cabinets line the wall, their drawers labeled by year and policy type. The records of insured vessels, from the company's founding through its final policy.`,
       x: -19,
-      y: 13,
+      y: 11,
       z: 2,
       population: 0,
       ambientNoise: 1,

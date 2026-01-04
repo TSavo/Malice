@@ -159,7 +159,7 @@ A window looks out over Yesler Way, the view framed by heavy drapes that are mor
 
 A safe sits in the corner, a squat iron box with a combination dial. The safe is locked, its contents unknown.`,
       x: -18,
-      y: 13,
+      y: 11,
       z: 1,
       population: 0,
       ambientNoise: 1,
@@ -246,7 +246,7 @@ A poster on the wall shows the anatomy of a tooth, cross-sectioned and labeled i
 
 The x-ray machine is mounted on its swing arm, its cone pointed at the empty chair. The last x-ray was taken years ago.`,
       x: -19,
-      y: 13,
+      y: 11,
       z: 1,
       population: 0,
       ambientNoise: 1,

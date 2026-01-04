@@ -155,7 +155,7 @@ Scale models of buildings line the shelves, some completed, some in progress. A 
 
 A supply cabinet stands open, its contents organized with the precision of craftspeople who took their work seriously. The precision continues. The work does not.`,
       x: -18,
-      y: 13,
+      y: 11,
       z: 3,
       population: 0,
       ambientNoise: 1,
@@ -248,7 +248,7 @@ Buckets and mops lean in one corner. A floor polisher, industrial-sized, sits un
 
 A window offers a view north, toward downtown and the debris wall that marks the edge of the habitable zone.`,
       x: -19,
-      y: 13,
+      y: 11,
       z: 3,
       population: 0,
       ambientNoise: 1,

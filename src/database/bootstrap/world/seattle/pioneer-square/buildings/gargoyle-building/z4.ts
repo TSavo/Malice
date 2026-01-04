@@ -68,7 +68,7 @@ The skylight that illuminates the stairwell below is here, a square of grimy gla
 
 A stone gargoyle perches on the parapet at this corner—something between a dog and a demon, its face worn smooth by a century of Seattle rain. The expression beneath remains hungry.`,
       x: -18,
-      y: 13,
+      y: 11,
       z: 4,
       population: 0,
       ambientNoise: 25,
@@ -108,8 +108,8 @@ A stone gargoyle perches on the parapet at this corner—something between a dog
 The roofing here is in worse shape than the rest, tar paper peeling up at the edges, exposing the wooden decking beneath. Rain pools in the low spots. The wood is soft with rot in places. Someone should repair it. No one will.
 
 An eagle-like gargoyle watches from this corner—wings folded, beak open in a silent scream. The stone is weathered, but the expression of rage or hunger or warning persists.`,
-      x: -18,
-      y: 13,
+      x: -19,
+      y: 11,
       z: 4,
       population: 0,
       ambientNoise: 30,
@@ -158,7 +158,7 @@ An eagle-like gargoyle watches from this corner—wings folded, beak open in a s
 The parapet here is crumbling, mortar failing between the stones, a few blocks already fallen to the street far below. The instability creates both danger and opportunity—an escape route if you're desperate enough to use it.
 
 The strangest of the four gargoyles watches from this corner—a face without a body, emerging from the stone as if trying to escape. The features are almost human, but wrong in ways that create unease.`,
-      x: -18,
+      x: -19,
       y: 12,
       z: 4,
       population: 0,
