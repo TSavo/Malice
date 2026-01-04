@@ -77,6 +77,7 @@ The center of Pioneer Square is **S. Main Street at 2nd Avenue**.
 | **Doc Maynard's Public House** | 1st Ave & Washington | "Historic bar named for Seattle's founder. Underground Tour used to launch from the basement." |
 | **J&M Cafe** | 1st Ave & Washington | "Historic bar and cardroom. Been open since 1889. Oldest bar in Pioneer Square." |
 | **Interurban Building** | 2nd Ave & Yesler | "Old office building, four floors. Named for the railway that used to run to Tacoma." |
+| **Jade Palace Jewelers** | S. Jackson St, east side | "Chinese jewelry store in the International District. S. Jackson between 2nd and 3rd Ave, on the north side. Security gate still down. Jade and gold inside, basement karaoke bar, apartments upstairs. Been closed since the Burning." |
 | **Merchant's Cafe** | 1st Ave & Main | "Seattle's oldest restaurant. 1st Ave at Main, on the west side. Been there since 1890." |
 | **Pioneer Books** | Yesler & 2nd Ave | "Independent bookstore. Head to Yesler and 2nd Ave, northeast corner." |
 | **Pioneer Pawn & Loan** | Yesler Way, between 2nd & 3rd Ave | "Pawn shop on Yesler. Look for the three golden balls above the door—tarnished green now. Security bars on every window. Owner lived upstairs, hasn't been back in fifty-five years. Everything's still tagged and priced inside." |
