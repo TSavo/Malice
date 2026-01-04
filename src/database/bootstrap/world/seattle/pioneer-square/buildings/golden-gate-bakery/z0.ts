@@ -116,6 +116,7 @@ The air should smell of baked goods: yeast and sugar and the red bean paste that
           name: 'order board',
           aliases: ['tickets', 'orders', 'pegboard'],
           description: `A pegboard behind the counter holds order tickets on metal clips—the last day's special orders, never fulfilled. Names written in careful handwriting: "Mrs. Chen - 2 doz egg tarts," "Wong family - wedding cake pickup 8/16." The wedding cake was never picked up. The wedding probably never happened.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -163,12 +164,14 @@ A set of narrow stairs leads up to what was probably storage, accessed from insi
           name: 'commercial ovens',
           aliases: ['ovens', 'stove'],
           description: `Three commercial deck ovens, the workhorses of Chinese bakery production. Their doors hang open, their stone baking surfaces cracked and rusted. The temperature dials are frozen at 350 degrees—the last setting, fifty-five years ago. No one turned them off. The power did that.`,
+          boltedDown: true,
         },
         {
           prototype: 'furniture',
           name: 'mixer',
           aliases: ['dough mixer', 'stand mixer'],
           description: `A massive floor-standing mixer, the kind that could handle fifty pounds of dough at once. The bowl is empty, the paddle crusted with the residue of the last batch—flour and water that dried to cement half a century ago. The machine is silent. The motor might still work. No one has tried.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',

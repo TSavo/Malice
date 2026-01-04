@@ -196,6 +196,7 @@ A credenza against the wall holds a coffee service—carafe, cups, sugar and cre
           name: 'credenza',
           aliases: ['sideboard'],
           description: `A mahogany credenza against the wall, its surface holding the coffee service for client meetings. The wood matches the conference table—purchased as a set, meant to project prosperity and permanence. Cabinet doors below conceal legal files, extra legal pads, and the decanters of whiskey that lubricated difficult negotiations.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -267,6 +268,7 @@ The room smells of old paper and leather bindings, the distinct scent of accumul
           name: 'card catalog',
           aliases: ['catalog', 'index'],
           description: `A wooden card catalog stands against one wall, its small drawers labeled alphabetically—an anachronism even before everything ended. The cards inside cross-reference cases and topics, handwritten in fountain pen by librarians who retired decades ago. Someone maintained the system out of tradition rather than necessity. The tradition outlived its practitioners.`,
+          boltedDown: true,
         },
       ],
     },
