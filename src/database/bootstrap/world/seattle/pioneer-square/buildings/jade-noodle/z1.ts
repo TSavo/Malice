@@ -189,6 +189,7 @@ A small table with two chairs sits by the window—meals eaten here were intimat
           name: 'home stove',
           aliases: ['stove', 'burners'],
           description: `A two-burner stove, modest compared to the commercial equipment downstairs. This was for home cooking—comfort dishes, grandmother's recipes, the food that wasn't on any menu. A small wok sits on one burner, seasoned differently than the restaurant woks, used for different purposes.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -207,6 +208,7 @@ A small table with two chairs sits by the window—meals eaten here were intimat
           name: 'kitchen table',
           aliases: ['table'],
           description: `A small table with two chairs by the window, sized for intimate meals. Conversations were held here in Cantonese or Mandarin, the language of home rather than the mixed English used with customers. The table is set for a meal that was never eaten.`,
+          boltedDown: true,
         },
       ],
     },
@@ -252,6 +254,7 @@ A window looks out over the International District, the view of storefronts that
           name: 'bedside table',
           aliases: ['nightstand', 'table'],
           description: `A bedside table holding the small objects of daily life: reading glasses with one lens cracked, a worn paperback novel in Chinese marked with a receipt, a jar of Tiger Balm for hands cramped from years of pulling noodles. The items wait for their owner. The owner is not coming back.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',

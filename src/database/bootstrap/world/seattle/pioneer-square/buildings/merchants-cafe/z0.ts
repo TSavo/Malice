@@ -87,6 +87,7 @@ Bar stools with torn leather seats line the mahogany counter, their chrome bases
           name: 'mahogany bar',
           aliases: ['bar', 'counter'],
           description: `The bar is a work of art—solid mahogany, at least fifteen feet long, its surface worn smooth by generations of glasses and elbows. Brass rails run along its base and edge, tarnished but still elegant. The wood has absorbed decades of spills and conversations, its dark surface holding memories the way old wood does. This bar has outlasted everyone who ever drank at it.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',
@@ -142,12 +143,14 @@ A fireplace occupies one wall, its hearth cold, its mantle displaying trophies a
           name: 'dining tables',
           aliases: ['tables'],
           description: `Wooden tables covered in white linen, arranged in neat rows with precise spacing between them. Each table is set with silverware, cloth napkins folded into fans, wine glasses positioned at the upper right. The settings are complete, waiting for orders that will never be taken. The white cloths have yellowed. The silverware has tarnished. The arrangement persists.`,
+          boltedDown: true,
         },
         {
           prototype: 'furniture',
           name: 'fireplace',
           aliases: ['hearth', 'mantle'],
           description: `A brick fireplace, its hearth cold, ashes long since settled into grey dust. The mantle displays the restaurant's history: framed awards, photographs of celebrity diners, a proclamation from the mayor declaring some anniversary or another. Brass candlesticks flank the display, their candles burned down to nubs. The fireplace warmed countless winter evenings. The warmth has faded.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -199,6 +202,7 @@ Prep tables line the center of the room, their surfaces stained with the history
           name: 'commercial range',
           aliases: ['range', 'stove', 'griddle'],
           description: `A massive commercial range with eight burners, a griddle, and two ovens—the kind of equipment that can feed a hundred people in an evening. The burners are cold, the pilot lights extinguished. The griddle surface is crusted with carbonized residue from the last breakfast service. The ovens are empty. The kitchen waits for cooks who will never return.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',
