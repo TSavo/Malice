@@ -195,6 +195,7 @@ A maintenance log hangs from a clipboard, entries in multiple handwritings spann
           name: 'HVAC system',
           aliases: ['hvac', 'air conditioning', 'ventilation'],
           description: `A commercial HVAC system, its components spread across the room—air handlers, compressors, ductwork, the arterial system of climate control. The system is silent, its last cycle complete, its next cycle never coming. The courthouse temperature now follows the seasons.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',

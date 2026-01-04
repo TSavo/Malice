@@ -72,6 +72,7 @@ A stairwell leads up to the processing area. A passage in the western wall opens
           aliases: ['boiler', 'furnace'],
           description:
             'A commercial boiler, its heavy steel housing cold to the touch. The system was shut down properly—valves closed, gauges at zero, the checklist completed by the last maintenance worker. The boiler could be restarted. The fuel supply is the question.',
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -116,6 +117,7 @@ Emergency equipment fills one corner: a backup generator, fuel cans, emergency l
           aliases: ['generator', 'genset'],
           description:
             'A diesel backup generator, large enough to power the building\'s essential systems. The generator is silent, waiting. Fuel cans sit nearby, their levels visible through translucent plastic. Enough fuel for maybe a week of operation. The generator has never been started since the maintenance schedule ended.',
+          boltedDown: true,
         },
       ],
     },

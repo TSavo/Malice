@@ -112,6 +112,7 @@ Finished orders sit in cubbies behind the counter, organized alphabetically, wra
           name: 'service counter',
           aliases: ['counter', 'register'],
           description: `A Formica counter separating staff from customers, its surface covered in order forms and business cards and the everyday clutter of commerce. The cash register is mechanical, a vintage NCR that the owner kept because it worked and because it looked good. The drawer is open, emptied of bills but still holding coins. The last sale was $47.50.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',
@@ -130,6 +131,7 @@ Finished orders sit in cubbies behind the counter, organized alphabetically, wra
           name: 'window letterpress',
           aliases: ['letterpress', 'window', 'display'],
           description: `A vintage letterpress positioned in the shop window, its forme locked with wooden type spelling SATURDAY NIGHT in reverse—ready to print, never printed. The press was decorative and functional, a demonstration of craft that also produced actual work. The type is dusty now, the ink dried in its well, but the letters still spell their message for anyone who can read backward.`,
+          boltedDown: true,
         },
       ],
     },
@@ -169,6 +171,7 @@ Band posters cover every wall, the shop's portfolio and decoration combined: SOU
           name: 'offset press',
           aliases: ['press', 'offset', 'printer'],
           description: `A Heidelberg offset press, vintage 1970s, the workhorse that produced thousands of posters and flyers over the decades. The rollers have dried and cracked, the ink in the fountains turned to tar, but the machinery is still beautiful in its industrial complexity. Someone knew how to run this. That knowledge is probably gone.`,
+          boltedDown: true,
         },
         {
           prototype: 'furniture',

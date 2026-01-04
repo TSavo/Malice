@@ -84,6 +84,7 @@ The corporate legacy seems quaint now—a delivery company that grew into a glob
           name: 'ivy-covered walls',
           aliases: ['ivy', 'vines', 'walls'],
           description: `English ivy covers the brick walls, decades of growth forming a living curtain. The vines have thickened to the diameter of small branches in places, woody and permanent. Without maintenance, the ivy has gone feral—climbing higher, spreading wider, sending exploratory tendrils across the iron gates and up toward the rooflines above.`,
+          boltedDown: true,
         },
       ],
     },
@@ -115,6 +116,7 @@ Mist rises from the impact point, coating everything within twenty feet in perpe
           description: `Twenty-two feet of falling water, a manufactured cascade that has become genuinely wild. The original architects imported granite boulders and arranged them to simulate a mountain stream. Decades of mineral deposits have crusted the stone with white calcium streaks. Moss fills every joint between rocks. Ferns sprout from cracks that weren't there when the park was built.
 
 The pump that drives the waterfall hums somewhere below, hidden in the infrastructure. Whether anyone maintains it or whether it runs on systems that maintain themselves—the question seems academic. The water falls. The falls continue.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -214,12 +216,14 @@ Despite the roar of the waterfall, this corner is quieter—far enough from the 
           name: 'café tables',
           aliases: ['tables', 'furniture'],
           description: `Wrought iron café tables, their round tops sized for coffee and pastries from a café that doesn't operate anymore. The green paint is chipped and peeling, exposing rust beneath. The tables are bolted to the flagstone—theft-proof, weather-proof, time-resistant. They'll be here when the waterfall finally stops.`,
+          boltedDown: true,
         },
         {
           prototype: 'furniture',
           name: 'vine maples',
           aliases: ['trees', 'maples'],
           description: `Two vine maples grow from stone planters, their multiple trunks twisted and graceful in the Japanese style. The trees have outgrown their containers, roots cracking through the stone, branches reaching toward the narrow strip of sky visible above. Leaves filter what light reaches this level, creating shifting patterns on the flagstone below.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',

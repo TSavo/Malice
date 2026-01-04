@@ -91,6 +91,7 @@ A stone gargoyle perches on the parapet at this corner—something between a dog
           name: 'skylight',
           aliases: ['glass', 'light'],
           description: `A skylight set into the roof, thick glass in a steel frame, illuminating the stairwell four stories below. The glass is clouded with decades of grime, bird droppings, and the detritus of a city that no longer cleans. The skylight is structurally sound—stepping on it would probably be fine. Probably.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
