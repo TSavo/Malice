@@ -134,7 +134,7 @@ A breach in the western wall leads into darkness—the underground network that 
       exits: {
         east: '%COLLECTION_STORAGE',
         west: {
-          to: 'underground/upper-tunnels/x-14-y-3.ts#%PASSAGE',
+          to: 'underground/upper-tunnels/x-14-y-3.ts',
           description: 'A breach in the stone wall leads into the underground',
         },
       },

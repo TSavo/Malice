@@ -172,7 +172,7 @@ In the corner, partially hidden behind the water heater, a floor drain sits lowe
         south: '%STAIRS',
         west: '%STORAGE',
         down: {
-          to: 'underground/upper-tunnels/x-14-y7.ts#%SHAFT',
+          to: 'underground/upper-tunnels/x-14-y7.ts',
           description: 'A concealed hatch leads down into the underground',
         },
       },

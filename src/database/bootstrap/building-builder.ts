@@ -177,12 +177,14 @@ export class BuildingBuilder implements Builder {
         const fileUrl = pathToFileURL(filePath).href;
         const module = await import(fileUrl);
 
-        if (module.building) {
+        // Accept either 'building' or 'floor' export
+        const floorDef = module.building || module.floor;
+        if (floorDef) {
           const floorName = file.replace('.ts', '');
           await this.buildFloor(
             buildingName,
             floorName,
-            module.building,
+            floorDef,
             sharedPlaceholders,
             postProcessors,
           );
@@ -970,18 +972,39 @@ export class BuildingBuilder implements Builder {
     try {
       const fileUrl = pathToFileURL(filePath).href;
       const module = await import(fileUrl);
-      const roomDef = module.room;
 
-      if (
-        roomDef &&
-        typeof roomDef.x === 'number' &&
-        typeof roomDef.y === 'number'
-      ) {
-        return {
-          x: roomDef.x,
-          y: roomDef.y,
-          z: roomDef.z || 0,
-        };
+      // Handle single room export (world streets)
+      if (module.room) {
+        const roomDef = module.room;
+        if (
+          typeof roomDef.x === 'number' &&
+          typeof roomDef.y === 'number'
+        ) {
+          return {
+            x: roomDef.x,
+            y: roomDef.y,
+            z: roomDef.z || 0,
+          };
+        }
+      }
+
+      // Handle building export (underground tunnels) - get first room's coords
+      if (module.building && module.building.rooms) {
+        const rooms = module.building.rooms;
+        const firstRoomKey = Object.keys(rooms)[0];
+        if (firstRoomKey) {
+          const roomDef = rooms[firstRoomKey];
+          if (
+            typeof roomDef.x === 'number' &&
+            typeof roomDef.y === 'number'
+          ) {
+            return {
+              x: roomDef.x,
+              y: roomDef.y,
+              z: roomDef.z || 0,
+            };
+          }
+        }
       }
     } catch (err) {
       console.warn(`    Warning: Could not load room file ${toPath}: ${err}`);

@@ -83,7 +83,7 @@ A breach in the far wall leads to the underground—stones removed, edges worn s
       exits: {
         west: '%RECORDS',
         east: {
-          to: 'underground/upper-tunnels/x-14-y10.ts#%PASSAGE',
+          to: 'underground/upper-tunnels/x-14-y10.ts',
           description:
             'A breach in the wall leads to the underground tunnels',
         },

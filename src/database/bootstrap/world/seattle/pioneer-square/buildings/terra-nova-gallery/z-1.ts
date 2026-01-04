@@ -90,7 +90,7 @@ A breach in the northern wall opens to the underground, the edges worn smooth by
       exits: {
         south: '%WORKSHOP',
         north: {
-          to: 'underground/upper-tunnels/x-15-y-5.ts#%PASSAGE',
+          to: 'underground/upper-tunnels/x-15-y-5.ts',
           description:
             'A breach in the wall leads to the underground tunnels',
         },

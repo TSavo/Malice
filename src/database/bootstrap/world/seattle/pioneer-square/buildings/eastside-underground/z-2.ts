@@ -101,12 +101,15 @@ A vertical shaft rises toward the surface, its maintenance ladder still in regul
         west: '%STEAM_MAIN',
         north: '%4TH_N1',
         south: '%4TH_S1',
-        up: {
-          to: '4th-ave-s/y0.ts',
-          description: 'A maintenance shaft rises to Fourth Avenue',
-          hidden: true,
-        },
       },
+      objects: [
+        {
+          prototype: 'describable',
+          name: 'sealed maintenance shaft',
+          aliases: ['shaft', 'hatch', 'sealed shaft'],
+          description: 'A maintenance shaft once rose to Fourth Avenue above, but it has been welded shut. Scorch marks around the seams suggest the closure was hasty and permanent.',
+        },
+      ],
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -751,6 +754,29 @@ The access is maintained but not official—the route used by those who need to 
       exits: {
         up: '%4TH_S4',
         west: '%DEEP_EAST_S',
+      },
+    },
+
+    '%UTILITY_HUB': {
+      name: 'Utility Hub',
+      description: `A junction point where utility conduits converge—electrical, water, steam, and telecommunications bundled together in a cramped space designed for maintenance access rather than passage. The walls are lined with junction boxes, valves, and meters, the infrastructure of a living city compressed into an underground chamber.
+
+The floor grates allow drainage from the constant seepage, water trickling down toward the deeper levels. A maintenance shaft descends into darkness, the rungs worn smooth by the boots of workers who still service this node.`,
+      x: 12,
+      y: -2,
+      z: -2,
+      population: 0,
+      ambientNoise: 35,
+      lighting: 25,
+      waterLevel: 10,
+      outdoor: false,
+      exits: {
+        west: '%STEAM_MAIN',
+        down: {
+          to: 'buildings/homeless-warrens/z-3.ts',
+          room: '%DRAINAGE_ACCESS',
+          description: 'A maintenance shaft descends into the deeper tunnels',
+        },
       },
     },
   },

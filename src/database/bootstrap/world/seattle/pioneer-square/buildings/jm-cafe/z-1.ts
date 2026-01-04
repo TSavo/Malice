@@ -91,7 +91,7 @@ A heavy door in the north wall leads to a passage beyond—the tunnels the bootl
       exits: {
         south: '%CELLAR',
         north: {
-          to: 'underground/upper-tunnels/x-14-y4.ts#%PASSAGE',
+          to: 'underground/upper-tunnels/x-14-y4.ts',
           description: 'A bootlegger passage leads into the underground',
         },
       },

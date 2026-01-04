@@ -329,7 +329,7 @@ A back door leads to the loading dock, where supplies were once delivered and ga
       exits: {
         west: '%CAFETERIA',
         south: {
-          to: 'alley/y0.ts',
+          to: null,
           description: 'A service door leads to the loading dock',
           locks: ['%SERVICE_LOCK'],
         },

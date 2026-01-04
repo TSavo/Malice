@@ -127,7 +127,7 @@ A breach in the western wall opens into darkness—the underground passage netwo
       exits: {
         east: '%ART_STORAGE',
         west: {
-          to: 'underground/upper-tunnels/x-14-y1.ts#%PASSAGE',
+          to: 'underground/upper-tunnels/x-14-y1.ts',
           description: 'A breach in the foundation leads to the underground',
         },
       },

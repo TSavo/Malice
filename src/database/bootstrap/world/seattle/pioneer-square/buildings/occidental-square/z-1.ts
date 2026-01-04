@@ -83,7 +83,7 @@ A breach in the southern wall opens into darkness—the underground tunnel netwo
       exits: {
         north: '%STORAGE',
         south: {
-          to: 'underground/upper-tunnels/x-8-y0.ts#%PASSAGE',
+          to: 'underground/upper-tunnels/x-8-y0.ts',
           description:
             'A breach in the old brick leads to the underground tunnels',
         },

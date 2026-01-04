@@ -98,7 +98,7 @@ A breach in the southern wall opens to the underground tunnels, the edges worn s
         west: '%PROCESSING',
         east: '%GENERATOR',
         south: {
-          to: 'underground/upper-tunnels/x-19-y10.ts#%PASSAGE',
+          to: 'underground/upper-tunnels/x-19-y10.ts',
           description:
             'A breach in the wall leads to the underground tunnels',
         },

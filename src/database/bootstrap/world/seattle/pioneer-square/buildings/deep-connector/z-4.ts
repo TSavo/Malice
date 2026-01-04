@@ -259,8 +259,8 @@ The deep chambers are partially flooded year-round, accessible only to those wil
       exits: {
         north: '%CISTERN_CENTER',
         down: {
-          to: 'buildings/flooded-sewers/z-5.ts',
-          room: '%DEEP_POOL_N',
+          to: 'buildings/flooded-sewers/z-4.ts',
+          room: '%DEEP_POOL',
           description: 'The passage descends into flooded depths',
           hidden: true,
         },

@@ -90,7 +90,7 @@ A section of wall in the eastern corner has been knocked through, revealing an o
       exits: {
         west: '%LAUNDRY',
         east: {
-          to: 'underground/upper-tunnels/x-14-y7.ts#%PASSAGE',
+          to: 'underground/upper-tunnels/x-14-y7.ts',
           description: 'A breach in the wall leads to the underground',
         },
       },

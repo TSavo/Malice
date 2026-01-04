@@ -228,7 +228,7 @@ In the eastern wall, behind the furnace, a section of brickwork has been removed
       exits: {
         up: '%MAIL_ROOM',
         east: {
-          to: 'underground/upper-tunnels/x-12-y6.ts#%PASSAGE',
+          to: 'underground/upper-tunnels/x-12-y6.ts',
           description: 'A breach in the foundation wall leads to the underground',
         },
       },

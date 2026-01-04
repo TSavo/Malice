@@ -29,9 +29,9 @@ This is the main entrance. The city above pretends not to notice the traffic.`,
       outdoor: false,
       exits: {
         up: {
-          to: 'buildings/pioneer-square-underground/z-2.ts',
-          room: '%STEAM_TUNNEL_WEST',
-          description: 'A shaft rises to the steam tunnels above',
+          to: 'buildings/underground-tour/z-2.ts',
+          room: '%TOUR_END',
+          description: 'A shaft rises to the underground passages above',
         },
         south: '%MAIN_CAMP',
         east: '%SUPPLY_TUNNEL',

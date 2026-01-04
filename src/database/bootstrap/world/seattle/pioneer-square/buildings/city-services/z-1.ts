@@ -61,7 +61,7 @@ A stairwell leads up to the processing area. A passage in the western wall opens
         },
         east: '%UTILITY_VAULT',
         west: {
-          to: 'underground/upper-tunnels/x-16-y8.ts#%PASSAGE',
+          to: 'underground/upper-tunnels/x-16-y8.ts',
           description: 'A passage leads into the underground',
         },
       },
