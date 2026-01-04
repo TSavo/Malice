@@ -347,12 +347,17 @@ export class BuildingBuilder implements Builder {
             // Skip this exit - it's a placeholder for a door with no implemented destination
             continue;
           }
-          // Check for world reference (to: path.ts) OR cross-floor reference (to: z1.ts#ROOM)
+          // Check for world reference (to: path.ts) OR cross-floor reference (to: z1.ts#ROOM or to: %ROOM)
           if ((exitDef as any).to && typeof (exitDef as any).to === 'string') {
             const toPath = (exitDef as any).to;
-            // Check if this is a cross-floor reference (contains #)
-            if (toPath.includes('#')) {
-              // Extract room name from 'z1.ts#ROOM_NAME' format
+            // Check if this is a placeholder reference (to: '%ROOM')
+            if (toPath.startsWith('%')) {
+              // Direct placeholder reference
+              destPlaceholder = toPath;
+              exitProps = exitDef;
+              // Don't continue - fall through to normal exit creation
+            } else if (toPath.includes('#')) {
+              // Cross-floor reference: 'z1.ts#ROOM_NAME' format
               const roomName = toPath.split('#')[1];
               destPlaceholder = roomName.startsWith('%')
                 ? roomName
@@ -784,39 +789,82 @@ export class BuildingBuilder implements Builder {
       const { sourceRoom, direction, toPath, exitProps, description } =
         deferred;
 
-      // Parse the path to extract coordinates
-      // Format: "yesler-way/x-12.ts" or "1st-ave-s/y10.ts"
-      const targetCoords = await this.parsePathToCoordinates(toPath);
-      if (!targetCoords) {
-        console.warn(
-          `    Warning: Could not parse coordinates from path: ${toPath}`,
+      let destRoom: RuntimeObject | null = null;
+
+      // Check if this is a building-to-building reference
+      if (toPath.startsWith('buildings/')) {
+        // Building-to-building exit - resolve via room placeholder
+        const roomPlaceholder = (exitProps as any).room;
+        if (roomPlaceholder && typeof roomPlaceholder === 'string') {
+          const placeholder = roomPlaceholder.startsWith('%')
+            ? roomPlaceholder
+            : `%${roomPlaceholder}`;
+          destRoom =
+            this.allPlaceholders.get(placeholder) ||
+            (await this.findPlaceholderObject(placeholder));
+          if (!destRoom) {
+            console.warn(
+              `    Warning: Building room placeholder ${placeholder} not found for path: ${toPath}`,
+            );
+            continue;
+          }
+        } else {
+          console.warn(
+            `    Warning: Building-to-building exit missing room placeholder for path: ${toPath}`,
+          );
+          continue;
+        }
+      } else if (toPath.startsWith('%')) {
+        // This is a placeholder that got deferred incorrectly - resolve it directly
+        destRoom =
+          this.allPlaceholders.get(toPath) ||
+          (await this.findPlaceholderObject(toPath));
+        if (!destRoom) {
+          console.warn(
+            `    Warning: Room placeholder ${toPath} not found`,
+          );
+          continue;
+        }
+      } else {
+        // World path reference - parse coordinates
+        // Format: "yesler-way/x-12.ts" or "1st-ave-s/y10.ts"
+        const targetCoords = await this.parsePathToCoordinates(toPath);
+        if (!targetCoords) {
+          console.warn(
+            `    Warning: Could not parse coordinates from path: ${toPath}`,
+          );
+          continue;
+        }
+
+        // Find the world room by coordinates
+        destRoom = await this.findRoomByCoordinates(
+          targetCoords.x,
+          targetCoords.y,
+          targetCoords.z,
         );
-        continue;
       }
 
-      // Find the world room by coordinates
-      const worldRoom = await this.findRoomByCoordinates(
-        targetCoords.x,
-        targetCoords.y,
-        targetCoords.z,
-      );
+      const worldRoom = destRoom;
       if (!worldRoom) {
         console.warn(
-          `    Warning: No world room found at (${targetCoords.x}, ${targetCoords.y}, ${targetCoords.z}) for path: ${toPath}`,
+          `    Warning: No room found for path: ${toPath}`,
         );
         continue;
       }
 
-      // Calculate distance
+      // Calculate distance using destination room's coordinates
+      const destX = (worldRoom.get('x') as number) || 0;
+      const destY = (worldRoom.get('y') as number) || 0;
+      const destZ = (worldRoom.get('z') as number) || 0;
       const distance =
         exitProps.distance ||
         this.calculateDistance(
           (sourceRoom.get('x') as number) || 0,
           (sourceRoom.get('y') as number) || 0,
           (sourceRoom.get('z') as number) || 0,
-          targetCoords.x,
-          targetCoords.y,
-          targetCoords.z,
+          destX,
+          destY,
+          destZ,
         );
 
       // Resolve locks if specified (locks are placeholders like '%LOCK_NAME')
