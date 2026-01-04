@@ -13,9 +13,11 @@ services:
     environment:
       - NVIDIA_VISIBLE_DEVICES=${GPU_DEVICE_ID:-0}
       - CUDA_VISIBLE_DEVICES=${GPU_DEVICE_ID:-0}
-      - MODEL_PATH=${MODEL_PATH:-DevParker/VibeVoice7b-low-vram/4bit}
+      - MODEL_PATH=${MODEL_PATH:-DevParker/VibeVoice7b-low-vram}
+      - MODEL_SUBFOLDER=${MODEL_SUBFOLDER:-4bit}
       - MODEL_DEVICE=${MODEL_DEVICE:-cuda}
-      - INFERENCE_STEPS=${INFERENCE_STEPS:-10}
+      - INFERENCE_STEPS=${INFERENCE_STEPS:-32}
+      - CFG_SCALE=${CFG_SCALE:-2.0}
       - DEFAULT_VOICE=${DEFAULT_VOICE:-}
     deploy:
       resources:
@@ -30,6 +32,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 120s
 
 volumes:
   vibevoice-cache:
