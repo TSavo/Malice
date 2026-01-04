@@ -235,6 +235,10 @@ This was once a busy street. The storefronts are sealed now, their windows brick
       outdoor: false,
       exits: {
         up: '%SHAFT',
+        south: {
+          to: 'underground/upper-tunnels/x-15-y4.ts',
+          description: 'The passage continues into the underground tunnel network',
+        },
       },
     },
   },

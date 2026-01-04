@@ -15,4 +15,10 @@ The main crossing is one of the oldest junctions in the underground, a place whe
   lighting: 20,
   waterLevel: 0,
   outdoor: false,
+  exits: {
+    north: {
+      to: 'buildings/zeitgeist-coffee/z-1.ts:%OLD_BASEMENT',
+      description: 'A breach in the wall leads to an old foundation',
+    },
+  },
 };
