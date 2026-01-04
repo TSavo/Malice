@@ -6,13 +6,13 @@ The player gets a place to stay. Not housing allocation — earned territory.
 
 ## Context
 
-**Trigger:** Multiple successful jobs, handler vouches for them
+**Trigger:** Stage 4 (Real Work) complete
 
 **Player State:**
-- Has completed 3-4 Cartel jobs
-- Has proven reliable
+- Completed first paid job
+- Handler is impressed
 - Has cash but no permanent shelter
-- Is becoming known to the organization
+- Has proven useful
 
 **Goal:** Player gets assigned to a Cartel-controlled space
 

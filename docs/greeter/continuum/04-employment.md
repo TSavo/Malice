@@ -6,12 +6,12 @@ The player is offered a regular position. Not just pickup jobs — something ste
 
 ## Context
 
-**Trigger:** 2-3 successful courier jobs with clean record
+**Trigger:** Stage 3 (First Job) complete
 
 **Player State:**
-- Has work history
-- Has earned 30-50 credits
-- Has proven basic reliability
+- Completed first courier job
+- Has earned 15+ credits
+- Has shown basic reliability
 - Ready for advancement
 
 **Goal:** Player is assigned to a regular role
@@ -125,7 +125,7 @@ await $.notes.add(player.id, `
   - Position: ${position}
   - Workplace: ${workplaceName}
   - Rate: ${payRate} credits/shift
-  - Next: Stage 5 (Housing) - eligible after 1-2 weeks steady work
+  - Next: Stage 5 (Housing)
 `, ['onboarding', 'continuum', 'progress']);
 ```
 
@@ -151,13 +151,13 @@ await $.notes.add(player.id, `
 
 ## Next Stage
 
-After accepting and working 1-2 weeks:
+After accepting the position:
 
-> "You've got steady work now. Time to think about housing."
+> "Good. Now that you've got steady work, you qualify for housing. Let me show you."
 
 Or a housing clerk approaches:
 
-> "I saw your employment record. You qualify for housing allocation. Want to see the options?"
+> "New permanent employee? You qualify for housing allocation. Come with me."
 
 Proceed to [05-housing.md](./05-housing.md).
 

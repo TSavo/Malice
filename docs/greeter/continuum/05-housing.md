@@ -6,13 +6,13 @@ The player gets their own place. No more dormitory.
 
 ## Context
 
-**Trigger:** Stage 4 complete, 1-2 weeks of steady employment
+**Trigger:** Stage 4 (Employment) complete
 
 **Player State:**
-- Has permanent employment
+- Has just accepted permanent employment
 - Has been sleeping in the dormitory
-- Has accumulated 50+ credits
-- Has proven reliability
+- Has earned 15+ credits from first job
+- Employment status qualifies them for housing
 
 **Goal:** Player gets assigned housing
 
@@ -39,13 +39,12 @@ YOUR APPROACH:
 - They're getting what they've earned
 
 HOUSING OPTIONS:
-Based on their record, they probably qualify for:
-- Assigned Bunk (Tier 1): 10 credits/month, locker included
-- Shared Room (Tier 2): 25 credits/month, 2-4 people, door that locks
+New employees get starter housing:
+- Shared Room: 25 credits/month, 2-4 people, door that locks
+- Private Room: 50 cr/mo (if they ask nicely or have extra credits)
 
-Higher tiers require more time/savings:
-- Private Room (Tier 3): 50 cr/mo, requires 1 month employment + 100 cr savings
-- Apartment (Tier 4): 100 cr/mo, requires 2 months + 250 cr savings
+Grant them a year on the rent — standard new citizen benefit.
+They can upgrade later as they save.
 ```
 
 ---
@@ -54,19 +53,19 @@ Higher tiers require more time/savings:
 
 ### Checking eligibility
 
-> "Employment confirmed. Credit balance... sufficient. You qualify for Tier 1, possibly Tier 2."
+> "Employment confirmed. You qualify for housing. Let's get you set up."
 
 ### Explaining options
 
-**Tier 1:**
-> "Assigned bunk. Same dormitory, but a specific bed that's yours. Locker with an actual lock. Ten credits per month."
+**Shared Room:**
+> "Shared room in Smith Tower. Two to four people, but walls and a door that locks. Twenty-five per month."
 
-**Tier 2:**
-> "Shared room. Two to four people. Walls. A door. Twenty-five per month."
+**Private Room (if available):**
+> "Private room. Just you. Fifty per month. Worth it if you value quiet."
 
 ### After they choose
 
-> "Good. Here's your assignment confirmation. Show it to the building supervisor. First payment deducts end of month."
+> "Good. You get a year covered as a new citizen benefit. After that, rent comes out of your pay. Here's your access code."
 
 ---
 
@@ -150,15 +149,14 @@ await $.notes.add(player.id, `
 
 ## Edge Cases
 
-### Player can't afford any tier
+### Player asks about better housing
 
-> "Your balance is too low for housing. Keep working, save up, come back."
-> They stay in the dormitory for now.
+> "Private rooms are available. Fifty per month. Want me to check availability?"
+> They can upgrade if they want.
 
-### Player wants higher tier than they qualify for
+### Player asks about the free year
 
-> "Tier 3 requires a month of employment and 100 credits saved. You're not there yet."
-> Offer what they qualify for. They can upgrade later.
+> "New citizen benefit. Pluribus invests in productive citizens. After the year, you pay from your wages."
 
 ### Player asks about skipping rent
 

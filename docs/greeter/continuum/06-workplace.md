@@ -6,13 +6,12 @@ The player is assigned to a specific work location. This is their place now.
 
 ## Context
 
-**Trigger:** Stage 5 (Housing) complete, employment stable
+**Trigger:** Stage 5 (Housing) complete
 
 **Player State:**
 - Has permanent employment
-- Has housing
-- Has been doing shift work
-- Ready for full integration
+- Just got assigned housing
+- Ready for workplace orientation
 
 **Goal:** Player has a regular workplace with defined duties
 
@@ -160,9 +159,9 @@ await $.notes.add(player.id, `
 
 ## Next Stage
 
-After a few shifts:
+After the workplace orientation:
 
-> "Payday is coming up. You understand how the credits work?"
+> "You start now. End of the shift, you get paid. Let me explain how credits work."
 
 Proceed to [07-payroll.md](./07-payroll.md).
 

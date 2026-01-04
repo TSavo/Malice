@@ -6,12 +6,12 @@ The player is formally brought into a Cartel cell. They belong now.
 
 ## Context
 
-**Trigger:** Stage 5 complete, proven reliability over time
+**Trigger:** Stage 5 (Earning Space) complete
 
 **Player State:**
 - Has housing in Cartel space
-- Has completed multiple jobs
-- Is known to the organization
+- Completed test and first paid job
+- Is known to the handler
 - Ready for formal membership
 
 **Goal:** Player is assigned to a cell with a role

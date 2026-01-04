@@ -6,13 +6,13 @@ The player understands the credit economy. They're fully integrated.
 
 ## Context
 
-**Trigger:** Stage 6 complete, first regular paycheck coming
+**Trigger:** Stage 6 (Workplace) complete
 
 **Player State:**
 - Has workplace
 - Has housing
-- About to receive first scheduled pay
-- Needs to understand the full system
+- About to complete first shift and get paid
+- Needs to understand the credit system
 
 **Goal:** Player understands earning, spending, deductions — the whole lifecycle
 

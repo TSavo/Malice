@@ -126,16 +126,16 @@ The city-ai doesn't follow a script — it **makes decisions** based on these gu
 ### Making Decisions On The Fly
 
 **Housing example (Continuum):**
-> Player has worked steadily for two weeks. They ask about better housing.
+> Player just completed their first job. Greeter offers housing immediately.
 >
-> AI decision: They've earned it. Find an available unit in Smith Tower.
+> AI decision: They're cooperating. Give them a place.
 > Execute: `await lock.rent(player, 365 * 24 * 60 * 60 * 1000)` for a year.
 > Track: Note the assignment in their profile.
 
 **Housing example (Underground):**
-> Player has completed three jobs for the Cartel. They need somewhere to sleep.
+> Player just completed their first real Cartel job. Handler offers them a corner.
 >
-> AI decision: They've proven useful. Assign them a corner in a Cartel safe house.
+> AI decision: They've proven useful. Assign them space in the safe house.
 > Execute: Set a note that they have access to location X.
 > Track: Note their status advancement.
 
@@ -143,17 +143,25 @@ The docs tell you *what* to do. The AI decides *when* and *how*.
 
 ---
 
+## Pacing: First Session (~4 Hours per Path)
+
+**This is first-session content.** A player who engages completes all 7 stages in their first 3-4 hours. No waiting periods. No "come back next week." Rewards are immediate.
+
+The stages flow continuously — complete one, immediately offered the next.
+
+---
+
 ## Stage Comparison
 
-| Stage | Continuum | Underground |
-|-------|-----------|-------------|
-| 1 | **Clothing** — Issued from City Services | **Survival** — Scavenge, trade, or provided |
-| 2 | **Orientation** — Greeter walks the block | **The Tunnels** — Learn the Underground |
-| 3 | **First Job** — Courier delivery (credits) | **First Test** — Observation task (no pay) |
-| 4 | **Employment** — Permanent position offer | **Real Work** — Cartel jobs (cash) |
-| 5 | **Housing** — Assigned from the system | **Earning Space** — Claim or earn a squat |
-| 6 | **Workplace** — Assigned location and duties | **Cell Assignment** — Role in the organization |
-| 7 | **Payroll** — Credit economy, deductions | **Cash Life** — Cash, barter, favors |
+| Stage | Continuum | Underground | Time |
+|-------|-----------|-------------|------|
+| 1 | **Clothing** — Issued | **Survival** — Provided | ~10 min |
+| 2 | **Orientation** — Block tour | **The Tunnels** — Underground tour | ~20 min |
+| 3 | **First Job** — Courier (credits) | **First Test** — Observation (no pay) | ~30 min |
+| 4 | **Employment** — Position offered | **Real Work** — Paid job (cash) | ~1 hr |
+| 5 | **Housing** — Assigned immediately | **Earning Space** — Corner given | ~15 min |
+| 6 | **Workplace** — First shift | **Cell Assignment** — Inducted | ~1 hr |
+| 7 | **Payroll** — Economy explained | **Cash Life** — Supply network | ~15 min |
 
 ---
 

@@ -233,9 +233,9 @@ The player now needs the Cartel's supply chain to survive. This is intentional.
 
 ## Next Stage
 
-After a few successful jobs:
+After completing the job:
 
-> "You've been sleeping where? The tunnels are cold. There's better spots if you've earned them."
+> "Good work. You've earned a spot. No more sleeping rough."
 
 Proceed to [05-earning-space.md](./05-earning-space.md).
 

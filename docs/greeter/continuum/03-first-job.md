@@ -130,7 +130,7 @@ await $.notes.add(player.id, `
   - Job: Courier delivery
   - Payment: 15 credits
   - Performance: ${sealIntact ? 'Clean' : 'Opened package (flagged)'}
-  - Next: Stage 4 (Employment offer after 2-3 more jobs)
+  - Next: Stage 4 (Employment offer)
 
   WORK HISTORY:
   - Total jobs: 1
@@ -161,19 +161,19 @@ await $.notes.add(player.id, `
 
 ### Player takes another job immediately
 
-> Great — they're learning. Track it. After 2-3 successful jobs, trigger Stage 4.
+> Great — they're learning. But one job is enough to advance.
 
 ---
 
 ## Transition to Stage 4
 
-After 2-3 successful deliveries, the system notices:
+After completing the delivery, the greeter finds them:
 
-> A message appears: "Report to Supervisor Chen, Office 2B — advancement opportunity."
+> "Good work. Clean delivery, no problems. Someone wants to talk to you about steady employment."
 
-Or the greeter finds them:
+Or a message appears:
 
-> "Your work's been noticed. Someone wants to talk to you about better assignments."
+> "Report to Supervisor Chen, Office 2B — employment opportunity."
 
 Proceed to [04-employment.md](./04-employment.md).
 
