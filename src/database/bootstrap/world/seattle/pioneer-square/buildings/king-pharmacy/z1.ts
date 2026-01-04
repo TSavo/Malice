@@ -6,8 +6,8 @@ export const building = {
   name: 'King Pharmacy',
   x: 4,
   y: -12,
-  width: 2,
-  height: 1,
+  width: 3,
+  height: 3,
   floors: 3,
 
   rooms: {
@@ -263,8 +263,8 @@ A window looks out on the back alley, its blinds half-drawn. The morning light t
 Someone used this space, once. A few folding chairs sit near the western edge, positioned to catch the afternoon sun when Seattle provides it. Potted plants—dead now, their soil dried to dust—once grew here: tomatoes, peppers, the vegetables that remind immigrants of home gardens.
 
 The rooftop shows the infrastructure of a small building: a ventilation stack, electrical conduits, a small satellite dish that once pulled in Chinese-language television. The dish points at a sky that no longer broadcasts.`,
-      x: 4,
-      y: -12,
+      x: 3,
+      y: -11,
       z: 2,
       population: 0,
       ambientNoise: 20,

@@ -16,4 +16,11 @@ The building's brick facade shows a century of weathering plus fifty-five years 
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  exits: {
+    north: {
+      description: 'The pharmacy entrance',
+      door: 'buildings/king-pharmacy/z0.ts#FRONT_DOOR',
+      to: 'buildings/king-pharmacy/z0.ts#FRONT',
+    },
+  },
 };

@@ -6,8 +6,8 @@ export const building = {
   name: 'King Pharmacy',
   x: 4,
   y: -12,
-  width: 2,
-  height: 1,
+  width: 3,
+  height: 3,
   floors: 3,
 
   rooms: {
@@ -275,7 +275,6 @@ A steel door leads to the back alley, heavily locked, showing scratches where so
           door: '%BACK_DOOR',
           to: null, // Alley not implemented
         },
-        up: 'z1.ts#UPSTAIRS_HALL',
       },
       objects: [
         {
