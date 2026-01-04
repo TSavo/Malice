@@ -61,12 +61,16 @@ Entry points connect surface (z=0) to underground (z=-2) through z=-1 transition
 | ID | Location | z=0 (Surface) | z=-1 (Access) | z=-2 (Underground) |
 |----|----------|---------------|---------------|-------------------|
 | E1 | Smith Tower | n/a (internal) | Escape Tunnel (-13, +9) | Tunnel Mouth (-14, +9) |
-| E2 | Fabrication | Door (-21, +10) | Basement (-20, +10) | Fab Access (-20, +10) |
-| E3 | Occidental Park | Trapdoor (-3, +2) | Ladder Shaft (-3, +2) | Park Access (-3, +2) |
-| E4 | Supply Depot | Door (-21, -5) | Basement (-20, -5) | Supply Access (-20, -5) |
+| E2 | Fabrication Factory | Public Services (-21, +10) | n/a | Fab Basement (-20, +10) |
+| E3 | Occidental Square | Gallery (-3, +2) | n/a | Occ Cross (-3, +2) |
+| E4 | Supply Depot | Loading (-21, -5) | n/a | South Tunnel (-20, -5) |
 | E5 | Yesler Way | Hidden grating (-7, +12) | Shaft (new) | Yesler Access (-7, +12) |
 | E6 | 4th Avenue | Utility hatch (+14, 0) | Steam shaft | 4th Ave Access (+14, 0) |
 | E7 | King Street Station | Platform access (+4, -12) | Service shaft | Platform Tunnel (+4, -12) |
+| E8 | Trinity Nightclub | n/a | Underground Exit (-8, +3) | Occ S1 (-7, +3) |
+| E9 | Underground Tour | Tour Entrance (-15, -2, z=0) | Descent (-15, -3, z=-1) | Tour Start (-15, -3, z=-2) |
+
+**Note:** E2, E3, E4 use direct down exits (hidden trapdoors/hatches) that skip z=-1.
 
 ---
 
@@ -204,7 +208,14 @@ Legend:
 | Factory Basements | cluster | (+7, -13) | (+13, -15) | 8 |
 | Loading Tunnels | E-W | (+10, -13) | (+13, -13) | 3 |
 
-**Total z=-2 rooms: ~289** (88 original + 29 waterfront + 35 eastside + 36 yesler + 39 king + 40 eastern + 22 chinatown + 14 industrial)
+#### Underground Tour (NEW)
+| Corridor | Direction | Start | End | Room Count |
+|----------|-----------|-------|-----|------------|
+| Tour Route | N-S cluster | (-15, -3) | (-14, -5) | 6 |
+
+The historic Underground Tour building at (-15, -3 to -4) preserves a section of the 1889 buried streets as they were presented to tourists. The tour route shows preserved storefronts (pharmacy, hardware store, dry goods), prism glass skylights, and interpretive signage. Beyond the former tour boundaries, hidden passages and alcoves connect to the wider underground network, including a route to the Yesler Underground tunnels.
+
+**Total z=-2 rooms: ~295** (88 original + 29 waterfront + 35 eastside + 36 yesler + 39 king + 40 eastern + 22 chinatown + 14 industrial + 6 tour)
 
 ---
 
@@ -252,8 +263,8 @@ Gray Cartel secured territory.
         x=-16    x=-14    x=-12    x=-10    x=-8     x=-6     x=-4
            │        │        │        │        │        │        │
       ┌────┴────────┴────────┴────────┴────────┴────────┴────────┴────┐
-y=+6  │         ●  CUTTER BARRACKS                                   │
-y=+5  │   ●─────●  LOWER JUNCTION                                    │
+y=+6  │         ●──●  CUTTER BARRACKS + MEDICAL BAY                  │
+y=+5  │   ●─────●──●  LOWER JUNCTION + ARMORY + COMMS CENTER         │
 y=+2  │         │                                    ●  RUNNER'S DEN  │
 y=+1  │   ●─────●─────●─────●─────●─────●─────●─────●                 │
 y=0   │         ●─────●  SAFE     ●  DEAD                            │
@@ -262,6 +273,13 @@ y=-4  │   ●─────●  KEEPER'S      ●─────●───�
 y=-5  │         ●  SUPPLY HUB                                        │
       └───────────────────────────────────────────────────────────────┘
 ```
+
+Key facilities:
+- **The Armory** (-16, +5): Primary weapons cache with reinforced construction
+- **Communications Center** (-11, +5): Radio/data intercept with Faraday shielding
+- **Medical Bay** (-12, +6): Underground surgical facility
+- **Cutter Barracks** (-14, +6): Cell housing and operations
+- **Lower Junction** (-14, +5): Main logistics hub
 
 ### Deep Cisterns (NEW)
 Pre-fire water infrastructure beneath Pioneer Square and Chinatown. Ancient brick-lined cisterns, abandoned reservoirs, and flooded passages dating to the 1870s-1880s. These chambers predate the Great Fire and were rediscovered by later underground development.
@@ -286,7 +304,7 @@ Key locations:
 - **Pioneer Reservoir** (-10, -16): Largest cistern, 60% flooded
 - **Industrial Reservoir** (+10 to +20, -18 to -19): Adapted for factory use
 
-**Total z=-4 rooms: 56** (40 cartel operational + 16 deep cisterns)
+**Total z=-4 rooms: 59** (43 cartel operational + 16 deep cisterns)
 
 ---
 
@@ -326,14 +344,14 @@ Ultra-secure chamber below water table. Pluribus cannot see here.
 
 ## Network Statistics
 
-| Level | Original | Waterfront | Eastside | Yesler | King Street | Eastern | Chinatown | Industrial | Deep Cisterns | Total |
-|-------|----------|------------|----------|--------|-------------|---------|-----------|------------|---------------|-------|
-| z=-2 | 88 | 29 | 35 | 36 | 39 | 40 | 22 | 14 | 0 | **303** |
-| z=-3 | 29 | 22 | 18 | 6 | 0 | 0 | 2 | 0 | 0 | **77** |
-| z=-4 | 40 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 16 | **56** |
-| z=-5 | 16 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **16** |
-| z=-6 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **1** |
-| **Total** | **174** | **51** | **53** | **42** | **39** | **40** | **24** | **14** | **16** | **453** |
+| Level | Original | Waterfront | Eastside | Yesler | King Street | Eastern | Chinatown | Industrial | Deep Cisterns | Tour | Total |
+|-------|----------|------------|----------|--------|-------------|---------|-----------|------------|---------------|------|-------|
+| z=-2 | 88 | 29 | 35 | 36 | 39 | 40 | 22 | 14 | 0 | 6 | **309** |
+| z=-3 | 29 | 22 | 18 | 6 | 0 | 0 | 2 | 0 | 0 | 0 | **77** |
+| z=-4 | 43 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 16 | 0 | **59** |
+| z=-5 | 16 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **16** |
+| z=-6 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **1** |
+| **Total** | **177** | **51** | **53** | **42** | **39** | **40** | **24** | **14** | **16** | **6** | **462** |
 
 ---
 
