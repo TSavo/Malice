@@ -76,9 +76,9 @@ Street ─ sidewalk ─ Building (3 tall) ─ sidewalk ─ Street
       │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
  -1   │ ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ● │
       │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
- -2   │ ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ● │
-      │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
- -3   │ ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ● │
+ -2   │ ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │ ╔═════╗  │  │  │  │  D  │  │  │  │  │  │  ● │
+      │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ ║WASH ║  │  │  │  │  │  │  │  │  │  │  │  │ │
+ -3   │ ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │ ╚═════╝  │  │  │  │  ●  │  │  │  │  │  │  ● │
       │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
  -4   │ ● ╔════╗ │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ● │
       │ │ ║SUPP║ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
@@ -130,6 +130,7 @@ Street ─ sidewalk ─ Building (3 tall) ─ sidewalk ─ Street
 | Corp Construction | 0 to +6 | +1 to +4 | (+6, +1) | Unknown, armed guards, blocks 2nd Ave |
 | Supply Depot | -20 to -19 | -5 to -4 | W: (-21, -5) | Distribution center, sealed packages |
 | King Pharmacy | +3 to +5 | -12 to -11 | S: (+4, -12) | 3 floors + roof, hybrid Chinese/Western pharmacy, looted |
+| Washington Federal Bank | -1 to 0 | -3 to -2 | E: (0, -2) | 3 floors, neoclassical bank with sealed vault |
 
 ## Hazard Zones (Impassable)
 
