@@ -60,6 +60,7 @@ The waiting area offers leather chairs arranged around a coffee table stacked wi
         },
         west: '%OFFICE_MAIN',
         north: '%CONFERENCE',
+        down: { room: '%STAIRS', door: '%BASEMENT_DOOR', locks: ['%BASEMENT_LOCK'] },
       },
       sittables: [
         {
