@@ -4,10 +4,10 @@
 
 export const building = {
   name: 'Jade Palace Jewelers',
-  x: 10,
-  y: -6,
-  width: 3,
-  height: 4,
+  x: 12,
+  y: -4,
+  width: 5,
+  height: 3,
   floors: 3,
 
   rooms: {
