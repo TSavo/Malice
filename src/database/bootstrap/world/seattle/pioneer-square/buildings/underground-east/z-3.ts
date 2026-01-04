@@ -12,6 +12,76 @@ export const building = {
 
   rooms: {
     // ═══════════════════════════════════════════════════════════════════════
+    // VERTICAL CONNECTIONS FROM Z=-2
+    // ═══════════════════════════════════════════════════════════════════════
+
+    '%DOCK_SHAFT': {
+      name: 'Loading Shaft',
+      description: `A vertical shaft descends from the pergola undercroft, the remains of a freight elevator that once served the businesses above. The elevator car is gone, but the shaft remains—a concrete tube dropping into darkness.
+
+Iron rungs set into the wall provide a precarious ladder for those willing to descend. The rungs are old but solid, their rust surface rather than structural, their grip adequate for careful climbing. The descent is not impossible. It merely requires commitment.`,
+      x: -7,
+      y: 4,
+      z: -3,
+      population: 0,
+      ambientNoise: 20,
+      lighting: 5,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        up: {
+          to: 'buildings/underground-east/z-2.ts',
+          description: 'A shaft rises toward the pergola undercroft',
+        },
+        down: '%DEEP_OCC',
+      },
+    },
+
+    '%SLUICE_DOWN': {
+      name: 'Sluice Descent',
+      description: `A narrow passage follows the sluice channel downward, the water flowing alongside in a brick-lined channel. The descent is steep but navigable, the channel providing a guide through darkness that otherwise would disorient. The water knows the way. Following it leads somewhere.
+
+The air grows colder with each step down, the temperature dropping as the passage approaches levels that never see sunlight, that never feel the warmth of surface days. The deep underground has its own climate, its own atmosphere, its own rules.`,
+      x: -7,
+      y: -4,
+      z: -3,
+      population: 0,
+      ambientNoise: 35,
+      lighting: 3,
+      waterLevel: 40,
+      outdoor: false,
+      exits: {
+        up: {
+          to: 'buildings/underground-east/z-2.ts',
+          description: 'A passage rises toward the sluice chamber',
+        },
+        down: '%DEEP_SLUICE',
+      },
+    },
+
+    '%DEEP_PUMP': {
+      name: 'Deep Pump Station',
+      description: `The shaft descends past the pump room into a deeper chamber where the city's original water management infrastructure still functions—or tries to. Massive pipes converge here, their Victorian engineering struggling against a water table that has risen with the city's growth.
+
+The pumps here are a mix of centuries: cast iron behemoths from the original installation, electric replacements from various upgrades, and modern equipment that someone installed recently. The old and new work together, or fail together, in the eternal struggle to keep the deep underground dry enough to use.`,
+      x: 0,
+      y: -3,
+      z: -3,
+      population: 0,
+      ambientNoise: 45,
+      lighting: 25,
+      waterLevel: 20,
+      outdoor: false,
+      exits: {
+        up: {
+          to: 'buildings/underground-east/z-2.ts',
+          description: 'A shaft rises toward the pump room',
+        },
+        south: '%DEEP_2ND_S',
+      },
+    },
+
+    // ═══════════════════════════════════════════════════════════════════════
     // DEEP OCCIDENTAL SECTION (beneath Occidental Ave)
     // ═══════════════════════════════════════════════════════════════════════
 

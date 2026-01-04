@@ -4,6 +4,11 @@
 
 export const building = {
   name: 'Underground East North',
+  x: -11,
+  y: 5,
+  width: 15,
+  height: 8,
+  floors: 1,
 
   rooms: {
     // ═══════════════════════════════════════════════════════════════════════
@@ -50,6 +55,7 @@ A faded calendar hangs on one column, its pages yellowed, its dates meaningless.
         south: '%NORTH_7',
         north: '%NORTH_9',
         west: '%STORAGE_WEST',
+        east: '%PARK_NORTH',
       },
     },
 
@@ -291,6 +297,7 @@ The corridor is tight but passable, the infrastructure leaving enough room for a
       exits: {
         west: '%COMM_WEST',
         east: '%COMM_EAST',
+        north: '%2ND_YESLER_S2',
         south: {
           to: 'buildings/underground-east/z-2.ts',
           description: 'A passage leads south toward the Pergola Undercroft',

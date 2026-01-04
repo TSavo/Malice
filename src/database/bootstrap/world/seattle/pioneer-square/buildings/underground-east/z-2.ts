@@ -120,7 +120,10 @@ Passages branch in multiple directions here—the network spreads beneath the pa
           description: 'A passage leads west toward the park access point',
         },
         east: '%PARK_E1',
-        down: '%DOCK_SHAFT',
+        down: {
+          to: 'buildings/underground-east/z-3.ts',
+          description: 'A shaft descends into darkness',
+        },
       },
     },
 
@@ -236,7 +239,10 @@ The sluice still functions after a fashion, carrying water that finds its own pa
       exits: {
         north: '%OCC_S3',
         south: '%OCC_S5',
-        down: '%SLUICE_DOWN',
+        down: {
+          to: 'buildings/underground-east/z-3.ts',
+          description: 'A sluice channel descends into darkness',
+        },
       },
     },
 
@@ -395,7 +401,7 @@ Scratched into the brick: a crude map showing the tunnel network. The map is inc
       name: 'Widening Chamber',
       description: `The passage opens unexpectedly into a small chamber where someone once lived—or hid. The evidence remains: a bedframe rusted to a skeleton of iron, a cast-iron stove that was never connected to any chimney, shelves carved directly into the stone. The occupant is long gone. The sense of occupancy lingers.
 
-A passage continues west toward the main network.`,
+A passage continues north toward the main network.`,
       x: -5,
       y: 4,
       z: -2,
@@ -406,7 +412,7 @@ A passage continues west toward the main network.`,
       outdoor: false,
       exits: {
         east: '%MAZE_2',
-        west: '%OCC_N4',
+        north: '%PARK_E1',
       },
     },
 
@@ -487,6 +493,7 @@ Graffiti covers the walls: names, dates, declarations of love and defiance. The 
       exits: {
         west: '%OCC_N4',
         east: '%PARK_E2',
+        south: '%MAZE_3',
       },
     },
 
@@ -505,7 +512,6 @@ Fresh excavation marks the eastern wall—picks and shovels have been at work he
       outdoor: false,
       exits: {
         west: '%PARK_E1',
-        north: '%MAZE_3',
       },
     },
 
@@ -647,7 +653,6 @@ Above, a freight elevator shaft rises toward one of the buildings on Second Aven
       exits: {
         south: '%2ND_N2',
         north: '%2ND_N3',
-        west: '%ALLEY_E',
         east: '%COURT_TUNNEL',
       },
     },
@@ -742,7 +747,10 @@ But not all the equipment is dead. A newer pump hums quietly in the corner, its 
       outdoor: false,
       exits: {
         north: '%2ND_S2',
-        down: '%DEEP_PUMP',
+        down: {
+          to: 'buildings/underground-east/z-3.ts',
+          description: 'A shaft descends to the deep pump station',
+        },
       },
     },
 
@@ -870,65 +878,5 @@ The door shows no signs of recent opening. But the passage leading to it shows s
       },
     },
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // VERTICAL CONNECTIONS (to z=-3)
-    // ═══════════════════════════════════════════════════════════════════════
-
-    '%DOCK_SHAFT': {
-      name: 'Loading Shaft',
-      description: `A vertical shaft descends from the pergola undercroft, the remains of a freight elevator that once served the businesses above. The elevator car is gone, but the shaft remains—a concrete tube dropping into darkness.
-
-Iron rungs set into the wall provide a precarious ladder for those willing to descend. The rungs are old but solid, their rust surface rather than structural, their grip adequate for careful climbing. The descent is not impossible. It merely requires commitment.`,
-      x: -7,
-      y: 4,
-      z: -3,
-      population: 0,
-      ambientNoise: 20,
-      lighting: 5,
-      waterLevel: 0,
-      outdoor: false,
-      exits: {
-        up: '%OCC_N4',
-        down: '%DEEP_OCC',
-      },
-    },
-
-    '%SLUICE_DOWN': {
-      name: 'Sluice Descent',
-      description: `A narrow passage follows the sluice channel downward, the water flowing alongside in a brick-lined channel. The descent is steep but navigable, the channel providing a guide through darkness that otherwise would disorient. The water knows the way. Following it leads somewhere.
-
-The air grows colder with each step down, the temperature dropping as the passage approaches levels that never see sunlight, that never feel the warmth of surface days. The deep underground has its own climate, its own atmosphere, its own rules.`,
-      x: -7,
-      y: -4,
-      z: -3,
-      population: 0,
-      ambientNoise: 35,
-      lighting: 3,
-      waterLevel: 40,
-      outdoor: false,
-      exits: {
-        up: '%OCC_S4',
-        down: '%DEEP_SLUICE',
-      },
-    },
-
-    '%DEEP_PUMP': {
-      name: 'Deep Pump Station',
-      description: `The shaft descends past the pump room into a deeper chamber where the city's original water management infrastructure still functions—or tries to. Massive pipes converge here, their Victorian engineering struggling against a water table that has risen with the city's growth.
-
-The pumps here are a mix of centuries: cast iron behemoths from the original installation, electric replacements from various upgrades, and modern equipment that someone installed recently. The old and new work together, or fail together, in the eternal struggle to keep the deep underground dry enough to use.`,
-      x: 0,
-      y: -3,
-      z: -3,
-      population: 0,
-      ambientNoise: 45,
-      lighting: 25,
-      waterLevel: 20,
-      outdoor: false,
-      exits: {
-        up: '%PUMP_ROOM',
-        south: '%DEEP_2ND_S',
-      },
-    },
   },
 };
