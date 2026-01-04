@@ -151,7 +151,7 @@ The clock ran on springs and gears, wound weekly by someone who understood the m
       ambientNoise: 20,
       lighting: 70,
       waterLevel: 0,
-      outdoor: true,
+      outdoor: false,
       exits: {
         north: {
           description: 'A maintenance panel leads back to the main roof',

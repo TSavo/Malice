@@ -102,7 +102,7 @@ A circular information desk occupies the center of the hall, its marble surface 
         },
         west: '%OFFICES',
         south: '%VAULT_ANTE',
-        up: '%STAIRWELL',
+        north: '%STAIRWELL',
       },
       sittables: [
         {
@@ -337,6 +337,7 @@ The contrast with the banking hall is deliberate. Customers got marble and colum
       waterLevel: 0,
       outdoor: false,
       exits: {
+        south: '%LOBBY',
         up: 'z1.ts#STAIRWELL_1',
       },
       objects: [

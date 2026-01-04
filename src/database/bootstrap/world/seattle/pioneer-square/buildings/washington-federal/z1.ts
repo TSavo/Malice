@@ -95,7 +95,7 @@ Above, the stairs continue to the roof access.`,
 
     '%EXEC_RECEPTION': {
       name: 'Washington Federal - Executive Reception',
-      description: `The executive floor's reception area—a smaller, more intimate version of the grand banking hall below. The furniture here is real leather, real wood, designed to make visitors feel important while they waited to see people who actually were. A reception desk of polished granite holds a phone console, a visitor log, and a vase of flowers that have long since dessicated into something botanical and sad.
+      description: `The executive floor's reception area—a smaller, more intimate version of the grand banking hall below. The furniture here is real leather, real wood, designed to make visitors feel important while they waited to see people who actually were. A reception desk of polished granite holds a phone console, a visitor log, and a vase of flowers that have long since desiccated into something botanical and sad.
 
 The walls display the same motivational art found in offices everywhere—abstract prints in corporate colors, landscapes that offend no one, the visual equivalent of elevator music. A flat-screen TV, now dark, once showed market updates and financial news.
 
