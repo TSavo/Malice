@@ -20,12 +20,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Install bitsandbytes for quantization
 RUN pip install bitsandbytes>=0.43.0
 
-# Clone VibeVoice repo and install (includes demo voices)
-RUN git clone https://github.com/microsoft/VibeVoice.git /opt/vibevoice && \
+# Clone VibeVoice community fork (has full 7B inference support)
+# Microsoft removed original repo, community fork maintains compatibility
+RUN git clone https://github.com/vibevoice-community/VibeVoice.git /opt/vibevoice && \
     cd /opt/vibevoice && pip install -e .
 
-# Set up voices directory
+# Set up voices directories (7B uses .wav files, streaming uses .pt files)
 ENV VIBEVOICE_VOICES_DIR=/opt/vibevoice/demo/voices/streaming_model
+ENV VIBEVOICE_VOICES_DIR_7B=/opt/vibevoice/demo/voices
 
 # Copy application code
 COPY app.py .
