@@ -31,6 +31,7 @@ Base prototype for all furniture items. Provides common properties and abilities
 - `name`: Furniture name (e.g., 'Metal Bunk Bed')
 - `description`: Detailed description
 - `weight`: Weight in grams (default: 20000g = 20kg)
+- `boltedDown`: Boolean - if true, furniture cannot be picked up or moved (default: false)
 - `abilities`: Prose physics describing interactions
 
 ### Abilities
@@ -44,6 +45,7 @@ Can be destroyed - wood burns, glass shatters.
 ### Usage
 
 ```javascript
+// Movable furniture
 const furniture = await $recycler.create($furniture, {
   name: 'Wooden Shelf',
   description: 'A simple wooden shelf with three levels.',
@@ -52,6 +54,16 @@ const furniture = await $recycler.create($furniture, {
 Can be tipped over with sufficient force. Wood is flammable.`
 });
 await furniture.moveTo(room);
+
+// Immovable furniture (bolted down)
+const bar = await $recycler.create($furniture, {
+  name: 'Mahogany Bar',
+  description: 'A solid mahogany bar, at least fifteen feet long.',
+  weight: 200000, // 200kg
+  boltedDown: true,
+  abilities: `Heavy bar counter bolted to the floor. Cannot be moved.`
+});
+await bar.moveTo(room);
 ```
 
 ## $bed - Sleeping Surfaces
@@ -367,16 +379,24 @@ IMMOVABLE: Bolted to the floor.`
 
 ### Weight and Mobility
 
-Set realistic weights and describe mobility in abilities:
+Set realistic weights and use `boltedDown` property for immovable furniture:
 
 ```javascript
-// Heavy, immovable
-weight: 100000, // 100kg
-abilities: `Bolted to the floor. Cannot be moved without tools.`
+// Heavy, immovable (use boltedDown property)
+const counter = await $recycler.create($furniture, {
+  name: 'Reception Counter',
+  weight: 100000, // 100kg
+  boltedDown: true, // Prevents pickup/movement
+  abilities: `Bolted to the floor. Cannot be moved without tools.`
+});
 
 // Light, portable
-weight: 5000, // 5kg
-abilities: `Lightweight folding chair. Easy to carry and reposition.`
+const chair = await $recycler.create($furniture, {
+  name: 'Folding Chair',
+  weight: 5000, // 5kg
+  boltedDown: false, // Default - can be moved
+  abilities: `Lightweight folding chair. Easy to carry and reposition.`
+});
 ```
 
 ### Concealment and Cover
