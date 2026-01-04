@@ -128,6 +128,7 @@ Decorations line the walls: Chinese landscape prints in cheap frames, paper lant
           name: 'jade register',
           aliases: ['register', 'cash'],
           description: `A cash register in jade green, matching the restaurant's color scheme. The drawer is sealed, the day's receipts presumably still inside—worthless paper now, but present. The last transaction was fifty-five years ago. The register never closed out. The business never officially ended.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -190,6 +191,7 @@ A display case near the register holds small desserts that have long since mummi
           name: 'takeout counter',
           aliases: ['counter', 'pickup'],
           description: `A laminate counter scarred by decades of hot containers, stained with soy sauce and chili oil. The counter served the lunch rush—office workers grabbing containers, families picking up dinner. Stacks of paper bags with the restaurant logo sit ready for orders that won't come.`,
+          boltedDown: true,
         },
       ],
     },
@@ -231,12 +233,14 @@ Stairs in the corner lead up to the family apartment.`,
           name: 'wok stations',
           aliases: ['woks', 'burners', 'stoves'],
           description: `Commercial wok stations with high-BTU burners, the kind that generate flames fierce enough for proper stir-fry. The woks are still in place, carbon-steel seasoned black from ten thousand dishes. The seasoning holds flavor memory that outlasts the cook. The burners are cold, the gas long since cut. The flames that gave Sichuan food its breath are extinguished.`,
+          boltedDown: true,
         },
         {
           prototype: 'furniture',
           name: 'noodle station',
           aliases: ['noodles', 'dough', 'workspace'],
           description: `The noodle-making station where dough was stretched and folded into hand-pulled noodles. The technique required years to master—the feel of the dough, the rhythm of the pull, the instinct for when strands were thin enough. The flour is gone. The workspace is bare wood, stained by decades of use. The technique died with the cook who knew it.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -278,6 +282,7 @@ A prep cooler against one wall is silent and dark, smaller than the main walk-in
           name: 'prep tables',
           aliases: ['tables', 'workspace'],
           description: `Stainless steel prep tables scored by decades of knife work, the surfaces telling stories in scratches and cuts. Vegetables were julienned here, meat sliced thin for stir-fry, the mise en place that made fast cooking possible. The cutting boards are still in place, stained and worn. The knives are probably still sharp.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',

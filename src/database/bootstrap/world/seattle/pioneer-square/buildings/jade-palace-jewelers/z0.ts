@@ -204,6 +204,7 @@ A small bathroom and a cramped kitchenette occupy one corner—the amenities tha
           name: 'jeweler workbench',
           aliases: ['workbench', 'bench', 'desk'],
           description: `A proper jeweler's workbench with a leather apron hanging from one edge to catch dropped pieces. Loupes of various magnification are scattered across the surface—a 10x for general inspection, a 20x for finding flaws. Small pliers and files wait in a wooden holder. A polishing wheel is caked with buffing compound that dried to powder decades ago. The last piece worked on sits in a vise: a jade ring being resized, the work interrupted and never resumed.`,
+          boltedDown: true,
         },
         {
           prototype: 'safe',
@@ -224,6 +225,7 @@ A small bathroom and a cramped kitchenette occupy one corner—the amenities tha
           name: 'repair tray',
           aliases: ['repairs', 'tray'],
           description: `A tray of jewelry awaiting repair, each piece tagged with the customer's name and the work to be done. A cracked jade bangle with "Mrs. Lin - reglue" written on its tag. A gold chain marked "Chen - new clasp." The repairs were never completed. The customers never returned to claim them.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',

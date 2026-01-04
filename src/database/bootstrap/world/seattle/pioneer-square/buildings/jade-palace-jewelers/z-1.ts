@@ -74,6 +74,7 @@ Corridors branch off to the private rooms—the real business of karaoke, the so
           name: 'reception counter',
           aliases: ['counter', 'desk'],
           description: `A curved reception counter that once glowed with internal lighting, now dark. The surface is covered in a layer of dust and forgotten drink rings. Behind the counter: a computer terminal for booking rooms, its screen blank; a cabinet of numbered remote controls, one for each private room; a cash drawer that was probably emptied long ago. A laminated FAQ answers questions no one will ever ask again: "How do I search for songs?" "Can we order more drinks to the room?"`,
+          boltedDown: true,
         },
         {
           prototype: 'couch',
@@ -129,6 +130,7 @@ A small kitchen window opens to a prep area where appetizers were assembled—th
           name: 'bar counter',
           aliases: ['counter', 'bar'],
           description: `A curved bar counter with a padded edge for leaning elbows, the surface sticky with the residue of ancient spills. The lacquer finish has clouded with age. Beer taps rise from the counter, their handles dusty, their lines dried out long ago. The last kegs ran dry decades ago. A tip jar sits empty by the register, its sign—"Tips Appreciated!"—a plea to people who no longer exist.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',
