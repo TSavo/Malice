@@ -4,7 +4,7 @@
 
 export const building = {
   name: 'Chinatown Underground',
-  x: -7,
+  x: 7,
   y: -8,
   width: 15,
   height: 14,
