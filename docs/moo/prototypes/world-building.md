@@ -435,22 +435,37 @@ Full room definition:
     // etc.
   },
 
-  // Sittable positions (optional)
+  // Sittables (optional) - Furniture agents can sit on
   sittables: [
     {
       name: 'a wooden chair',
       capacity: 1,
-      emptyMsg: 'A wooden chair sits in the corner.',
-      occupiedMsg: '%s sitting on the chair',
+      emptyMsg: 'A wooden chair sits against the wall.',
+      occupiedMsg: '%s sitting on a wooden chair'
     },
     {
       name: 'a long bench',
       capacity: 4,
-      emptyMsg: 'A bench lines the wall.',
-      occupiedMsg: '%s on the bench',
-    },
+      emptyMsg: 'A bench runs along the wall.',
+      occupiedMsg: '%s on the bench'
+    }
   ],
-  
+
+  // Objects (optional) - Items to create and place in room
+  objects: [
+    {
+      prototype: 'furniture',
+      name: 'desk',
+      description: 'A sturdy wooden desk.',
+    },
+    {
+      prototype: 'cabinet',
+      name: 'filing cabinet',
+      aliases: ['cabinet', 'files'],
+      description: 'A metal filing cabinet with four drawers.',
+    }
+  ],
+
   // Elevator-specific (if prototype: 'elevator')
   elevator: {
     floors: [1, 2, 3],
