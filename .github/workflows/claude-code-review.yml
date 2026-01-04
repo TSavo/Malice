@@ -21,7 +21,7 @@ jobs:
     # Skip if PR title indicates it was already fixed (only for pull_request events)
     if: github.event_name == 'workflow_dispatch' || !contains(github.event.pull_request.title, '[claude-fixed]')
 
-    runs-on: [self-hosted, malice]
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
