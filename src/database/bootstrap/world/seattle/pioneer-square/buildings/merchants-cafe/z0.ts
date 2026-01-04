@@ -185,10 +185,7 @@ Prep tables line the center of the room, their surfaces stained with the history
           door: '%KITCHEN_DOOR',
           to: '%BAR',
         },
-        up: {
-          description: 'A steel hatch and ladder lead up through the upper floors to the roof',
-          to: '%ROOF_NW',
-        },
+        up: '%HALL_Z1',
       },
       objects: [
         {
