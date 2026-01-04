@@ -142,6 +142,7 @@ The tile floor is hexagonal—black and white in an alternating pattern—severa
       exits: {
         north: '%HALL_Z1',
         west: { room: '%ROOM_102', door: '%ROOM_102_DOOR', locks: ['%ROOM_102_LOCK'] },
+        south: { room: '%ROOM_103', door: '%ROOM_103_DOOR', locks: ['%ROOM_103_LOCK'] },
       },
       sittables: [
         {
@@ -203,8 +204,8 @@ A radiator beneath the west window is cold and silent, its cast iron decorated w
 Despite its awkward access, the room shows signs of more recent occupation than the others. The bed has a mattress that isn't completely rotted. A camping lantern sits on the nightstand. Empty food tins are stacked in one corner—someone lived here, after the hotel closed but before the city fell.
 
 A fire escape landing is visible through the window, the rusted grating providing both an exit and an entrance for anyone who knew to look.`,
-      x: -16,
-      y: -3,
+      x: -15,
+      y: -4,
       z: 1,
       population: 0,
       ambientNoise: 2,
@@ -212,7 +213,7 @@ A fire escape landing is visible through the window, the rusted grating providin
       waterLevel: 0,
       outdoor: false,
       exits: {
-        out: { room: '%BATH_Z1', door: '%ROOM_103_DOOR', locks: ['%ROOM_103_LOCK'] },
+        north: { room: '%BATH_Z1', door: '%ROOM_103_DOOR', locks: ['%ROOM_103_LOCK'] },
       },
       objects: [
         {
