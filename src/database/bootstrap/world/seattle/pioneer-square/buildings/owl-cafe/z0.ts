@@ -92,6 +92,7 @@ A ticket wheel hangs by the kitchen window, order slips still clipped to it—th
           name: 'diner counter',
           aliases: ['counter', 'bar'],
           description: `A curved Formica counter, the classic diner design that puts customers face-to-face with the action. The surface is speckled beige, chosen to hide stains but unable to hide history—decades of coffee rings, cigarette burns from when that was allowed, scratches from plates and elbows and the general friction of use. Chrome trim runs along the edge, dented in places, polished by a thousand hands reaching for coffee cups.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',
@@ -159,6 +160,7 @@ One booth still has dishes on the table—plates with the remnants of breakfast,
           name: 'window booths',
           aliases: ['booths', 'benches'],
           description: `A row of booths along the front windows, the red vinyl upholstery cracked but still comfortable. Each booth seats four—two on each side, facing each other across Formica tables. The tables are bolted to the wall and floor, immovable, designed to last forever. They've outlasted almost everyone who sat at them.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -210,6 +212,7 @@ A walk-in cooler hums in the corner—somehow still running, still maintaining t
           name: 'flat-top grill',
           aliases: ['grill', 'griddle', 'flattop'],
           description: `A commercial flat-top grill, the cooking surface crusted with carbonized grease from years of eggs and bacon and hash browns. The grill is cold now, the burners off, but the seasoning of ten thousand breakfasts remains baked into the steel. A row of squeeze bottles sits above: ketchup, mustard, hot sauce, their contents long since separated into layers.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',
@@ -339,6 +342,7 @@ From here you can see south toward Pioneer Square's historic core, the brick bui
           name: 'neon sign',
           aliases: ['sign', 'owl', 'neon'],
           description: `The OWL CAFE neon sign rises from the roof's edge, its tubes dark but intact. The owl shape is still recognizable—a stylized bird in flight, wings spread, the letters curved beneath it in classic 1950s typography. The sign was the cafe's identity, visible from blocks away. It hasn't glowed in years, but it still announces what this place was.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -412,6 +416,7 @@ The parapet here is lower than elsewhere, worn down by weather or never built to
           name: 'HVAC unit',
           aliases: ['hvac', 'ac', 'air conditioner'],
           description: `A rooftop HVAC unit, its housing dented by some past impact—falling debris, maybe, or vandalism. The fan inside still spins occasionally, responding to some power source that operates on its own schedule. The unit cooled the dining room once, making summer breakfast tolerable. Now it cools empty booths and abandoned plates.`,
+          boltedDown: true,
         },
       ],
     },
