@@ -4,8 +4,8 @@
 
 export const building = {
   name: 'QuickPrint',
-  x: -13,
-  y: 2,
+  x: -12,
+  y: 4,
   width: 2,
   height: 3,
   floors: 3,
@@ -75,8 +75,8 @@ Old lawn chairs sit by the parapet, arranged to face west toward Elliott Bay. So
 The parapet on this side is lower, easier to lean against, which someone did often enough to wear the coping smooth. A bucket of sand sits by the edge—the kind used for cigarette butts, its contents long since scattered by wind and rain. An ashtray would have been more practical. Practicality wasn't the point.
 
 The fire escape landing here is a small platform of metal grating, the top of the zigzag path down. The iron is rusted but solid, anchored to the building with bolts that have held for a century. The escape route is still viable, for anyone who needs one.`,
-      x: -13,
-      y: 3,
+      x: -12,
+      y: 2,
       z: 2,
       population: 0,
       ambientNoise: 15,
