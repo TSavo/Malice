@@ -178,6 +178,7 @@ A separate entrance opens onto the alley to the south, its door locked but its g
           name: 'three-way mirror',
           aliases: ['mirror', 'mirrors'],
           description: `A three-way mirror, the kind that lets you see yourself from all angles when trying on clothes. The glass is dusty but unbroken, its brass frame tarnished. The reflections show the empty shop from multiple angles, multiplying the abandonment. In better days, customers stood here and watched themselves transformed by tailored clothing.`,
+          boltedDown: true,
         },
         {
           prototype: 'desk',

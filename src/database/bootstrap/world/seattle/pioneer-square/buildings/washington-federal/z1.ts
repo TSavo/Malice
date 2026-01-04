@@ -177,6 +177,7 @@ A sidebar holds coffee carafes and water pitchers, the contents long since evapo
           name: 'conference table',
           aliases: ['table', 'boardroom table'],
           description: `A massive mahogany conference table, long enough to seat twelve executives in the high-backed chairs that surround it. Each place has a leather-edged notepad embossed with the bank's logo, a branded pen, a coaster for drinks that were never poured. A speakerphone occupies the center, its console dark, its last conference call permanently on hold.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',

@@ -93,6 +93,7 @@ At the end of the hall, a steel ladder leads up through a hatch to the roof. A f
           name: 'roof ladder',
           aliases: ['ladder', 'hatch'],
           description: `A steel ladder bolted to the wall leads up through a roof hatch. The ladder is industrial, utilitarian—meant for maintenance workers, not tenants. The hatch above is secured with a padlock, green with oxidation, but the lock still functions. Authorized personnel only. There is no longer any personnel, authorized or otherwise.`,
+          boltedDown: true,
         },
       ],
     },
@@ -131,6 +132,7 @@ The irony of a historic preservation firm operating in a building that is itself
           name: 'drafting tables',
           aliases: ['tables', 'drafting'],
           description: `Tilted drafting tables arranged along the windows, their surfaces covered with blueprints and drawings. Scale rules, triangles, and drafting pencils are scattered across the paper—the tools of architectural drawing, frozen mid-project. The drawings show Pioneer Square storefronts, elevation views of buildings that the firm was hired to preserve.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',

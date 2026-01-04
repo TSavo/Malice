@@ -119,12 +119,14 @@ A circular information desk occupies the center of the hall, its marble surface 
           name: 'teller windows',
           aliases: ['tellers', 'cages', 'windows'],
           description: `A row of teller windows with brass cages and bulletproof glass. Each station has a nameplate—JANET, MARCUS, CHRISTINE—the tellers who stood here counting other people's money. The cash drawers are visible through the glass, some still containing neat stacks of bills. The bills are worthless. The habit of organizing them neatly persists in the arrangement.`,
+          boltedDown: true,
         },
         {
           prototype: 'furniture',
           name: 'information desk',
           aliases: ['desk', 'marble desk'],
           description: `A circular marble desk in the center of the hall, cracked down the middle where something heavy struck it. Brochures for mortgages and car loans are fanned out in holders—the financial products that defined middle-class aspiration. The brochures promise low rates and easy approval. The promises meant something once.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -271,6 +273,7 @@ The vault door dominates the south wall—a circular steel behemoth with a combi
           name: 'viewing booth',
           aliases: ['booth', 'privacy booth'],
           description: `A small privacy booth where customers could examine their safe deposit box contents. A marble counter, a leather stool, a velvet-lined tray for handling valuables. The booth is designed for discretion—what you keep here is your business. The discretion continues. The business ended.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',

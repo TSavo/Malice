@@ -271,6 +271,7 @@ The x-ray machine is mounted on its swing arm, its cone pointed at the empty cha
           name: 'dental equipment',
           aliases: ['chair', 'equipment'],
           description: `A dental chair in teal vinyl, the kind that reclines patients into positions of vulnerability. The armrests are worn where thousands of nervous hands gripped them. The vinyl is cracked in places.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
