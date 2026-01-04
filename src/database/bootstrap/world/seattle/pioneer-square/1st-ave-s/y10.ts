@@ -2,9 +2,9 @@
 
 export const room = {
   name: '1st Ave S',
-  description: `Yesler Way opens just ahead, and with it the view of Smith Tower rising at the intersection—thirty-eight stories of white terra cotta, an Edwardian giant watching over a dead city. The tower was L.C. Smith's monument to ambition, typewriter money transformed into height and permanence. The typewriters are museum pieces now. The tower still stands. There's probably a lesson in that about what survives.
+  description: `Yesler Way opens just ahead, the historic intersection where Seattle's two grids collide. The old brick buildings here date to the 1890s reconstruction after the Great Fire—Romanesque Revival architecture built to last. In the distance to the east, Smith Tower's terracotta crown rises above the neighborhood, the landmark visible from most of Pioneer Square.
 
-The debris wall reaches nearly to the tower's base, a frozen avalanche of brick and steel and shattered glass. From this angle you can see where the Merrill Building's upper floors accordioned down onto the lower ones, each floor pancaking into the one below until the whole structure became a single compressed mass. The physics of collapse, demonstrated in brick. Downtown's grid meets Pioneer Square's here at an angle—the two men who platted Seattle couldn't agree on which way was north. The grids collide at Yesler. They always did. The rubble just made it visible.
+The debris wall reaches across Yesler Way to the north, a frozen avalanche of brick and steel and shattered glass from collapsed buildings. From this angle you can see where the Merrill Building's upper floors accordioned down onto the lower ones, each floor pancaking into the one below until the whole structure became a single compressed mass. Downtown's grid meets Pioneer Square's here at an angle—the two men who platted Seattle couldn't agree on which way was north. The grids collide at Yesler. They always did. The rubble just made it visible.
 
 Across the street to the west, a squat federal building still stands—the old Immigration Services station, its neoclassical facade weathered but intact. The building processed Pacific arrivals for decades before the war. Someone's repurposed it since; the windows show signs of habitation.
 

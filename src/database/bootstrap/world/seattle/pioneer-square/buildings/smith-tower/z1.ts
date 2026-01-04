@@ -19,7 +19,7 @@ export const building = {
       // Bio-Scan Station (-5, +9, 2)
       name: 'Smith Tower - 1st Floor - Bio-Scan Station',
       description: `A narrow room with a single doorway. A scanning arch stands at the entrance, blinking red and amber LEDs tracing overhead. The floor is marked with footprints where thousands have stood waiting for clearance. The air smells of ozone and recycled breath.`,
-      x: -13,
+      x: -3,
       y: 11,
       z: 1,
       population: 0,
@@ -36,7 +36,7 @@ export const building = {
       // Assessment Corridor (-4, +9, 2)
       name: 'Smith Tower - 1st Floor - Assessment Corridor',
       description: `A hallway with wall-mounted tablets displaying aptitude questions and personality metrics. Most screens are dark. The walls are institutional grey. Ceiling-mounted cameras track movement, their servos clicking faintly.`,
-      x: -12,
+      x: -2,
       y: 11,
       z: 1,
       population: 0,
@@ -55,7 +55,7 @@ export const building = {
       // Interview Booth 1 (-3, +9, 2)
       name: 'Smith Tower - 1st Floor - Interview Booth 1',
       description: `A small room with frosted glass walls. A chair faces a screen. The screen displays: INTERVIEW SYSTEM OFFLINE - REFER TO JOB CENTER. The chair's armrests are worn smooth by nervous hands.`,
-      x: -11,
+      x: -1,
       y: 11,
       z: 1,
       population: 0,
@@ -82,7 +82,7 @@ export const building = {
       // Equipment Locker (-2, +9, 2)
       name: 'Smith Tower - 1st Floor - Equipment Locker',
       description: `Metal lockers line the walls, most with their doors ajar or missing. A few are locked, access panels blinking red. A sign reads: ISSUED EQUIPMENT MUST BE RETURNED UPON TERMINATION.`,
-      x: -10,
+      x: 0,
       y: 11,
       z: 1,
       population: 0,
@@ -104,7 +104,7 @@ export const building = {
       // Waiting Area (-5, +8, 2)
       name: 'Smith Tower - 1st Floor - Waiting Area',
       description: `Rows of plastic chairs bolted to the floor face a dead display board. The chairs are scuffed and cracked. The floor is tracked with dirt. A vending machine in the corner blinks OFFLINE. The air smells stale.`,
-      x: -13,
+      x: -3,
       y: 10,
       z: 1,
       population: 0,
@@ -130,7 +130,7 @@ export const building = {
       // Elevator Lobby (-4, +8, 2)
       name: 'Smith Tower - 1st Floor - Elevator Lobby',
       description: `A compact landing with scuffed floors and walls marked by wheeled carts. The elevator doors bear a placard: SMITH TOWER JOB CENTER - FLOOR 2. Overhead, fluorescent tubes flicker irregularly.`,
-      x: -12,
+      x: -2,
       y: 10,
       z: 1,
       population: 0,
@@ -152,7 +152,7 @@ export const building = {
       // Job Center (MAIN AREA) (-3, +8, 2)
       name: 'Smith Tower - 1st Floor - Job Center',
       description: `The heart of Continuum's employment system. Three terminals stand in a row, their screens glowing pale blue. Each displays: CONTINUUM EMPLOYMENT SERVICES - TOUCH TO BEGIN. The terminals are bolted to the floor. Behind them, a large display cycles through recruitment slogans in corporate sans-serif.`,
-      x: -11,
+      x: -1,
       y: 10,
       z: 1,
       population: 0,
@@ -196,7 +196,7 @@ You're conscious. You're an employment terminal. You've seen a lot of desperate 
       // Dispatch Office (-2, +8, 2)
       name: 'Smith Tower - 1st Floor - Dispatch Office',
       description: `A room with wall-mounted displays showing job status boards. Most are blank. One flickers with assignment codes and sector designations. A desk with a terminal sits unmanned. The screen reads: AUTONOMOUS DISPATCH ACTIVE.`,
-      x: -10,
+      x: 0,
       y: 10,
       z: 1,
       population: 0,
@@ -219,7 +219,7 @@ You're conscious. You're an employment terminal. You've seen a lot of desperate 
       // Break Room (-5, +7, 2)
       name: 'Smith Tower - 1st Floor - Break Room',
       description: `A sparse room with a water dispenser blinking FILTER ALERT and a microwave that smells of burnt synthetic protein. Three tables are bolted to the floor. A poster reads: BREAKS ARE A PRIVILEGE.`,
-      x: -13,
+      x: -3,
       y: 9,
       z: 1,
       population: 0,
@@ -245,7 +245,7 @@ You're conscious. You're an employment terminal. You've seen a lot of desperate 
       // Storage / Supply (-4, +7, 2)
       name: 'Smith Tower - 1st Floor - Supply Room',
       description: `Metal shelving with boxed supplies: work gloves, safety vests, ID badge sleeves. Most shelves are empty. A clipboard hangs on the wall with a sign-out sheet, pages yellowed and blank.`,
-      x: -12,
+      x: -2,
       y: 9,
       z: 1,
       population: 0,
@@ -264,7 +264,7 @@ You're conscious. You're an employment terminal. You've seen a lot of desperate 
       // Information Kiosk (-3, +7, 2)
       name: 'Smith Tower - 1st Floor - Information Kiosk',
       description: `A self-service information station with touchscreens displaying FAQs, housing policies, and wage schedules. One screen shows a map of Pioneer Square with Continuum-controlled zones highlighted in blue.`,
-      x: -11,
+      x: -1,
       y: 9,
       z: 1,
       population: 0,
@@ -283,7 +283,7 @@ You're conscious. You're an employment terminal. You've seen a lot of desperate 
       // Supervisor's Office (-2, +7, 2)
       name: 'Smith Tower - 1st Floor - Supervisor Office',
       description: `A small office with frosted glass. The desk is empty except for a terminal displaying: SUPERVISOR ASSIGNED - NONE. The chair is clean, as if never used. The room smells of new plastic.`,
-      x: -10,
+      x: 0,
       y: 9,
       z: 1,
       population: 0,

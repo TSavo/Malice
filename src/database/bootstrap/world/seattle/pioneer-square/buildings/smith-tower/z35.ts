@@ -13,7 +13,7 @@ export const building = {
       description: `A high-floor landing with polished floors and soft lighting. Wall panels display: EXECUTIVE AMENITIES - FLOOR 35. Direction signs point to the fitness center, lounge, and meeting rooms. Everything is clean, modern, unmanned.
 
 The space echoes with emptiness. The air circulation hums steadily. Waiting for executives who haven't arrived.`,
-      x: -12,
+      x: -2,
       y: 10,
       z: 35,
       population: 0,
@@ -40,7 +40,7 @@ The space echoes with emptiness. The air circulation hums steadily. Waiting for 
       description: `A spacious lounge with floor-to-ceiling windows overlooking the grey city. Modern seating arranged in conversational clusters - clean lines, minimalist design. A beverage station stands ready but unstocked, its display reading: INVENTORY PENDING.
 
 No one sits in the chairs. The lighting is warm but the space feels cold. A showroom waiting for occupants.`,
-      x: -12,
+      x: -2,
       y: 11,
       z: 35,
       population: 0,
@@ -68,7 +68,7 @@ No one sits in the chairs. The lighting is warm but the space feels cold. A show
       description: `A quiet reading space with built-in shelving - empty except for a few sample books wrapped in plastic. Study carrels with integrated terminals line one wall. A sign reads: DIGITAL ARCHIVE ACCESS - CONFIGURATION PENDING.
 
 The lighting is soft, conducive to reading. The air is silent. No one studies here.`,
-      x: -13,
+      x: -3,
       y: 11,
       z: 35,
       population: 0,
@@ -99,7 +99,7 @@ The lighting is soft, conducive to reading. The air is silent. No one studies he
       description: `A gym space with modern equipment still wrapped in protective plastic. Treadmills, resistance machines, free weight racks - all new, all unused. Mirrored walls reflect empty space. A terminal displays: FITNESS CENTER - EQUIPMENT CALIBRATION REQUIRED.
 
 The air smells of new rubber and cleaning solution. The floor is pristine. No one works out here.`,
-      x: -12,
+      x: -2,
       y: 9,
       z: 35,
       population: 0,
@@ -119,7 +119,7 @@ The air smells of new rubber and cleaning solution. The floor is pristine. No on
       description: `An empty studio with polished wood floors and one mirrored wall. Rolled exercise mats stacked in the corner, still in packaging. A sound system bracket on the wall - no equipment installed. Floor-to-ceiling windows offer views south toward the waterfront.
 
 The space echoes. Everything ready, nothing used.`,
-      x: -13,
+      x: -3,
       y: 9,
       z: 35,
       population: 0,
@@ -150,7 +150,7 @@ The space echoes. Everything ready, nothing used.`,
       description: `A glass-walled meeting room with a long table and modern chairs. Wall-mounted displays show: ROOM AVAILABLE - NO RESERVATIONS. Presentation equipment installed but idle. The table surface is spotless.
 
 The room has never been used. The chairs have never been sat in. Waiting for meetings that hasn't been scheduled.`,
-      x: -11,
+      x: -1,
       y: 10,
       z: 35,
       population: 0,
@@ -179,7 +179,7 @@ The room has never been used. The chairs have never been sat in. Waiting for mee
       description: `A smaller meeting space with a round table and six chairs. A wall screen displays collaboration software in demo mode. The table has integrated power and data ports - all functional, none used.
 
 Clean, modern, empty. A space for decisions that haven't been made.`,
-      x: -11,
+      x: -1,
       y: 11,
       z: 35,
       population: 0,
@@ -207,7 +207,7 @@ Clean, modern, empty. A space for decisions that haven't been made.`,
       description: `A small executive office with a desk, chair, and credenza. Windows offer city views. The desk surface is bare except for a terminal displaying: WORKSPACE AVAILABLE - UNASSIGNED. The chair is new, never sat in.
 
 A space for an executive who hasn't been hired.`,
-      x: -10,
+      x: 0,
       y: 11,
       z: 35,
       population: 0,
@@ -238,7 +238,7 @@ A space for an executive who hasn't been hired.`,
       description: `A small lounge with comfortable seating and a beverage station. The dispenser is installed but not stocked, its display reading: INVENTORY PENDING. A window offers eastern views of the grey city. Charging ports are built into every surface.
 
 Clean, modern, empty. A break room with no one to take breaks.`,
-      x: -10,
+      x: 0,
       y: 10,
       z: 35,
       population: 0,
@@ -266,7 +266,7 @@ Clean, modern, empty. A break room with no one to take breaks.`,
       description: `A treatment room with a massage table and wall-mounted equipment still in packaging. Soft lighting is pre-set. Aromatherapy dispensers are installed but empty. A terminal reads: SPA SERVICES - AWAITING STAFF CERTIFICATION.
 
 The air is clean, neutral. The table has never been used.`,
-      x: -11,
+      x: -1,
       y: 9,
       z: 35,
       population: 0,
@@ -294,7 +294,7 @@ The air is clean, neutral. The table has never been used.`,
       description: `A tiled steam chamber with wooden benches. The steam generator is installed but dormant, its control panel dark. The space is clean and dry, smelling faintly of cedar. A sign reads: STEAM SERVICE - SYSTEM INITIALIZATION REQUIRED.
 
 Ready for relaxation that hasn't begun.`,
-      x: -10,
+      x: 0,
       y: 9,
       z: 35,
       population: 0,
@@ -325,7 +325,7 @@ Ready for relaxation that hasn't begun.`,
       description: `A wraparound terrace behind floor-to-ceiling windows. Views of grey Seattle stretch in all directions. Built-in seating runs along the windows. The floor is polished concrete. The lighting is natural, filtered through the windows.
 
 A peaceful space. Entirely empty. The city visible but distant below.`,
-      x: -13,
+      x: -3,
       y: 10,
       z: 35,
       population: 0,
