@@ -803,7 +803,7 @@ See `docs/city-ai/MAP-UNDERGROUND.md` for detailed maps, room coordinates, and t
 The server provides 3D map visualization at:
 
 - **`/map`** - Public map (above-ground rooms, population heatmap)
-- **`/map/admin`** - Admin map (all rooms including underground, individual agents)
+- **`/admin/map`** - Admin map (all rooms including underground, individual agents) - requires HTTP Basic Auth
 
 **Features:**
 - Rooms rendered as 3D cubes with height-based coloring
@@ -817,7 +817,7 @@ The server provides 3D map visualization at:
 - `GET /api/map/rooms` - Room coordinates and exits
 - `GET /api/map/rooms?z_min=0` - Filter by minimum z-level
 - `GET /api/map/players` - Aggregated population heatmap
-- `GET /api/map/players/admin` - Individual agent positions (auth required)
+- `GET /api/map/players/admin` - Individual agent positions (admin auth required)
 
 ## Faction System
 

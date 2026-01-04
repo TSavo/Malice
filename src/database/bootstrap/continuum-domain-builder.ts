@@ -552,7 +552,7 @@ export class ContinuumDomainBuilder implements Builder {
     `,
     );
 
-    // NOTE: /map and /map/admin routes moved to meta-domain-builder.ts (malice.world)
+    // NOTE: /map and /admin/map routes moved to meta-domain-builder.ts (malice.world)
     // NOTE: /admin/* routes moved to meta-domain-builder.ts (malice.world)
 
     // /js/malice-client.js - client script
