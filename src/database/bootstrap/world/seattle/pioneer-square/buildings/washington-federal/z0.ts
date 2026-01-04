@@ -4,10 +4,10 @@
 
 export const building = {
   name: 'Washington Federal Bank',
-  x: -1,
-  y: -2,
+  x: 0,
+  y: 0,
   width: 2,
-  height: 2,
+  height: 5,
   floors: 3,
 
   rooms: {
