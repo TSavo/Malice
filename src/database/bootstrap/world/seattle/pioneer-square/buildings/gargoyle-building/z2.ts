@@ -108,7 +108,7 @@ Suite numbers run 201 through 204, the same configuration as the floor below. So
 Law books line one wall, their spines showing the familiar titles of Washington state legal codes. The books are current through whenever the subscription lapsed, their contents still technically accurate even if the courts that applied them no longer function.
 
 A framed law degree hangs behind the desk: UNIVERSITY OF WASHINGTON SCHOOL OF LAW, CLASS OF 1982. Mr. or Ms. Hendricks practiced law for decades before the practice ended.`,
-      x: -17,
+      x: -18,
       y: 12,
       z: 2,
       population: 0,
@@ -152,7 +152,7 @@ A framed law degree hangs behind the desk: UNIVERSITY OF WASHINGTON SCHOOL OF LA
 Case files are stacked on every surface, the paper trail of legal work in progress when the work stopped. Folders are labeled with client names and matter numbers, the organizational system of a practice that processed dozens of cases at once.
 
 A window looks out over Yesler Way, the view unchanged from a century of attorneys gazing out while clients waited for counsel.`,
-      x: -17,
+      x: -18,
       y: 13,
       z: 2,
       population: 0,

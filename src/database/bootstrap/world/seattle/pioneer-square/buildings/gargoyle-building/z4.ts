@@ -22,7 +22,7 @@ export const building = {
 The roofing here is surprisingly solid, the tar paper intact where it matters, evidence that water drains properly from this corner. Small victories in a building losing its war with entropy.
 
 A stone serpent coils around a sphere at this corner—the last of the four gargoyles, its mouth open to show fangs worn smooth by weather. The sphere might be the world. The serpent might be time. Victorian sculptors loved their symbolism.`,
-      x: -17,
+      x: -18,
       y: 12,
       z: 4,
       population: 0,
@@ -67,7 +67,7 @@ A stone serpent coils around a sphere at this corner—the last of the four garg
 The skylight that illuminates the stairwell below is here, a square of grimy glass set into the roof. The glass is thick with accumulated filth, but still intact. A fall through it would be four stories straight down.
 
 A stone gargoyle perches on the parapet at this corner—something between a dog and a demon, its face worn smooth by a century of Seattle rain. The expression beneath remains hungry.`,
-      x: -17,
+      x: -18,
       y: 13,
       z: 4,
       population: 0,

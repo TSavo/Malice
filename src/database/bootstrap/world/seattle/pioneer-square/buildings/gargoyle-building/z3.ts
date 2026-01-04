@@ -104,7 +104,7 @@ At the end of the hall, a steel ladder leads up through a hatch to the roof. A f
 Drafting tables are arranged near the windows, their surfaces still holding blueprints weighted down with scale rules and triangles. The drawings show elevations of Pioneer Square buildings, renovation plans for structures that still stand—or stood—throughout the neighborhood.
 
 The irony of a historic preservation firm operating in a building that is itself decaying is probably not lost on whoever isn't here to appreciate it.`,
-      x: -17,
+      x: -18,
       y: 12,
       z: 3,
       population: 0,
@@ -154,7 +154,7 @@ The irony of a historic preservation firm operating in a building that is itself
 Scale models of buildings line the shelves, some completed, some in progress. A half-finished model sits on the workbench—a Pioneer Square building recognizable by its Romanesque arches, its detail work interrupted mid-construction.
 
 A supply cabinet stands open, its contents organized with the precision of craftspeople who took their work seriously. The precision continues. The work does not.`,
-      x: -17,
+      x: -18,
       y: 13,
       z: 3,
       population: 0,

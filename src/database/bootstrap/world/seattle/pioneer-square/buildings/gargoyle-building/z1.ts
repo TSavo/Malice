@@ -108,7 +108,7 @@ A water-stained ceiling panel near the end of the hall suggests problems from ab
 Filing cabinets line one wall, drawer labels reading ACTIVE CLAIMS, LAPSED POLICIES, PENDING INVESTIGATIONS. The insurance industry's paper trail, preserved in these drawers, claims for ships and cargo that sank or were damaged decades ago.
 
 A maritime map covers one wall—Puget Sound, the Strait of Juan de Fuca, the Pacific coast from Alaska to California. Push pins mark locations, their meanings lost without the legend that explained them.`,
-      x: -17,
+      x: -18,
       y: 12,
       z: 1,
       population: 0,
@@ -158,7 +158,7 @@ A maritime map covers one wall—Puget Sound, the Strait of Juan de Fuca, the Pa
 A window looks out over Yesler Way, the view framed by heavy drapes that are more dust than fabric at this point. The window is intact, the view unchanged from a century of occupants gazing out at the street below.
 
 A safe sits in the corner, a squat iron box with a combination dial. The safe is locked, its contents unknown.`,
-      x: -17,
+      x: -18,
       y: 13,
       z: 1,
       population: 0,
