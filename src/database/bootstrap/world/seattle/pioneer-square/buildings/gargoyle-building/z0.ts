@@ -7,7 +7,7 @@ export const building = {
   y: 12,
   width: 2,
   height: 2,
-  floors: 2,
+  floors: 5,
 
   rooms: {
     // ═══════════════════════════════════════════════════════════════════
@@ -263,6 +263,7 @@ Doors on each landing lead to the upper floors—offices once, apartments perhap
       outdoor: false,
       exits: {
         down: '%LOBBY',
+        up: 'z1.ts#HALL_1',
       },
       objects: [
         {
