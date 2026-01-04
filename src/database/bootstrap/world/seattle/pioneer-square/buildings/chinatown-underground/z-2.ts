@@ -373,7 +373,7 @@ The community that built this space built it from necessity. They are gone now. 
       description: `The passage runs south from the inhabited areas into territory that was never developed for use—a tunnel that was started and abandoned, perhaps intended to connect to something that was never built. The construction grows rougher, the passage narrower, the light dimmer.
 
 The tunnel ends at a cave-in. Beyond it, who knows.`,
-      x: -1,
+      x: -3,
       y: -11,
       z: -2,
       population: 0,
