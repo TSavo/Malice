@@ -275,6 +275,7 @@ A steel door leads to the back alley, heavily locked, showing scratches where so
           door: '%BACK_DOOR',
           to: null, // Alley not implemented
         },
+        up: 'z1.ts#UPSTAIRS_HALL',
       },
       objects: [
         {
@@ -305,7 +306,7 @@ A steel door leads to the back alley, heavily locked, showing scratches where so
 Diplomas and licenses hang on the wall: a pharmacy degree, state licensing, certification for traditional Chinese medicine—the credentials that allowed one person to practice both disciplines. The name on the documents is "David Chen, PharmD, L.Ac."—Doctor of Pharmacy, Licensed Acupuncturist. A rare combination of training.
 
 Family photos on the desk show children at various ages, a spouse, the markers of a life beyond the pharmacy. The photos are face-down. Whoever was here last didn't want to look at them.`,
-      x: 5,
+      x: 4,
       y: -11,
       z: 0,
       population: 0,
