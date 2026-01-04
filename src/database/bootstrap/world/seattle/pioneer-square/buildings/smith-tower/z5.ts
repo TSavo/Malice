@@ -209,7 +209,7 @@ export const building = {
       },
       objects: [
         { prototype: 'furniture', name: 'a spiral staircase', description: 'A tight spiral staircase with brass rails leads to the loft. The steps are carpeted in mauve shag.', boltedDown: true },
-        { prototype: 'bed', name: 'a platform bed', description: 'A low platform bed with a lacquered black frame fills the loft. The geometric bedding is very Memphis Design.', quality: 'standard' },
+        { prototype: 'bed', name: 'a platform bed', description: 'A low platform bed with a lacquered black frame fills the loft. The geometric bedding is very Memphis Design.', quality: 'standard', boltedDown: true },
         { prototype: 'furniture', name: 'a leather pit group', description: 'A sunken conversation pit with modular leather seating in cream. Very Dynasty. The cushions are surprisingly intact.', boltedDown: true },
         { prototype: 'furniture', name: 'track lighting', description: 'Track lighting runs across the ceiling, its halogen bulbs long dead. The brass fixtures are tarnished.', boltedDown: true },
       ],

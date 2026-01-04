@@ -135,7 +135,7 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a platform bed', description: 'A low Japanese-style platform bed in black lacquer with a high-end Tempur-Pedic mattress. Egyptian cotton sheets, now grey with dust.', quality: 'nice' },
+        { prototype: 'bed', name: 'a platform bed', description: 'A low Japanese-style platform bed in black lacquer with a high-end Tempur-Pedic mattress. Egyptian cotton sheets, now grey with dust.', quality: 'nice', boltedDown: true },
         { prototype: 'furniture', name: 'a walk-in closet', description: 'A walk-in closet with custom California Closet organizers. Designer suits hang motionless, Italian leather shoes lined up below.', boltedDown: true },
         { prototype: 'table', name: 'a floating nightstand', description: 'A wall-mounted nightstand with a wireless charging pad (dead), a Bose clock radio (silent), and a copy of "The 7 Habits."', boltedDown: true },
         { prototype: 'furniture', name: 'a Poang chair', description: 'An IKEA Poang chair in black leather sits in the corner, a cashmere throw draped over its arm.', boltedDown: false },
@@ -220,7 +220,7 @@ export const building = {
       },
       objects: [
         { prototype: 'furniture', name: 'a steel ship ladder', description: 'A brushed steel ship ladder leads to the mezzanine, its industrial design matching the exposed ductwork above.', boltedDown: true },
-        { prototype: 'bed', name: 'a loft platform bed', description: 'A custom-built platform bed with built-in reading lights and USB ports (dead) fills the mezzanine. The mattress is memory foam.', quality: 'nice' },
+        { prototype: 'bed', name: 'a loft platform bed', description: 'A custom-built platform bed with built-in reading lights and USB ports (dead) fills the mezzanine. The mattress is memory foam.', quality: 'nice', boltedDown: true },
         { prototype: 'furniture', name: 'an Eames lounge chair', description: 'A genuine Eames lounge chair and ottoman in black leather sits beneath the mezzanine, its rosewood shell gleaming.', boltedDown: false },
         { prototype: 'table', name: 'a Noguchi coffee table', description: 'An Isamu Noguchi coffee table with its distinctive biomorphic glass top. A copy of Wallpaper magazine lies on it.', boltedDown: false },
       ],
