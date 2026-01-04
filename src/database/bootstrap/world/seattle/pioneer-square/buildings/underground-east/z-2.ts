@@ -62,6 +62,12 @@ Above, through gaps in the timber ceiling, you can see the underside of the mode
       exits: {
         south: '%OCC_CROSS',
         north: '%OCC_N2',
+        east: {
+          to: 'buildings/owl-cafe/z-1.ts',
+          room: '%OLD_CELLAR',
+          description: 'A breach in the wall leads to an old basement',
+          hidden: true,
+        },
       },
     },
 
