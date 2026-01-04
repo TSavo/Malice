@@ -52,7 +52,7 @@ RUN groupadd -f docker && usermod -aG docker runner
 WORKDIR /home/runner/actions-runner
 
 # Download and extract GitHub Actions runner (use latest version)
-ARG RUNNER_VERSION=2.322.0
+ARG RUNNER_VERSION=2.330.0
 RUN curl -o actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz -L \
     https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz \
     && tar xzf ./actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz \
