@@ -10,6 +10,7 @@ import io
 import time
 import copy
 import logging
+from threading import Lock
 from typing import Optional, Literal
 from pathlib import Path
 
@@ -43,6 +44,7 @@ IS_7B_MODEL = "7b" in MODEL_PATH.lower() or "1.5b" in MODEL_PATH.lower()
 
 # Cached voice prompts (for streaming model)
 voice_cache = {}
+voice_cache_lock = Lock()
 
 # Select voice directory based on model type
 VOICES_DIR = VOICES_DIR_7B if IS_7B_MODEL else VOICES_DIR_STREAMING
@@ -84,19 +86,21 @@ OPENAI_VOICES = {
 
 
 def get_voice_preset(voice_name: str) -> Optional[dict]:
-    """Load a voice preset from .pt file"""
-    global voice_cache
-    
+    """Load a voice preset from .pt file (thread-safe)"""
+    global voice_cache, voice_cache_lock
+
     # Map OpenAI voice names to VibeVoice presets
     voice_key = OPENAI_VOICES.get(voice_name.lower(), voice_name.lower())
-    
-    if voice_key in voice_cache:
-        return voice_cache[voice_key]
-    
+
+    # Check cache with lock
+    with voice_cache_lock:
+        if voice_key in voice_cache:
+            return voice_cache[voice_key]
+
     # Look for voice file
     voice_files = list(VOICES_DIR.glob(f"**/{voice_key}*.pt")) + \
                   list(VOICES_DIR.glob(f"**/*{voice_key}*.pt"))
-    
+
     if not voice_files:
         # Try to find any voice file as default
         voice_files = list(VOICES_DIR.glob("**/*.pt"))
@@ -105,14 +109,18 @@ def get_voice_preset(voice_name: str) -> Optional[dict]:
         else:
             logger.error(f"No voice presets found in {VOICES_DIR}")
             return None
-    
+
     voice_path = voice_files[0]
     logger.info(f"Loading voice preset from {voice_path}")
-    
+
     try:
         device = MODEL_DEVICE if MODEL_DEVICE != "cuda" else "cuda"
         preset = torch.load(voice_path, map_location=device, weights_only=False)
-        voice_cache[voice_key] = preset
+
+        # Store in cache with lock
+        with voice_cache_lock:
+            voice_cache[voice_key] = preset
+
         return preset
     except Exception as e:
         logger.error(f"Failed to load voice preset: {e}")
@@ -167,35 +175,39 @@ def load_model():
             )
 
             # Use subfolder for DevParker repo structure
-            subfolder = MODEL_SUBFOLDER if MODEL_SUBFOLDER else None
+            subfolder = MODEL_SUBFOLDER if MODEL_SUBFOLDER and MODEL_SUBFOLDER.strip() else None
 
+            # WARNING: trust_remote_code=True allows arbitrary code execution from HuggingFace repos.
+            # This is required for VibeVoice custom modeling code, but poses a security risk if the
+            # model repository is compromised. In production, consider pinning to specific commit hashes.
             model = VibeVoiceForConditionalGenerationInference.from_pretrained(
                 MODEL_PATH,
                 subfolder=subfolder,
                 quantization_config=bnb_config,
                 device_map=MODEL_DEVICE,
                 torch_dtype=torch.bfloat16,
-                trust_remote_code=True,
+                trust_remote_code=True,  # Required for VibeVoice custom code
             )
             # Processor needs special handling - use microsoft/VibeVoice-1.5B processor
             # since the DevParker 4-bit repo doesn't have full tokenizer files
             processor = VibeVoiceProcessor.from_pretrained(
                 "microsoft/VibeVoice-1.5B",
-                trust_remote_code=True,
+                trust_remote_code=True,  # Required for VibeVoice custom code
             )
         else:
             # Use VibeVoice Streaming modules (Realtime 0.5B)
             from vibevoice import VibeVoiceStreamingForConditionalGenerationInference, VibeVoiceStreamingProcessor
 
+            # WARNING: trust_remote_code=True allows arbitrary code execution (see comment above)
             model = VibeVoiceStreamingForConditionalGenerationInference.from_pretrained(
                 MODEL_PATH,
                 device_map=MODEL_DEVICE,
                 torch_dtype=torch.bfloat16,
-                trust_remote_code=True,
+                trust_remote_code=True,  # Required for VibeVoice custom code
             )
             processor = VibeVoiceStreamingProcessor.from_pretrained(
                 MODEL_PATH,
-                trust_remote_code=True,
+                trust_remote_code=True,  # Required for VibeVoice custom code
             )
 
         elapsed = time.time() - start_time
@@ -535,26 +547,15 @@ async def generate_advanced(
     text: str,
     voice: Optional[str] = None,
     speed: float = 1.0,
-    inference_steps: Optional[int] = None,
 ):
     """Advanced generation endpoint with more options"""
-    global INFERENCE_STEPS
-    
-    # Temporarily override inference steps if provided
-    original_steps = INFERENCE_STEPS
-    if inference_steps is not None:
-        INFERENCE_STEPS = inference_steps
-    
-    try:
-        audio = generate_speech(text, voice, speed)
-        audio_bytes = audio_to_bytes(audio, "wav")
-        
-        return Response(
-            content=audio_bytes,
-            media_type="audio/wav",
-        )
-    finally:
-        INFERENCE_STEPS = original_steps
+    audio = generate_speech(text, voice, speed)
+    audio_bytes = audio_to_bytes(audio, "wav")
+
+    return Response(
+        content=audio_bytes,
+        media_type="audio/wav",
+    )
 
 
 @app.post("/v1/voices/add")
