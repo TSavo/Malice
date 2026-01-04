@@ -35,6 +35,10 @@ The air tastes of salt and rot, the organic decay of things the tide brings in a
         north: '%PIER_N1',
         east: '%WHARF_CONN',
       },
+      objects: [
+        { prototype: 'crate', name: 'a rotting crate', description: 'A wooden shipping crate, its boards warped and green with algae. Salt crystals encrust the rusted iron bands.', boltedDown: true },
+        { prototype: 'sign', name: 'a faded cargo manifest', description: 'A water-damaged manifest nailed to the wall. The ink has run, but a few words remain visible: "...SHANGHAI... 47 BARRELS... INSPECT..."', boltedDown: true },
+      ],
     },
 
     '%PIER_N1': {
@@ -72,6 +76,9 @@ A rusted iron ladder rises toward a hatch in the ceiling, the route to the pier 
         north: '%PIER_N3',
         east: '%MUSSEL_CAVE',
       },
+      objects: [
+        { prototype: 'bench', name: 'a barnacle-covered bench', description: 'A stone bench embedded in the wall, completely encrusted with barnacles. Whatever it once was, the bay has claimed it.', boltedDown: true },
+      ],
     },
 
     '%PIER_N3': {
@@ -185,6 +192,10 @@ Smugglers used this chamber for storage that needed to be hidden quickly—goods
         south: '%TIDAL_CAVE',
         east: '%CARGO_HIDE',
       },
+      objects: [
+        { prototype: 'crate', name: 'a weighted crate', description: 'A wooden crate with chains attached, designed to sink quickly. Something rattles inside when the water moves it.', boltedDown: true },
+        { prototype: 'sign', name: 'scratched tally marks', description: 'Tally marks scratched into the stone above the waterline. Someone counted something here. The count stopped at forty-seven.', boltedDown: true },
+      ],
     },
 
     '%TIDAL_CAVE': {
@@ -225,6 +236,11 @@ The platform shows the wear of heavy use, the stone polished by decades of boots
         south: '%SOUTH_CAVE',
         east: '%DOCK_PASSAGE',
       },
+      objects: [
+        { prototype: 'bench', name: 'a stone loading platform', description: 'A flat stone platform at the water\'s edge, worn smooth by decades of cargo. Iron rings are set into the rock for mooring lines.', boltedDown: true },
+        { prototype: 'crate', name: 'an anchor chain pile', description: 'A massive pile of rusted anchor chain, coiled in the corner. It could hold a ship—or weigh down something that needed to disappear.', boltedDown: true },
+        { prototype: 'sign', name: 'carved initials', description: 'Initials carved deep into the stone: "J.K. 1923" and below it, fresher, "R.M. 1987". The tradition continues.', boltedDown: true },
+      ],
     },
 
     '%SOUTH_CAVE': {
@@ -264,6 +280,9 @@ Bones lie scattered on the floor here, too old to identify, too numerous to igno
         north: '%SOUTH_CAVE',
         down: '%DEEP_SOUTH',
       },
+      objects: [
+        { prototype: 'sign', name: 'a warning scratched in stone', description: 'Words scratched deeply into the rock: "TIDE KILLS. WAIT FOR LOW." Below it, in different handwriting: "Chen didn\'t wait."', boltedDown: true },
+      ],
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -449,6 +468,10 @@ The cold makes this chamber useful for purposes the original builders never inte
         west: '%DOCK_PASSAGE',
         down: '%DEEP_COLD',
       },
+      objects: [
+        { prototype: 'cabinet', name: 'an ice-block frame', description: 'A massive wooden frame where ice blocks were once stacked. The wood is frozen into the walls, immovable after a century of cold.', boltedDown: true },
+        { prototype: 'sign', name: 'an ice company sign', description: 'A painted metal sign reads "ALASKA ICE CO. - KEEP DOORS CLOSED". The paint is flaking but the warning remains clear.', boltedDown: true },
+      ],
     },
 
     '%DOCK_PASSAGE': {
@@ -484,6 +507,10 @@ The walls show the marks of past contents: scuffs and scratches at consistent he
       exits: {
         west: '%TIDAL_N2',
       },
+      objects: [
+        { prototype: 'crate', name: 'an oilcloth bundle', description: 'A bundle wrapped in deteriorating oilcloth, wedged behind a false panel. The cloth is old but the contents feel solid—metal, perhaps, or glass.', boltedDown: true },
+        { prototype: 'trunk', name: 'a smuggler\'s cache', description: 'A watertight metal box hidden in a carved niche. It\'s locked, but the lock is old and corroded.', boltedDown: true },
+      ],
     },
 
     '%SOUTH_TUNNEL': {
@@ -522,6 +549,9 @@ The walls show the marks of past contents: scuffs and scratches at consistent he
         },
         down: '%DEEP_SOUTH_CONN',
       },
+      objects: [
+        { prototype: 'sign', name: 'a scratched message', description: 'Scratched into the stone: "M.C. was here - 1934. Made it to Vancouver. Made it free." The letters are worn but deep.', boltedDown: true },
+      ],
     },
 
     '%SUPPLY_CONN': {

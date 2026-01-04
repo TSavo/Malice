@@ -78,6 +78,10 @@ The heat is significant here—the proximity to live steam making the air thick 
         north: '%STEAM_N2',
         south: '%STEAM_S2',
       },
+      objects: [
+        { prototype: 'sign', name: 'a valve control panel', description: 'A massive panel of valve wheels and pressure gauges, some still functioning. Labels indicate zones: "BLOCK 14", "COURTHOUSE", "KING ST STATION".', boltedDown: true },
+        { prototype: 'cabinet', name: 'a utility cabinet', description: 'A metal cabinet bolted to the wall, its door hanging open. Inside are wrenches, pipe tape, and a clipboard with maintenance logs from 1987.', boltedDown: true },
+      ],
     },
 
     '%4TH_ACCESS': {
@@ -181,6 +185,11 @@ The chamber serves as a waystation in the eastern underground—a space large en
         north: '%UTILITY_NORTH',
         east: '%4TH_N2',
       },
+      objects: [
+        { prototype: 'furniture', name: 'a dormant boiler', description: 'A massive cast-iron boiler dominates the room, cold and silent. Its riveted hull shows a century of use, and the manufacturer\'s plate reads "BABCOCK & WILCOX 1912".', boltedDown: true },
+        { prototype: 'desk', name: 'an engineer\'s workbench', description: 'A heavy wooden workbench covered in old tools—pipe wrenches, pressure gauges, a hand-crank telephone that might still work.', boltedDown: true },
+        { prototype: 'sign', name: 'safety regulations poster', description: 'A faded poster lists boiler room regulations in archaic language. "NO INTOXICANTS", "MAINTAIN WATER LEVEL", "REPORT ALL ANOMALIES".', boltedDown: true },
+      ],
     },
 
     '%4TH_N1': {
@@ -272,6 +281,9 @@ Someone who understood these cables could tap into remarkable amounts of data. S
         north: '%JUNCTION_BOX',
         east: '%BASEMENT_RUINS',
       },
+      objects: [
+        { prototype: 'sign', name: 'a technician\'s note', description: 'A yellowed note taped to a cable tray reads: "DO NOT TOUCH RED BUNDLE - GOES TO COURTHOUSE. J.P. 2003". The red bundle is untouched.', boltedDown: true },
+      ],
     },
 
     '%JUNCTION_BOX': {
@@ -291,6 +303,10 @@ The chamber is maintained by people who come through official channels, entering
         south: '%CABLE_RUN',
         west: '%YESLER_EAST',
       },
+      objects: [
+        { prototype: 'cabinet', name: 'a fiber junction cabinet', description: 'A large metal cabinet filled with fiber optic patch panels. Status lights blink in patterns—green, green, amber, red—a language only technicians understand.', boltedDown: true },
+        { prototype: 'sign', name: 'a network diagram', description: 'A laminated diagram shows cable routes through the building. Someone has added handwritten notes: "TAP HERE" with an arrow pointing to a specific junction.', boltedDown: true },
+      ],
     },
 
     '%YESLER_EAST': {
@@ -353,6 +369,10 @@ Debris litters the floor: fragments of the building that once stood here, materi
         west: '%CABLE_RUN',
         down: '%RUBBLE_DESCENT',
       },
+      objects: [
+        { prototype: 'crate', name: 'a pile of debris', description: 'Broken bricks, twisted rebar, fragments of tile—the remains of whatever building once stood here, pushed aside to clear paths.', boltedDown: true },
+        { prototype: 'sign', name: 'a cornerstone', description: 'A granite cornerstone lies amid the rubble: "ERECTED 1903 - SEATTLE SAVINGS BANK". The bank is gone; its foundation remembers.', boltedDown: true },
+      ],
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -525,6 +545,11 @@ WARNING signs in multiple languages warn of electrical hazard. The warnings are 
         south: '%SOUTH_TUNNEL_W',
         east: '%UTILITY_SOUTH',
       },
+      objects: [
+        { prototype: 'furniture', name: 'a transformer bank', description: 'Three massive electrical transformers hum with power, their coils radiating heat. Warning signs in red and yellow cover every surface.', boltedDown: true },
+        { prototype: 'sign', name: 'a danger sign', description: 'A bright yellow sign with a lightning bolt: "DANGER - HIGH VOLTAGE - AUTHORIZED PERSONNEL ONLY". Below it, graffiti adds: "that means you".', boltedDown: true },
+        { prototype: 'cabinet', name: 'a circuit breaker panel', description: 'A massive breaker panel with dozens of switches. Labels indicate the buildings above: "SMITH TOWER", "MUTUAL LIFE", "ALASKA BLDG".', boltedDown: true },
+      ],
     },
 
     '%UTILITY_SOUTH': {

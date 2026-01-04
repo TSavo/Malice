@@ -95,6 +95,10 @@ The junction is maintained despite the decades since its official use ended. Som
         east: '%FREIGHT_CENTRAL',
         west: '%FREIGHT_WEST',
       },
+      objects: [
+        { prototype: 'sign', name: 'a railway timetable', description: 'A massive iron-framed timetable shows arrivals and departures. The trains listed haven\'t run since 1971, but the board remains, frozen in time.', boltedDown: true },
+        { prototype: 'bench', name: 'a cargo scale platform', description: 'A massive industrial scale platform is set into the floor, its dial frozen at 2,347 pounds—the weight of some long-forgotten load.', boltedDown: true },
+      ],
     },
 
     '%FIRST_SOUTH_PASSAGE': {
@@ -154,6 +158,11 @@ The junction was built to handle the traffic of a major rail terminus, designed 
         north: '%OCCIDENTAL_SOUTH',
         down: '%FREIGHT_SHAFT',
       },
+      objects: [
+        { prototype: 'furniture', name: 'freight elevator machinery', description: 'The massive drum and cable system for a freight elevator stands silent, its gears frozen with rust. The elevator car is somewhere below, immobile.', boltedDown: true },
+        { prototype: 'sign', name: 'a load capacity sign', description: 'A metal plate reads: "MAXIMUM LOAD 10,000 LBS - GREAT NORTHERN RAILWAY". The railway merged decades ago, but its infrastructure remains.', boltedDown: true },
+        { prototype: 'cabinet', name: 'a switch box', description: 'An electrical switch cabinet with handles labeled "UP", "DOWN", "STOP". The power was cut long ago.', boltedDown: true },
+      ],
     },
 
     '%OCCIDENTAL_SOUTH': {
@@ -445,6 +454,11 @@ The loading bay is abandoned now, the freight operations moved elsewhere, but th
         north: '%FREIGHT_WEST',
         east: '%KING_MID_W',
       },
+      objects: [
+        { prototype: 'bench', name: 'a loading dock', description: 'A concrete loading dock with a rusted chain-link barrier. Yellow paint on the floor marks where trucks once backed in.', boltedDown: true },
+        { prototype: 'crate', name: 'abandoned pallets', description: 'A stack of wooden shipping pallets, rotting and splintered. Some still bear faded shipping labels: "FRAGILE - MACHINERY".', boltedDown: true },
+        { prototype: 'sign', name: 'a dock assignment board', description: 'A chalkboard shows dock assignments in faded chalk: "DOCK 1 - ALASKA S.S. CO. / DOCK 2 - PACIFIC FREIGHT / DOCK 3 - RESERVED".', boltedDown: true },
+      ],
     },
 
     '%FREIGHT_CENTRAL': {
@@ -482,6 +496,11 @@ The loading bay is abandoned now, the freight operations moved elsewhere, but th
         west: '%FREIGHT_LOADING',
         down: '%DEEP_FREIGHT',
       },
+      objects: [
+        { prototype: 'furniture', name: 'a track switching lever', description: 'A massive iron lever is set into the floor, connected to cables that disappear into the walls. The mechanism for routing freight cars still appears functional.', boltedDown: true },
+        { prototype: 'sign', name: 'a switch diagram', description: 'A painted diagram on the wall shows rail routes: lines to the docks, to the station, to sidings. Some routes are marked "CLOSED" in red.', boltedDown: true },
+        { prototype: 'cabinet', name: 'a signal lantern cabinet', description: 'A wall cabinet holds old railroad signal lanterns—red, green, clear glass. Some still have kerosene in their reservoirs.', boltedDown: true },
+      ],
     },
 
     '%STORAGE_BAY': {
@@ -537,6 +556,11 @@ The emptiness is useful in its own way. The space accommodates what the current 
         east: '%KING_MAIN',
         down: '%DEEP_BAGGAGE',
       },
+      objects: [
+        { prototype: 'furniture', name: 'a carousel frame', description: 'The steel frame of a baggage carousel remains bolted to the floor, its belt and rollers removed. The outline shows where travelers once waited.', boltedDown: true },
+        { prototype: 'crate', name: 'an unclaimed trunk', description: 'A battered steamer trunk sits in the corner, its owner\'s name painted on the side: "MRS. HAROLD SINCLAIR - TACOMA". She never came back for it.', boltedDown: true },
+        { prototype: 'sign', name: 'a claim check board', description: 'A board with hooks for claim checks still hangs on the wall. A few yellowed tickets remain: "CLAIM #4471 - HOLD FOR PASSENGER".', boltedDown: true },
+      ],
     },
 
     '%PLATFORM_TUNNEL': {
@@ -576,6 +600,11 @@ The hatch is locked from the surface side, but the lock is old and the mechanism
         north: '%PLATFORM_TUNNEL',
         down: '%DEEP_PLATFORM',
       },
+      objects: [
+        { prototype: 'furniture', name: 'maintenance ladder', description: 'A steel ladder is bolted to the wall, rising toward a hatch in the ceiling. The hatch has a heavy padlock, but the hasp is loose.', boltedDown: true },
+        { prototype: 'sign', name: 'a platform diagram', description: 'A faded diagram shows the platforms above: "TRACK 1 - COAST STARLIGHT / TRACK 2 - EMPIRE BUILDER / TRACK 3 - LOCAL SERVICE".', boltedDown: true },
+        { prototype: 'cabinet', name: 'a tool locker', description: 'A metal locker holds railroad maintenance tools: track gauges, spike mauls, lanterns. The Amtrak logo is scratched but visible.', boltedDown: true },
+      ],
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -600,6 +629,10 @@ Iron rungs line one wall, providing a climbing route for those willing to descen
         south: '%DEEP_FREIGHT_MAIN',
         east: '%DEEP_KING_MID',
       },
+      objects: [
+        { prototype: 'furniture', name: 'the shaft cage', description: 'A rusted freight elevator cage sits at the bottom of the shaft, its cables long since cut. The frame would still hold, but there\'s no way to raise it.', boltedDown: true },
+        { prototype: 'sign', name: 'a depth marker', description: 'Painted numbers mark depth intervals on the shaft wall: "40 FT... 60 FT... 80 FT". Someone has added in chalk: "100 FT - bottom".', boltedDown: true },
+      ],
     },
 
     '%DEEP_FREIGHT': {
@@ -772,6 +805,10 @@ Iron rungs line one wall, providing a climbing route for those willing to descen
           description: 'A passage leads east toward the rail tunnels',
         },
       },
+      objects: [
+        { prototype: 'sign', name: 'a worker\'s memorial', description: 'A small brass plaque is bolted to the wall: "IN MEMORY OF THE TUNNEL WORKERS - 1903-1906 - TWELVE MEN GAVE THEIR LIVES". Below, someone added: "we remember".', boltedDown: true },
+        { prototype: 'sign', name: 'union graffiti', description: 'Faded paint reads: "IWW LOCAL 10 - AN INJURY TO ONE IS AN INJURY TO ALL". The Wobblies organized these tunnels a century ago.', boltedDown: true },
+      ],
     },
   },
 };

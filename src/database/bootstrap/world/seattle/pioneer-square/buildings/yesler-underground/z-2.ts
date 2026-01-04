@@ -197,6 +197,10 @@ The walls show the accumulated markings of decades—territorial claims overlapp
         east: '%BASEMENT_ROW',
         west: '%PROHIBITION_HALL',
       },
+      objects: [
+        { prototype: 'sign', name: 'layered graffiti', description: 'Decades of graffiti cover one wall: "HOBOS WELCOME 1932", "ARMY OF THE UNEMPLOYED", "WE WERE HERE BEFORE THE WAR", and newer: "still here - 2019".', boltedDown: true },
+        { prototype: 'sign', name: 'a direction marker', description: 'Chalk arrows point in multiple directions with cryptic labels: "WATER ←", "HEAT ↑", "TROUBLE →", "OUT ↓".', boltedDown: true },
+      ],
     },
 
     '%OCC_NORTH_EXT': {
@@ -413,6 +417,11 @@ The speakeasy operated during Prohibition, serving customers who descended from 
         east: '%OCCIDENTAL_YESLER',
         south: '%SPEAKEASY_BACK',
       },
+      objects: [
+        { prototype: 'furniture', name: 'the old bar', description: 'A long mahogany bar stretches along the wall, its brass rail tarnished green. A century of elbows have worn grooves in the wood. Behind it, empty shelves wait for bottles that will never return.', boltedDown: true },
+        { prototype: 'sign', name: 'a painted menu board', description: 'A slate board on the wall still shows prices in chalk: "BEER 5¢ - WHISKEY 10¢ - CHAMPAGNE 50¢". Below, someone added "DON\'T ASK QUESTIONS".', boltedDown: true },
+        { prototype: 'bench', name: 'a booth bench', description: 'A curved wooden bench from a booth, its leather upholstery cracked and split. The high back offered privacy for conversations that couldn\'t be overheard.', boltedDown: true },
+      ],
     },
 
     '%SPEAKEASY_BACK': {
@@ -433,6 +442,10 @@ A hidden door in the back wall opens onto a passage that was used to evacuate cu
         east: '%SPEAKEASY_HALL',
         down: '%BOOTLEG_CELLAR',
       },
+      objects: [
+        { prototype: 'desk', name: 'a poker table', description: 'A round felt-topped table, the green baize stained with old spills and cigarette burns. Chips and cards are long gone, but the indentations where elbows rested remain.', boltedDown: true },
+        { prototype: 'sign', name: 'a framed photo', description: 'A sepia photograph in a tarnished frame shows men in suits raising glasses. Someone has scratched out all the faces.', boltedDown: true },
+      ],
     },
 
     '%SPEAKEASY_HALL': {
@@ -470,6 +483,12 @@ The den operated alongside the speakeasy, offering customers a chance to lose th
         east: '%SPEAKEASY_HALL',
         down: '%GAMBLING_VAULT',
       },
+      objects: [
+        { prototype: 'furniture', name: 'a roulette wheel base', description: 'The base of a roulette wheel remains bolted to the floor, though the wheel itself is long gone. Faded numbers are painted on the surrounding floor.', boltedDown: true },
+        { prototype: 'desk', name: 'a card dealer\'s table', description: 'A curved blackjack table, its padded rail worn smooth by thousands of nervous hands. The green felt shows outlines where cards were dealt.', boltedDown: true },
+        { prototype: 'sign', name: 'a painted wall slogan', description: 'Faded paint on the wall reads: "LADY LUCK LOVES THE BOLD". Below it, someone scratched: "Lady Luck is a liar."', boltedDown: true },
+        { prototype: 'safe', name: 'an empty wall safe', description: 'A safe door hangs open in the wall, its interior empty. The lock mechanism has been removed—someone took their time getting in.', boltedDown: true },
+      ],
     },
 
     '%BASEMENT_ROW': {
@@ -525,6 +544,10 @@ Storage rooms branch off the main space, their doors hanging open on rusted hing
         east: '%THIRD_YESLER',
         south: '%LAUNDRY_ROOM',
       },
+      objects: [
+        { prototype: 'cabinet', name: 'a linen closet', description: 'A built-in closet with shelves still lined with yellowed paper. A few moth-eaten towels remain, their hotel monogram barely visible: "P.S.H."', boltedDown: true },
+        { prototype: 'sign', name: 'a room service menu', description: 'A framed menu offers "OYSTERS 25¢ - STEAK 40¢ - ROOM SERVICE AVAILABLE 24 HOURS". The Pioneer Square Hotel has been gone for decades.', boltedDown: true },
+      ],
     },
 
     '%LAUNDRY_ROOM': {
@@ -542,6 +565,10 @@ Storage rooms branch off the main space, their doors hanging open on rusted hing
         north: '%HOTEL_BASEMENT',
         west: '%BOARDING_BASEMENT',
       },
+      objects: [
+        { prototype: 'furniture', name: 'a mangle frame', description: 'The iron frame of an industrial mangle is bolted to the floor, its rollers and gears long removed. The wall behind it is stained dark from decades of steam.', boltedDown: true },
+        { prototype: 'bench', name: 'a folding table base', description: 'A heavy wooden table base where laundry was sorted and folded. The iron legs are rusted but solid.', boltedDown: true },
+      ],
     },
 
     '%BOARDING_BASEMENT': {
@@ -621,6 +648,11 @@ The liquor is long gone, but the cellar remains as a connection to the deeper ne
         up: '%SPEAKEASY_BACK',
         south: '%DEEP_YESLER_W',
       },
+      objects: [
+        { prototype: 'crate', name: 'an empty bottle rack', description: 'A wooden rack designed to hold whiskey bottles lies empty against the wall. The wood is stained dark from decades of spilled liquor.', boltedDown: true },
+        { prototype: 'sign', name: 'a painted warning', description: 'Red paint on the wall reads: "IF BELL RINGS, HIDE EVERYTHING". The bell mechanism is gone, but the warning remains.', boltedDown: true },
+        { prototype: 'trunk', name: 'a bootlegger\'s trunk', description: 'A large steamer trunk with false bottom compartments, designed to smuggle bottles past inspectors. The secret latches still work.', boltedDown: true },
+      ],
     },
 
     '%GAMBLING_VAULT': {
@@ -638,6 +670,10 @@ The liquor is long gone, but the cellar remains as a connection to the deeper ne
         up: '%GAMBLING_DEN',
         east: '%DEEP_YESLER_W',
       },
+      objects: [
+        { prototype: 'safe', name: 'a cracked vault', description: 'A massive Mosler safe stands in the corner, its door blown off by an ancient explosion. Scorch marks blacken the walls around it.', boltedDown: true },
+        { prototype: 'sign', name: 'a ledger page', description: 'A yellowed page nailed to the wall shows columns of numbers and initials—bets placed, debts owed. The last entry is dated October 1929.', boltedDown: true },
+      ],
     },
 
     '%DEEP_YESLER_W': {
