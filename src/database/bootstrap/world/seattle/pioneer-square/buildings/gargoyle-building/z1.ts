@@ -1,69 +1,165 @@
-// Gargoyle Building - Upper Floors and Roof (z=1)
-// Victorian-era offices and roof with gargoyle views
+// Gargoyle Building - First Floor (z=1)
+// Victorian-era offices: Suite 101-104 (Harbor Insurance, Dental Office)
 
 export const building = {
+  name: 'Gargoyle Building',
+  x: -18,
+  y: 12,
+  width: 2,
+  height: 2,
+  floors: 5,
+
   rooms: {
     // ═══════════════════════════════════════════════════════════════════
-    // LOCKS
+    // DOORS AND LOCKS
     // ═══════════════════════════════════════════════════════════════════
 
-    '%ROOF_HATCH_LOCK': {
-      prototype: 'lock',
-      name: 'Roof Hatch Lock',
+    '%SUITE_101_LOCK': {
+      prototype: 'rentableLock',
+      name: 'Suite 101 Lock',
       description:
-        'A heavy padlock on the roof hatch, its brass tarnished green with age. The lock is rusted but still functional.',
+        'A brass lock with a tarnished plate reading "101". The mechanism is old but functional.',
       difficulty: 4,
+    },
+    '%SUITE_101_DOOR': {
+      prototype: 'door',
+      name: 'Suite 101 Door',
+      description:
+        'A solid wood door with a frosted glass panel. Gold leaf lettering reads: "HARBOR INSURANCE CO." The glass is cracked but intact.',
+      locked: true,
+      open: false,
+      locks: ['%SUITE_101_LOCK'],
+      material: 'wood',
+      durability: 70,
+    },
+
+    '%SUITE_102_LOCK': {
+      prototype: 'rentableLock',
+      name: 'Suite 102 Lock',
+      description:
+        'A brass lock matching the others on this floor. Slightly newer, installed during some renovation.',
+      difficulty: 4,
+    },
+    '%SUITE_102_DOOR': {
+      prototype: 'door',
+      name: 'Suite 102 Door',
+      description:
+        'A wooden door with frosted glass. "DR. EDWARD CHEN, D.D.S." in peeling gold leaf. A dental practice.',
+      locked: true,
+      open: false,
+      locks: ['%SUITE_102_LOCK'],
+      material: 'wood',
+      durability: 70,
     },
 
     // ═══════════════════════════════════════════════════════════════════
-    // UPPER FLOOR (z=1) - OFFICES
+    // FIRST FLOOR (z=1) - OFFICES
     // ═══════════════════════════════════════════════════════════════════
 
-    '%UPPER_HALL': {
-      name: 'Gargoyle Building - Upper Hall',
-      description: `The upper hallway continues the building's Victorian grandeur, though neglect has taken a heavier toll up here. The pressed tin ceiling shows water damage where the roof has leaked, rust blooming through the decorative pattern. The plaster walls are cracked, the crown molding pulling away in places.
+    '%HALL_1': {
+      name: 'Gargoyle Building - First Floor Hall',
+      description: `The first floor hallway retains more of its original grandeur than the floors above—the tin ceiling panels are intact here, the wallpaper merely faded rather than peeling. The ornate cast iron staircase continues upward, while doors to offices line the corridor.
 
-Doors line both sides of the hall—frosted glass transoms bearing suite numbers and the names of businesses that closed decades before everything else did. Some doors stand ajar, revealing empty offices beyond. Others remain locked, their contents preserved by neglect.
+The numbering system is traditional: 101, 102, 103, 104. Each door has a frosted glass transom and a brass mail slot. The mail slots are stuffed with papers that will never be read, correspondence for businesses that no longer exist.
 
-At the end of the hall, a narrow ladder leads up through a hatch to the roof. A faded sign reads: ROOF ACCESS - AUTHORIZED PERSONNEL ONLY. The lock on the hatch is rusted but intact.`,
+A water-stained ceiling panel near the end of the hall suggests problems from above—leaks that traveled down through the building's bones, finding their way through plaster and lathe to mark this spot.`,
       x: -18,
       y: 12,
       z: 1,
       population: 0,
       ambientNoise: 2,
-      lighting: 25,
+      lighting: 35,
       waterLevel: 0,
       outdoor: false,
       exits: {
-        down: '%STAIRWELL',
-        west: '%OFFICE_VACANT',
-        up: { room: '%ROOF_NE', locks: ['%ROOF_HATCH_LOCK'] },
+        down: 'z0.ts#STAIRWELL',
+        up: '%HALL_2',
+        east: {
+          description: 'A frosted glass door leads to Suite 101',
+          door: '%SUITE_101_DOOR',
+          to: '%SUITE_101',
+        },
+        west: {
+          description: 'A frosted glass door leads to Suite 102',
+          door: '%SUITE_102_DOOR',
+          to: '%SUITE_102',
+        },
       },
       objects: [
         {
           prototype: 'describable',
-          name: 'water damage',
-          aliases: ['ceiling', 'damage', 'rust'],
-          description: `The pressed tin ceiling shows the telltale signs of roof leaks—rust blooming through the decorative pattern in orange-brown stains, the metal warped where water pooled above. Each storm added another layer of damage. The damage accumulated. The repairs never came.`,
+          name: 'tin ceiling',
+          aliases: ['ceiling', 'panels'],
+          description: `The pressed tin ceiling panels are remarkably intact—stamped metal in a pattern of interlocking circles and flowers, painted cream that has yellowed to ivory over the decades. A few panels are dented where something hit them, but the overall effect remains impressive. Victorian-era buildings invested in their ceilings.`,
         },
         {
           prototype: 'describable',
-          name: 'office doors',
-          aliases: ['doors', 'transoms'],
-          description: `Frosted glass transoms above wooden doors, each one etched with a suite number and a business name: "Suite 201 - Hendricks & Associates," "Suite 203 - Pacific Maritime Insurance." The glass is dusty, the names of enterprises that shuttered long before the world did. Some doors are locked. Some stand ajar, revealing emptiness.`,
+          name: 'mail slots',
+          aliases: ['slots', 'mail'],
+          description: `Each office door has a brass mail slot, the kind designed for business correspondence in the days before email. The slots are stuffed with papers—bills and notices and marketing materials that accumulated after the last forwarding address expired. The papers are yellowed now, their urgency expired along with their recipients.`,
         },
       ],
     },
 
-    '%OFFICE_VACANT': {
-      name: 'Gargoyle Building - Vacant Office',
-      description: `A corner office that once commanded premium rent—two walls of windows looking out over Yesler Way and the alley. The view would have been impressive once. Now it shows a city frozen in abandonment, the street below empty, the buildings across the way dark.
+    '%SUITE_101': {
+      name: 'Gargoyle Building - Suite 101 (Harbor Insurance)',
+      description: `Harbor Insurance Company occupied this corner office—a small operation by the look of it, one reception area and one private office visible through a doorway. The aesthetic is 1960s corporate: wood paneling, acoustic tile ceiling, fluorescent lights that have long since burned out.
 
-The office is stripped bare except for a massive wooden desk too heavy to move. The desk is scarred with decades of use—coffee rings, cigarette burns, the impressions of pens pressed too hard on paper above. Whoever worked here was a heavy user of this desk. They left it behind.
+Filing cabinets line one wall, drawer labels reading ACTIVE CLAIMS, LAPSED POLICIES, PENDING INVESTIGATIONS. The insurance industry's paper trail, preserved in these drawers, claims for ships and cargo that sank or were damaged decades ago.
 
-Dust motes float in the grey light from the windows. The silence is absolute.`,
-      x: -19,
+A maritime map covers one wall—Puget Sound, the Strait of Juan de Fuca, the Pacific coast from Alaska to California. Push pins mark locations, their meanings lost without the legend that explained them.`,
+      x: -18,
       y: 12,
+      z: 1,
+      population: 0,
+      ambientNoise: 1,
+      lighting: 30,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        west: '%HALL_1',
+        north: '%SUITE_101_BACK',
+      },
+      sittables: [
+        {
+          name: 'a reception chair',
+          capacity: 2,
+          emptyMsg:
+            'Vinyl reception chairs line the wall, the kind designed for uncomfortable waiting.',
+          occupiedMsg: '%s waiting in a reception chair',
+        },
+      ],
+      objects: [
+        {
+          prototype: 'desk',
+          name: 'reception desk',
+          aliases: ['desk', 'counter'],
+          description: `A reception desk with a sliding glass window—the barrier between clients and the business that served them. The window is open, frozen mid-slide. A sign on the counter reads "PLEASE TAKE A NUMBER." The number dispenser is empty.`,
+        },
+        {
+          prototype: 'cabinet',
+          name: 'filing cabinets',
+          aliases: ['cabinets', 'files'],
+          description: `Metal filing cabinets, grey and institutional, labeled with categories of insurance work: ACTIVE CLAIMS, LAPSED POLICIES, MARINE CASUALTIES. The drawers contain records of losses—ships that sank, cargo that was damaged, voyages that ended badly.`,
+        },
+        {
+          prototype: 'describable',
+          name: 'maritime map',
+          aliases: ['map', 'chart'],
+          description: `A large nautical chart covers one wall, showing Puget Sound and the approaches to Seattle's harbor. Push pins mark locations throughout the chart—some red, some blue, some yellow. The legend that explained the color coding is gone.`,
+        },
+      ],
+    },
+
+    '%SUITE_101_BACK': {
+      name: 'Gargoyle Building - Suite 101 (Private Office)',
+      description: `The insurance agent's private office—where the serious claims were discussed, the difficult conversations happened. The desk faces the door, the power position, a high-backed leather chair behind it. The chair is cracked and faded.
+
+A window looks out over Yesler Way, the view framed by heavy drapes that are more dust than fabric at this point. The window is intact, the view unchanged from a century of occupants gazing out at the street below.
+
+A safe sits in the corner, a squat iron box with a combination dial. The safe is locked, its contents unknown.`,
+      x: -18,
+      y: 11,
       z: 1,
       population: 0,
       ambientNoise: 1,
@@ -71,141 +167,122 @@ Dust motes float in the grey light from the windows. The silence is absolute.`,
       waterLevel: 0,
       outdoor: false,
       exits: {
-        east: '%UPPER_HALL',
+        south: '%SUITE_101',
       },
+      sittables: [
+        {
+          name: 'the executive chair',
+          capacity: 1,
+          emptyMsg:
+            'A high-backed leather chair commands the room from behind the desk, its upholstery cracked with age.',
+          occupiedMsg: '%s sitting in the executive chair',
+        },
+      ],
       objects: [
         {
           prototype: 'desk',
-          name: 'massive desk',
-          aliases: ['desk', 'wooden desk'],
-          description: `A desk built to last centuries—solid oak, probably weighed five hundred pounds when it was new and weighs more now with the accumulated grime of a century. The surface is a map of use: coffee rings, cigarette burns, the impressions of ten thousand documents pressed too hard. A brass nameplate sits in a holder, the name worn away by thumbs that polished it unconsciously over decades.`,
+          name: 'executive desk',
+          aliases: ['desk'],
+          description: `A substantial desk in dark wood, its surface covered in the debris of abandoned work: a desk blotter with notes in the margins, a pen set with dried-out pens, a calendar turned to a month that no longer matters.`,
         },
         {
-          prototype: 'describable',
-          name: 'corner windows',
-          aliases: ['windows', 'view'],
-          description: `Two walls of windows meet at the corner, offering a panoramic view that once justified the premium rent. The glass is grimy but intact, looking out over Yesler Way to the north and the alley to the west. The street below is empty. The buildings across are dark. The view persists. The viewers are gone.`,
+          prototype: 'safe',
+          name: 'office safe',
+          aliases: ['safe', 'strongbox'],
+          description: `A floor safe, maybe two feet on a side, with a combination dial and a brass handle. The safe is old—Victorian, probably installed when the building was new—but it still functions. The combination is unknown.`,
         },
       ],
     },
 
-    // ═══════════════════════════════════════════════════════════════════
-    // ROOF (z=1) - Outdoor 2x2 area with gargoyles
-    // ═══════════════════════════════════════════════════════════════════
+    '%SUITE_102': {
+      name: 'Gargoyle Building - Suite 102 (Dental Office)',
+      description: `Dr. Edward Chen, D.D.S. practiced dentistry in this suite—the equipment remains, frozen in time, a dental museum from the 1980s. The waiting room is small, just three chairs and a magazine rack, the magazines themselves long since decomposed into pulp.
 
-    '%ROOF_NE': {
-      name: 'Gargoyle Building - Roof (Northeast)',
-      description: `The northeast corner of the roof, where a steel hatch opens up from the building below. The roofing is old—tar paper over wooden decking, patched a dozen times in a dozen different ways. Some patches are professional. Others are clearly amateur, applied in emergencies that became permanent.
+A sliding window connects to the reception area, its glass clouded with age. Appointment cards are scattered on the counter, reminders for cleanings that never happened.
 
-From here, Smith Tower rises to the southeast, its white terracotta stained grey by decades of Seattle rain. The Chinese guardian figures at the corners are visible from here, watching over a city that has mostly forgotten them.
-
-A stone gargoyle perches on the parapet at the corner, one of four that give the building its name. This one depicts something between a dog and a demon, its face worn smooth by a century of weather. Rain has carved channels in the stone. The expression beneath is still hungry.`,
-      x: -17,
-      y: 13,
-      z: 1,
-      population: 0,
-      ambientNoise: 25,
-      lighting: 100,
-      waterLevel: 0,
-      outdoor: true,
-      exits: {
-        down: { room: '%UPPER_HALL', locks: ['%ROOF_HATCH_LOCK'] },
-        west: '%ROOF_NW',
-        south: '%ROOF_SE',
-      },
-      objects: [
-        {
-          prototype: 'describable',
-          name: 'dog gargoyle',
-          aliases: ['gargoyle', 'grotesque', 'stone figure'],
-          description: `A stone gargoyle crouches on the parapet, part dog, part demon, all hunger. The carving is Victorian—detailed, slightly grotesque, designed to ward off evil spirits by being more frightening than whatever might approach. A century of Seattle rain has worn the features smooth, but the expression remains legible. The gargoyle is patient. It has been watching for a hundred years. It will watch for a hundred more.`,
-        },
-      ],
-    },
-
-    '%ROOF_NW': {
-      name: 'Gargoyle Building - Roof (Northwest)',
-      description: `The northwest corner of the roof, looking out over the grid collision where Pioneer Square meets downtown. Yesler Way runs below, the street that was once the skid road for timber sliding down to the mills. The view north shows the debris wall that seals Pioneer Square from the rest of the city—collapsed buildings that have become terrain.
-
-The roofing here is in worse shape than the rest, the tar paper peeling up at the edges, exposing the wooden decking beneath. Rain pools in the low spots. The wood is soft with rot in places.
-
-Another gargoyle watches from this corner—an eagle or something like it, its wings folded, its beak open in a silent scream. The stone is weathered, but the expression of rage or hunger or warning persists.`,
-      x: -18,
-      y: 13,
-      z: 1,
-      population: 0,
-      ambientNoise: 30,
-      lighting: 100,
-      waterLevel: 0,
-      outdoor: true,
-      exits: {
-        east: '%ROOF_NE',
-        south: '%ROOF_SW',
-      },
-      objects: [
-        {
-          prototype: 'describable',
-          name: 'eagle gargoyle',
-          aliases: ['gargoyle', 'eagle', 'bird'],
-          description: `An eagle-like gargoyle perches at the corner, wings folded tight against its body, beak open in a silent scream. The carving captures something between nobility and menace—the bird of prey aspect emphasized, the eyes deep-set and predatory. Lichen grows in the carved feathers, green against grey stone. The eagle doesn't mind. It has other concerns.`,
-        },
-      ],
-    },
-
-    '%ROOF_SW': {
-      name: 'Gargoyle Building - Roof (Southwest)',
-      description: `The southwest corner offers the best view of Elliott Bay, grey water stretching to the horizon where it merges with grey sky. The waterfront is visible below—the crumbling seawall, the old piers, the water that claims a little more of the city each year.
-
-The parapet here is crumbling, the mortar between stones failing, a few stones already fallen to the street far below. Someone should repair it. No one will repair it. The decay continues on its schedule.
-
-The gargoyle on this corner is the strangest of the four—a face without a body, emerging from the stone as if trying to escape. The features are almost human, but twisted, the proportions wrong in ways that are hard to articulate. It watches the bay. It has been watching for a hundred years.`,
-      x: -18,
+The sound system still has a cassette in it: EASY LISTENING FAVORITES. The kind of music meant to calm dental anxiety. The music stopped.`,
+      x: -19,
       y: 12,
       z: 1,
       population: 0,
-      ambientNoise: 35,
-      lighting: 100,
+      ambientNoise: 1,
+      lighting: 25,
       waterLevel: 0,
-      outdoor: true,
+      outdoor: false,
       exits: {
-        north: '%ROOF_NW',
-        east: '%ROOF_SE',
+        east: '%HALL_1',
+        north: '%EXAM_ROOM',
       },
+      sittables: [
+        {
+          name: 'a waiting room chair',
+          capacity: 3,
+          emptyMsg:
+            'Padded chairs in muted colors line the waiting area, designed for anxious patients.',
+          occupiedMsg: '%s waiting nervously in a dental office chair',
+        },
+      ],
       objects: [
         {
+          prototype: 'desk',
+          name: 'reception counter',
+          aliases: ['counter', 'desk'],
+          description: `A reception counter with a sliding glass window, appointment books open on the desk behind it. The books are filled with names and times, a schedule of dental work that was never performed.`,
+        },
+        {
           prototype: 'describable',
-          name: 'face gargoyle',
-          aliases: ['gargoyle', 'face', 'grotesque'],
-          description: `A face emerges from the stone—no body, just a head pushing through the parapet as if trying to escape the building itself. The features are almost human but wrong: the eyes too wide, the mouth too long, the proportions shifted in ways that create unease without being identifiably monstrous. The sculptor was skilled. The sculptor may have been disturbed.`,
+          name: 'cassette player',
+          aliases: ['stereo', 'player', 'music'],
+          description: `A small stereo system with a cassette deck, the kind that played soothing music to mask the sound of drills. A cassette is loaded: EASY LISTENING FAVORITES, the spine reads.`,
         },
       ],
     },
 
-    '%ROOF_SE': {
-      name: 'Gargoyle Building - Roof (Southeast)',
-      description: `The southeast corner commands the best overall view—Smith Tower to the east, the bay to the west, Yesler Way below, the expanse of Pioneer Square spreading south. On a clear day, you could see the mountains. Today is not a clear day. Today the horizon dissolves into grey.
+    '%EXAM_ROOM': {
+      name: 'Gargoyle Building - Dental Exam Room',
+      description: `The exam room is a time capsule of 1980s dentistry—a reclining chair in teal vinyl, an overhead light on an articulated arm, a tray of instruments that glint dully in the dim light. The instruments are clean but tarnished.
 
-The roofing here is surprisingly solid, the tar paper intact, evidence that water drains properly from this corner. Small victories. The parapet is sturdy, the stones mortared tight.
+A poster on the wall shows the anatomy of a tooth, cross-sectioned and labeled in clinical detail. Another poster urges patients to BRUSH TWICE DAILY! with cartoon enthusiasm. The posters have faded to pastels.
 
-The fourth gargoyle—the last of the set—is a serpent coiled around a sphere, its mouth open to show fangs worn smooth by weather. The sphere might be the world. The serpent might be time. Victorian sculptors loved their symbolism.`,
-      x: -17,
-      y: 12,
+The x-ray machine is mounted on its swing arm, its cone pointed at the empty chair. The last x-ray was taken years ago.`,
+      x: -19,
+      y: 11,
       z: 1,
       population: 0,
-      ambientNoise: 25,
-      lighting: 100,
+      ambientNoise: 1,
+      lighting: 20,
       waterLevel: 0,
-      outdoor: true,
+      outdoor: false,
       exits: {
-        north: '%ROOF_NE',
-        west: '%ROOF_SW',
+        south: '%SUITE_102',
       },
+      sittables: [
+        {
+          name: 'the dental chair',
+          capacity: 1,
+          emptyMsg:
+            'A teal vinyl dental chair reclines at an angle, positioned under the overhead light.',
+          occupiedMsg: '%s reclined in the dental chair',
+        },
+      ],
       objects: [
         {
+          prototype: 'furniture',
+          name: 'dental equipment',
+          aliases: ['chair', 'equipment'],
+          description: `A dental chair in teal vinyl, the kind that reclines patients into positions of vulnerability. The armrests are worn where thousands of nervous hands gripped them. The vinyl is cracked in places.`,
+        },
+        {
           prototype: 'describable',
-          name: 'serpent gargoyle',
-          aliases: ['gargoyle', 'serpent', 'snake'],
-          description: `A serpent coils around a stone sphere, its body wrapping three times before its head rises to show worn fangs. The sphere might represent the world, the serpent time consuming it—or perhaps the snake represents wisdom guarding knowledge. Victorian symbolism allowed for multiple interpretations. The sculptor left no notes. The serpent keeps its own counsel.`,
+          name: 'instrument tray',
+          aliases: ['instruments', 'tools', 'tray'],
+          description: `A tray of dental instruments: mirror, probe, scaler, excavator. The steel is tarnished but the edges are still sharp.`,
+        },
+        {
+          prototype: 'describable',
+          name: 'x-ray machine',
+          aliases: ['xray', 'x-ray'],
+          description: `A dental x-ray machine on a swing arm, its cone positioned to image the jaw of a patient who isn't here. The machine is old—the kind that required lead aprons.`,
         },
       ],
     },
