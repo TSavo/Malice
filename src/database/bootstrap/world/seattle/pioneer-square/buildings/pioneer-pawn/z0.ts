@@ -130,6 +130,7 @@ Security bars cross every window, casting striped shadows across the dusty inven
           name: 'pawn counter',
           aliases: ['counter', 'register'],
           description: `A heavy counter of laminate and steel, designed to keep customers at arm's length while transactions happened. The register sits sealed, its drawer locked, whatever cash was inside still there—worthless now but present. A small camera above the counter, its lens dark, once recorded every transaction. The recordings are on a hard drive somewhere, unwatched.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -165,12 +166,14 @@ A glass case near the counter holds the small accessories: picks in every color,
           name: 'guitar wall',
           aliases: ['guitars', 'instruments'],
           description: `Guitars hang from hooks on the wall, arranged by type and value: acoustics on the left, electrics on the right, the expensive ones higher up where they're harder to grab and run. A vintage Fender Stratocaster hangs near the ceiling, its sunburst finish faded, its value now purely theoretical. Below it, rows of lesser instruments await players who will never come.`,
+          boltedDown: true,
         },
         {
           prototype: 'furniture',
           name: 'drum kit',
           aliases: ['drums', 'kit'],
           description: `A five-piece drum kit assembled in the corner, its chrome hardware tarnished, its drum heads covered in dust. Someone brought this in piece by piece over multiple visits, each piece representing a small surrender. The hi-hat is frozen open. The kick pedal is locked in place. The drums are silent, waiting for a beat that won't come.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',

@@ -123,6 +123,7 @@ A window overlooks the alley behind the building, frosted glass providing light 
           aliases: ['table', 'workbench'],
           description:
             'A long wooden table scarred by years of packing and shipping. Box cutters, tape dispensers, and shipping labels are scattered across its surface. The work stopped mid-task—a half-packed box sits waiting, its contents never sealed.',
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -205,6 +206,7 @@ A small table with two chairs occupies what space remains. The table is cluttere
           aliases: ['stove', 'range'],
           description:
             'A gas stove that still works—the gas lines are still pressurized, a small miracle of municipal infrastructure. The burners light with a click, blue flames dancing. Someone could cook here, if someone had ingredients to cook.',
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',

@@ -114,6 +114,7 @@ The floor is littered with packaging—pill bottles opened and emptied, blister 
           name: 'checkout counter',
           aliases: ['counter', 'register'],
           description: `A laminate checkout counter with a dead cash register, its drawer hanging open. The register's digital display is blank, its last transaction frozen in memory no one can access. Impulse-buy items are scattered around the counter—lip balms and hand sanitizers, the small purchases people made while waiting. The waiting ended.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',
@@ -230,6 +231,7 @@ A computer terminal sits dead on the counter, its screen grey, its database of p
           name: 'dispensing counter',
           aliases: ['counter', 'work counter'],
           description: `A long laminate counter where prescriptions were filled, its surface covered in counting trays and pill bottles. A fluorescent light overhead is burned out, but enough ambient light filters in to see the organized chaos of pharmacy work frozen in place: a half-filled prescription, pills scattered when someone was interrupted, a label printed for a patient who never picked up.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',

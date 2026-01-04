@@ -119,12 +119,14 @@ Display cases hold smaller pieces: miniature portraits, ivory carvings yellowed 
           name: 'bronze horse',
           aliases: ['horse', 'bronze', 'sculpture'],
           description: `A bronze horse frozen mid-gallop on a marble pedestal, its mane flowing, its legs extended. The bronze has developed a green patina that might be deliberate or might be neglect. The horse gallops nowhere, has galloped nowhere for over a century. It will gallop nowhere forever.`,
+          boltedDown: true,
         },
         {
           prototype: 'furniture',
           name: 'marble Venus',
           aliases: ['venus', 'statue', 'marble'],
           description: `A marble Venus on a pedestal, missing one arm—the damage older than The Burning, probably part of its provenance, the kind of imperfection that adds value to antiquities. The goddess of love stands in an empty gallery, beautiful and broken, representing an ideal that humans never lived up to.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',
@@ -236,6 +238,7 @@ The smell here is different—old paper and leather, the distinctive scent of bo
           name: 'reading table',
           aliases: ['table', 'desk'],
           description: `A reading table with a green-shaded lamp, the kind that equipped libraries before electricity became unreliable. A magnifying glass sits positioned over a page, examining text that no one has studied in fifty-five years. The lamp is dead. The examination is suspended indefinitely.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',

@@ -94,6 +94,7 @@ The original hotel lobby is still visible beneath the museum overlay—the marbl
           name: 'reception desk',
           aliases: ['desk', 'counter', 'reception'],
           description: `A curved reception desk of dark wood, its surface scratched and worn but still dignified. Brochures fan across the top—KLONDIKE GOLD RUSH TRAIL, JUNIOR RANGER PROGRAM, ACCESSIBILITY GUIDE. The brochures are faded and curled at the edges. A computer monitor sits dark on the desk, its screen dusty. The donation box is a clear acrylic cube, a few coins visible inside—the last contributions to a federal agency that no longer exists.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -145,6 +146,7 @@ Wall panels document Seattle's role in the rush: the outfitters who got rich sel
           name: "prospector's pack",
           aliases: ['pack', 'supplies', 'ton'],
           description: `A replica of a Klondike-bound prospector's pack, assembled to demonstrate the "ton of supplies" required by Canadian authorities. Sacks of flour and beans, crates of bacon, tins of condensed milk—the supplies stack on a wooden platform, roped together as they would have been for the climb over Chilkoot Pass. A sign invites visitors to TRY LIFTING IT. The pack hasn't moved in years. It weighs exactly 2,000 pounds.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -189,6 +191,7 @@ The film they showed here was called "Gold Fever!" according to the placard by t
           name: 'projector',
           aliases: ['screen', 'movie'],
           description: `A ceiling-mounted projector, the kind used in educational settings—sturdy, reliable, obsolete. Dust coats the lens housing. The power indicator is dark. The film it showed, "Gold Fever!", is probably still loaded, its reels waiting in the mechanism for a screening that will never happen. The screen hangs at the front of the room, pulled down and left there, its surface yellowed by time.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -235,6 +238,7 @@ A model of the Seattle waterfront circa 1897 fills a display case, tiny ships at
           name: 'route map',
           aliases: ['map', 'wall map'],
           description: `A large illuminated map showing routes from Seattle to the Klondike gold fields. The main routes are traced in brass strips set into the wooden backing: by ship to Skagway, over Chilkoot Pass, down the Yukon to Dawson. Push buttons at key points were meant to illuminate different legs of the journey with colored LEDs. The buttons are dead, the LEDs dark, but the brass routes still gleam, and you can trace the path with your finger the way thousands of hopefuls traced it with their boots.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -444,6 +448,7 @@ Graffiti covers the parapet wall—tags and throw-ups accumulated over years. SE
           name: 'HVAC units',
           aliases: ['hvac', 'air conditioning', 'units'],
           description: `Industrial HVAC units squat on concrete pads, their fans spinning, their compressors humming. The units are working hard, maintaining climate control for a museum with no visitors. Heat exhaust rises from their housings, creating pockets of warm air on the otherwise cool rooftop. The electricity that powers them comes from somewhere. The bills are not being paid. The power continues.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -488,6 +493,7 @@ Antenna mounts punctuate the roofline, their original equipment removed or stole
           name: 'observation platform',
           aliases: ['platform', 'deck', 'lookout'],
           description: `A raised wooden platform, maybe four feet above the roof level, with a gap-toothed railing around its perimeter. Someone built this for observation—watching the neighborhood, the sunset, the city lights. The construction is amateur but sturdy, the wood weathered to grey but still solid. The platform creaks under weight but holds.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',

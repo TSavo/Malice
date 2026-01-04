@@ -228,6 +228,7 @@ The door to the office stands open, the lock intact but unused, as if someone st
           name: 'conference table',
           aliases: ['table'],
           description: `A mahogany conference table dominates the room, its surface covered with maritime charts and documents. The table was where risks were assessed, premiums calculated, policies written for ships that would sail into storms and return—or not.`,
+          boltedDown: true,
         },
         {
           prototype: 'cabinet',

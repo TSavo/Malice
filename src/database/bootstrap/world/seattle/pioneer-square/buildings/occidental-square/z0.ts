@@ -118,6 +118,7 @@ The gallery was artist-run, the placard on the wall explains. Twenty members sha
           name: 'spiral sculpture',
           aliases: ['sculpture', 'spiral', 'steel'],
           description: `A massive steel sculpture spirals from floor to ceiling, its polished surface reflecting the dim gallery light. The piece is maybe twelve feet tall, too heavy and too awkward to remove. The artist's name is engraved on a small plaque at the base: RIVERA, 2019. The sculpture has no title, or the title was on a card that's been taken.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -186,12 +187,14 @@ Tables and chairs fill the front half, the mismatched furniture carefully curate
           name: 'Probat roaster',
           aliases: ['roaster', 'coffee roaster', 'probat'],
           description: `A vintage Probat drum roaster, the crown jewel of any serious coffee operation. Cast iron construction, brass fittings, a drum that held five pounds of beans per batch. The hopper still contains dried green beans—the last shipment, probably, ordered before supply chains collapsed. The roaster is cold, its controls frozen at the settings for a medium roast that never happened.`,
+          boltedDown: true,
         },
         {
           prototype: 'furniture',
           name: 'espresso machine',
           aliases: ['espresso', 'coffee machine', 'machine'],
           description: `A two-group La Marzocco espresso machine, polished steel and clean lines, the kind of equipment that serious coffee shops invest in and maintain with religious devotion. The portafilters are still locked into the group heads, packed with old grounds now welded by moisture into solid pucks. The steam wands are crusted with dried milk. The machine was the heart of this place. The heart has stopped.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -363,6 +366,7 @@ The building's old signage—OCCIDENTAL SQUARE, painted in art deco letters—is
           name: 'rooftop garden',
           aliases: ['garden', 'beds', 'planters'],
           description: `Raised garden beds made from reclaimed timber, once a tidy urban farm, now a jungle of neglected plants. Tomato vines have grown woody and sprawling, still producing small hard fruits. Herbs have bolted to seed, their flowers attracting what bees remain. Squash plants send tendrils over the bed edges, reaching for more space. The garden is more productive in its abandonment than it was under cultivation.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -398,6 +402,7 @@ Someone has strung lights between the water tower frame and the building's eleva
           name: 'water tower frame',
           aliases: ['tower', 'water tower', 'frame'],
           description: `The steel frame of an old water tower, its wooden tank long since rotted away. The frame stands maybe twenty feet tall, a lattice of riveted steel that once supported thousands of gallons. Now it supports nothing but habit and rust. The structure is still sound, if you trust century-old metalwork.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -433,6 +438,7 @@ A fire escape descends from here, iron stairs zigzagging down the building's eas
           name: 'HVAC units',
           aliases: ['hvac', 'air conditioning'],
           description: `Rooftop HVAC units in various states of decay—some merely silent, others rusted through, a few with panels torn off to reveal the internal machinery. The units haven't run in years. Whatever cooling they once provided for the offices below is now provided by opening windows, if the windows still open.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
