@@ -17,7 +17,7 @@ The floor is uneven, cobblestone in places, packed earth in others, the surface 
   outdoor: false,
   exits: {
     west: {
-      to: 'buildings/gargoyle-building/z0.ts:%TUNNEL_ACCESS',
+      to: 'buildings/gargoyle-building/z-1.ts:%TUNNEL_ACCESS',
       description: 'The passage connects to the coal cellar',
     },
   },
