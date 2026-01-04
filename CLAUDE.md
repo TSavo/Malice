@@ -270,6 +270,7 @@ Messages are JSON envelopes with channel routing:
 | `game` | bidirectional | Text I/O (like telnet) |
 | `state` | server→client | State pushes (room, inventory, etc.) |
 | `ctrl` | bidirectional | Control signals (resize, ready, prompt) |
+| `audio` | server→client | TTS audio segments for speech synthesis |
 | `custom:*` | bidirectional | Custom channels (open with `t: 'open'`) |
 
 ### MOO Methods for Channels
@@ -306,6 +307,7 @@ ws.onmessage = (e) => {
   if (ch === 'game') terminal.write(p);
   if (ch === 'state') updateState(p);
   if (ch === 'ctrl') handleCtrl(p);
+  if (ch === 'audio') handleTTS(p.segments);
 };
 
 // Send game input
@@ -314,6 +316,46 @@ ws.send(JSON.stringify({ ch: 'game', t: 'data', p: 'look' }));
 // Send resize
 ws.send(JSON.stringify({ ch: 'ctrl', t: 'data', p: { type: 'resize', w: 80, h: 24 } }));
 ```
+
+### Text-to-Speech (TTS)
+
+Every object in the game can speak using the TTS system. Speech is broadcast as both text and audio to all players in the same location.
+
+**Object Methods:**
+```typescript
+// Say something out loud (available on ALL objects via $describable)
+npc.say("Hello there!");
+player.say("Hi!");
+vendingMachine.say("Please insert coins.");
+
+// Get object's TTS voice ID (deterministic based on object ID)
+const voice = obj.getVoiceId();
+// Returns: 'alloy', 'echo', 'fable', 'onyx', 'nova', or 'shimmer'
+```
+
+**Location Broadcast:**
+```typescript
+// Broadcast audio segments to all players in location
+room.broadcastAudio([
+  { speaker: '42', speakerName: 'Bot', voiceId: 'alloy', text: 'Hello' },
+  { speaker: '99', speakerName: 'Alice', voiceId: 'nova', text: 'Hi there!' }
+]);
+```
+
+**How it works:**
+1. Any object calls `say(message)` - broadcasts text via `location.announce()` and audio via `location.broadcastAudio()`
+2. Voice is deterministic: same object always gets same voice (based on `objectId % 6`)
+3. Audio segments sent to all players in location via `audio` channel
+4. Client requests TTS audio from server and plays it
+
+**Voice assignment:**
+Objects are assigned one of 6 OpenAI TTS voices based on their ID:
+- `alloy` - Neutral, balanced
+- `echo` - Clear, expressive
+- `fable` - Warm, storytelling
+- `onyx` - Deep, authoritative
+- `nova` - Bright, energetic
+- `shimmer` - Soft, gentle
 
 ### WebSocket Protocol
 
