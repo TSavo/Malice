@@ -284,6 +284,7 @@ The sluice still functions after a fashion, carrying water that finds its own pa
       exits: {
         west: '%OCC_N2',
         east: '%ALLEY_E',
+        northeast: '%MAZE_LOOP',
       },
     },
 
@@ -429,7 +430,7 @@ A passage continues north toward the main network.`,
       outdoor: false,
       exits: {
         north: '%MAZE_2',
-        west: '%ALLEY_W',
+        southwest: '%ALLEY_W',
       },
     },
 
