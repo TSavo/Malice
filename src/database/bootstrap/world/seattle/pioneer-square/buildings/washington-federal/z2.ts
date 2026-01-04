@@ -74,7 +74,7 @@ A window in the door offers a preview of the roof—gravel and tar paper, HVAC e
       outdoor: false,
       exits: {
         down: 'z1.ts#STAIRWELL_1',
-        east: {
+        west: {
           description: 'The roof access door leads outside',
           door: '%ROOF_DOOR',
           to: '%ROOF_MAIN',
@@ -106,10 +106,8 @@ The view from the roof encompasses Pioneer Square and beyond—other rooftops, t
       waterLevel: 0,
       outdoor: true,
       exits: {
-        west: '%ROOF_ACCESS',
+        east: '%ROOF_EDGE',
         south: '%CLOCK_TOWER',
-        north: '%ROOF_EDGE',
-        east: '%ROOF_CORNER',
       },
       sittables: [
         {
@@ -163,6 +161,7 @@ The clock ran on springs and gears, wound weekly by someone who understood the m
           door: '%CLOCK_DOOR',
           to: '%ROOF_MAIN',
         },
+        east: '%ROOF_CORNER',
       },
       objects: [
         {
@@ -193,7 +192,7 @@ The clock ran on springs and gears, wound weekly by someone who understood the m
 Someone has left a camp chair here, weathered and stained, its fabric torn. The chair faces north, positioned for watching the street below. Cigarette butts are scattered nearby, filtered and unfiltered, the accumulated evidence of someone who spent time here. Watching. Waiting. The watching ended. The chair remains.
 
 A fire escape ladder is bolted to the parapet, providing emergency egress to the alley below. The ladder is rusted but structurally sound—tested by whoever left the chair, probably.`,
-      x: -2,
+      x: -1,
       y: -2,
       z: 2,
       population: 0,
@@ -202,7 +201,8 @@ A fire escape ladder is bolted to the parapet, providing emergency egress to the
       waterLevel: 0,
       outdoor: true,
       exits: {
-        south: '%ROOF_MAIN',
+        west: '%ROOF_MAIN',
+        south: '%ROOF_CORNER',
         down: null, // Fire escape to alley - could be implemented
       },
       sittables: [
@@ -251,7 +251,7 @@ The parapet here is more substantial, a decorative balustrade that matches the n
 
 A drainage gutter runs along the parapet, channeling rainwater to downspouts at the corners. The gutter is clogged with debris—leaves, feathers, the accumulated detritus of seasons without maintenance. Water pools instead of draining.`,
       x: -1,
-      y: -2,
+      y: -3,
       z: 2,
       population: 0,
       ambientNoise: 25,
@@ -259,7 +259,8 @@ A drainage gutter runs along the parapet, channeling rainwater to downspouts at 
       waterLevel: 0,
       outdoor: true,
       exits: {
-        west: '%ROOF_MAIN',
+        west: '%CLOCK_TOWER',
+        north: '%ROOF_EDGE',
       },
       sittables: [
         {
