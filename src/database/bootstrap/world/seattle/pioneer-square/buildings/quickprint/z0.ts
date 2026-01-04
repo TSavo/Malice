@@ -178,12 +178,14 @@ Band posters cover every wall, the shop's portfolio and decoration combined: SOU
           name: 'digital printer',
           aliases: ['digital', 'color printer'],
           description: `A large-format digital printer from the 2010s, the technology that made offset obsolete for short runs. Paper is still loaded in the tray. A test print is stuck in the output—color bars and registration marks, the diagnostics of a machine testing itself. The test passed. No one came to see the results.`,
+          boltedDown: true,
         },
         {
           prototype: 'furniture',
           name: 'paper cutter',
           aliases: ['cutter', 'guillotine'],
           description: `A commercial paper cutter, the guillotine type with a heavy blade and a safety guard that's been disabled for convenience. The blade is still sharp—these things stay sharp for decades. A stack of paper sits on the bed, measured and marked for cutting. The cut never happened.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
@@ -262,6 +264,7 @@ The alley connects to streets at both ends, a through-passage for those who know
           name: 'paper dumpster',
           aliases: ['dumpster', 'garbage'],
           description: `A dumpster overflowing with paper scraps—misprints, test sheets, the shredded remains of jobs gone wrong. The paper has composted into a solid mass after years of weather, unrecognizable as individual sheets. PRINTERS NEVER DIE is spray-painted on the side in silver letters. Whether that's true is debatable.`,
+          boltedDown: true,
         },
         {
           prototype: 'describable',
