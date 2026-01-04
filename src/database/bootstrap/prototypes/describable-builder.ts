@@ -45,6 +45,8 @@ export class DescribableBuilder implements Builder {
           // Every digital device in 2110 is conscious (legacy of AI solving software in 2026)
           systemPrompt: null, // string - AI personality/role prompt
           interactionSession: null, // string - session ID for conversation continuity
+          // TTS voice for speech synthesis
+          voiceId: null, // string - TTS voice ID (alloy, echo, fable, onyx, nova, shimmer)
         },
         methods: {},
       });
@@ -848,6 +850,60 @@ export class DescribableBuilder implements Builder {
     `,
     );
 
+    // ═══════════════════════════════════════════════════════════════════
+    // TTS SPEECH - Text-to-speech for any object that can speak
+    // ═══════════════════════════════════════════════════════════════════
+
+    // getVoiceId() - Get deterministic TTS voice for this object
+    obj.setMethod(
+      'getVoiceId',
+      `
+      /** Get this object's TTS voice ID. Deterministic based on object ID.
+       *  Same object always gets same voice across sessions.
+       *  @returns voice ID string (alloy, echo, fable, onyx, nova, shimmer)
+       */
+      if (self.voiceId) return self.voiceId;
+
+      // Deterministic assignment from object ID
+      const VOICES = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
+      self.voiceId = VOICES[self.id % VOICES.length];
+      return self.voiceId;
+    `,
+    );
+
+    // say(message) - Say something out loud with TTS
+    obj.setMethod(
+      'say',
+      `
+      /** Say something out loud. Broadcasts text AND audio to location.
+       *  Works for ANY object - NPCs, players, vending machines, AIs, etc.
+       *  @param message - What to say
+       */
+      const message = args[0];
+      if (!message?.trim()) return;
+
+      const location = self.location;
+      if (!location) return;
+
+      // Text broadcast (existing behavior)
+      await location.announce(self, null, {
+        actor: 'You say, "' + message + '"',
+        others: self.name + ' says, "' + message + '"'
+      });
+
+      // Audio broadcast for TTS-enabled clients
+      const voiceId = await self.getVoiceId();
+      if (location.broadcastAudio) {
+        await location.broadcastAudio([{
+          speaker: String(self.id),
+          speakerName: self.name,
+          voiceId: voiceId,
+          text: message
+        }]);
+      }
+    `,
+    );
+
     // Property descriptions for AI context
     obj.setPropertyDescription('name', 'Display name of this object');
     obj.setPropertyDescription(
@@ -889,6 +945,10 @@ export class DescribableBuilder implements Builder {
     obj.setPropertyDescription(
       'interactionSession',
       'AI session ID for conversation continuity with this object',
+    );
+    obj.setPropertyDescription(
+      'voiceId',
+      'TTS voice ID for speech synthesis (alloy, echo, fable, onyx, nova, shimmer)',
     );
 
     this.obj = obj;
