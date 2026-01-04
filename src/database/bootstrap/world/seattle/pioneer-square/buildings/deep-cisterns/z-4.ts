@@ -4,10 +4,10 @@
 
 export const building = {
   name: 'Deep Cisterns',
-  x: -14,
-  y: -20,
-  width: 28,
-  height: 25,
+  x: 10,
+  y: -10,
+  width: 16,
+  height: 10,
   floors: 1,
 
   rooms: {
