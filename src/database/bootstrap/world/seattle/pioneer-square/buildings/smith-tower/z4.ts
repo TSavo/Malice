@@ -209,7 +209,7 @@ export const building = {
       },
       objects: [
         { prototype: 'furniture', name: 'a rickety loft ladder', description: 'A wooden ladder leads to the mezzanine, its rungs worn thin and one cracked down the middle. It creaks alarmingly with each step.', boltedDown: true },
-        { prototype: 'bed', name: 'a bare loft mattress', description: 'A stained mattress sits directly on the loft platform. No sheets, just a balled-up sleeping bag in one corner.', quality: 'cheap' },
+        { prototype: 'bed', name: 'a bare loft mattress', description: 'A stained mattress sits directly on the loft platform. No sheets, just a balled-up sleeping bag in one corner.', quality: 'cheap', boltedDown: true },
         { prototype: 'furniture', name: 'a broken recliner', description: 'A La-Z-Boy recliner sits below the loft, its footrest permanently extended and mechanism jammed. The vinyl is split along every seam.', boltedDown: false },
         { prototype: 'furniture', name: 'a standing lamp skeleton', description: 'A floor lamp stands in the corner, its shade long gone, bare bulb socket exposed. The wiring looks questionable.', boltedDown: false },
       ],

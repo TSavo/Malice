@@ -293,7 +293,7 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a curved sectional', description: 'A sweeping curved sectional in emerald velvet dominates the room, its chrome legs tarnished but elegant. The geometric pattern of the upholstery is faded but discernible.', boltedDown: false },
+        { prototype: 'furniture', name: 'a curved sectional', description: 'A sweeping curved sectional in emerald velvet dominates the room, its chrome legs tarnished but elegant. The geometric pattern of the upholstery is faded but discernible.', boltedDown: true },
         { prototype: 'table', name: 'a mirrored coffee table', description: 'A hexagonal coffee table with a mirrored top and chrome frame sits before the sectional. The mirror is clouded with age spots.', boltedDown: false },
         { prototype: 'furniture', name: 'a built-in radio cabinet', description: 'An elaborate built-in cabinet houses a vintage radio with a half-circle dial and cloth speaker grille. The tubes are surely dead.', boltedDown: true },
         { prototype: 'furniture', name: 'a lacquered coat closet', description: 'A coat closet with black lacquer doors and chrome pulls is built into the wall, its geometric pattern echoing the room\'s decor.', boltedDown: true },
@@ -367,7 +367,7 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a tuxedo sofa', description: 'A sleek tuxedo sofa in faded mauve velvet faces the window, its geometric lines and low profile unmistakably Art Deco.', boltedDown: false },
+        { prototype: 'furniture', name: 'a tuxedo sofa', description: 'A sleek tuxedo sofa in faded mauve velvet faces the window, its geometric lines and low profile unmistakably Art Deco.', boltedDown: true },
         { prototype: 'table', name: 'a chrome and glass side table', description: 'A two-tiered side table with smoked glass shelves and chrome frame holds a geometric table lamp and a crystal ashtray.', boltedDown: false },
         { prototype: 'furniture', name: 'a sunburst radiator cover', description: 'An ornate radiator cover in brass with a sunburst pattern conceals the steam radiator. Heat still rises from its geometric openings.', boltedDown: true },
         { prototype: 'furniture', name: 'chrome curtain hardware', description: 'Chrome curtain rods with geometric finials span the windows, holding velvet drapes in faded gold that pool on the floor.', boltedDown: true },
@@ -480,7 +480,7 @@ export const building = {
         { prototype: 'furniture', name: 'a lacquered Murphy cabinet', description: 'The Murphy bed folds into a striking black lacquer cabinet with geometric chrome inlays. When closed, it appears to be an elaborate armoire.', boltedDown: true },
         { prototype: 'furniture', name: 'geometric display niches', description: 'Built-in niches with geometric shapes are carved into the walls around the window, displaying frosted glass figurines and chrome sculptures.', boltedDown: true },
         { prototype: 'table', name: 'a chrome fold-down desk', description: 'A fold-down desk with a chrome frame and burled walnut surface is hinged to the wall. When closed, only a geometric chrome panel shows.', boltedDown: true },
-        { prototype: 'furniture', name: 'a streamlined dresser', description: 'A low dresser in blonde wood with waterfall edges and Bakelite pulls is wedged into the corner. A chrome-framed mirror stands atop it.', boltedDown: false },
+        { prototype: 'furniture', name: 'a streamlined dresser', description: 'A low dresser in blonde wood with waterfall edges and Bakelite pulls is wedged into the corner. A chrome-framed mirror stands atop it.', boltedDown: true },
       ],
       sittables: [
         {

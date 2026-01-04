@@ -220,7 +220,7 @@ export const building = {
       },
       objects: [
         { prototype: 'furniture', name: 'an ornate spiral stair', description: 'A narrow cast-iron spiral staircase with fleur-de-lis balusters leads to the mezzanine. The treads are worn concave from a century of footsteps.', boltedDown: true },
-        { prototype: 'bed', name: 'a brass sleigh bed', description: 'A small brass sleigh bed with an oxidized patina fills the mezzanine. The mattress is thin but the frame is gorgeous.', quality: 'standard' },
+        { prototype: 'bed', name: 'a brass sleigh bed', description: 'A small brass sleigh bed with an oxidized patina fills the mezzanine. The mattress is thin but the frame is gorgeous.', quality: 'standard', boltedDown: true },
         { prototype: 'furniture', name: 'a crystal chandelier', description: 'A small crystal chandelier hangs from the exposed beams, its pendants clouded and dusty. A few are missing entirely.', boltedDown: true },
         { prototype: 'table', name: 'a whatnot shelf', description: 'A corner whatnot shelf displays a collection of dusty daguerreotypes, a broken pocket watch, and a taxidermied songbird under glass.', boltedDown: true },
       ],
@@ -458,7 +458,7 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'an alcove daybed', description: 'A built-in daybed fills the alcove, its heavy brocade curtains drawn back with tasseled cords. The featherbed is surprisingly well-preserved.', quality: 'nice' },
+        { prototype: 'bed', name: 'an alcove daybed', description: 'A built-in daybed fills the alcove, its heavy brocade curtains drawn back with tasseled cords. The featherbed is surprisingly well-preserved.', quality: 'nice', boltedDown: true },
         { prototype: 'furniture', name: 'a cheval mirror', description: 'A full-length cheval mirror on a mahogany swivel frame. The glass is spotted with age, reflecting the room in fragments.', boltedDown: false },
         { prototype: 'furniture', name: 'a gentleman\'s wardrobe', description: 'A massive gentleman\'s wardrobe with drawers, shelves, and a mirror inside the door. Cedar-lined, it still faintly perfumes the air.', boltedDown: true },
         { prototype: 'table', name: 'a bow-fronted nightstand', description: 'A small bow-fronted nightstand with brass pulls. A porcelain chamber pot peeks from its lower shelf.', boltedDown: false },
