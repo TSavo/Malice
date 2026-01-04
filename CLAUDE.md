@@ -770,7 +770,7 @@ The game features an extensive underground tunnel network beneath Pioneer Square
 **Key levels:**
 - **z=-2**: Upper tunnels (~267 rooms) - Dense corridor network across the entire district
 - **z=-3**: Transitional layer (~75 rooms) - Deep passages, cisterns, and flooded zones
-- **z=-4**: Lower passages - Gray Cartel operational territory
+- **z=-4**: Lower passages - Gray Cartel operational territory, Deep Cisterns (pre-fire water infrastructure)
 - **z=-5**: Deep vaults - Secured cell bases
 - **z=-6**: Submerged zones - Water table boundary
 
@@ -780,6 +780,7 @@ The game features an extensive underground tunnel network beneath Pioneer Square
 - Eastside Underground (steam tunnels and utility infrastructure)
 - Yesler Underground (prohibition-era passages)
 - King Street Underground (rail platform connections)
+- Chinatown Underground (historic Chinese tunnels, gambling dens, opium passages)
 
 **Surface entry points:**
 - Fabrication building (-21, +10)
