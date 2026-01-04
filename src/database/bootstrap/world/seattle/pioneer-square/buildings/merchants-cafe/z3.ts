@@ -24,7 +24,7 @@ A steel hatch in the floor leads down through the upper floors to the kitchen be
       waterLevel: 0,
       outdoor: true,
       exits: {
-        down: '%KITCHEN',
+        down: '%HALL_Z2',
         east: '%ROOF_NE',
         south: '%ROOF_SW',
       },
