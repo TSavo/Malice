@@ -5,9 +5,9 @@
 export const building = {
   name: 'Chinatown Underground',
   x: -7,
-  y: -14,
+  y: -8,
   width: 15,
-  height: 8,
+  height: 14,
   floors: 1,
 
   rooms: {

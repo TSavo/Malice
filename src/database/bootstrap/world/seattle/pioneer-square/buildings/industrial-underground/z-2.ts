@@ -4,10 +4,10 @@
 
 export const building = {
   name: 'Industrial Underground',
-  x: 7,
-  y: -20,
-  width: 8,
-  height: 10,
+  x: 13,
+  y: -11,
+  width: 7,
+  height: 9,
   floors: 1,
 
   rooms: {
