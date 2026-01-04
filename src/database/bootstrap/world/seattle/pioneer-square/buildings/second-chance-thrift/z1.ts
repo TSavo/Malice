@@ -4,10 +4,10 @@
 
 export const building = {
   name: 'Second Chance Thrift',
-  x: -11,
-  y: 6,
-  width: 2,
-  height: 2,
+  x: -10,
+  y: 8,
+  width: 3,
+  height: 3,
   floors: 3,
 
   rooms: {

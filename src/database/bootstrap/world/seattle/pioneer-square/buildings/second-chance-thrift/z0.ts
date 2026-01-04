@@ -285,7 +285,7 @@ The steel donation door leads to the alley behind the building.`,
         north: {
           description: 'The donation door opens to the alley',
           door: '%BACK_DOOR',
-          to: 'alley/y11.ts',
+          to: 'alley/y7.ts',
         },
       },
       objects: [
