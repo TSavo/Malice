@@ -4,9 +4,9 @@
 
 export const building = {
   name: 'Deep Cisterns',
-  x: 10,
+  x: 13,
   y: -10,
-  width: 16,
+  width: 19,
   height: 10,
   floors: 1,
 
