@@ -398,3 +398,6 @@ import './blog-builder';
 // Faction-specific chargen
 import './cartel-chargen-builder';
 import './neural-log-chargen-builder';
+
+// Underground upgrades (locks and furniture, depends on sisterGray)
+import './underground-upgrades-builder';
