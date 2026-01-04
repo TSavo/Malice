@@ -7,7 +7,7 @@ export const building = {
   x: -13,
   y: 3,
   width: 2,
-  height: 2,
+  height: 3,
   floors: 3,
 
   rooms: {
@@ -31,7 +31,7 @@ A window overlooks First Avenue, the view that someone watched every day while d
       waterLevel: 0,
       outdoor: false,
       exits: {
-        south: { door: '%UPSTAIRS_DOOR', description: 'The apartment door leads to the stairs', to: '%LANDING' },
+        west: { door: '%UPSTAIRS_DOOR', description: 'The apartment door leads to the stairs', to: '%LANDING' },
         east: '%KITCHEN',
         north: '%BEDROOM',
       },

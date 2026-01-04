@@ -7,7 +7,7 @@ export const building = {
   x: -13,
   y: 3,
   width: 2,
-  height: 2,
+  height: 3,
   floors: 3,
 
   rooms: {
@@ -278,7 +278,7 @@ The apartment door is solid wood with a modern deadbolt—installed when the ups
 Through a window on the landing, you can see the street below, the view that renters accepted in exchange for affordable Pioneer Square rent.`,
       x: -13,
       y: 3,
-      z: 0,
+      z: 1,
       population: 0,
       ambientNoise: 1,
       lighting: 40,
@@ -286,7 +286,7 @@ Through a window on the landing, you can see the street below, the view that ren
       outdoor: false,
       exits: {
         down: '%FRONT',
-        north: { door: '%UPSTAIRS_DOOR', description: 'The apartment door', to: '%APARTMENT_MAIN' },
+        east: { door: '%UPSTAIRS_DOOR', description: 'The apartment door', to: '%APARTMENT_MAIN' },
       },
     },
   },
