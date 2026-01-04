@@ -236,9 +236,9 @@ A narrow stairway leads up to the second floor, where the building's original ho
       name: "Doc Maynard's - Cellar",
       description: `The cellar beneath Doc Maynard's is older than the bar above it—brick walls that predate the Great Fire, a floor of packed earth with flagstones in the high-traffic areas. This was basement level once, before the streets were raised and the basements became ground floors and the ground floors became underground.
 
-Kegs and cases line the walls, the bar's reserve inventory dusty but intact. A ancient refrigeration unit hums in one corner, somehow still keeping things cold, its compressor rattling with the effort of decades. The unit probably shouldn't work. It does.
+Kegs and cases line the walls, the bar's reserve inventory dusty but intact. An ancient refrigeration unit hums in one corner, somehow still keeping things cold, its compressor rattling with the effort of decades. The unit probably shouldn't work. It does.
 
-In the far wall, a passage has been sealed with fresh cinderblocks—the old tour entrance to the Seattle Underground, now bricked shut. Tour groups descended through here for sixty years before the tours stopped. Someone sealed it recently. The mortar is still light-colored, the work deliberate. The Underground remains beyond, inaccessible from here.`,
+The cinderblock seal that once closed the old tour entrance has been broken through—someone removed enough blocks to create a passage. The Underground Tour descended here for sixty years before the tours stopped. Now the passage is open again, leading east into the buried streets of old Seattle.`,
       x: -15,
       y: 2,
       z: -1,
@@ -252,6 +252,10 @@ In the far wall, a passage has been sealed with fresh cinderblocks—the old tou
           description: 'A ladder leads up to the bar',
           to: '%BAR',
         },
+        east: {
+          to: 'underground/upper-tunnels/x-14-y2.ts',
+          description: 'A breach in the cinderblock wall leads into the Underground',
+        },
       },
       objects: [
         {
@@ -262,9 +266,9 @@ In the far wall, a passage has been sealed with fresh cinderblocks—the old tou
         },
         {
           prototype: 'describable',
-          name: 'sealed passage',
-          aliases: ['passage', 'tunnel', 'underground'],
-          description: `A rough-cut passage in the far wall has been sealed with cinderblocks and mortar, the bricks stacked to close what was once the entrance to the Seattle Underground. Tour groups descended through here for sixty years, passing into the buried streets. The tours stopped. The passage was sealed. Fresh mortar suggests recent work—someone didn't want this entrance accessible. The Underground remains beyond the barrier, dark and quiet.`,
+          name: 'breached passage',
+          aliases: ['passage', 'tunnel', 'underground', 'breach'],
+          description: `A rough-cut passage in the east wall where the cinderblock seal was broken through. The blocks lie scattered on the floor, removed with crowbars rather than demolished. Tour groups descended through here for sixty years before the tours stopped. Someone reopened the route. The Underground breathes through the gap, cold air carrying the smell of old brick and older secrets.`,
         },
         {
           prototype: 'furniture',
