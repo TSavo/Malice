@@ -800,13 +800,19 @@ The game features an extensive underground tunnel network beneath Pioneer Square
 
 **Building basement connections:**
 - Doc Maynard's cellar (-15, 2, -1) → east to underground
+- Fabrication Factory foundry (-19, 10, -1) → south to underground
 - Gargoyle Building coal cellar (-18, 12, -1) → east to underground
 - Grand Central cistern (-15, 0, -1) → south to underground
+- Immigration Services detention cells (-15, 10, -1) → east to underground
 - Merchants Cafe basement → underground connection
 - Morrison & Kline basement (-14, 8, -1) → down to underground
+- Occidental Square old cellar (-8, 0, -1) → south to underground
 - Owl Cafe basement → underground connection
 - Pioneer Books basement → underground connection
+- Pioneer Hotel mechanical room (-15, 7, -1) → east to underground
 - Redux Vintage basement (-16, 4, -1) → underground smuggling route
+- Supply Depot emergency reserves (-20, -5, -1) → east to underground
+- Terra Nova Gallery art vault (-16, -5, -1) → north to underground
 - Zeitgeist Coffee basement (-10, 11, -1) → underground breach
 
 See `docs/city-ai/MAP-UNDERGROUND.md` for detailed maps, room coordinates, and territorial information.

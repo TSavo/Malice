@@ -145,6 +145,12 @@ Tables and chairs fill the front half, the mismatched furniture carefully curate
         },
         south: '%GALLERY',
         north: '%BOOKSTORE',
+        down: {
+          to: 'z-1.ts:%STORAGE',
+          description: 'A trapdoor leads down to the basement',
+          door: 'z-1.ts:%BASEMENT_DOOR',
+          locks: ['z-1.ts:%BASEMENT_LOCK'],
+        },
       },
       sittables: [
         {

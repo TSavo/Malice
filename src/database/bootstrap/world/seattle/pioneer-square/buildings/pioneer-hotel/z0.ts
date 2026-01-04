@@ -70,7 +70,7 @@ The control panel has six buttons, each one worn smooth by decades of fingers. T
 
 A cage elevator occupies the corner, its brass gate folded open. The stairs beside it are blocked by a chain and a handwritten sign: USE ELEVATOR. The stairs haven't been safe since something happened that no one talks about anymore.
 
-The smell is mildew and bodies and the chemical attempts to mask both. The lighting is fluorescent, one tube flickering in a rhythm that suggests it's been flickering for years.`,
+The smell is mildew and bodies and the chemical attempts to mask both. The lighting is fluorescent, one tube flickering in a rhythm that suggests it's been flickering for years. A door beside the blocked stairwell leads down to the basement.`,
       x: -16,
       y: 7,
       z: 0,
@@ -91,6 +91,12 @@ The smell is mildew and bodies and the chemical attempts to mask both. The light
           description: 'A metal service door leads to the alley',
         },
         in: '%E',
+        down: {
+          to: 'z-1.ts:%LAUNDRY',
+          description: 'A door leads down to the basement',
+          door: 'z-1.ts:%BASEMENT_DOOR',
+          locks: ['z-1.ts:%BASEMENT_LOCK'],
+        },
       },
     },
 

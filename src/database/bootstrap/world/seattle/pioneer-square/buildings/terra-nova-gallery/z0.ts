@@ -136,6 +136,12 @@ A small safe sits in the corner, its door hanging open, its contents long since 
         north: '%BACK',
         east: '%MAIN',
         up: { room: '%ROOF_SW', locks: ['%ROOF_HATCH_LOCK'] },
+        down: {
+          to: 'z-1.ts:%WORKSHOP',
+          description: 'A trapdoor leads down to the basement',
+          door: 'z-1.ts:%BASEMENT_DOOR',
+          locks: ['z-1.ts:%BASEMENT_LOCK'],
+        },
       },
       objects: [
         {
