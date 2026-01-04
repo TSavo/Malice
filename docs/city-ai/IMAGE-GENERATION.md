@@ -38,7 +38,9 @@ const blobKey = await map.image();
 
 ## $aiImageGen - Direct Image Generation
 
-For generating images directly (used internally by `$describable.image()`):
+For generating images directly (used internally by `$describable.image()`).
+
+Uses Nano Banana via [laozhang.ai](https://api.laozhang.ai) - 79% cheaper than Google direct at $0.05/image.
 
 ### generate(prompt, options?)
 
@@ -62,7 +64,7 @@ const url = $blob.url(result.blobKey, 'thecontinuum.city');
 
 ```javascript
 await $aiImageGen.generate('A glowing orb', {
-  model: 'gemini-3-pro-image-preview',  // Override default model
+  model: 'gemini-3-pro-image-preview',   // Nano Banana Pro (4K support)
   aspectRatio: 'portrait',               // 'landscape', 'portrait', 'square'
   metadata: { createdBy: player.id },    // Stored with blob
   filename: 'orb.png'                    // Optional filename
@@ -91,16 +93,14 @@ const result = await $aiImageGen.generateRaw('An icon');
 ```javascript
 const models = $aiImageGen.listModels();
 // [
-//   { id: 'gemini-2.0-flash-exp-image-generation', tier: 'free' },
-//   { id: 'gemini-2.5-flash-image', name: 'Nano Banana', tier: 'free' },
-//   { id: 'gemini-3-pro-image-preview', name: 'Nano Banana Pro', tier: 'free' },
-//   { id: 'imagen-4.0-generate-001', tier: 'paid' }
+//   { id: 'gemini-2.5-flash-image', name: 'Nano Banana (stable)', tier: 'budget', pricePerImage: 0.05 },
+//   { id: 'gemini-3-pro-image-preview', name: 'Nano Banana Pro (4K support)', tier: 'quality', pricePerImage: 0.05 }
 // ]
 
-$aiImageGen.setDefaultModel('gemini-3-pro-image-preview');
+$aiImageGen.setDefaultModel('gemini-3-pro-image-preview');  // Use Pro model
 ```
 
-**Environment:** Requires `GEMINI_API_KEY` environment variable.
+**Environment:** Requires `LAOZHANG_API_KEY` environment variable.
 
 ---
 

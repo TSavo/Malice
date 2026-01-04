@@ -5,8 +5,8 @@ import { type Builder, registerBuilder } from './builder-registry';
 /**
  * Builds $aiImageGen MOO object for AI image generation
  *
- * Uses Google's Gemini API (Nano Banana) to generate images,
- * then stores them in $blob for persistence.
+ * Uses laozhang.ai API proxy for Nano Banana (79% cheaper than Google direct).
+ * Stores generated images in $blob for persistence.
  *
  * Usage from MOO code:
  *   const result = await $aiImageGen.generate('A cyberpunk banana');
@@ -41,8 +41,8 @@ export class AiImageGenBuilder implements Builder {
         parent: root!,
         properties: {
           name: 'AI Image Generator',
-          description: 'Generate images using Gemini API (Nano Banana)',
-          defaultModel: 'gemini-2.0-flash-exp-image-generation',
+          description: 'Generate images using Nano Banana via laozhang.ai',
+          defaultModel: 'gemini-2.5-flash-image', // Nano Banana (stable)
         },
       });
     }
@@ -52,10 +52,10 @@ export class AiImageGenBuilder implements Builder {
       'generate',
       `
       /**
-       * Generate an image and store in $blob
+       * Generate an image and store in $blob using Nano Banana via laozhang.ai
        * @param prompt - Text description of the image to generate
        * @param options - { model?, metadata?, filename?, aspectRatio? }
-       *   aspectRatio: 'landscape' (default), 'portrait', 'square', or '16:9', '9:16', '4:3', '3:4', '1:1'
+       *   aspectRatio: 'landscape' (default), 'portrait', 'square'
        * @returns { success, blobKey, aspectRatio, contentType, prompt, error? }
        */
       const prompt = args[0];
@@ -65,16 +65,15 @@ export class AiImageGenBuilder implements Builder {
         return { success: false, error: 'Prompt is required' };
       }
 
-      // Get API key from environment
-      const apiKey = process.env.GEMINI_API_KEY;
+      // Get API key from environment (laozhang.ai key)
+      const apiKey = process.env.LAOZHANG_API_KEY;
       if (!apiKey) {
-        return { success: false, error: 'GEMINI_API_KEY not set in environment' };
+        return { success: false, error: 'LAOZHANG_API_KEY not set in environment' };
       }
 
       const model = options.model || self.defaultModel;
-      const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent';
 
-      // Map friendly aspect ratio names to API values
+      // Map aspect ratio names to API values
       const aspectRatioMap = {
         'landscape': '16:9',
         'portrait': '9:16',
@@ -89,16 +88,19 @@ export class AiImageGenBuilder implements Builder {
       const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min timeout
 
       try {
+        // Use laozhang.ai's Google-native format endpoint
+        const apiUrl = 'https://api.laozhang.ai/v1beta/models/' + model + ':generateContent';
+
         const resp = await fetch(apiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-goog-api-key': apiKey,
+            'Authorization': 'Bearer ' + apiKey,
           },
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
-              responseModalities: ['TEXT', 'IMAGE'],
+              responseModalities: ['IMAGE'],
               aspectRatio: aspectRatio,
             },
           }),
@@ -176,7 +178,7 @@ export class AiImageGenBuilder implements Builder {
       'generateRaw',
       `
       /**
-       * Generate an image and return base64 directly (not stored)
+       * Generate an image and return base64 directly (not stored) using Nano Banana
        * @param prompt - Text description of the image to generate
        * @param options - { model?, aspectRatio? }
        * @returns { success, data, aspectRatio, contentType, prompt, error? }
@@ -188,15 +190,14 @@ export class AiImageGenBuilder implements Builder {
         return { success: false, error: 'Prompt is required' };
       }
 
-      const apiKey = process.env.GEMINI_API_KEY;
+      const apiKey = process.env.LAOZHANG_API_KEY;
       if (!apiKey) {
-        return { success: false, error: 'GEMINI_API_KEY not set in environment' };
+        return { success: false, error: 'LAOZHANG_API_KEY not set in environment' };
       }
 
       const model = options.model || self.defaultModel;
-      const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent';
 
-      // Map friendly aspect ratio names to API values
+      // Map aspect ratio names to API values
       const aspectRatioMap = {
         'landscape': '16:9',
         'portrait': '9:16',
@@ -211,16 +212,18 @@ export class AiImageGenBuilder implements Builder {
       const timeoutId = setTimeout(() => controller.abort(), 120000);
 
       try {
+        const apiUrl = 'https://api.laozhang.ai/v1beta/models/' + model + ':generateContent';
+
         const resp = await fetch(apiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-goog-api-key': apiKey,
+            'Authorization': 'Bearer ' + apiKey,
           },
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
-              responseModalities: ['TEXT', 'IMAGE'],
+              responseModalities: ['IMAGE'],
               aspectRatio: aspectRatio,
             },
           }),
@@ -278,15 +281,12 @@ export class AiImageGenBuilder implements Builder {
       'listModels',
       `
       /**
-       * List available image generation models
+       * List available Nano Banana models via laozhang.ai
        * @returns Array of model info
        */
       return [
-        { id: 'gemini-2.0-flash-exp-image-generation', name: 'Gemini 2.0 Flash (Experimental)', tier: 'free' },
-        { id: 'gemini-2.5-flash-image', name: 'Gemini 2.5 Flash Image (Nano Banana)', tier: 'free' },
-        { id: 'gemini-3-pro-image-preview', name: 'Gemini 3 Pro Image (Nano Banana Pro)', tier: 'free' },
-        { id: 'imagen-4.0-generate-001', name: 'Imagen 4.0', tier: 'paid' },
-        { id: 'imagen-4.0-ultra-generate-001', name: 'Imagen 4.0 Ultra', tier: 'paid' },
+        { id: 'gemini-2.5-flash-image', name: 'Nano Banana (stable)', tier: 'budget', pricePerImage: 0.05 },
+        { id: 'gemini-3-pro-image-preview', name: 'Nano Banana Pro (4K support)', tier: 'quality', pricePerImage: 0.05 },
       ];
     `,
     );
