@@ -5,8 +5,8 @@ export const building = {
   name: 'Zeitgeist Building',
   x: -13,
   y: 1,
-  width: 2,
-  height: 2,
+  width: 3,
+  height: 3,
   floors: 5,
 
   rooms: {

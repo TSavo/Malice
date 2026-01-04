@@ -3,10 +3,10 @@
 
 export const building = {
   name: 'Trinity Nightclub',
-  x: -13,
-  y: 2,
-  width: 2,
-  height: 2,
+  x: -14,
+  y: 0,
+  width: 4,
+  height: 3,
   floors: 3,
 
   rooms: {

@@ -5,8 +5,8 @@ export const building = {
   name: 'Zeitgeist Building',
   x: -13,
   y: 1,
-  width: 2,
-  height: 2,
+  width: 3,
+  height: 3,
   floors: 5,
 
   rooms: {
@@ -114,7 +114,7 @@ The view north shows Pioneer Square's roofscape: water towers, solar panels, the
       exits: {
         south: '%ROOF_ACCESS',
         east: '%ROOF_CORNER',
-        west: '%ROOF_WEST',
+        southwest: '%ROOF_WEST',
       },
       sittables: [
         {
@@ -151,7 +151,7 @@ The neighboring building's wall rises close on the north side, a mural visible o
       outdoor: true,
       exits: {
         east: '%ROOF_ACCESS',
-        north: '%ROOF_GARDEN',
+        northeast: '%ROOF_GARDEN',
       },
       sittables: [
         {
