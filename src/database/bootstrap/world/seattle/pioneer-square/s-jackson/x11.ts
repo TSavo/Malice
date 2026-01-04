@@ -16,4 +16,10 @@ The buildings along this block maintain the International District's characteris
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  exits: {
+    north: {
+      to: '../buildings/jade-palace-jewelers/z0.ts#SHOWROOM',
+      description: 'The rusted security gate of Jade Palace Jewelers',
+    },
+  },
 };
