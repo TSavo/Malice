@@ -8,6 +8,7 @@ OpenAI-compatible TTS API supporting both:
 import os
 import io
 import time
+import copy
 import logging
 from typing import Optional, Literal
 from pathlib import Path
@@ -290,7 +291,6 @@ def generate_speech_streaming(text: str, voice: Optional[str] = None) -> np.ndar
         raise HTTPException(status_code=400, detail=f"Voice preset not found for '{voice_name}'")
 
     # Make a deep copy to avoid modifying the cached version
-    import copy
     cached_prompt_copy = copy.deepcopy(cached_prompt)
 
     # Prepare inputs using the streaming processor
