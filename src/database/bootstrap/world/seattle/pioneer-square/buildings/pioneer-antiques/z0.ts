@@ -4,9 +4,9 @@
 
 export const building = {
   name: 'Pioneer Antiques',
-  x: -2,
+  x: -3,
   y: 7,
-  width: 4,
+  width: 2,
   height: 2,
   floors: 2,
 
@@ -351,7 +351,7 @@ A delivery door leads to the back alley, wide enough to admit the largest furnit
 Reference books line one wall: price guides for various collectibles, auction records, identification manuals for silver marks and furniture styles. The books are outdated now—prices that meant something in 2062 mean nothing in 2110—but the knowledge they contain about identifying antiques remains valid. Things don't change just because the world did.
 
 A safe sits in the corner, its door closed, its combination lock set. Whatever valuables warranted a safe—cash, gold, jewelry consigned for sale—are still inside, presumably. The safe has kept its secrets for fifty-five years.`,
-      x: -2,
+      x: -3,
       y: 7,
       z: 0,
       population: 0,

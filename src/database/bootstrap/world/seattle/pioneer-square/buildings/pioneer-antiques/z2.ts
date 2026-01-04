@@ -4,9 +4,9 @@
 
 export const building = {
   name: 'Pioneer Antiques',
-  x: -2,
+  x: -3,
   y: 7,
-  width: 4,
+  width: 2,
   height: 2,
   floors: 2,
 

@@ -63,7 +63,7 @@ export const building = {
       name: 'Smith Tower - 23th Floor - Elevator Landing',
       description:
         'A compact landing with scuffed brass trim and a single call panel.',
-      x: -12,
+      x: -2,
       y: 10,
       z: 23,
       exits: {
@@ -81,7 +81,7 @@ export const building = {
     '%A1_z23': {
       name: 'Smith Tower - 23th Floor - North Suite - Living Room',
       description: 'A corner unit with tall windows and pale wood floors. A kitchenette occupies one wall, its appliances dark and silent. Built-in shelving holds the remnants of someone\'s life—books, decorative objects, a dead potted plant.',
-      x: -13,
+      x: -3,
       y: 11,
       z: 23,
       exits: { east: '%A2_z23' },
@@ -123,7 +123,7 @@ export const building = {
       name: 'Smith Tower - 23rd Floor - North Suite - Bedroom',
       description:
         'A bright one-bedroom overlooking the skyline, hall-facing door to the south. Tapestries cover the walls in rich reds and purples, and a dream catcher hangs in the window, its feathers stirring with any breeze.',
-      x: -12,
+      x: -2,
       y: 11,
       z: 23,
       exits: {
@@ -162,7 +162,7 @@ export const building = {
       name: 'Smith Tower - 23rd Floor - North Suite - Studio',
       description:
         'A long studio awash in tie-dye and tapestries. Prayer flags are strung across the ceiling beams, their faded colors still vibrant against the exposed brick. The space smells faintly of old patchouli.',
-      x: -11,
+      x: -1,
       y: 11,
       z: 23,
       exits: { west: '%A2_z23' },
@@ -204,7 +204,7 @@ export const building = {
       name: 'Smith Tower - 23rd Floor - East Suite - Loft',
       description:
         'A lofted corner with string lights wound around the ceiling beams and a compact mezzanine draped in Indian block-print fabrics. The space feels like a secret treehouse for flower children.',
-      x: -10,
+      x: 0,
       y: 11,
       z: 23,
       exits: { south: '%B2_z23' },
@@ -246,7 +246,7 @@ export const building = {
       name: 'Smith Tower - 23rd Floor - South Suite - Alcove',
       description:
         'A snug unit transformed into a meditation nook. Tapestries cover every wall in rich jewel tones, and the frosted window filters light through a sun-catcher crystal.',
-      x: -13,
+      x: -3,
       y: 10,
       z: 23,
       exits: { south: '%C2_z23', east: '%EL_z23' },
@@ -281,7 +281,7 @@ export const building = {
       name: 'Smith Tower - 23rd Floor - East Suite - Living Room',
       description:
         'A two-room suite draped in flowing fabrics and woven textures. Batik prints hang from the ceiling, and the air holds the ghost of patchouli and sandalwood. This was clearly a gathering space for seekers.',
-      x: -11,
+      x: -1,
       y: 10,
       z: 23,
       exits: {
@@ -321,7 +321,7 @@ export const building = {
       name: 'Smith Tower - 23rd Floor - East Suite - Den',
       description:
         'A narrow end unit converted into a spiritual library. The built-in shelves overflow with books on astrology, tarot, Eastern philosophy, and consciousness expansion. Crystals cluster on every surface.',
-      x: -10,
+      x: 0,
       y: 10,
       z: 23,
       exits: { west: '%B2_z23' },
@@ -362,7 +362,7 @@ export const building = {
     '%C2_z23': {
       name: 'Smith Tower - 23rd Floor - South Suite - Living Room',
       description: 'A corner unit transformed into an artist\'s commune. Canvases lean against every wall, paint-spattered and half-finished. The western light pours through windows hung with tie-dyed curtains.',
-      x: -13,
+      x: -3,
       y: 9,
       z: 23,
       exits: { north: '%C1_z23', east: '%C3_z23' },
@@ -397,7 +397,7 @@ export const building = {
       name: 'Smith Tower - 23rd Floor - South Suite - Foyer',
       description:
         'The entrance to the C block, its doorway hung with a beaded curtain that clicks and sways. Hand-painted peace symbols decorate the walls, and a shoe rack overflows with dusty sandals.',
-      x: -12,
+      x: -2,
       y: 9,
       z: 23,
       exits: {
@@ -436,7 +436,7 @@ export const building = {
       name: 'Smith Tower - 23rd Floor - South Suite - Bedroom',
       description:
         'A deep bedroom transformed into a bohemian boudoir. The recessed alcove is draped in sheer fabrics and fairy lights, while Indian textile wall hangings soften every surface.',
-      x: -11,
+      x: -1,
       y: 9,
       z: 23,
       exits: { west: '%C3_z23' },
@@ -471,7 +471,7 @@ export const building = {
       name: 'Smith Tower - 23rd Floor - East Suite - Bedroom',
       description:
         'A compact bedroom converted into a creative sanctuary. Every surface is covered in tapestries, and the built-in shelving holds jars of dried flowers, crystals, and hand-bound journals.',
-      x: -10,
+      x: 0,
       y: 9,
       z: 23,
       exits: { north: '%B2_z23' },

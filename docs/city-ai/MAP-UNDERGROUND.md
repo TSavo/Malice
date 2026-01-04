@@ -60,7 +60,7 @@ Entry points connect surface (z=0) to underground (z=-2) through z=-1 transition
 
 | ID | Location | z=0 (Surface) | z=-1 (Access) | z=-2 (Underground) |
 |----|----------|---------------|---------------|-------------------|
-| E1 | Smith Tower | n/a (internal) | Escape Tunnel (-13, +9) | Tunnel Mouth (-14, +9) |
+| E1 | Smith Tower | n/a (internal) | Escape Tunnel (-3, +9) | Tunnel Mouth (-4, +9) |
 | E2 | Fabrication Factory | Public Services (-21, +10) | n/a | Fab Basement (-20, +10) |
 | E3 | Occidental Square | Gallery (-3, +2) | n/a | Occ Cross (-3, +2) |
 | E4 | Supply Depot | Loading (-21, -5) | n/a | South Tunnel (-20, -5) |
@@ -93,9 +93,9 @@ y=+11                      │         │   │                             │
 y=+10  ◆───●───●───●───●───●───●───●───●───●───●───●                    │   │   │   │                                │   │   FABRICATION BRANCH        │
   │    E2                              │                                │   │   │   │                                │   │   (y=+10, x=-20 to -11)     │
   │                                    │                                │   │   │   │                                │   │                              │
-y=+9                                   ●───●───●───◆E1                  │   │   │   │                                │   │   SMITH TOWER FOUNDATIONS   │
-  │                                    │           SMITH                │   │   │   │                                │   │   (y=+9, x=-14 to -12)      │
-  │                                    │           TOWER                │   │   │   │                                │   │                              │
+y=+9                                   │                                │   │   │   ◆E1─●───●───●               │   │   SMITH TOWER FOUNDATIONS   │
+  │                                    │                                │   │   │   │   SMITH TOWER               │   │   (y=+9, x=-4 to -1)        │
+  │                                    │                                │   │   │   │   ESCAPE                    │   │                              │
 y=+8                                   │                                │   │   │   │                   ●───●───●───●───●   FOURTH AVE NORTH           │
   │                                    │                                │   │   │   │                   │                   (y=+8, steam tunnels)      │
 y=+7                                   │                                │   │   │   │                   │                                              │

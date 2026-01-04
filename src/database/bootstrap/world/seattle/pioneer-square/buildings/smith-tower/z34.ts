@@ -13,7 +13,7 @@ export const building = {
       description: `A high-floor lobby with floor-to-ceiling windows offering grey city views. The floor is dark polished stone. Indirect lighting provides soft illumination from recessed fixtures. A digital directory displays: PREMIUM HOUSING - ASSIGNMENT PENDING.
 
 Six unit doors line the hallway, each marked with clean metal numbers. The space smells of new carpet and filtered air. Everything is pristine, untouched, waiting.`,
-      x: -12,
+      x: -2,
       y: 10,
       z: 34,
       population: 0,
@@ -38,7 +38,7 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
     '%A1': {
       name: 'Smith Tower - 34th Floor - Unit A1 Foyer',
       description: `A unit entrance with a biometric scanner beside a seamless door. The panel displays: UNIT 34A1 - EXECUTIVE TIER - UNASSIGNED. The door is sealed, waiting for authorization.`,
-      x: -12,
+      x: -2,
       y: 11,
       z: 34,
       population: 0,
@@ -56,7 +56,7 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
     '%A2': {
       name: 'Smith Tower - 34th Floor - Unit A2 Foyer',
       description: `A unit entrance with a biometric scanner beside a seamless door. The panel displays: UNIT 34A2 - EXECUTIVE TIER - UNASSIGNED. The door is sealed, waiting for authorization.`,
-      x: -12,
+      x: -2,
       y: 9,
       z: 34,
       population: 0,
@@ -78,7 +78,7 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
     '%B1': {
       name: 'Smith Tower - 34th Floor - Unit B1 Foyer',
       description: `A unit entrance with a biometric scanner beside a seamless door. The panel displays: UNIT 34B1 - EXECUTIVE TIER - UNASSIGNED. The door is sealed, waiting for authorization.`,
-      x: -11,
+      x: -1,
       y: 10,
       z: 34,
       population: 0,
@@ -97,7 +97,7 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
     '%B1_VIEW': {
       name: 'Smith Tower - 34th Floor - Northeast Viewing Alcove',
       description: `A small windowed alcove with views of the grey city sprawl. The glass is clean, recently installed. A bench built into the wall sits empty. The lighting is soft, the space quiet.`,
-      x: -11,
+      x: -1,
       y: 11,
       z: 34,
       population: 0,
@@ -123,7 +123,7 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
     '%B2': {
       name: 'Smith Tower - 34th Floor - Unit B2 Foyer',
       description: `A unit entrance with a biometric scanner beside a seamless door. The panel displays: UNIT 34B2 - EXECUTIVE TIER - UNASSIGNED. The door is sealed, waiting for authorization.`,
-      x: -10,
+      x: 0,
       y: 10,
       z: 34,
       population: 0,
@@ -141,7 +141,7 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
     '%B2_VIEW': {
       name: 'Smith Tower - 34th Floor - East Corner Alcove',
       description: `A corner alcove with panoramic windows offering sweeping views east and north. The glass wraps around two walls, floor to ceiling. Built-in seating follows the window line. The space is bright, quiet, untouched.`,
-      x: -10,
+      x: 0,
       y: 11,
       z: 34,
       population: 0,
@@ -166,7 +166,7 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
     '%B1_STUDY': {
       name: 'Smith Tower - 34th Floor - Executive Study',
       description: `A quiet study with built-in bookshelves and a compact desk station. The shelves are empty, awaiting occupant preference. A terminal sits dark on the desk. The lighting is warm, the space designed for focus and concentration.`,
-      x: -11,
+      x: -1,
       y: 9,
       z: 34,
       population: 0,
@@ -192,7 +192,7 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
     '%B2_LOUNGE': {
       name: 'Smith Tower - 34th Floor - Southeast Lounge',
       description: `A small lounge with comfortable seating and a beverage station. The dispenser is installed but not stocked. Floor-to-ceiling windows offer views south and east. A terminal displays: AMENITY SERVICE - CONFIGURATION PENDING.`,
-      x: -10,
+      x: 0,
       y: 9,
       z: 34,
       population: 0,
@@ -221,7 +221,7 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
     '%C1': {
       name: 'Smith Tower - 34th Floor - Unit C1 Foyer',
       description: `A unit entrance with a biometric scanner beside a seamless door. The panel displays: UNIT 34C1 - EXECUTIVE TIER - UNASSIGNED. The door is sealed, waiting for authorization.`,
-      x: -13,
+      x: -3,
       y: 10,
       z: 34,
       population: 0,
@@ -239,7 +239,7 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
     '%C1_VIEW': {
       name: 'Smith Tower - 34th Floor - West Viewing Alcove',
       description: `A small windowed alcove with views of Pioneer Square below. The glass is clean, recently installed. A bench built into the wall sits empty. The lighting is soft, the space quiet.`,
-      x: -13,
+      x: -3,
       y: 9,
       z: 34,
       population: 0,
@@ -264,7 +264,7 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
     '%C2': {
       name: 'Smith Tower - 34th Floor - Unit C2 Foyer',
       description: `A unit entrance with a biometric scanner beside a seamless door. The panel displays: UNIT 34C2 - EXECUTIVE TIER - UNASSIGNED. The door is sealed, waiting for authorization.`,
-      x: -13,
+      x: -3,
       y: 11,
       z: 34,
       population: 0,

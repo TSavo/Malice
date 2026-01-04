@@ -4,9 +4,9 @@
 
 export const building = {
   name: 'Pioneer Antiques',
-  x: -2,
+  x: -3,
   y: 7,
-  width: 4,
+  width: 2,
   height: 2,
   floors: 2,
 
@@ -96,7 +96,7 @@ Oil paintings hang on the landing walls, their frames ornate, their subjects con
 Sculpture pedestals hold bronzes and marble pieces—classical forms, mostly, the kind of art that suggested culture without demanding interpretation. A bronze horse frozen mid-gallop, a marble Venus missing one arm (the damage older than The Burning, probably original), a modernist abstract that looks like melted metal.
 
 Display cases hold smaller pieces: miniature portraits, ivory carvings yellowed with age, jade figurines that might be genuine. The cases are locked, their contents visible but inaccessible, protected by glass from a world that no longer cares to steal them.`,
-      x: -5,
+      x: -4,
       y: 6,
       z: 1,
       population: 0,
