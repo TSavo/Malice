@@ -187,7 +187,7 @@ A freight elevator shaft rises toward the factory floor, its cage permanently lo
 
 The Gray Cartel maintains this access point. The factory's AI either doesn't know about it or has been instructed not to notice.`,
       x: -20,
-      y: -10,
+      y: 10,
       z: -2,
       population: 0,
       ambientNoise: 35,
