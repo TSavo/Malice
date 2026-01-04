@@ -54,6 +54,7 @@ The center of Pioneer Square is **S. Main Street at 2nd Avenue**.
 | Location | Where | How to Get There |
 |----------|-------|------------------|
 | **Smith Tower** | 2nd Ave & Yesler | "Tallest building around. 2nd Ave, north end at Yesler." |
+| **Union Station** | 1st Ave & S. Jackson | "Old train station. South of Pioneer Square at Jackson Street. Beaux-Arts building with the copper dome." |
 | **Occidental Park** | Between 2nd & Occidental, Main to Washington | "The plaza. Head toward 2nd Ave between Main and Washington." |
 | **Grand Central** | Occidental & Main | "Old arcade building. Occidental Ave at Main Street." |
 | **Pioneer Building** | 3rd Ave & Washington | "East side, 3rd Ave at Washington." |
