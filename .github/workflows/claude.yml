@@ -23,7 +23,7 @@ jobs:
       !contains(github.event.comment.body || '', '<!-- CLAUDE_REVIEW_MARKER -->') &&
       !contains(github.event.comment.body || '', '<!-- CLAUDE_FIXER_MARKER -->')
 
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, malice]
     permissions:
       contents: write
       pull-requests: write
@@ -58,7 +58,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          path_to_claude_code_executable: /usr/bin/claude
+          path_to_claude_code_executable: /usr/local/bin/claude
           additional_permissions: |
             actions: read
 
