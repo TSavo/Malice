@@ -10,7 +10,7 @@ The buried streets and tunnels beneath Pioneer Square. Gray Cartel territory.
              x=-21    x=-14    x=-7     x=0      x=+7     x=+14
               │        │        │        │        │        │
         ┌─────┴────────┴────────┴────────┴────────┴────────┴─────┐
-y=+12   │ WATER   ═══════════ YESLER WAY (BLOCKED) ═════════════ │
+y=+12   │ WATER   ═══════════ YESLER WAY ══════════════════════ │
         │ FRONT       │                                          │
 y=+11   │   │    ╔════╧════╗ ╔═══════╗                           │
         │   │    ║FABRICATN║ ║ SMITH ║                           │
@@ -64,311 +64,186 @@ Entry points connect surface (z=0) to underground (z=-2) through z=-1 transition
 | E2 | Fabrication | Door (-21, +10) | Basement (-20, +10) | Fab Access (-20, +10) |
 | E3 | Occidental Park | Trapdoor (-3, +2) | Ladder Shaft (-3, +2) | Park Access (-3, +2) |
 | E4 | Supply Depot | Door (-21, -5) | Basement (-20, -5) | Supply Access (-20, -5) |
-
----
-
-## Level z=-1: Access Points (Transitional)
-
-Basements, shafts, and stairways connecting surface to underground.
-
-```
-    x=-20              x=-14  x=-13              x=-3
-       │                  │      │                 │
-  ┌────┴──────────────────┴──────┴─────────────────┴────┐
-  │                                                     │
-y=+10  ●                                                │  FABRICATION BASEMENT
-  │    FAB                                              │  Stairs down from factory floor
-  │    BASEMENT                                         │
-  │                                                     │
-y=+9                            ●                       │  SMITH TOWER ESCAPE
-  │                          ESCAPE                     │  From datacenter z=-2
-  │                          TUNNEL                     │  (already exists in building)
-  │                                                     │
-y=+2                                              ●     │  OCCIDENTAL SHAFT
-  │                                            LADDER   │  Hidden trapdoor in park
-  │                                            SHAFT    │
-  │                                                     │
-y=-5   ●                                                │  SUPPLY BASEMENT
-  │    SUPPLY                                           │  Loading dock access
-  │    BASEMENT                                         │
-  └─────────────────────────────────────────────────────┘
-```
-
-### z=-1 Room List
-
-| Name | Coordinates | Connects |
-|------|-------------|----------|
-| Fabrication Basement | (-20, +10, -1) | up: factory, down: underground |
-| Smith Tower Escape | (-13, +9, -1) | *exists in building z=-2.ts* |
-| Occidental Shaft | (-3, +2, -1) | up: park trapdoor, down: underground |
-| Supply Basement | (-20, -5, -1) | up: depot, down: underground |
-
-**Note:** Smith Tower's escape tunnel is defined in the building file at z=-2 and connects west to the underground tunnel mouth at (-14, +9, -2).
+| E5 | Yesler Way | Hidden grating (-7, +12) | Shaft (new) | Yesler Access (-7, +12) |
+| E6 | 4th Avenue | Utility hatch (+14, 0) | Steam shaft | 4th Ave Access (+14, 0) |
+| E7 | King Street Station | Platform access (+4, -12) | Service shaft | Platform Tunnel (+4, -12) |
 
 ---
 
 ## Level z=-2: Upper Tunnels (Dense Corridor Network)
 
-The original 1889 street level. All rooms at adjacent coordinates for auto-connection.
+The original 1889 street level plus modern expansions. All rooms at adjacent coordinates for auto-connection.
+
+### Full Network Overview
 
 ```
-    x=-21 -20 -19 -18 -17 -16 -15 -14 -13 -12 -11 -10  -9  -8  -7  -6  -5  -4  -3  -2  -1   0
-       │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │
-  ┌────┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴────┐
-  │                                                                                              │
-y=+12                              ●───●                        YESLER CROSSING                 │
-  │                                │   │                        (x=-14 to -13, y=12)            │
-y=+11                              ●───●───●                    NORTHERN EXTENSION              │
-  │                                │                            (approaching Yesler)            │
-y=+10  ◆───●───●───●───●───●───●───●───●───●───●───●           FABRICATION BRANCH              │
-  │    E2                          │                            (y=+10, x=-20 to -11)           │
-  │                                │                                                            │
-y=+9                               ●───●───●───◆E1              SMITH TOWER FOUNDATIONS         │
-  │                                │           SMITH            (y=+9, x=-14 to -12)            │
-  │                                │           TOWER                                            │
-y=+8                               │                                                            │
-  │                                │                                                            │
-y=+7                               │                                                            │
-  │                                │                                                            │
-y=+6                               │                            WEST SPINE                      │
-  │                                │                            (x=-14, y=+10 to -8)            │
-y=+5                               ●                            THE JUNCTION                    │
-  │                                │                                                            │
-y=+4                               ●───●───●───●───●───●───●───●   GRAND CENTRAL & PARK        │
-  │                                │                       ▓   ▓   (x=-14 to -4, y=+4)          │
-y=+3                               ●───●───●───●───●───●───●───●   OCCIDENTAL PARK              │
-  │                                │                       ▓   ▓   (x=-10 to -4, y=+3)          │
-y=+2                               │                   ●───●───●───◆E3                          │
-  │                                │                   ▓   ▓       PARK                         │
-y=+1                               │                   ●───●───●───●                       ⊗    │
-  │                                │                   ▓   ▓   ▓   ▓                      SEALED│
-y=0   ●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●    │
-  │  SEAWALL                    MAIN                                    S. MAIN  2ND AVE        │
-  │  x=-21                      CROSSING                               CORRIDOR  BASEMENT       │
-  │                                │                            (y=0, x=-21 to 0)               │
-y=-1      ●                        │                                                            │
-  │       │                        │                                                            │
-y=-2      ●                        │                            WATERFRONT CORRIDOR             │
-  │       │                        │                            (y=-2 to +5, x=-20)             │
-y=-3      │                        │                                                            │
-  │       │                        │                                                            │
-y=-4      │                        │                                                            │
-  │       │                        │                                                            │
-y=-5   ◆──●───●───●───●───●───●───●                            SUPPLY BRANCH                   │
-  │    E4                       SUPPLY                          (y=-5, x=-20 to -14)            │
-  │    SUPPLY                   JUNCTION                                                        │
-  │    DEPOT                       │                                                            │
-y=-6                   ●───●       │                            SOUTHERN EXTENSION              │
-  │                               │                            (sinkhole approach)             │
-y=-7                   ●───●       │                            SINKHOLE PERIMETER              │
-  │                   EDGE         │                            (x=-16 to -15, y=-6 to -8)      │
-y=-8                       ●       ⊗                            FLOODED ZONES                   │
-  │                     DROWNED  FLOODED                        (dead end - sinkhole water)     │
-  └──────────────────────────────────────────────────────────────────────────────────────────────┘
+    x=-21 -20 -19 -18 -17 -16 -15 -14 -13 -12 -11 -10  -9  -8  -7  -6  -5  -4  -3  -2  -1   0  +1  +2  +3  +4  +5  +6  +7  +8  +9 +10 +11 +12 +13 +14
+       │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │
+  ┌────┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴────┐
+  │                                                                                                                                                      │
+y=+12 ●───●───●───●───●───●───●───●───●   ●───●───●───●───●───●───●───●───●───●                                       ●───●   YESLER WAY UNDERGROUND  │
+  │   WATERFRONT           │         │   │   YESLER UNDERGROUND        │   │                                         │   │   (y=+12, full width)        │
+  │   NORTHERN             │         │   │   (PROHIBITION ERA)         │   │                                         │   │                              │
+y=+11                      │         │   │                             │   │                                         │   │                              │
+  │                        │         │   │                             │   │                                         │   │                              │
+y=+10  ◆───●───●───●───●───●───●───●───●───●───●───●                    │   │   │   │                                │   │   FABRICATION BRANCH        │
+  │    E2                              │                                │   │   │   │                                │   │   (y=+10, x=-20 to -11)     │
+  │                                    │                                │   │   │   │                                │   │                              │
+y=+9                                   ●───●───●───◆E1                  │   │   │   │                                │   │   SMITH TOWER FOUNDATIONS   │
+  │                                    │           SMITH                │   │   │   │                                │   │   (y=+9, x=-14 to -12)      │
+  │                                    │           TOWER                │   │   │   │                                │   │                              │
+y=+8                                   │                                │   │   │   │                   ●───●───●───●───●   FOURTH AVE NORTH           │
+  │                                    │                                │   │   │   │                   │                   (y=+8, steam tunnels)      │
+y=+7                                   │                                │   │   │   │                   │                                              │
+  │                                    │                                │   │   │   │                   │                                              │
+y=+6                                   │                                ●   │   │   │                   │                   WEST SPINE                 │
+  │                                    │                                │   │   │   │                   │                   (x=-14, y=+10 to -8)       │
+y=+5                                   ●                                │   │   │   │                   │                   THE JUNCTION               │
+  │                                    │                                │   │   │   │                   │                                              │
+y=+4       ●───●───●                   ●───●───●───●───●───●───●───●───●   │   │   │   ●───●───●───●───●                   GRAND CENTRAL & PARK       │
+  │        │       │                   │                       ▓   ▓   │   │   │   │   │                                   (x=-14 to -4, y=+4)         │
+y=+3       │       ●───●───●           ●───●───●───●───●───●───●───●   │   │   │   │   │                                   TIDAL CAVES                │
+  │        │       TIDAL               │                       ▓   ▓   │   │   │   │   │                                                              │
+y=+2       │       CAVE                │                   ●───●───●───◆E3 │   │   │   ●───●───●                                                      │
+  │        │       │                   │                   ▓   ▓       │   │   │   │   BOILER                                                         │
+y=+1       │       │                   │                   ●───●───●───●   │   │   │   ROOM                                                           │
+  │        │       │                   │                   ▓   ▓   ▓   ▓   │   │   │   │                                                              │
+y=0   ●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●   ●───●───●───●───●───●───●───●───●───●───●───●
+  │   SEAWALL              │       MAIN                                 S. MAIN  2ND AVE      │   │   │       STEAM                           4TH AVE  │
+  │   PIER                 │       CROSSING                             CORRIDOR  BASEMENT    │   │   │       MAIN                           ACCESS     │
+y=-1       ●               │           │                                                      │   │   │       JUNCTION                                  │
+  │        │               │           │                                                      │   │   │       │                                         │
+y=-2       ●               │           │                                                      │   │   │       │                                         │
+  │        │               │           │                                                      │   │   │       │                                         │
+y=-3       ●               │           │                                                      │   │   │       │                                         │
+  │        SMUGGLER        │           │                                                      │   │   │       │                                         │
+y=-4       ●               │           │                                                      │   │   │       ●───●───●───●                             │
+  │        DOCK            │           │                                                      │   │   │       TRANSFORMER                               │
+y=-5   ◆──●───●───●───●───●───●───●───●───●                                                   │   │   │       │                                         │
+  │    E4                       SUPPLY                                                        │   │   │       │                                         │
+  │    SUPPLY                   JUNCTION                                                      │   │   │       │                                         │
+y=-6       ●                   ●───●   │                                                      │   │   │       │                                         │
+  │        │                           │                                                      │   │   │       │                                         │
+y=-7       │                   ●───●   │                                                      │   │   │       │                                         │
+  │        │                   EDGE    │                                                      │   │   │       │                                         │
+y=-8       │                       ●   ⊗                                                      │   │   │       │                                         │
+  │        │                    DROWNED                                                       │   │   │       │                                         │
+y=-10      │                                                                                  │   │   │   ●───●───●───●───●───●                         │
+  │        │                                                                                  │   │   │   FREIGHT                                       │
+y=-12 ●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●   KING STREET UNDERGROUND│
+  │   KING WEST             │               KING MAIN                              │   │   │   │                   KING TERMINUS │                     │
+  │                         │                                                      │   │   │   │                                 │                     │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+```
 
 Legend:
-  ◆  = Entry point (building connection)
+  ◆  = Entry point (building/surface connection)
   ●  = Underground room
   ⊗  = Dead end (blocked/flooded)
   │─ = Tunnel passage (adjacent coordinates auto-connect)
-```
 
-### Corridor Definitions
+### Network Sections
 
+#### Western Network (Gray Cartel Core)
 | Corridor | Direction | Start | End | Room Count |
 |----------|-----------|-------|-----|------------|
 | West Spine | N-S | (-14, +12) | (-14, -8) | 21 |
 | Fabrication Branch | E-W | (-20, +10) | (-11, +10) | 10 |
 | Supply Branch | E-W | (-20, -5) | (-14, -5) | 7 |
 | S. Main Corridor | E-W | (-21, 0) | (-3, 0) | 19 |
-| Eastern Extension | E-W | (-2, 0) | (0, 0) | 3 |
-| Sealed Passage | N-S | (0, 0) | (0, +1) | 2 |
-| Smith Tower Foundations | E-W | (-14, +9) | (-12, +9) | 3 |
-| Smith Tower East Extension | N-S | (-13, +9) | (-13, +10) | 2 |
-| Smith Tower North Extension | E-W | (-12, +10) | (-11, +10) | 2 |
-| Northern Extension | N-S | (-14, +11) | (-14, +12) | 2 |
-| Northern Extension East | E-W | (-13, +11) | (-12, +11) | 2 |
-| Yesler Crossing | E-W | (-14, +12) | (-13, +12) | 2 |
-| Grand Central Arcade Main | E-W | (-14, +4) | (-10, +4) | 5 |
-| Grand Central to Park | E-W | (-10, +4) | (-4, +4) | 7 |
-| Park Connection y=3 | E-W | (-10, +3) | (-4, +3) | 7 |
-| Arcade South Wing | E-W | (-12, +3) | (-11, +3) | 2 |
-| Waterfront Corridor North | N-S | (-20, -2) | (-20, +5) | 8 |
-| Park Access | N-S | (-3, +1) | (-3, +2) | 2 |
-| Occidental Park Underground North | N-S | (-6, +1) | (-6, +4) | 4 |
-| Occidental Park Underground East | N-S | (-5, +1) | (-5, +4) | 4 |
-| Occidental Park Underground Center | N-S | (-4, +1) | (-4, +4) | 4 |
-| Sinkhole Perimeter West | N-S | (-16, -6) | (-16, -7) | 2 |
-| Sinkhole Approach | N-S | (-15, -6) | (-15, -8) | 3 |
 
-**Total z=-2 rooms: 93** (72 previous + 21 new expansion rooms)
+#### Waterfront Underground (NEW)
+| Corridor | Direction | Start | End | Room Count |
+|----------|-----------|-------|-----|------------|
+| Pier Spine | N-S | (-21, +4) | (-21, -6) | 11 |
+| Tidal Caves | N-S | (-21, -3) | (-21, -6) | 4 |
+| Wharf Connections | E-W | (-21, 0) | (-17, 0) | 5 |
+| Warehouse Row | N-S | (-19, +4) | (-19, -3) | 9 |
 
-### Named Locations (z=-2)
+#### Eastern Underground (underground-east)
+| Corridor | Direction | Start | End | Room Count |
+|----------|-----------|-------|-----|------------|
+| Occidental Corridor | N-S | (-7, -5) | (-7, +6) | 12 |
+| Second Ave Underground | N-S | (0, -3) | (0, +5) | 9 |
+| Eastern Extension | E-W | (0, 0) | (+7, 0) | 8 |
 
-| Name | Coordinates | Description |
-|------|-------------|-------------|
-| Tunnel Mouth | (-14, +9) | Where Smith Tower escape meets underground |
-| Tower Subbasement | (-11, +10) | Datacenter servers in converted coal storage beneath Smith Tower |
-| Tower Foundation | (-12, +10) | Massive concrete columns supporting Smith Tower |
-| Yesler Crossing | (-14, +12) | Chaotic junction where Maynard and Denny street grids collide |
-| Arcade Basement | (-11, +4) | Grand Central's shopping arcade basement with vaulted ceilings |
-| Seawall Passage | (-21, 0) | Western edge of underground network at the old seawall |
-| The Junction | (-14, +5) | Main hub on West Spine |
-| Main Crossing | (-14, 0) | Where spine meets S. Main corridor |
-| Fabrication Access | (-20, +10) | Entry from Fabrication basement |
-| Supply Access | (-20, -5) | Entry from Supply Depot basement |
-| Park Access | (-3, +2) | Hidden entry in Occidental Park |
-| Supply Junction | (-14, -5) | Where spine meets Supply branch |
-| 2nd Avenue Basement | (0, 0) | Old commercial space, sealed door to street |
-| Sealed Passage | (0, +1) | Blocked by Corp Construction's concrete wall |
-| Flooded Terminus | (-14, -8) | Dead end - sinkhole water blocks passage south |
-| Merchant Vault | (-5, +1) | Old storage vault with faded inventory codes |
-| Cistern Approach | (-5, +2) | Passage to abandoned cistern below |
-| Plaza Foundation | (-5, +3) | Shared basement revealing old property disputes |
-| Collapsed Section | (-16, -6) | Partial ceiling failure near sinkhole, barely navigable |
-| Sinkhole Edge | (-16, -7) | The edge of the void - passage ends at 15m deep flooded pit |
-| Drowned Corridor | (-15, -8) | Fully submerged passage with rope anchor into darkness |
+#### Eastside Underground (NEW)
+| Corridor | Direction | Start | End | Room Count |
+|----------|-----------|-------|-----|------------|
+| Steam Tunnel | E-W | (+8, 0) | (+14, 0) | 7 |
+| Fourth Ave Spine | N-S | (+14, -4) | (+14, +4) | 9 |
+| Utility North | E-W | (+10, +4) | (+14, +4) | 5 |
 
-### Generic Passage Types
+#### Yesler Underground (NEW)
+| Corridor | Direction | Start | End | Room Count |
+|----------|-----------|-------|-----|------------|
+| Yesler Way Main | E-W | (-14, +12) | (+14, +12) | 29 |
+| Prohibition Hall | cluster | (-14, +6) | (-10, +10) | 8 |
+| Historic Basements | scattered | (+2, +8) | (+10, +10) | 12 |
 
-Rooms without special names use one of these types based on conditions:
+#### King Street Underground (NEW)
+| Corridor | Direction | Start | End | Room Count |
+|----------|-----------|-------|-----|------------|
+| King Street Main | E-W | (-21, -12) | (+14, -12) | 36 |
+| Freight Tunnels | cluster | (-17, -10) | (-7, -10) | 12 |
+| Rail Platform | E-W | (+4, -10) | (+7, -10) | 4 |
 
-| Type | Name | Conditions |
-|------|------|------------|
-| Standard | Underground Passage | Default brick-lined tunnel |
-| Wet | Flooded Section | Near water table, ankle-deep |
-| Damaged | Collapsed Rubble | Debris, narrow gap |
-| Historic | Old Storefront | Ghost of 1889 shop visible |
-| Utility | Service Tunnel | Pipes, utility access |
+**Total z=-2 rooms: ~267** (88 original + 29 waterfront + 35 eastside + 36 yesler + 39 king + 40 eastern)
 
 ---
 
 ## Level z=-3: Transitional Layer (Buffer Zone with Horizontal Network)
 
-Originally just vertical shafts, now expanded into a full horizontal network creating true 3D depth.
-This layer connects the public tunnels (z=-2) to secured territory (z=-4) while providing:
-- Defensive depth and chokepoints
-- Old infrastructure access (cisterns, storm drains, utility passages)
-- Water table boundary zones (increasing flooding toward south)
+The deep transitional level connecting z=-2 to z=-4. Includes natural caves, utility infrastructure, and flooded sections.
 
+### Western Network (Gray Cartel Secured)
 ```
     x=-14 -13 -12 -11 -10  -9  -8  -7  -6  -5  -4  -3  -2  -1   0
        │   │   │   │   │   │   │   │   │   │   │   │   │   │   │
   ┌────┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴────┐
-  │                                                                  │
-y=+4  │    ●  JUNCTION SHAFT                                        │
-  │    │                                                            │
-y=+3  │    │                                                        │
-y=+2  │    │                                                   ●  PARK
-  │    │   ●───●───●───●───●───●───●───●   CISTERN BRANCH      │  SHAFT
-  │    │                         THE OLD                        │
-y=+1  │    │                     CISTERN                        │
-  │    │                                                         │
-y=0   │    ●───────────────────────●───●───●───●  THE DEEP      │
-  │    │                              CROSSING  STORM DRAINS    │
-y=-1  │    │                                                     │
-y=-2  │    │                                                     │
-y=-3  │    │                                                     │
-y=-4  │    ●───────────────────────●  SUPPLY SHAFT               │
-  │    │                              (connects to horizontal)   │
-y=-5  │    │  SUPPLY SHAFT                                       │
-y=-6  │    │  (vert only)             ●  FLOODED                 │
-y=-7  │    │                          │                          │
-y=-8  │    ↓                          ●  DROWNED TERMINUS        │
-  │    (to z=-4)                 (fully submerged)               │
-  └──────────────────────────────────────────────────────────────┘
+y=+5  │    ●  JUNCTION SHAFT                                        │
+y=+4  │    │                                                        │
+y=+2  │    │   ●───●───●───●───●───●───●───●   CISTERN BRANCH       │
+y=0   │    ●───────────────────────●───●───●   THE DEEP CROSSING    │
+y=-4  │    ●───────────────────────●  SUPPLY SHAFT                  │
+y=-8  │    ↓                          ●  DROWNED TERMINUS           │
+  └────────────────────────────────────────────────────────────────────┘
 ```
 
-### Named Locations (z=-3)
+### Eastern Deep Network (underground-east z=-3)
+Horizontal passages connecting upper tunnels to Gray Cartel territory.
 
-| Name | Coordinates | Description |
-|------|-------------|-------------|
-| Junction Shaft | (-14, +5, -3) | Vertical: up to The Junction (z=-2), down to Lower Junction (z=-4) |
-| Supply Shaft | (-14, -5, -3) | Vertical: up to Supply Junction (z=-2), down to Supply Hub (z=-4) |
-| Park Shaft | (-3, +2, -3) | Vertical: up to Park Access (z=-2), down to Runner's Den (z=-4) |
-| The Deep Crossing | (-14, 0, -3) | Major 4-way junction with ancient carved stone marker |
-| The Old Cistern | (-7, +2, -3) | Vast underground reservoir with domed brick ceiling |
-| Drowned Terminus | (-14, -8, -3) | Fully submerged dead end where aquifer breached tunnels |
+### Waterfront Deep (NEW)
+Sea caves, flooded passages, and cistern access beneath the piers.
 
-### Corridor Definitions (z=-3)
+### Eastside Deep (NEW)
+Rail tunnel connections and deep eastern passages.
 
-| Corridor | Direction | Start | End | Room Count | Notes |
-|----------|-----------|-------|-----|------------|-------|
-| Main Spine | N-S | (-14, +4) | (-14, -8) | 13 | Vertical connections at y=+5, y=-5 |
-| Cistern Branch | E-W | (-13, +2) | (-4, +2) | 10 | Old utility passage to cistern |
-| Storm Drain Network | E-W | (-3, 0) | (-1, 0) | 3 | Beneath 2nd Ave, ends at Corp wall |
-| Flooded Southern Depths | N-S | (-14, -6) | (-14, -8) | 3 | Increasing submersion toward sinkhole |
-
-### Water Level Zones
-
-| Zone | Coordinates | Water Level | Navigability |
-|------|-------------|-------------|--------------|
-| Dry Tunnels | Most of network | 0-1 | Normal passage |
-| Wet Sections | y=-2 to y=-4 on spine | 2-4 | Ankle to waist deep |
-| Flooded Zone | y=-6 | 5 | Wading required |
-| Submerged Zone | y=-7 | 7 | Chest deep, dangerous |
-| Drowned | y=-8 | 10 | Fully submerged, impassable |
-
-**Total z=-3 rooms: 29** (3 shafts + 26 horizontal network rooms)
+**Total z=-3 rooms: ~75** (29 original + 22 waterfront + 18 eastside + 6 yesler)
 
 ---
 
 ## Level z=-4: Lower Passages (Operational)
 
 Cramped service tunnels (6-8 ft). Cell bases, logistics, operational infrastructure.
+Gray Cartel secured territory.
 
 ```
         x=-16    x=-14    x=-12    x=-10    x=-8     x=-6     x=-4
            │        │        │        │        │        │        │
       ┌────┴────────┴────────┴────────┴────────┴────────┴────────┴────┐
-      │                                                               │
 y=+6  │         ●  CUTTER BARRACKS                                   │
-      │         │                                                     │
 y=+5  │   ●─────●  LOWER JUNCTION                                    │
-      │         │                                                     │
-y=+4  │         │                                                     │
-y=+3  │         ●                                                     │
 y=+2  │         │                                    ●  RUNNER'S DEN  │
 y=+1  │   ●─────●─────●─────●─────●─────●─────●─────●                 │
-      │  SPARK                                                        │
-      │  WORKSHOP                                                     │
 y=0   │         ●─────●  SAFE     ●  DEAD                            │
-      │         │     HOUSE       DROP                                │
-y=-1  │         │                             │                       │
 y=-2  │         ●  INTERROGATION              ●                       │
-y=-3  │         │                             │                       │
 y=-4  │   ●─────●  KEEPER'S      ●─────●─────●                       │
-      │         │  VAULT                                              │
 y=-5  │         ●  SUPPLY HUB                                        │
-      │         ↓                                                     │
       └───────────────────────────────────────────────────────────────┘
 ```
 
-### Named Locations (z=-4)
-
-| Name | Coordinates | Purpose |
-|------|-------------|---------|
-| Lower Junction | (-14, +5, -4) | Main entry from z=-3 |
-| Cutter Barracks | (-14, +6, -4) | Combat cell base |
-| Spark Workshop | (-16, +1, -4) | Tech operations, salvage |
-| Safe House | (-12, 0, -4) | Hideout with multiple exits |
-| Dead Drop | (-8, 0, -4) | Message exchange point |
-| Runner's Den | (-4, +2, -4) | Courier cell |
-| Interrogation | (-14, -2, -4) | Prisoner holding |
-| Keeper's Vault | (-14, -4, -4) | Armored supply cache |
-| Supply Hub | (-14, -5, -4) | Continues down to z=-5 |
-
-### Corridor Structure (z=-4)
-
-| Corridor | Direction | Rooms |
-|----------|-----------|-------|
-| West Spine | (-14, +6) to (-14, -5) | 12 rooms (N-S) |
-| Upper Cross | (-16, +1) to (-4, +1) | 13 rooms (E-W) |
-| Safe House Corridor | (-14, 0) to (-8, 0) | 6 rooms (E-W) |
-| Eastern Spur | (-8, +1) to (-8, -4) | 5 rooms (N-S) |
-| Lower Cross | (-14, -4) to (-8, -4) | 6 rooms (E-W) |
-
-**Total z=-4 rooms: 40** (9 named + 31 passages)
+**Total z=-4 rooms: 40**
 
 ---
 
@@ -380,44 +255,17 @@ Reinforced chambers. Near water table. Sister Gray's domain.
         x=-16    x=-14    x=-12    x=-10
            │        │        │        │
       ┌────┴────────┴────────┴────────┴────┐
-      │                                     │
 y=-5  │         ●  THE DESCENT              │
-y=-4  │         │                           │
 y=-3  │   ●─────●─────●─────●─────●         │
       │  ARCHIVE WAR        │   HOLDING     │
-      │         ROOM        │   CELLS       │
-y=-2  │         │           │               │
 y=-1  │   ●─────●  THE VAULT                │
       │  COUNCIL│                           │
-y=0   │  CHAMB  │                           │
 y=+1  │   ●─────●  SISTER'S QUARTERS       │
-      │  CLONE  │                           │
-      │  LAB    ↓ (to z=-6 The Blind)      │
+      │  CLONE  ↓ (to z=-6 The Blind)      │
       └─────────────────────────────────────┘
 ```
 
-### Named Locations (z=-5)
-
-| Name | Coordinates | Purpose |
-|------|-------------|---------|
-| The Descent | (-14, -5, -5) | Entry from Supply Hub z=-4 |
-| War Room | (-14, -3, -5) | Command center, planning |
-| Archive | (-16, -3, -5) | Intelligence files, dossiers |
-| Holding Cells | (-10, -3, -5) | High-value prisoners |
-| The Vault | (-14, -1, -5) | Mask decoy chamber |
-| Council Chambers | (-16, -1, -5) | Inner circle meetings |
-| Sister's Quarters | (-14, +1, -5) | Her austere private space |
-| Clone Lab | (-16, +1, -5) | Continuity operations |
-
-### Corridor Structure (z=-5)
-
-| Corridor | Direction | Rooms |
-|----------|-----------|-------|
-| Main Spine | (-14, -5) to (-14, +1) | 7 rooms (S-N) |
-| Command Cross | (-16, -3) to (-10, -3) | 7 rooms (E-W) |
-| Lower Cross | (-16, +1) to (-14, +1) | 3 rooms (E-W) |
-
-**Total z=-5 rooms: 16** (8 named + 8 passages)
+**Total z=-5 rooms: 16**
 
 ---
 
@@ -425,54 +273,52 @@ y=+1  │   ●─────●  SISTER'S QUARTERS       │
 
 Ultra-secure chamber below water table. Pluribus cannot see here.
 
-```
-        x=-14
-           │
-      ┌────┴────┐
-      │         │
-y=+1  │    ●    │  THE BLIND
-      │         │  Where the Mask is kept
-      └─────────┘
-```
-
 | Name | Coordinates | Purpose |
 |------|-------------|---------|
 | The Blind | (-14, +1, -6) | Faraday-cage isolation, total darkness |
-
-**Characteristics:**
-- No signals penetrate (electromagnetic isolation)
-- Complete darkness (engineered, not merely unlit)
-- Below water table (constant seepage pressure)
-- Only Sister Gray and one trusted keeper know location
-- The Mask is here
 
 **Total z=-6 rooms: 1**
 
 ---
 
+## Network Statistics
+
+| Level | Original | Waterfront | Eastside | Yesler | King Street | Eastern | Total |
+|-------|----------|------------|----------|--------|-------------|---------|-------|
+| z=-2 | 88 | 29 | 35 | 36 | 39 | 40 | **267** |
+| z=-3 | 29 | 22 | 18 | 6 | 0 | 0 | **75** |
+| z=-4 | 40 | 0 | 0 | 0 | 0 | 0 | **40** |
+| z=-5 | 16 | 0 | 0 | 0 | 0 | 0 | **16** |
+| z=-6 | 1 | 0 | 0 | 0 | 0 | 0 | **1** |
+| **Total** | **174** | **51** | **53** | **42** | **39** | **40** | **399** |
+
+---
+
 ## Strategic Value
 
+**City-Wide Coverage:**
+- Underground now reaches ALL edges of the city
+- Waterfront (x=-21) to 4th Avenue (x=+14)
+- King Street (y=-12) to Yesler Way (y=+12)
+- True 3D network from z=-2 to z=-6
+
 **Bypass Surface Blockages:**
-- Yesler Way is blocked (except Waterfront) - underground goes anywhere
-- Sinkhole is impassable on surface - tunnels route around it
+- Yesler Way blocked above - underground goes anywhere
+- Sinkhole impassable on surface - tunnels route around it
 - All major buildings connected below
+- Multiple entry/exit points (if one compromised, others remain)
 
-**Cartel Advantage:**
-- Multiple entry/exit points (if one is compromised, others remain)
-- Depth = security (deeper = harder to reach = more secure)
-- Pluribus cannot monitor underground (no sensors, no drones)
+**Thematic Zones:**
+- **Waterfront:** Salt-crusted smuggler caves, tidal flooding, hidden docks
+- **Eastside:** Steam tunnels, utility infrastructure, rail connections
+- **Yesler:** Prohibition speakeasies, gambling dens, historic basements
+- **King Street:** Industrial freight, rail yard access, platform tunnels
 
-**The Network Pattern:**
-
-```
-SURFACE:  [Fabrication] ──blocked── [Smith Tower] ──blocked── [Occidental Park]
-               │                          │                          │
-               ↓                          ↓                          ↓
-z=-2:     ◆────●────●────●────●────●────●────◆────────────●────●────◆
-          │         WEST SPINE              │       S. MAIN CORRIDOR │
-          │                                 │                        │
-          ◆ Supply Depot                    └────────────────────────┘
-```
+**Territorial Control:**
+- **Gray Cartel Core (x < -7):** Secured to z=-6, defensive depth
+- **Eastern Expansion (x >= -7):** Contested, only to z=-3
+- **Waterfront (x=-21):** Smuggler routes, tidal access
+- **Rail Network (y=-12):** Industrial infrastructure, freight movement
 
 ---
 
