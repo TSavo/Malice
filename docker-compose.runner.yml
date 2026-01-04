@@ -49,3 +49,4 @@ volumes:
 networks:
   malice-network:
     external: true
+    name: malice_malice-network

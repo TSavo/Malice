@@ -6,7 +6,7 @@ FROM ubuntu:24.04
 # Avoid prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install dependencies
+# Install dependencies (including libicu for .NET runner)
 RUN apt-get update && apt-get install -y \
     curl \
     ca-certificates \
@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     zip \
     wget \
+    libicu74 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Docker CLI (for docker commands inside runner)
@@ -59,9 +60,9 @@ RUN curl -o actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz -L \
     && ./bin/installdependencies.sh \
     && chown -R runner:runner /home/runner/actions-runner
 
-# Copy entrypoint script
+# Copy entrypoint script (ensure it's readable and executable by all, fix line endings)
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN chmod 755 /entrypoint.sh && sed -i 's/\r$//' /entrypoint.sh
 
 USER runner
 
