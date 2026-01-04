@@ -4,9 +4,9 @@
 
 export const building = {
   name: 'Eastside Underground',
-  x: 7,
+  x: 14,
   y: -6,
-  width: 10,
+  width: 17,
   height: 16,
   floors: 1,
 

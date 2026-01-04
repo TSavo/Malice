@@ -5,9 +5,9 @@
 export const building = {
   name: 'Yesler Underground',
   x: -14,
-  y: 6,
-  width: 22,
-  height: 8,
+  y: 12,
+  width: 29,
+  height: 14,
   floors: 1,
 
   rooms: {

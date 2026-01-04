@@ -6,7 +6,7 @@ export const building = {
   name: 'Underground East North',
   x: 3,
   y: 12,
-  width: 14,
+  width: 15,
   height: 8,
   floors: 1,
 
