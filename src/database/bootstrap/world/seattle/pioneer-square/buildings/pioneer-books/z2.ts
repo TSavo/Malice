@@ -24,7 +24,7 @@ Smith Tower rises to the west, its white terra cotta facade visible above the su
       waterLevel: 0,
       outdoor: true,
       exits: {
-        down: '%BACK',
+        down: '%LANDING',
         east: '%ROOF_SE',
         north: '%ROOF_NW',
       },
