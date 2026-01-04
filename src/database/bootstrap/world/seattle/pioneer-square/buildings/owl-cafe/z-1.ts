@@ -90,8 +90,10 @@ The breach isn't new. The mortar shows decades of age. Someone opened this passa
       exits: {
         south: '%CELLAR',
         west: {
-          to: 'underground/upper-tunnels/x-14-y-1.ts',
+          to: 'buildings/underground-east/z-2.ts',
+          room: '%OCC_N1',
           description: 'A breach in the stone wall leads to the underground',
+          hidden: true,
         },
       },
       objects: [

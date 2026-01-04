@@ -36,6 +36,12 @@ The air is damp with proximity to the bay, salt seeping in through routes that c
           room: '%FIRST_AVE_CONN',
           description: 'A damp passage leads toward the waterfront',
         },
+        north: {
+          to: 'buildings/pioneer-books/z-1.ts',
+          room: '%FOUNDATION',
+          description: 'A rough passage leads north into an old basement',
+          hidden: true,
+        },
       },
     },
 
