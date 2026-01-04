@@ -78,6 +78,7 @@ The center of Pioneer Square is **S. Main Street at 2nd Avenue**.
 | **Interurban Building** | 2nd Ave & Yesler | "Old office building, four floors. Named for the railway that used to run to Tacoma." |
 | **Merchant's Cafe** | 1st Ave & Main | "Seattle's oldest restaurant. 1st Ave at Main, on the west side. Been there since 1890." |
 | **Pioneer Books** | Yesler & 2nd Ave | "Independent bookstore. Head to Yesler and 2nd Ave, northeast corner." |
+| **Pioneer Pawn & Loan** | Yesler Way, between 2nd & 3rd Ave | "Pawn shop on Yesler. Look for the three golden balls above the door—tarnished green now. Security bars on every window. Owner lived upstairs, hasn't been back in fifty-five years. Everything's still tagged and priced inside." |
 | **Second Chance Thrift** | S. Washington & 1st Ave | "Thrift store with apartments above. S. Washington between 1st and Waterfront, north side. Ground floor's full of donated clothes and housewares. Color-coded price tags, mannequins everywhere." |
 
 ### Restricted Facilities (Secret)

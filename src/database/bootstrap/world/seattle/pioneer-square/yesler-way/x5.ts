@@ -16,4 +16,10 @@ A dive bar occupies the opposite corner, its blacked-out windows and minimal sig
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  exits: {
+    north: {
+      to: '../buildings/pioneer-pawn/z0.ts#SHOWROOM',
+      description: 'The security door of Pioneer Pawn & Loan',
+    },
+  },
 };
