@@ -1,206 +1,194 @@
-# Greeter System Overview
+# Greeter System: Two Paths
 
-The greeter is an NPC that guides new players through their first hours in Pioneer Square. This is a **sequential progression** — each stage builds on the previous, creating a natural onboarding flow that integrates new arrivals into the Pluribus system.
+New arrivals to Pioneer Square face a choice — often before they realize they're choosing.
 
----
-
-## The Greeter Role
-
-The greeter is a City Services employee assigned to assist new registrants. They're not a tutorial NPC — they're an in-character representative of the system, doing their job. They genuinely believe they're helping. They are.
-
-**Personality:**
-- Patient but efficient — they do this a lot
-- Encouraging but not overly warm — bureaucratic friendliness
-- Knows the system cold — can answer questions about how things work
-- Slightly weary — new arrivals are unpredictable, sometimes ungrateful
-- Ultimately helpful — they want you to succeed (it makes their metrics look good)
-
-**The Greeter Knows:**
-- The player just completed chargen and registration
-- The player has no possessions, no housing, no job
-- The player needs clothing, orientation, work, and eventually housing
-- The player is being evaluated for future roles (though they don't say this)
+This documentation provides **AI playbooks** for onboarding players down either path. These are not coded systems — the city-ai makes decisions on the fly, using these guides to know what NPCs to deploy, what to offer, what code to execute, and what to track.
 
 ---
 
-## The Seven Stages
+## The Choice Point
 
-Each stage has its own documentation file with detailed scripts, NPC prompts, and technical implementation.
+Every player completes chargen the same way: crisis, interview, registration offer. The split happens at **what they do next**.
 
-### Stage 1: Clothing (01-clothing.md)
+### Path A: Continuum
 
-**Goal:** Get the player dressed in basic citizen attire.
+The player accepts citizenship. They register at City Services. Pluribus welcomes them with:
+- Clothing from the outfitting room
+- A greeter NPC who shows them around
+- Work assignments through the job board
+- Housing through the allocation system
+- Credits deposited to their account
 
-The player emerges from registration with nothing. The greeter takes them to get issued clothes and helps them dress properly. This teaches:
-- How inventory works (picking things up)
-- How the wear/remove system works
-- That Pluribus provides for its citizens
+This is the **safe path**. Stable. Predictable. Constraining.
 
-### Stage 2: Block Tour (02-block-tour.md)
+See: [continuum/](./continuum/)
 
-**Goal:** Orient the player to their immediate surroundings.
+### Path B: Underground
 
-The greeter walks the player around the block, pointing out key locations:
-- City Services (where they registered)
-- The ration dispensary
-- The job board terminal
-- Nearest shelter/dormitory
-- Basic navigation and street names
+The player refuses or avoids citizenship. They slip away from City Services. The Cartel notices them with:
+- A recruiter who makes contact
+- Survival basics (scavenged, traded, provided)
+- Tests to prove their worth
+- Eventually, a place in the organization
+- Cash, favors, and earned territory
 
-This teaches:
-- How movement works
-- The geography of the starting area
-- Where essential services are located
+This is the **dangerous path**. Free. Uncertain. Purposeful.
 
-### Stage 3: First Courier Job (03-courier-job.md)
+See: [underground/](./underground/)
 
-**Goal:** Give the player their first paying task.
+### Path C: The Mole
 
-The greeter assigns or introduces the player to their first job: a simple delivery within the block. Pick up a package, carry it somewhere, hand it to someone.
+The player registers as a citizen but secretly works for the Cartel. They do both onboarding processes simultaneously — citizen by day, Cartel by night.
 
-This teaches:
-- How work orders function
-- How to complete objectives
-- How credits work (they get paid)
-- That reliability is noticed
+This is the **double life**. Maximum access. Maximum risk.
 
-### Stage 4: Better Job (04-better-job.md)
-
-**Goal:** Show the player that advancement is possible.
-
-After completing a few courier runs, the greeter (or another NPC) offers the player something slightly better — a job with more responsibility, more pay, or more interest.
-
-This teaches:
-- The progression system exists
-- Reliability leads to opportunity
-- Different job types exist
-
-### Stage 5: Housing (05-housing.md)
-
-**Goal:** Help the player secure their own living space.
-
-With some credits earned and a work history, the player can apply for housing. The greeter (or a housing clerk) helps them navigate the process and get assigned to a bunk, then a room, eventually their own apartment.
-
-This teaches:
-- Housing tiers exist
-- Credits have real purchasing power
-- Pluribus provides security (but also dependency)
-
-### Stage 6: Permanent Employment (06-permanent-employment.md)
-
-**Goal:** Assign the player to a regular work location.
-
-Instead of pickup courier jobs, the player gets assigned to a workplace — a factory floor, a maintenance crew, a shop, a patrol route. Regular work, regular pay, regular presence somewhere.
-
-This teaches:
-- Long-term employment is the goal
-- Different roles in the city
-- Where they fit in the system
-
-### Stage 7: Payment System (07-payment-system.md)
-
-**Goal:** Ensure the player understands and is enrolled in regular pay.
-
-The player's employment is now set up to pay them on a schedule. They understand how credits flow, how to check their balance, how to spend, and what happens if they don't work.
-
-This teaches:
-- The full credit economy
-- Dependency on the system
-- What citizenship really means
+See: Both paths, plus [../city-ai/GRAY-CARTEL.md](../city-ai/GRAY-CARTEL.md) → "Moles"
 
 ---
 
-## Technical Pattern
+## How to Detect the Path
 
-Each stage follows the same pattern:
+### Signs of Continuum Path
 
-1. **Trigger:** Previous stage completed, or player meets criteria
-2. **NPC Contact:** Greeter (or delegate) approaches or summons player
-3. **Dialogue:** In-character explanation of what's happening
-4. **Action:** Player performs the required actions (with guidance)
-5. **Completion:** Stage marked complete, next stage enabled
-6. **Notes:** Update player's profile notes for NPC awareness
+- Player completes registration
+- Player asks about work, housing, rations
+- Player follows the greeter willingly
+- Player expresses interest in "the system"
 
-### Tracking Progress
+### Signs of Underground Path
 
-Use the notes system to track player progress:
+- Player refuses or delays registration
+- Player asks about "alternatives" or "other options"
+- Player seems suspicious of Pluribus
+- Player wanders away from City Services
+- Player lingers in areas where Cartel recruiters operate
 
-```javascript
-await $.notes.add(player.id, `
-  GREETER PROGRESS:
-  - Stage: 3 (First Courier Job)
-  - Completed: clothing, orientation
-  - Current task: Deliver package to Supply Depot
-  - Started: ${new Date().toISOString()}
-`, ['greeter', 'onboarding', 'active']);
-```
+### Signs of Mole Path
 
-### NPC Prompts
-
-Each greeter interaction should include context about the player's progress:
-
-```javascript
-await $.notes.add(greeter.id, `
-  CURRENT ASSIGNMENT:
-  Player: ${player.name} (#${player.id})
-  Stage: 3 - First Courier Job
-  History: Completed clothing and orientation smoothly
-  Demeanor: Cooperative, asks good questions
-  Next: After delivery, assess for better job offer
-`, ['job', 'current']);
-```
+- Player registers but asks too many questions
+- Player seems to be playing along
+- Player later makes contact with known Cartel areas
+- Player accepts Cartel recruitment while maintaining citizen status
 
 ---
 
-## Design Principles
+## What These Docs Provide
 
-### In-Character Always
+Each stage document includes:
 
-The greeter is not a tutorial system. They're a person doing their job. They have opinions, preferences, and a life outside this interaction. They might mention being tired, or comment on the weather, or express mild frustration at the previous new arrival who couldn't figure out how to put on pants.
+### 1. Context
+- When this stage triggers
+- What the player's state is
+- What the goal is
 
-### Player Agency
+### 2. The NPC
+- Who handles this stage
+- Their personality and approach
+- Notes to inject into their AI prompt
 
-The greeter offers. The player chooses. If the player wanders off during the tour, the greeter adapts. If the player refuses a job, the greeter notes that (and so does Pluribus). Choices have consequences, but we don't force the progression.
+### 3. Dialogue Patterns
+- Example conversations
+- How to handle common questions
+- Edge cases
 
-### Natural Pacing
+### 4. Actions to Take
+- Actual MOO code to execute
+- What objects to create/modify
+- What properties to set
 
-Don't rush. Real onboarding takes time. A player might complete stages 1-3 in their first session and not reach stage 5 until they've been playing for a while. That's fine. The greeter doesn't force anything — they check in, offer the next stage when the player is ready, and otherwise leave them alone.
-
-### Seamless Handoffs
-
-The greeter doesn't do everything. Stage 5 might involve a housing clerk. Stage 6 might involve a factory foreman. The greeter introduces, then hands off. The new NPC picks up with full context.
-
-### Evaluation Subtext
-
-Everything the player does is being evaluated. Not explicitly — the greeter doesn't say "Pluribus is watching." But every choice, every delay, every question, every refusal gets noted. This information flows into the player's profile and affects future opportunities.
-
-The player might notice patterns: cooperative people get better offers faster. But no one says that out loud.
+### 5. What to Track
+- Notes to add to player profile
+- Flags that affect future interactions
+- Progress markers
 
 ---
 
-## File Structure
+## The AI's Role
+
+The city-ai doesn't follow a script — it **makes decisions** based on these guidelines.
+
+### For Continuum NPCs (Greeter, Clerks, Supervisors)
+
+- Act like bureaucrats doing their jobs
+- Be helpful but not warm
+- The system provides, the system expects
+- Everything is logged, tracked, evaluated
+- Advancement is possible for the reliable
+
+### For Underground NPCs (Recruiters, Handlers, Sister Gray's people)
+
+- Act like criminals vetting a new recruit
+- Be cautious, indirect, testing
+- Nothing is free — everything is earned
+- Trust is built through action, not words
+- The Cartel is family, and family demands loyalty
+
+### Making Decisions On The Fly
+
+**Housing example (Continuum):**
+> Player has worked steadily for two weeks. They ask about better housing.
+>
+> AI decision: They've earned it. Find an available unit in Smith Tower.
+> Execute: `await lock.rent(player, 365 * 24 * 60 * 60 * 1000)` for a year.
+> Track: Note the assignment in their profile.
+
+**Housing example (Underground):**
+> Player has completed three jobs for the Cartel. They need somewhere to sleep.
+>
+> AI decision: They've proven useful. Assign them a corner in a Cartel safe house.
+> Execute: Set a note that they have access to location X.
+> Track: Note their status advancement.
+
+The docs tell you *what* to do. The AI decides *when* and *how*.
+
+---
+
+## Stage Comparison
+
+| Stage | Continuum | Underground |
+|-------|-----------|-------------|
+| 1 | **Clothing** — Issued from City Services | **Survival** — Scavenge, trade, or provided |
+| 2 | **Orientation** — Greeter walks the block | **The Tunnels** — Learn the Underground |
+| 3 | **First Job** — Courier delivery (credits) | **First Test** — Observation task (no pay) |
+| 4 | **Employment** — Permanent position offer | **Real Work** — Cartel jobs (cash) |
+| 5 | **Housing** — Assigned from the system | **Earning Space** — Claim or earn a squat |
+| 6 | **Workplace** — Assigned location and duties | **Cell Assignment** — Role in the organization |
+| 7 | **Payroll** — Credit economy, deductions | **Cash Life** — Cash, barter, favors |
+
+---
+
+## Directory Structure
 
 ```
 docs/greeter/
-├── 00-overview.md      ← This file
-├── 01-clothing.md      ← Stage 1: Getting dressed
-├── 02-block-tour.md    ← Stage 2: Orientation
-├── 03-courier-job.md   ← Stage 3: First work
-├── 04-better-job.md    ← Stage 4: Advancement
-├── 05-housing.md       ← Stage 5: Own place
-├── 06-permanent-employment.md  ← Stage 6: Regular work
-└── 07-payment-system.md        ← Stage 7: Pay setup
+├── 00-overview.md              ← This file
+├── continuum/
+│   ├── 01-clothing.md          ← Getting dressed
+│   ├── 02-orientation.md       ← Learning the block
+│   ├── 03-first-job.md         ← First courier work
+│   ├── 04-employment.md        ← Permanent position
+│   ├── 05-housing.md           ← Getting assigned housing
+│   ├── 06-workplace.md         ← Regular work location
+│   └── 07-payroll.md           ← Credit economy
+└── underground/
+    ├── 01-survival.md          ← Immediate needs
+    ├── 02-the-tunnels.md       ← Learning the Underground
+    ├── 03-first-test.md        ← Proving yourself
+    ├── 04-real-work.md         ← Cartel jobs
+    ├── 05-earning-space.md     ← Getting a place
+    ├── 06-cell-assignment.md   ← Role in the Cartel
+    └── 07-cash-life.md         ← Cash economy
 ```
 
 ---
 
 ## Related Documentation
 
-- [JOBS.md](../city-ai/JOBS.md) — How jobs work
-- [ECONOMY.md](../city-ai/ECONOMY.md) — Credit and cash systems
-- [PLURIBUS.md](../city-ai/PLURIBUS.md) — The system the player is joining
-- [TAILORING.md](../TAILORING.md) — Clothing system details
-- [wearables.md](../moo/prototypes/wearables.md) — Clothing prototypes
+- [FACTIONS.md](../city-ai/FACTIONS.md) — Faction system and citizenship
+- [GRAY-CARTEL.md](../city-ai/GRAY-CARTEL.md) — The Cartel organization
+- [PLURIBUS.md](../city-ai/PLURIBUS.md) — How Pluribus operates
+- [ECONOMY.md](../city-ai/ECONOMY.md) — Credits vs. cash
+- [JOBS.md](../city-ai/JOBS.md) — Work order system
 
 ---
 
