@@ -343,6 +343,25 @@ export class PlayerBuilder implements Builder {
     `,
     );
 
+    // Send TTS audio segments to client
+    obj.setMethod(
+      'audio',
+      `
+      /** Send TTS audio segments to the client for speech synthesis.
+       *  Client will request audio from TTS server and play it.
+       *  @param segments - Array of { speaker, speakerName, voiceId, text }
+       */
+      const segments = args[0];
+      if (!segments || !Array.isArray(segments) || segments.length === 0) return false;
+
+      // Send via the 'audio' channel
+      if (self._context?.channel) {
+        return self._context.channel('audio', { segments });
+      }
+      return false;
+    `,
+    );
+
     // Window management for web client
     this.addWindowMethods(obj);
   }

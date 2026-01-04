@@ -446,6 +446,32 @@ SENSATION: broadcastSensation(target, sensation) routes pain/feeling to target's
       `,
     );
 
+    // Broadcast audio segments to all TTS-enabled clients in this location
+    obj.setMethod(
+      'broadcastAudio',
+      `
+      /**
+       * Send audio segments to all TTS-enabled clients in this location
+       * Each segment specifies speaker, voice, and text for TTS generation
+       * @param segments - Array of { speaker, speakerName, voiceId, text }
+       */
+      const segments = args[0];
+      if (!segments || !Array.isArray(segments) || segments.length === 0) return;
+
+      const contents = self.contents || [];
+
+      for (const obj of contents) {
+        if (obj && obj.audio) {
+          try {
+            await obj.call('audio', segments);
+          } catch (e) {
+            // Ignore - object may not have TTS support
+          }
+        }
+      }
+      `,
+    );
+
     // Property descriptions for AI context (inherits from Describable)
     obj.setPropertyDescription(
       'contents',
