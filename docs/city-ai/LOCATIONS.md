@@ -80,6 +80,7 @@ The center of Pioneer Square is **S. Main Street at 2nd Avenue**.
 | **Pioneer Books** | Yesler & 2nd Ave | "Independent bookstore. Head to Yesler and 2nd Ave, northeast corner." |
 | **Pioneer Pawn & Loan** | Yesler Way, between 2nd & 3rd Ave | "Pawn shop on Yesler. Look for the three golden balls above the door—tarnished green now. Security bars on every window. Owner lived upstairs, hasn't been back in fifty-five years. Everything's still tagged and priced inside." |
 | **Second Chance Thrift** | S. Washington & 1st Ave | "Thrift store with apartments above. S. Washington between 1st and Waterfront, north side. Ground floor's full of donated clothes and housewares. Color-coded price tags, mannequins everywhere." |
+| **King Pharmacy** | S. King St & 4th Ave | "Old pharmacy in the International District. South on 4th Ave to King Street, it's on the north side. Hybrid Chinese and Western medicine. Place got looted—empty shelves, forced cabinets. Three floors plus roof access." |
 
 ### Restricted Facilities (Secret)
 
