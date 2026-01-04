@@ -530,7 +530,35 @@ The walls show organizational marks—zones indicated by paint that was once bri
       lighting: 18,
       waterLevel: 0,
       outdoor: false,
-      exits: { east: '%LJ' },
+      exits: { east: '%LJ', west: '%ARMORY' },
+    },
+
+    '%ARMORY': {
+      name: 'The Armory',
+      description: `The passage opens into a reinforced chamber that serves as the Cartel's primary weapons cache—a space designed for containment as much as storage. The walls are lined with steel plate, the floor poured thick with concrete, the entire structure built to survive the detonation of its contents if something goes wrong.
+
+The armory is organized with military precision: racks for long arms, lockers for sidearms, cages for explosives, cabinets for ammunition. The organization reflects necessity rather than preference, the limited space requiring efficiency. Every weapon has a place. Every place has a weapon.
+
+A reinforced workbench occupies one corner, its surface scarred by cleaning and maintenance. The tools of the trade hang on pegboards: cleaning rods, bore brushes, wrenches, files, the equipment needed to keep weapons functional in the damp underground environment.
+
+The air smells of oil and solvent, the residue of constant maintenance. Weapons don't survive the underground without care. The Cartel cares.`,
+      x: -16,
+      y: 5,
+      z: -4,
+      population: 0,
+      ambientNoise: 10,
+      lighting: 30,
+      waterLevel: 0,
+      outdoor: false,
+      exits: { east: '%X15Y5' },
+      objects: [
+        { prototype: 'cabinet', name: 'a weapons locker', description: 'A tall steel locker with a heavy padlock. Slots inside hold long arms in vertical racks.' },
+        { prototype: 'cabinet', name: 'a weapons locker', description: 'A locker marked with a faded number. The lock mechanism shows wear from frequent access.' },
+        { prototype: 'cabinet', name: 'an ammunition cabinet', description: 'A reinforced cabinet with blast-resistant construction, its shelves organized by caliber.' },
+        { prototype: 'crate', name: 'an equipment crate', description: 'A crate containing tactical gear: vests, holsters, pouches, the accoutrements of armed operations.' },
+        { prototype: 'desk', name: 'a maintenance bench', description: 'A heavy workbench with a vise, cleaning supplies, and spare parts organized in labeled bins.' },
+        { prototype: 'sign', name: 'an inventory board', description: 'A chalkboard tracking weapon allocation and maintenance schedules. The chalk is fresh.' },
+      ],
     },
 
     '%X13Y5': {
@@ -544,7 +572,78 @@ The walls show organizational marks—zones indicated by paint that was once bri
       lighting: 20,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%LJ' },
+      exits: { west: '%LJ', east: '%X12Y5' },
+    },
+
+    '%X12Y5': {
+      name: 'Lower Passage',
+      description: `The passage continues east toward specialized operational areas, the corridor showing the marks of heavy traffic—carts, equipment, the logistics of underground operations.`,
+      x: -12,
+      y: 5,
+      z: -4,
+      population: 0,
+      ambientNoise: 18,
+      lighting: 22,
+      waterLevel: 0,
+      outdoor: false,
+      exits: { west: '%X13Y5', east: '%COMMS_CENTER', north: '%MEDICAL_BAY' },
+    },
+
+    '%COMMS_CENTER': {
+      name: 'Communications Center',
+      description: `The chamber hums with the white noise of active electronics—a space dedicated to the invisible infrastructure of communication. The walls are lined with equipment racks, their blinking lights indicating systems that monitor, relay, and intercept the radio and data traffic that flows through the city above.
+
+The construction includes Faraday shielding, the walls lined with mesh that contains the center's own emissions while blocking external signals. The isolation is deliberate—what happens here cannot be detected from outside, and outside signals cannot compromise what happens here.
+
+A central console dominates the space, its multiple screens showing data flows, frequency monitors, and communication logs. The operator's chair is worn but functional, positioned for hours of observation. Someone watches the city from here. Someone listens.
+
+Antenna cables run upward through conduit, connecting to hidden receivers on the surface. The Cartel's ears extend throughout Pioneer Square, hearing what others think is private.`,
+      x: -11,
+      y: 5,
+      z: -4,
+      population: 0,
+      ambientNoise: 35,
+      lighting: 25,
+      waterLevel: 0,
+      outdoor: false,
+      exits: { west: '%X12Y5' },
+      objects: [
+        { prototype: 'desk', name: 'a communications console', description: 'A curved console with multiple monitors, radio equipment, and spectrum analyzers. The screens show real-time data.' },
+        { prototype: 'chair', name: 'an operator\'s chair', description: 'A heavy-duty office chair, its armrests worn from long hours of monitoring.' },
+        { prototype: 'cabinet', name: 'an equipment rack', description: 'A tall rack of radio equipment—transceivers, amplifiers, signal processors—their indicator lights blinking in coded patterns.' },
+        { prototype: 'cabinet', name: 'a server rack', description: 'A rack of servers humming with activity, processing intercepted data and managing secure communications.' },
+        { prototype: 'crate', name: 'a spare parts bin', description: 'A crate containing backup components: circuit boards, cables, antennas, the supplies needed to maintain the systems.' },
+        { prototype: 'sign', name: 'frequency charts', description: 'Laminated charts on the wall list frequencies to monitor, encryption protocols, and signal codes.' },
+      ],
+    },
+
+    '%MEDICAL_BAY': {
+      name: 'Medical Bay',
+      description: `The chamber is cleaner than anywhere else at this depth—surfaces scrubbed, air filtered, the environment maintained to standards that the rest of the underground cannot achieve. This is the Cartel's medical facility, a space designed for treatment when the surface hospitals cannot be trusted.
+
+The equipment is salvaged but functional: an operating table with adjustable lighting, cabinets of medical supplies, monitoring equipment that still works despite its age. The facility lacks the resources of a proper hospital but exceeds what most field medics could hope for.
+
+The walls show the marks of hasty construction—this space was carved from the network specifically for its purpose, the dimensions designed to accommodate medical procedures. The ceiling is lower here, the lighting brighter, the atmosphere clinical despite the surrounding darkness.
+
+Stains on the floor have been scrubbed but not entirely eliminated. Operations have been performed here. Wounds have been treated. Not everyone survived.`,
+      x: -12,
+      y: 6,
+      z: -4,
+      population: 0,
+      ambientNoise: 15,
+      lighting: 40,
+      waterLevel: 0,
+      outdoor: false,
+      exits: { south: '%X12Y5' },
+      objects: [
+        { prototype: 'bed', name: 'an operating table', description: 'A metal table with adjustable height and an overhead surgical light. The surface is stainless steel, worn but clean.', quality: 'standard' },
+        { prototype: 'bed', name: 'a recovery cot', description: 'A cot with clean sheets, positioned for post-operative recovery.', quality: 'standard' },
+        { prototype: 'cabinet', name: 'a medical supply cabinet', description: 'A locked cabinet containing bandages, sutures, antibiotics, and other medical supplies.' },
+        { prototype: 'cabinet', name: 'a surgical instrument cabinet', description: 'A glass-fronted cabinet displaying surgical instruments, organized by procedure type.' },
+        { prototype: 'desk', name: 'a workstation', description: 'A desk with a computer terminal for patient records and medical references.' },
+        { prototype: 'crate', name: 'an IV supply crate', description: 'A crate containing IV bags, tubing, and associated supplies.' },
+        { prototype: 'sign', name: 'a sterilization chart', description: 'A laminated chart detailing sterilization procedures and emergency protocols.' },
+      ],
     },
 
     '%X13Y1': {

@@ -38,6 +38,11 @@ The passage branches here—north toward the pergola and the park, south toward 
           to: 'underground/upper-tunnels/main-crossing.ts',
           description: 'A brick passage leads west toward 1st Ave',
         },
+        up: {
+          to: 'buildings/occidental-square/z0.ts',
+          room: '%GALLERY',
+          description: 'A trapdoor leads up toward the gallery above',
+        },
       },
     },
 
