@@ -38,7 +38,9 @@ const blobKey = await map.image();
 
 ## $aiImageGen - Direct Image Generation
 
-For generating images directly (used internally by `$describable.image()`):
+For generating images directly (used internally by `$describable.image()`).
+
+Uses [Runware API](https://runware.ai) - ~8x cheaper than Google Gemini at ~$0.005-0.02/image.
 
 ### generate(prompt, options?)
 
@@ -62,10 +64,13 @@ const url = $blob.url(result.blobKey, 'thecontinuum.city');
 
 ```javascript
 await $aiImageGen.generate('A glowing orb', {
-  model: 'gemini-3-pro-image-preview',  // Override default model
+  model: 'civitai:139562@297320',        // Override default model (Realistic Vision)
   aspectRatio: 'portrait',               // 'landscape', 'portrait', 'square'
   metadata: { createdBy: player.id },    // Stored with blob
-  filename: 'orb.png'                    // Optional filename
+  filename: 'orb.png',                   // Optional filename
+  negativePrompt: 'blurry, distorted',   // What to avoid
+  steps: 30,                             // Diffusion steps (more = higher quality)
+  cfgScale: 7.5                          // Prompt adherence (higher = stricter)
 });
 ```
 
@@ -91,16 +96,16 @@ const result = await $aiImageGen.generateRaw('An icon');
 ```javascript
 const models = $aiImageGen.listModels();
 // [
-//   { id: 'gemini-2.0-flash-exp-image-generation', tier: 'free' },
-//   { id: 'gemini-2.5-flash-image', name: 'Nano Banana', tier: 'free' },
-//   { id: 'gemini-3-pro-image-preview', name: 'Nano Banana Pro', tier: 'free' },
-//   { id: 'imagen-4.0-generate-001', tier: 'paid' }
+//   { id: 'runware:101@1', name: 'Stable Diffusion XL Base', tier: 'budget', pricePerImage: 0.015 },
+//   { id: 'civitai:102438@133677', name: 'SDXL Turbo', tier: 'budget', pricePerImage: 0.008 },
+//   { id: 'runware:100@1', name: 'Stable Diffusion 1.5', tier: 'cheapest', pricePerImage: 0.005 },
+//   { id: 'civitai:139562@297320', name: 'Realistic Vision', tier: 'quality', pricePerImage: 0.02 }
 // ]
 
-$aiImageGen.setDefaultModel('gemini-3-pro-image-preview');
+$aiImageGen.setDefaultModel('runware:100@1');  // Use cheapest model
 ```
 
-**Environment:** Requires `GEMINI_API_KEY` environment variable.
+**Environment:** Requires `RUNWARE_API_KEY` environment variable.
 
 ---
 

@@ -5,7 +5,7 @@ import { type Builder, registerBuilder } from './builder-registry';
 /**
  * Builds $aiImageGen MOO object for AI image generation
  *
- * Uses Google's Gemini API (Nano Banana) to generate images,
+ * Uses Runware API to generate images (much cheaper than Google Gemini),
  * then stores them in $blob for persistence.
  *
  * Usage from MOO code:
@@ -41,8 +41,8 @@ export class AiImageGenBuilder implements Builder {
         parent: root!,
         properties: {
           name: 'AI Image Generator',
-          description: 'Generate images using Gemini API (Nano Banana)',
-          defaultModel: 'gemini-2.0-flash-exp-image-generation',
+          description: 'Generate images using Runware API',
+          defaultModel: 'runware:101@1', // Stable Diffusion XL base model
         },
       });
     }
@@ -52,10 +52,10 @@ export class AiImageGenBuilder implements Builder {
       'generate',
       `
       /**
-       * Generate an image and store in $blob
+       * Generate an image and store in $blob using Runware API
        * @param prompt - Text description of the image to generate
        * @param options - { model?, metadata?, filename?, aspectRatio? }
-       *   aspectRatio: 'landscape' (default), 'portrait', 'square', or '16:9', '9:16', '4:3', '3:4', '1:1'
+       *   aspectRatio: 'landscape' (default), 'portrait', 'square'
        * @returns { success, blobKey, aspectRatio, contentType, prompt, error? }
        */
       const prompt = args[0];
@@ -66,42 +66,58 @@ export class AiImageGenBuilder implements Builder {
       }
 
       // Get API key from environment
-      const apiKey = process.env.GEMINI_API_KEY;
+      const apiKey = process.env.RUNWARE_API_KEY;
       if (!apiKey) {
-        return { success: false, error: 'GEMINI_API_KEY not set in environment' };
+        return { success: false, error: 'RUNWARE_API_KEY not set in environment' };
       }
 
       const model = options.model || self.defaultModel;
-      const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent';
+      const apiUrl = 'https://api.runware.ai/v1';
 
-      // Map friendly aspect ratio names to API values
-      const aspectRatioMap = {
-        'landscape': '16:9',
-        'portrait': '9:16',
-        'square': '1:1',
-        'wide': '16:9',
-        'tall': '9:16',
-      };
+      // Map aspect ratio to dimensions
       const rawRatio = options.aspectRatio || 'landscape';
-      const aspectRatio = aspectRatioMap[rawRatio] || rawRatio;
+      const dimensionMap = {
+        'landscape': { width: 1024, height: 576 },   // 16:9
+        'wide': { width: 1024, height: 576 },        // 16:9
+        'portrait': { width: 576, height: 1024 },    // 9:16
+        'tall': { width: 576, height: 1024 },        // 9:16
+        'square': { width: 1024, height: 1024 },     // 1:1
+        '16:9': { width: 1024, height: 576 },
+        '9:16': { width: 576, height: 1024 },
+        '1:1': { width: 1024, height: 1024 },
+      };
+      const dims = dimensionMap[rawRatio] || dimensionMap['landscape'];
+      const aspectRatio = rawRatio;
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min timeout
 
       try {
+        // Generate unique task ID
+        const taskUUID = crypto.randomUUID();
+
         const resp = await fetch(apiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-goog-api-key': apiKey,
+            'Authorization': 'Bearer ' + apiKey,
           },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: {
-              responseModalities: ['TEXT', 'IMAGE'],
-              aspectRatio: aspectRatio,
+          body: JSON.stringify([
+            {
+              taskType: 'imageInference',
+              taskUUID: taskUUID,
+              positivePrompt: prompt,
+              negativePrompt: options.negativePrompt || 'blurry, low quality, distorted',
+              model: model,
+              width: dims.width,
+              height: dims.height,
+              steps: options.steps || 30,
+              CFGScale: options.cfgScale || 7.5,
+              numberResults: 1,
+              outputType: 'base64Data',
+              outputFormat: 'PNG',
             },
-          }),
+          ]),
           signal: controller.signal,
         });
 
@@ -114,25 +130,22 @@ export class AiImageGenBuilder implements Builder {
 
         const data = await resp.json();
 
-        // Extract first image from response
-        const parts = data.candidates?.[0]?.content?.parts || [];
-        let imageData = null;
-        let mimeType = 'image/png';
-        let textResponse = null;
-
-        for (const part of parts) {
-          if (part.inlineData && !imageData) {
-            imageData = part.inlineData.data;
-            mimeType = part.inlineData.mimeType || 'image/png';
-          }
-          if (part.text) {
-            textResponse = part.text;
-          }
+        // Runware returns an array of task results
+        const result = data.data?.[0] || data[0];
+        if (!result) {
+          return { success: false, error: 'No result in response', data };
         }
 
+        if (result.error) {
+          return { success: false, error: result.error };
+        }
+
+        const imageData = result.imageBase64Data || result.base64Data;
         if (!imageData) {
-          return { success: false, error: 'No image in response', textResponse };
+          return { success: false, error: 'No image data in response', result };
         }
+
+        const mimeType = 'image/png';
 
         // Store in $blob
         const blob = $blob;
@@ -159,7 +172,6 @@ export class AiImageGenBuilder implements Builder {
           contentType: mimeType,
           prompt: prompt,
           aspectRatio: aspectRatio,
-          textResponse: textResponse,
         };
       } catch (err) {
         clearTimeout(timeoutId);
@@ -176,7 +188,7 @@ export class AiImageGenBuilder implements Builder {
       'generateRaw',
       `
       /**
-       * Generate an image and return base64 directly (not stored)
+       * Generate an image and return base64 directly (not stored) using Runware API
        * @param prompt - Text description of the image to generate
        * @param options - { model?, aspectRatio? }
        * @returns { success, data, aspectRatio, contentType, prompt, error? }
@@ -188,42 +200,57 @@ export class AiImageGenBuilder implements Builder {
         return { success: false, error: 'Prompt is required' };
       }
 
-      const apiKey = process.env.GEMINI_API_KEY;
+      const apiKey = process.env.RUNWARE_API_KEY;
       if (!apiKey) {
-        return { success: false, error: 'GEMINI_API_KEY not set in environment' };
+        return { success: false, error: 'RUNWARE_API_KEY not set in environment' };
       }
 
       const model = options.model || self.defaultModel;
-      const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent';
+      const apiUrl = 'https://api.runware.ai/v1';
 
-      // Map friendly aspect ratio names to API values
-      const aspectRatioMap = {
-        'landscape': '16:9',
-        'portrait': '9:16',
-        'square': '1:1',
-        'wide': '16:9',
-        'tall': '9:16',
-      };
+      // Map aspect ratio to dimensions
       const rawRatio = options.aspectRatio || 'landscape';
-      const aspectRatio = aspectRatioMap[rawRatio] || rawRatio;
+      const dimensionMap = {
+        'landscape': { width: 1024, height: 576 },   // 16:9
+        'wide': { width: 1024, height: 576 },        // 16:9
+        'portrait': { width: 576, height: 1024 },    // 9:16
+        'tall': { width: 576, height: 1024 },        // 9:16
+        'square': { width: 1024, height: 1024 },     // 1:1
+        '16:9': { width: 1024, height: 576 },
+        '9:16': { width: 576, height: 1024 },
+        '1:1': { width: 1024, height: 1024 },
+      };
+      const dims = dimensionMap[rawRatio] || dimensionMap['landscape'];
+      const aspectRatio = rawRatio;
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 120000);
 
       try {
+        const taskUUID = crypto.randomUUID();
+
         const resp = await fetch(apiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-goog-api-key': apiKey,
+            'Authorization': 'Bearer ' + apiKey,
           },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: {
-              responseModalities: ['TEXT', 'IMAGE'],
-              aspectRatio: aspectRatio,
+          body: JSON.stringify([
+            {
+              taskType: 'imageInference',
+              taskUUID: taskUUID,
+              positivePrompt: prompt,
+              negativePrompt: options.negativePrompt || 'blurry, low quality, distorted',
+              model: model,
+              width: dims.width,
+              height: dims.height,
+              steps: options.steps || 30,
+              CFGScale: options.cfgScale || 7.5,
+              numberResults: 1,
+              outputType: 'base64Data',
+              outputFormat: 'PNG',
             },
-          }),
+          ]),
           signal: controller.signal,
         });
 
@@ -236,32 +263,26 @@ export class AiImageGenBuilder implements Builder {
 
         const data = await resp.json();
 
-        const parts = data.candidates?.[0]?.content?.parts || [];
-        let imageData = null;
-        let mimeType = 'image/png';
-        let textResponse = null;
-
-        for (const part of parts) {
-          if (part.inlineData && !imageData) {
-            imageData = part.inlineData.data;
-            mimeType = part.inlineData.mimeType || 'image/png';
-          }
-          if (part.text) {
-            textResponse = part.text;
-          }
+        const result = data.data?.[0] || data[0];
+        if (!result) {
+          return { success: false, error: 'No result in response', data };
         }
 
+        if (result.error) {
+          return { success: false, error: result.error };
+        }
+
+        const imageData = result.imageBase64Data || result.base64Data;
         if (!imageData) {
-          return { success: false, error: 'No image in response', textResponse };
+          return { success: false, error: 'No image data in response', result };
         }
 
         return {
           success: true,
           data: imageData,
-          contentType: mimeType,
+          contentType: 'image/png',
           prompt: prompt,
           aspectRatio: aspectRatio,
-          textResponse: textResponse,
         };
       } catch (err) {
         clearTimeout(timeoutId);
@@ -278,15 +299,14 @@ export class AiImageGenBuilder implements Builder {
       'listModels',
       `
       /**
-       * List available image generation models
+       * List available Runware image generation models
        * @returns Array of model info
        */
       return [
-        { id: 'gemini-2.0-flash-exp-image-generation', name: 'Gemini 2.0 Flash (Experimental)', tier: 'free' },
-        { id: 'gemini-2.5-flash-image', name: 'Gemini 2.5 Flash Image (Nano Banana)', tier: 'free' },
-        { id: 'gemini-3-pro-image-preview', name: 'Gemini 3 Pro Image (Nano Banana Pro)', tier: 'free' },
-        { id: 'imagen-4.0-generate-001', name: 'Imagen 4.0', tier: 'paid' },
-        { id: 'imagen-4.0-ultra-generate-001', name: 'Imagen 4.0 Ultra', tier: 'paid' },
+        { id: 'runware:101@1', name: 'Stable Diffusion XL Base', tier: 'budget', pricePerImage: 0.015 },
+        { id: 'civitai:102438@133677', name: 'SDXL Turbo (Civitai)', tier: 'budget', pricePerImage: 0.008 },
+        { id: 'runware:100@1', name: 'Stable Diffusion 1.5', tier: 'cheapest', pricePerImage: 0.005 },
+        { id: 'civitai:139562@297320', name: 'Realistic Vision (Civitai)', tier: 'quality', pricePerImage: 0.02 },
       ];
     `,
     );

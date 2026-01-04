@@ -562,7 +562,7 @@ const result = await $cash.transfer(fromPlayer, toPlayer, 100);
 
 ### $aiImageGen - AI Image Generation
 
-Generate images using Google's Gemini API (Nano Banana) and store in `$blob`.
+Generate images using [Runware API](https://runware.ai) and store in `$blob`. ~8x cheaper than Google Gemini.
 
 ```javascript
 // Generate image and store in blob
@@ -574,7 +574,7 @@ const url = $blob.url(result.blobKey, 'thecontinuum.city');
 
 // Generate with options
 const result = await $aiImageGen.generate('A glowing orb', {
-  model: 'gemini-3-pro-image-preview',
+  model: 'civitai:139562@297320',  // Realistic Vision
   metadata: { createdBy: player.id },
   filename: 'orb.png'
 });
@@ -587,16 +587,16 @@ const raw = await $aiImageGen.generateRaw('An icon');
 const models = $aiImageGen.listModels();
 
 // Change default model
-$aiImageGen.setDefaultModel('gemini-3-pro-image-preview');
+$aiImageGen.setDefaultModel('runware:100@1');  // Cheapest
 ```
 
-**Environment:** Requires `GEMINI_API_KEY` environment variable.
+**Environment:** Requires `RUNWARE_API_KEY` environment variable.
 
 **Models:**
-- `gemini-2.0-flash-exp-image-generation` (default)
-- `gemini-2.5-flash-image` - Nano Banana
-- `gemini-3-pro-image-preview` - Nano Banana Pro
-- `imagen-4.0-generate-001` (paid)
+- `runware:101@1` - Stable Diffusion XL Base (default, ~$0.015/image)
+- `civitai:102438@133677` - SDXL Turbo (~$0.008/image)
+- `runware:100@1` - Stable Diffusion 1.5 (~$0.005/image, cheapest)
+- `civitai:139562@297320` - Realistic Vision (~$0.02/image)
 
 ### $describable.image() - Object Image Generation
 
@@ -678,7 +678,7 @@ Quick access to prototype objects for inheritance:
 | `$http` | HTTP client for external requests |
 | `$blob` | Binary storage (MongoDB GridFS) |
 | `$email` | Email sending (Resend) |
-| `$aiImageGen` | AI image generation (Gemini/Nano Banana) |
+| `$aiImageGen` | AI image generation (Runware) |
 
 ## Special Properties on $
 

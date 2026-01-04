@@ -1076,7 +1076,7 @@ player.avatarBlobKey = blobKey;
 
 ### $aiImageGen - AI Image Generation Object
 
-Generate images using Google's Gemini API (Nano Banana) and store them in `$blob`:
+Generate images using Runware API and store them in `$blob`:
 
 ```typescript
 // Generate image and store in $blob
@@ -1088,7 +1088,7 @@ const url = $blob.url(result.blobKey, 'thecontinuum.city');
 
 // Generate with options
 const result = await $aiImageGen.generate('A glowing orb', {
-  model: 'gemini-3-pro-image-preview',  // Use Nano Banana Pro
+  model: 'civitai:139562@297320',  // Realistic Vision model
   metadata: { createdBy: player.id },
   filename: 'orb.png'
 });
@@ -1099,19 +1099,18 @@ const raw = await $aiImageGen.generateRaw('A simple icon');
 
 // List available models
 const models = $aiImageGen.listModels();
-// [{ id: 'gemini-2.0-flash-exp-image-generation', name: '...', tier: 'free' }, ...]
+// [{ id: 'runware:101@1', name: 'Stable Diffusion XL Base', tier: 'budget' }, ...]
 
 // Change default model
-$aiImageGen.setDefaultModel('gemini-3-pro-image-preview');
+$aiImageGen.setDefaultModel('runware:100@1');
 ```
 
-**Environment:** Requires `GEMINI_API_KEY` environment variable.
+**Environment:** Requires `RUNWARE_API_KEY` environment variable.
 
 **Available models:**
-- `gemini-2.0-flash-exp-image-generation` (default, free tier)
-- `gemini-2.5-flash-image` - Nano Banana (free tier)
-- `gemini-3-pro-image-preview` - Nano Banana Pro (free tier)
-- `imagen-4.0-generate-001` - Imagen 4.0 (paid)
-- `imagen-4.0-ultra-generate-001` - Imagen 4.0 Ultra (paid)
+- `runware:101@1` - Stable Diffusion XL Base (default, ~$0.015/image)
+- `civitai:102438@133677` - SDXL Turbo (~$0.008/image)
+- `runware:100@1` - Stable Diffusion 1.5 (~$0.005/image, cheapest)
+- `civitai:139562@297320` - Realistic Vision (~$0.02/image, higher quality)
 
 All transports require authentication. Players must first register via `POST /register` on the faction's HTTP server, then connect via WebSocket or Session MCP with their credentials. Connections are tagged with `factionId` for routing to the correct character generation flow.
