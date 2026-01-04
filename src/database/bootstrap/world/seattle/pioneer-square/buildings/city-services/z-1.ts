@@ -43,7 +43,7 @@ export const building = {
 
 The main boiler is cold now, its pilot light extinguished, but the gauge still shows pressure in the emergency backup tank. Someone shut this down properly, following procedures even at the end. The electrical panels hum with current from somewhere, feeding the systems above that still function.
 
-A stairwell leads up to the processing area. A passage in the western wall opens into older construction—the underground network that predates this building.`,
+A stairwell leads up to the processing area. A shaft in the floor descends into the underground network that predates this building.`,
       x: -16,
       y: 8,
       z: -1,

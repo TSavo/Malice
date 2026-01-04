@@ -154,7 +154,7 @@ One pipe is larger than the others, a culvert of sorts that leads south into the
         east: '%BOILER_ROOM',
         west: '%STORAGE_WEST',
         south: {
-          to: 'underground/upper-tunnels/x-15-y0.ts',
+          to: 'underground/upper-tunnels/x-11-y3.ts',
           description: 'A culvert leads into the underground passages',
         },
       },

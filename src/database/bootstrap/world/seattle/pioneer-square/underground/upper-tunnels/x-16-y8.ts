@@ -18,9 +18,9 @@ An opening in the eastern wall connects to the City Services mechanical room—t
       waterLevel: 0,
       outdoor: false,
       exits: {
-        east: {
+        up: {
           to: 'buildings/city-services/z-1.ts:%MECHANICAL',
-          description: "A passage leads to the building's mechanical room",
+          description: 'A ladder leads up to the building basement',
         },
       },
     },
