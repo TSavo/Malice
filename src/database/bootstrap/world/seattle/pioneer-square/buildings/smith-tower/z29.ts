@@ -63,7 +63,7 @@ export const building = {
       name: 'Smith Tower - 29th Floor - Elevator Landing',
       description:
         'A compact landing with scuffed brass trim and a single call panel.',
-      x: -12,
+      x: -2,
       y: 10,
       z: 29,
       exits: {
@@ -81,7 +81,7 @@ export const building = {
     '%A1_z29': {
       name: 'Smith Tower - 29th Floor - North Suite - Living Room',
       description: 'A corner unit with tall windows and warm terracotta tile floors. A kitchenette with hand-painted Majolica tiles occupies one wall. Built-in archway alcoves hold blue and white Greek pottery, dried lavender, and sun-bleached books.',
-      x: -13,
+      x: -3,
       y: 11,
       z: 29,
       exits: { east: '%A2_z29' },
@@ -115,7 +115,7 @@ export const building = {
       name: 'Smith Tower - 29th Floor - North Suite - Bedroom',
       description:
         'A bright one-bedroom overlooking the skyline, hall-facing door to the south. A painted armoire with scenes of Tuscan countryside dominates one wall, its doors slightly ajar.',
-      x: -12,
+      x: -2,
       y: 11,
       z: 29,
       exits: {
@@ -153,7 +153,7 @@ export const building = {
       name: 'Smith Tower - 29th Floor - North Suite - Studio',
       description:
         'A long studio with whitewashed walls and terracotta floor tiles. A narrow galley kitchen features hand-painted tiles, while fishing nets hang decoratively from the ceiling beams.',
-      x: -11,
+      x: -1,
       y: 11,
       z: 29,
       exits: { west: '%A2_z29' },
@@ -194,7 +194,7 @@ export const building = {
       name: 'Smith Tower - 29th Floor - East Suite - Loft',
       description:
         'A lofted corner with exposed ceiling beams painted in Mediterranean blue and a compact mezzanine. Terracotta tiles cover the floor, cool and smooth underfoot. A wooden ladder leads up to the sleeping loft.',
-      x: -10,
+      x: 0,
       y: 11,
       z: 29,
       exits: { south: '%B2_z29' },
@@ -236,7 +236,7 @@ export const building = {
       name: 'Smith Tower - 29th Floor - South Suite - Alcove',
       description:
         'A snug unit tucked behind the shaft, with one frosted window. The walls are whitewashed plaster, and a Moorish-style archway frames the sleeping area.',
-      x: -13,
+      x: -3,
       y: 10,
       z: 29,
       exits: { south: '%C2_z29', east: '%EL_z29' },
@@ -270,7 +270,7 @@ export const building = {
       name: 'Smith Tower - 29th Floor - East Suite - Living Room',
       description:
         'A two-room suite with a west-facing door toward the elevator. Terracotta tiles and whitewashed walls give the space a villa-like warmth. Wrought iron sconces flank the windows.',
-      x: -11,
+      x: -1,
       y: 10,
       z: 29,
       exits: {
@@ -310,7 +310,7 @@ export const building = {
       name: 'Smith Tower - 29th Floor - East Suite - Den',
       description:
         'A narrow end unit with a bay of small windows and built-in shelving painted in faded Aegean blue. This was clearly a study, with Greek and Italian influences throughout.',
-      x: -10,
+      x: 0,
       y: 10,
       z: 29,
       exits: { west: '%B2_z29' },
@@ -351,7 +351,7 @@ export const building = {
     '%C2_z29': {
       name: 'Smith Tower - 29th Floor - South Suite - Living Room',
       description: 'A corner unit with western exposure and warm terracotta floor tiles. The afternoon sun has bleached the linen curtains to cream and highlighted the blue painted trim around doors and windows.',
-      x: -13,
+      x: -3,
       y: 9,
       z: 29,
       exits: { north: '%C1_z29', east: '%C3_z29' },
@@ -386,7 +386,7 @@ export const building = {
       name: 'Smith Tower - 29th Floor - South Suite - Foyer',
       description:
         'The single entrance to the C block, with a stout fire door to the elevator. Hand-painted tiles frame the doorway, depicting intertwined olive branches.',
-      x: -12,
+      x: -2,
       y: 9,
       z: 29,
       exits: {
@@ -425,7 +425,7 @@ export const building = {
       name: 'Smith Tower - 29th Floor - South Suite - Bedroom',
       description:
         'A deep plan with a recessed sleeping alcove framed by a Moorish-style archway. The terracotta floors are worn smooth, and whitewashed walls bear the ghost of sun-faded artwork.',
-      x: -11,
+      x: -1,
       y: 9,
       z: 29,
       exits: { west: '%C3_z29' },
@@ -460,7 +460,7 @@ export const building = {
       name: 'Smith Tower - 29th Floor - East Suite - Bedroom',
       description:
         'A compact end-cap with a single long window and built-in shelving painted in terracotta and cream. Every inch is utilized, the room reflecting Mediterranean practicality.',
-      x: -10,
+      x: 0,
       y: 9,
       z: 29,
       exits: { north: '%B2_z29' },

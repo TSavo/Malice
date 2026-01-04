@@ -63,7 +63,7 @@ export const building = {
       name: 'Smith Tower - 31th Floor - Elevator Landing',
       description:
         'A compact landing with scuffed brass trim and a single call panel.',
-      x: -12,
+      x: -2,
       y: 10,
       z: 31,
       exits: {
@@ -81,7 +81,7 @@ export const building = {
     '%A1_z31': {
       name: 'Smith Tower - 31th Floor - North Suite - Living Room',
       description: 'A corner unit with tall windows and wide-plank pine floors weathered to a honey gold. A farmhouse kitchenette occupies one wall, its apron sink and open shelving lending a country charm. Shiplap paneling painted cream white covers the interior walls, softening the urban view beyond.',
-      x: -13,
+      x: -3,
       y: 11,
       z: 31,
       exits: { east: '%A2_z31' },
@@ -116,7 +116,7 @@ export const building = {
       name: 'Smith Tower - 31th Floor - North Suite - Bedroom',
       description:
         'A bright one-bedroom overlooking the skyline, hall-facing door to the south. A sliding barn door on iron hardware serves as the closet, its reclaimed wood weathered to a silvery gray. The room smells faintly of cedar and old linen.',
-      x: -12,
+      x: -2,
       y: 11,
       z: 31,
       exits: {
@@ -155,7 +155,7 @@ export const building = {
       name: 'Smith Tower - 31th Floor - North Suite - Studio',
       description:
         'A long studio with exposed brick and a narrow galley kitchen appointed in farmhouse style. Open shelving displays mason jars of dry goods and enamelware. A butcher block island provides workspace in the center.',
-      x: -11,
+      x: -1,
       y: 11,
       z: 31,
       exits: { west: '%A2_z31' },
@@ -197,7 +197,7 @@ export const building = {
       name: 'Smith Tower - 31th Floor - East Suite - Loft',
       description:
         'A lofted corner with exposed beam ceilings and a compact mezzanine sleeping area. Weathered barn wood covers the loft railing, and a chicken wire cabinet displays vintage dishware. A wooden ladder leads to the sleeping loft above.',
-      x: -10,
+      x: 0,
       y: 11,
       z: 31,
       exits: { south: '%B2_z31' },
@@ -239,7 +239,7 @@ export const building = {
       name: 'Smith Tower - 31th Floor - South Suite - Alcove',
       description:
         'A snug unit tucked behind the shaft, with one frosted window. Shiplap walls painted buttermilk yellow make the small space feel cheerful despite its size. A wrought iron coat rack stands by the entrance.',
-      x: -13,
+      x: -3,
       y: 10,
       z: 31,
       exits: { south: '%C2_z31', east: '%EL_z31' },
@@ -274,7 +274,7 @@ export const building = {
       name: 'Smith Tower - 31th Floor - East Suite - Living Room',
       description:
         'A two-room suite with a west-facing door toward the elevator. This is clearly the main living space, dominated by a massive reclaimed wood coffee table and plank flooring. Galvanized metal accents catch the light throughout.',
-      x: -11,
+      x: -1,
       y: 10,
       z: 31,
       exits: {
@@ -314,7 +314,7 @@ export const building = {
       name: 'Smith Tower - 31th Floor - East Suite - Den',
       description:
         'A narrow end unit with a bay of small windows and floor-to-ceiling shelving. This cozy study features whitewashed pine walls and furniture finished in milk paint, creating a light-filled country retreat.',
-      x: -10,
+      x: 0,
       y: 10,
       z: 31,
       exits: { west: '%B2_z31' },
@@ -355,7 +355,7 @@ export const building = {
     '%C2_z31': {
       name: 'Smith Tower - 31th Floor - South Suite - Living Room',
       description: 'A corner unit with western exposure and wide pine plank floors. The afternoon sun has faded the homespun curtains to a uniform cream, and shiplap walls painted sage green give the space a garden cottage feel.',
-      x: -13,
+      x: -3,
       y: 9,
       z: 31,
       exits: { north: '%C1_z31', east: '%C3_z31' },
@@ -390,7 +390,7 @@ export const building = {
       name: 'Smith Tower - 31th Floor - South Suite - Foyer',
       description:
         'The single entrance to the C block, with a stout fire door to the elevator. A mudroom-style entryway features peg rails and a deacon\'s bench, all in weathered farmhouse style.',
-      x: -12,
+      x: -2,
       y: 9,
       z: 31,
       exits: {
@@ -429,7 +429,7 @@ export const building = {
       name: 'Smith Tower - 31th Floor - South Suite - Bedroom',
       description:
         'A deep plan with a recessed alcove and worn pine plank floors. The farmhouse aesthetic creates warmth despite the industrial bones, with a wrought iron bed filling the alcove behind gathered cotton curtains.',
-      x: -11,
+      x: -1,
       y: 9,
       z: 31,
       exits: { west: '%C3_z31' },
@@ -464,7 +464,7 @@ export const building = {
       name: 'Smith Tower - 31th Floor - East Suite - Bedroom',
       description:
         'A compact end-cap with a single long window and built-in storage. Every inch is utilized in farmhouse fashion, with a fold-down sewing table and a Murphy bed that disappears into whitewashed bead board paneling.',
-      x: -10,
+      x: 0,
       y: 9,
       z: 31,
       exits: { north: '%B2_z31' },

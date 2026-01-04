@@ -131,7 +131,7 @@ export const building = {
       description: `A polished lobby with dark stone floors and recessed lighting. Wall panels display: CONTINUUM EXECUTIVE SUITES. A digital directory shows office assignments, all reading: UNASSIGNED.
 
 The space is pristine, modern, echoing. The air smells of filtered air and new carpet. Elevator doors stand to the east, corridors extending to executive suites. Everything is ready, waiting for occupants who haven't arrived.`,
-      x: -12,
+      x: -2,
       y: 10,
       z: 3,
       population: 0,
@@ -154,7 +154,7 @@ The space is pristine, modern, echoing. The air smells of filtered air and new c
       description: `A reception area with a sleek desk and multiple waiting chairs arranged in conversational clusters. A display terminal sits dark beside the desk, reading: RECEPTION - TEMPORARILY UNMANNED.
 
 The chairs are leather, new. The desk surface is clean, organized with empty document trays. Overhead lights provide even, shadowless illumination. The space is silent, waiting.`,
-      x: -13,
+      x: -3,
       y: 10,
       z: 3,
       population: 0,
@@ -182,7 +182,7 @@ The chairs are leather, new. The desk surface is clean, organized with empty doc
       description: `A medium conference room with table seating eight. Videoconferencing display on wall stands in standby mode. Wall-mounted whiteboard is clean.
 
 A display reads: EXECUTIVE CONFERENCE - AWAITING SCHEDULE. The room is functional, prepared. Climate control hums quietly. Lighting is calibrated for presentations.`,
-      x: -11,
+      x: -1,
       y: 10,
       z: 3,
       population: 0,
@@ -210,7 +210,7 @@ A display reads: EXECUTIVE CONFERENCE - AWAITING SCHEDULE. The room is functiona
       description: `An administrative workspace with multiple desks and filing systems. Each workstation has terminal and chair. Central communication terminal stands ready.
 
 A display reads: EXECUTIVE SUPPORT - PERSONNEL PENDING. The desks are clean, organized. The space feels like it's waiting for a team to arrive and begin work.`,
-      x: -10,
+      x: 0,
       y: 10,
       z: 3,
       population: 0,
@@ -238,7 +238,7 @@ A display reads: EXECUTIVE SUPPORT - PERSONNEL PENDING. The desks are clean, org
       description: `A break area with multiple seating clusters. Beverage station stands against wall, currently unstocked. Climate control maintains comfortable temperature.
 
 A display reads: STAFF FACILITIES - STANDBY. The seating is comfortable, modern. The space is clean, restful. A corridor leads west to storage, east to reception.`,
-      x: -12,
+      x: -2,
       y: 9,
       z: 3,
       population: 0,
@@ -276,7 +276,7 @@ A display reads: STAFF FACILITIES - STANDBY. The seating is comfortable, modern.
       description: `A large conference room with a polished table seating twelve. Floor-to-ceiling windows face north, showing grey city skyline. A holographic display system hangs from ceiling, currently dormant.
 
 A wall display reads: BOARD OF DIRECTORS - NEXT MEETING: PENDING. The table surface is spotless, no documents. Videoconferencing units sit in standby mode. The room echoes.`,
-      x: -13,
+      x: -3,
       y: 11,
       z: 3,
       population: 0,
@@ -303,7 +303,7 @@ A wall display reads: BOARD OF DIRECTORS - NEXT MEETING: PENDING. The table surf
       description: `A spacious corner office with western and northern exposures. Executive desk faces city views through floor-to-ceiling glass. Private seating area occupies corner with comfortable lounge chairs.
 
 A display on desk reads: CHIEF EXECUTIVE OFFICER - UNASSIGNED. The desk surface is clean, no personal effects. Communication terminal stands ready. The space feels grand but hollow.`,
-      x: -12,
+      x: -2,
       y: 11,
       z: 3,
       population: 0,
@@ -335,7 +335,7 @@ A display on desk reads: CHIEF EXECUTIVE OFFICER - UNASSIGNED. The desk surface 
       description: `A high-level executive office with desk, workspace, and meeting area. Western windows provide city views. Built-in shelving and filing systems line walls.
 
 A display reads: EXECUTIVE SUITE A - UNASSIGNED. The workspace is arranged, ready. Chair, desk surface, lighting—all positioned for immediate occupancy.`,
-      x: -11,
+      x: -1,
       y: 11,
       z: 3,
       population: 0,
@@ -368,7 +368,7 @@ A display reads: EXECUTIVE SUITE A - UNASSIGNED. The workspace is arranged, read
       description: `A high-level executive office with corner windows facing northeast. Desk positioned to capture morning light. Small meeting area with two chairs.
 
 A display reads: EXECUTIVE SUITE B - UNASSIGNED. The office is pristine, silent. Built-in storage cabinets stand ready for documents and materials.`,
-      x: -10,
+      x: 0,
       y: 11,
       z: 3,
       population: 0,
@@ -405,7 +405,7 @@ A display reads: EXECUTIVE SUITE B - UNASSIGNED. The office is pristine, silent.
       description: `A secure storage room with climate-controlled filing systems. Digital lock panels on cabinet doors show green status. The space is cool, dry, organized.
 
 A display reads: ARCHIVE STORAGE - RESTRICTED ACCESS. Filing cabinets line walls, all sealed. A small workspace table stands in corner for document review.`,
-      x: -13,
+      x: -3,
       y: 9,
       z: 3,
       population: 0,
@@ -431,7 +431,7 @@ A display reads: ARCHIVE STORAGE - RESTRICTED ACCESS. Filing cabinets line walls
       description: `A smaller meeting room designed for confidential discussions. Frosted glass walls provide visual privacy while allowing ambient light. A round table seats six, promoting collaborative discussion.
 
 A display reads: PRIVATE MEETING - AVAILABLE. Soundproofing panels line the walls. A small credenza holds refreshment supplies, currently empty. The lighting is warm, adjustable.`,
-      x: -11,
+      x: -1,
       y: 9,
       z: 3,
       population: 0,
@@ -459,7 +459,7 @@ A display reads: PRIVATE MEETING - AVAILABLE. Soundproofing panels line the wall
       description: `A comfortable lounge space for executives to relax between meetings. Deep leather couches and armchairs are arranged around a low coffee table. A small bar area stands against the east wall, bottles empty, glasses polished.
 
 Floor-to-ceiling windows offer views of the city. A display reads: EXECUTIVE LOUNGE - COMPLIMENTARY REFRESHMENTS PENDING. The space is quiet, plush, waiting for the bustle of corporate life.`,
-      x: -10,
+      x: 0,
       y: 9,
       z: 3,
       population: 0,
