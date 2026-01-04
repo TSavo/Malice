@@ -220,6 +220,11 @@ The junction was built to handle the traffic of a major rail terminus, designed 
           room: '%OCC_S5',
           description: 'A passage leads north toward the Occidental corridor',
         },
+        up: {
+          to: 'buildings/union-station/z-1.ts',
+          room: '%MAINTENANCE_TUNNEL',
+          description: 'A service shaft rises toward the Union Station tunnels',
+        },
       },
     },
 

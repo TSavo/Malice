@@ -786,12 +786,14 @@ The game features an extensive underground tunnel network beneath Pioneer Square
 - Yesler Underground (prohibition-era passages)
 - King Street Underground (rail platform connections)
 - Chinatown Underground (historic Chinese tunnels, gambling dens, opium passages)
+- Underground Tour (preserved tourist route, buried storefronts, homeless shelter areas)
 
 **Surface entry points:**
 - Fabrication building (-21, +10)
 - Smith Tower (-12, +9)
 - Occidental Park (-3, +2)
 - Supply Depot (-21, -5)
+- Underground Tour entrance (-15, -3)
 - Yesler Way grating (-7, +12)
 - 4th Avenue utility hatch (+14, 0)
 - King Street Station (+4, -12)

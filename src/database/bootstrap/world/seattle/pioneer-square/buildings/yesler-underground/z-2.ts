@@ -416,6 +416,11 @@ The speakeasy operated during Prohibition, serving customers who descended from 
         west: '%YESLER_JUNCTION_W',
         east: '%OCCIDENTAL_YESLER',
         south: '%SPEAKEASY_BACK',
+        northeast: {
+          to: 'buildings/smith-tower/z-2.ts',
+          room: '%DC_TUNNEL',
+          description: 'A narrow tunnel leads toward the Smith Tower basement',
+        },
       },
       objects: [
         { prototype: 'furniture', name: 'the old bar', description: 'A long mahogany bar stretches along the wall, its brass rail tarnished green. A century of elbows have worn grooves in the wood. Behind it, empty shelves wait for bottles that will never return.', boltedDown: true },
