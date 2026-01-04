@@ -188,7 +188,23 @@ Legend:
 | Freight Tunnels | cluster | (-17, -10) | (-7, -10) | 12 |
 | Rail Platform | E-W | (+4, -10) | (+7, -10) | 4 |
 
-**Total z=-2 rooms: ~267** (88 original + 29 waterfront + 35 eastside + 36 yesler + 39 king + 40 eastern)
+#### Chinatown Underground (NEW)
+| Corridor | Direction | Start | End | Room Count |
+|----------|-----------|-------|-----|------------|
+| Jackson Street Main | E-W | (-7, -8) | (+7, -8) | 5 |
+| Gambling & Opium Dens | cluster | (-3, -9) | (+3, -10) | 8 |
+| Worker Quarters | cluster | (+7, -9) | (+7, -10) | 2 |
+| Storage Warren | cluster | (-3, -10) | (0, -11) | 3 |
+| Deep Access | vertical | (0, -8) | (0, -9) | 2 |
+
+#### Industrial Underground (NEW)
+| Corridor | Direction | Start | End | Room Count |
+|----------|-----------|-------|-----|------------|
+| Worker Tunnels | E-W | (+7, -11) | (+13, -11) | 3 |
+| Factory Basements | cluster | (+7, -13) | (+13, -15) | 8 |
+| Loading Tunnels | E-W | (+10, -13) | (+13, -13) | 3 |
+
+**Total z=-2 rooms: ~289** (88 original + 29 waterfront + 35 eastside + 36 yesler + 39 king + 40 eastern + 22 chinatown + 14 industrial)
 
 ---
 
@@ -219,7 +235,10 @@ Sea caves, flooded passages, and cistern access beneath the piers.
 ### Eastside Deep (NEW)
 Rail tunnel connections and deep eastern passages.
 
-**Total z=-3 rooms: ~75** (29 original + 22 waterfront + 18 eastside + 6 yesler)
+### Chinatown Deep (NEW)
+Ancient tunnels and cistern access beneath the International District.
+
+**Total z=-3 rooms: ~77** (29 original + 22 waterfront + 18 eastside + 6 yesler + 2 chinatown)
 
 ---
 
@@ -228,6 +247,7 @@ Rail tunnel connections and deep eastern passages.
 Cramped service tunnels (6-8 ft). Cell bases, logistics, operational infrastructure.
 Gray Cartel secured territory.
 
+### Gray Cartel Operational Tunnels
 ```
         x=-16    x=-14    x=-12    x=-10    x=-8     x=-6     x=-4
            │        │        │        │        │        │        │
@@ -243,7 +263,30 @@ y=-5  │         ●  SUPPLY HUB                                        │
       └───────────────────────────────────────────────────────────────┘
 ```
 
-**Total z=-4 rooms: 40**
+### Deep Cisterns (NEW)
+Pre-fire water infrastructure beneath Pioneer Square and Chinatown. Ancient brick-lined cisterns, abandoned reservoirs, and flooded passages dating to the 1870s-1880s. These chambers predate the Great Fire and were rediscovered by later underground development.
+
+```
+        x=-10    x=-5     x=0      x=+5     x=+10    x=+15    x=+20
+           │        │        │        │        │        │        │
+      ┌────┴────────┴────────┴────────┴────────┴────────┴────────┴────┐
+y=-8  │              ●  CHINATOWN ACCESS                              │
+y=-10 │              │                                      ●         │
+y=-12 │    ●─────●───●───●  CENTRAL CISTERN NETWORK         │         │
+y=-14 │    │                                                │         │
+y=-16 │    ●─────●  PIONEER RESERVOIR                       │         │
+y=-18 │                                          ●─────●────●─────●   │
+y=-19 │                                          INDUSTRIAL ACCESS    │
+      └────────────────────────────────────────────────────────────────┘
+```
+
+Key locations:
+- **Chinatown Cistern Access** (0, -10): Entry from ancient Chinese tunnels
+- **Central Cistern Network** (-10 to 0, -12): Pre-fire water storage
+- **Pioneer Reservoir** (-10, -16): Largest cistern, 60% flooded
+- **Industrial Reservoir** (+10 to +20, -18 to -19): Adapted for factory use
+
+**Total z=-4 rooms: 56** (40 cartel operational + 16 deep cisterns)
 
 ---
 
@@ -283,14 +326,14 @@ Ultra-secure chamber below water table. Pluribus cannot see here.
 
 ## Network Statistics
 
-| Level | Original | Waterfront | Eastside | Yesler | King Street | Eastern | Total |
-|-------|----------|------------|----------|--------|-------------|---------|-------|
-| z=-2 | 88 | 29 | 35 | 36 | 39 | 40 | **267** |
-| z=-3 | 29 | 22 | 18 | 6 | 0 | 0 | **75** |
-| z=-4 | 40 | 0 | 0 | 0 | 0 | 0 | **40** |
-| z=-5 | 16 | 0 | 0 | 0 | 0 | 0 | **16** |
-| z=-6 | 1 | 0 | 0 | 0 | 0 | 0 | **1** |
-| **Total** | **174** | **51** | **53** | **42** | **39** | **40** | **399** |
+| Level | Original | Waterfront | Eastside | Yesler | King Street | Eastern | Chinatown | Industrial | Deep Cisterns | Total |
+|-------|----------|------------|----------|--------|-------------|---------|-----------|------------|---------------|-------|
+| z=-2 | 88 | 29 | 35 | 36 | 39 | 40 | 22 | 14 | 0 | **303** |
+| z=-3 | 29 | 22 | 18 | 6 | 0 | 0 | 2 | 0 | 0 | **77** |
+| z=-4 | 40 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 16 | **56** |
+| z=-5 | 16 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **16** |
+| z=-6 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **1** |
+| **Total** | **174** | **51** | **53** | **42** | **39** | **40** | **24** | **14** | **16** | **453** |
 
 ---
 
@@ -313,6 +356,9 @@ Ultra-secure chamber below water table. Pluribus cannot see here.
 - **Eastside:** Steam tunnels, utility infrastructure, rail connections
 - **Yesler:** Prohibition speakeasies, gambling dens, historic basements
 - **King Street:** Industrial freight, rail yard access, platform tunnels
+- **Chinatown:** Historic Chinese tunnels, gambling halls, opium dens, worker quarters
+- **Industrial:** Factory basements, worker tunnels, canneries, foundries
+- **Deep Cisterns:** Pre-fire water infrastructure, ancient brick cisterns, flooded reservoirs
 
 **Territorial Control:**
 - **Gray Cartel Core (x < -7):** Secured to z=-6, defensive depth
