@@ -16,4 +16,10 @@ The buildings along this stretch maintain consistent cornice lines, their facade
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  exits: {
+    north: {
+      to: '../buildings/pioneer-antiques/z0.ts#SHOWROOM_FRONT',
+      description: 'The beveled glass door of Pioneer Antiques',
+    },
+  },
 };
