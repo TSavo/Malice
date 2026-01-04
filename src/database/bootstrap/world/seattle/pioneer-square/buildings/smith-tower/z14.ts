@@ -434,7 +434,7 @@ export const building = {
       },
       objects: [
         { prototype: 'bed', name: 'a captain\'s cabin bed', description: 'A substantial bed is built into the alcove like a ship\'s cabin, with heavy canvas curtains for privacy and wool blankets in a maritime stripe pattern.', quality: 'nice' },
-        { prototype: 'furniture', name: 'a wardrobe sea chest', description: 'A tall sea chest with brass corners serves as a wardrobe, its interior fitted with cedar and smelling faintly of camphor.', boltedDown: false },
+        { prototype: 'furniture', name: 'a wardrobe sea chest', description: 'A tall sea chest with brass corners serves as a wardrobe, its interior fitted with cedar and smelling faintly of camphor.', boltedDown: true },
         { prototype: 'furniture', name: 'a porthole mirror', description: 'A brass porthole frame has been converted into a wall mirror, complete with working dogs and hinges.', boltedDown: true },
         { prototype: 'table', name: 'a brass ship\'s lamp table', description: 'A small table bolted to the floor holds a brass gimbal lamp, a worn leather journal, and a faded photograph in a rope frame.', boltedDown: true },
       ],
@@ -471,7 +471,7 @@ export const building = {
         { prototype: 'furniture', name: 'a teak berth cabinet', description: 'The fold-down berth is concealed in a teak cabinet with brass latches. When closed, it displays a carved seascape of ships and waves.', boltedDown: true },
         { prototype: 'furniture', name: 'nautical display shelves', description: 'Built-in shelving with brass fiddle rails displays model ships, a brass sextant, and books on maritime history.', boltedDown: true },
         { prototype: 'table', name: 'a bulkhead fold-down desk', description: 'A small desk folds down from the bulkhead on brass hinges, fitted with a chart light and compass rose inlay.', boltedDown: true },
-        { prototype: 'furniture', name: 'a sea bag dresser', description: 'A compact chest of drawers with brass ring pulls is designed like a ship\'s quartermaster desk, each drawer labeled with brass plates.', boltedDown: false },
+        { prototype: 'furniture', name: 'a sea bag dresser', description: 'A compact chest of drawers with brass ring pulls is designed like a ship\'s quartermaster desk, each drawer labeled with brass plates.', boltedDown: true },
       ],
       sittables: [
         {

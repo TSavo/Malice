@@ -143,7 +143,7 @@ export const building = {
       },
       objects: [
         { prototype: 'bed', name: 'a steel frame bed', description: 'A queen bed with an industrial steel pipe frame sits against exposed brick. The mattress is dressed in grey linen, utilitarian but comfortable.', quality: 'standard' },
-        { prototype: 'furniture', name: 'a metal wardrobe', description: 'A tall metal wardrobe with mesh doors stands against the wall, the kind once used in factory locker rooms. A few garments hang inside.', boltedDown: false },
+        { prototype: 'furniture', name: 'a metal wardrobe', description: 'A tall metal wardrobe with mesh doors stands against the wall, the kind once used in factory locker rooms. A few garments hang inside.', boltedDown: true },
         { prototype: 'table', name: 'a reclaimed wood nightstand', description: 'A nightstand made from salvaged factory floor planks holds a gooseneck lamp with an Edison bulb and a few scattered coins.', boltedDown: false },
         { prototype: 'furniture', name: 'cast iron radiator', description: 'An ornate cast iron radiator stands beneath the window, its pipes exposed and painted matte black. It still radiates warmth.', boltedDown: true },
       ],
@@ -302,7 +302,7 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a modular leather sectional', description: 'A massive modular sectional in worn cognac leather dominates the space, its steel legs bolted to reclaimed wood blocks.', boltedDown: false },
+        { prototype: 'furniture', name: 'a modular leather sectional', description: 'A massive modular sectional in worn cognac leather dominates the space, its steel legs bolted to reclaimed wood blocks.', boltedDown: true },
         { prototype: 'table', name: 'a pallet coffee table', description: 'A sanded shipping pallet on casters serves as a coffee table, its surface bearing the stamps of distant ports.', boltedDown: false },
         { prototype: 'furniture', name: 'an industrial media console', description: 'A console made from angle iron and barn wood holds a dead television and vintage stereo equipment. Vacuum tubes glow faintly in the components.', boltedDown: true },
         { prototype: 'furniture', name: 'a rolling garment rack', description: 'A chrome garment rack on wheels stands near the entrance, holding jackets and a few vintage work shirts.', boltedDown: false },
@@ -379,11 +379,11 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a vintage factory bench', description: 'A long wooden bench salvaged from a factory break room sits against the wall, its surface worn smooth by generations of workers.', boltedDown: false },
+        { prototype: 'furniture', name: 'a vintage factory bench', description: 'A long wooden bench salvaged from a factory break room sits against the wall, its surface worn smooth by generations of workers.', boltedDown: true },
         { prototype: 'table', name: 'a cable spool table', description: 'A large wooden cable spool serves as a side table, its industrial origins stamped into the wood.', boltedDown: false },
         { prototype: 'furniture', name: 'a steam radiator', description: 'An exposed cast iron steam radiator clanks and hisses beneath the window, its pipes running visibly along the baseboard.', boltedDown: true },
         { prototype: 'furniture', name: 'steel cable curtain rods', description: 'Aircraft cable stretched between wall-mounted cleats serves as curtain rods, holding canvas drop cloths instead of proper curtains.', boltedDown: true },
-        { prototype: 'furniture', name: 'a metal storage trunk', description: 'A battered metal storage trunk sits beneath the window, its corners reinforced with riveted steel. Old shipping labels cover one side.', boltedDown: false },
+        { prototype: 'furniture', name: 'a metal storage trunk', description: 'A battered metal storage trunk sits beneath the window, its corners reinforced with riveted steel. Old shipping labels cover one side.', boltedDown: true },
       ],
       sittables: [
         {
@@ -494,7 +494,7 @@ export const building = {
         { prototype: 'furniture', name: 'the bed cabinet', description: 'The bed folds up into a riveted steel cabinet painted industrial grey. Stenciled numbers mark the side.', boltedDown: true },
         { prototype: 'furniture', name: 'wire basket shelving', description: 'Industrial wire basket shelving is mounted to the walls, the kind used in warehouse storage. Various items are sorted into the mesh containers.', boltedDown: true },
         { prototype: 'table', name: 'a drop-leaf work table', description: 'A wall-mounted drop-leaf table with steel brackets serves as a desk when extended. Folded flat, it\'s nearly invisible.', boltedDown: true },
-        { prototype: 'furniture', name: 'a steel tool cabinet', description: 'A narrow steel tool cabinet with many small drawers sits in the corner, each drawer labeled with embossed metal tags.', boltedDown: false },
+        { prototype: 'furniture', name: 'a steel tool cabinet', description: 'A narrow steel tool cabinet with many small drawers sits in the corner, each drawer labeled with embossed metal tags.', boltedDown: true },
       ],
       sittables: [
         {

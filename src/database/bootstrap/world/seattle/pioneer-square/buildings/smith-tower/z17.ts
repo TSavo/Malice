@@ -98,7 +98,7 @@ export const building = {
       objects: [
         { prototype: 'table', name: 'a mahogany coffee table', description: 'A low mahogany coffee table sits before the sofa, its polished surface protected by three crocheted doilies. A crystal candy dish filled with ancient ribbon candy occupies the center, flanked by porcelain figurines of shepherdesses.', boltedDown: false },
         { prototype: 'furniture', name: 'a built-in china cabinet', description: 'A floor-to-ceiling china cabinet is built into one wall, its glass doors revealing rows of depression glass, commemorative plates from state fairs, and a complete set of Blue Willow china that has never been used.', boltedDown: true },
-        { prototype: 'furniture', name: 'a console television cabinet', description: 'An enormous wooden console TV cabinet dominates one corner, the television tube long dead but the cabinet too heavy to move. Family photos in ornate frames crowd its top.', boltedDown: false },
+        { prototype: 'furniture', name: 'a console television cabinet', description: 'An enormous wooden console TV cabinet dominates one corner, the television tube long dead but the cabinet too heavy to move. Family photos in ornate frames crowd its top.', boltedDown: true },
         { prototype: 'furniture', name: 'a radiator cover', description: 'An ornate brass radiator cover conceals the steam radiator. Ceramic cats in various poses are arranged along its top, guarding the room with painted eyes.', boltedDown: true },
       ],
       sittables: [
@@ -138,7 +138,7 @@ export const building = {
         { prototype: 'bed', name: 'a brass bed', description: 'An ornate brass bed dominates the room, its headboard and footboard gleaming with polish. A chenille bedspread in dusty rose covers a mountain of needlepoint pillows.', quality: 'standard' },
         { prototype: 'furniture', name: 'a built-in wardrobe', description: 'A cedar-lined wardrobe is built into one wall, its doors adorned with decoupage flowers. The scent of mothballs wafts out when opened.', boltedDown: true },
         { prototype: 'table', name: 'a vanity table', description: 'A kidney-shaped vanity table with a triptych mirror holds an array of perfume bottles, a silver-backed brush set, and a jewelry box that plays a tinkling melody when opened.', boltedDown: false },
-        { prototype: 'furniture', name: 'a hope chest', description: 'A carved cedar hope chest sits at the foot of the bed, its lid heavy with decades of accumulated linens and memories.', boltedDown: false },
+        { prototype: 'furniture', name: 'a hope chest', description: 'A carved cedar hope chest sits at the foot of the bed, its lid heavy with decades of accumulated linens and memories.', boltedDown: true },
       ],
       sittables: [
         {
@@ -179,7 +179,7 @@ export const building = {
       objects: [
         { prototype: 'furniture', name: 'a built-in sewing nook', description: 'A sewing nook is built into the wall, complete with a treadle Singer sewing machine, thread organizer, and basket of fabric scraps. Half-finished quilt squares wait patiently.', boltedDown: true },
         { prototype: 'table', name: 'a card table', description: 'A folding card table covered with a crocheted tablecloth holds an unfinished jigsaw puzzle depicting kittens in a basket. Some pieces have fallen to the floor.', boltedDown: false },
-        { prototype: 'furniture', name: 'a curio cabinet', description: 'A curved-glass curio cabinet displays Hummel figurines, spoon collections from every state, and a porcelain thimble collection mounted on tiny shelves.', boltedDown: false },
+        { prototype: 'furniture', name: 'a curio cabinet', description: 'A curved-glass curio cabinet displays Hummel figurines, spoon collections from every state, and a porcelain thimble collection mounted on tiny shelves.', boltedDown: true },
         { prototype: 'furniture', name: 'a dried flower arrangement', description: 'A massive dried flower arrangement in a copper pot sits on a doily-covered stand, shedding petals whenever anyone walks past.', boltedDown: false },
       ],
       sittables: [
@@ -222,7 +222,7 @@ export const building = {
         { prototype: 'furniture', name: 'a built-in ladder', description: 'A sturdy wooden ladder with carved spindles leads up to the sleeping loft, each rung covered with braided rug scraps for grip.', boltedDown: true },
         { prototype: 'bed', name: 'a featherbed', description: 'A thick featherbed covered in a handmade patchwork quilt fills the loft space. The ceiling is low and cozy, perfect for reading by the glow of a ceramic night light.', quality: 'standard' },
         { prototype: 'table', name: 'a TV tray collection', description: 'A set of four metal TV trays with painted pastoral scenes stand ready for deployment, their legs slightly wobbly from decades of use.', boltedDown: false },
-        { prototype: 'furniture', name: 'a grandfather clock', description: 'A tall grandfather clock stands against the wall, its pendulum still and its face stopped at 7:15. The wood is polished to a warm glow despite the silence.', boltedDown: false },
+        { prototype: 'furniture', name: 'a grandfather clock', description: 'A tall grandfather clock stands against the wall, its pendulum still and its face stopped at 7:15. The wood is polished to a warm glow despite the silence.', boltedDown: true },
       ],
       sittables: [
         {
@@ -302,7 +302,7 @@ export const building = {
       },
       objects: [
         { prototype: 'table', name: 'a doily-covered end table', description: 'A round end table drowns under layers of crocheted doilies, supporting a ceramic lamp shaped like a colonial woman, a dish of hard candies, and a collection of Reader\'s Digest Condensed Books.', boltedDown: false },
-        { prototype: 'furniture', name: 'a whatnot shelf', description: 'A corner whatnot shelf displays ceramic collectibles: a Precious Moments wedding couple, a Lladro-style ballerina, commemorative bells from every national park, and a music box that plays "Somewhere My Love."', boltedDown: false },
+        { prototype: 'furniture', name: 'a whatnot shelf', description: 'A corner whatnot shelf displays ceramic collectibles: a Precious Moments wedding couple, a Lladro-style ballerina, commemorative bells from every national park, and a music box that plays "Somewhere My Love."', boltedDown: true },
         { prototype: 'furniture', name: 'a built-in bookcase', description: 'A built-in bookcase holds a complete encyclopedia set from 1975, family photo albums with magnetic pages, and a collection of decorative plates depicting American landmarks.', boltedDown: true },
         { prototype: 'furniture', name: 'a built-in entry closet', description: 'An entry closet with louvered doors contains wire hangers, a plastic shoe organizer, and the lingering scent of lavender sachets.', boltedDown: true },
         { prototype: 'furniture', name: 'a potpourri bowl', description: 'A large china bowl on the bookshelf overflows with dried potpourri, its scent of rose and cinnamon still faintly present after all these years.', boltedDown: false },
@@ -386,7 +386,7 @@ export const building = {
       },
       objects: [
         { prototype: 'table', name: 'a pie crust table', description: 'A small pie crust table with a scalloped edge holds a milk glass candy dish, a porcelain bell, and a framed photo of a stern couple in sepia tones.', boltedDown: false },
-        { prototype: 'furniture', name: 'a spoon rack', description: 'A wooden display rack on the wall holds commemorative spoons from every state plus several foreign countries, each in its designated slot.', boltedDown: false },
+        { prototype: 'furniture', name: 'a spoon rack', description: 'A wooden display rack on the wall holds commemorative spoons from every state plus several foreign countries, each in its designated slot.', boltedDown: true },
         { prototype: 'furniture', name: 'a built-in radiator cover', description: 'An ornate radiator cover painted cream white provides a shelf for a row of African violets in ceramic pots, still somehow blooming in the indirect light.', boltedDown: true },
         { prototype: 'furniture', name: 'built-in lace curtain rods', description: 'Brass curtain rods span the windows, holding layers of lace sheers that filter the light into a warm glow. Heavier drapes in dusty rose frame the lace.', boltedDown: true },
         { prototype: 'furniture', name: 'a ceramic cat collection', description: 'A shelf of ceramic cats in various poses occupies one wall: sleeping cats, stretching cats, cats with yarn, cats with butterflies. At least thirty pairs of painted eyes watch the room.', boltedDown: false },
@@ -428,7 +428,7 @@ export const building = {
         { prototype: 'table', name: 'a hall tree', description: 'A Victorian hall tree with a mirror, brass hooks, and a lift-lid bench seat dominates the foyer. Umbrellas and canes fill the stand, and a needlepoint cushion covers the bench.', boltedDown: false },
         { prototype: 'furniture', name: 'a built-in coat closet', description: 'A built-in coat closet with louvered doors exhales the scent of cedar and mothballs when opened. Plastic garment bags protect unseen treasures within.', boltedDown: true },
         { prototype: 'furniture', name: 'a built-in mail slot', description: 'An ornate brass mail slot is set into the door, polished despite years of disuse. A small basket beneath catches nothing but dust now.', boltedDown: true },
-        { prototype: 'furniture', name: 'a blessing plaque', description: 'A wooden plaque by the door reads "Bless This House and All Who Enter" in Gothic script, surrounded by painted roses and gilded edges.', boltedDown: false },
+        { prototype: 'furniture', name: 'a blessing plaque', description: 'A wooden plaque by the door reads "Bless This House and All Who Enter" in Gothic script, surrounded by painted roses and gilded edges.', boltedDown: true },
         { prototype: 'table', name: 'a doily-covered console', description: 'A narrow console table draped in crocheted doilies holds a crystal bowl of butterscotch candies, a ceramic goose with a bonnet, and a stack of coupons from 1971.', boltedDown: false },
       ],
       sittables: [
@@ -462,7 +462,7 @@ export const building = {
       },
       objects: [
         { prototype: 'bed', name: 'a canopy bed', description: 'A twin canopy bed fills the alcove, its white frame draped with pink ruffled fabric. A handmade quilt in the double wedding ring pattern covers layers of crisp white sheets.', quality: 'standard' },
-        { prototype: 'furniture', name: 'a chifferobe', description: 'A dark walnut chifferobe combines drawers and a wardrobe, its doors revealing dress patterns from the 1960s and sweaters wrapped in tissue paper.', boltedDown: false },
+        { prototype: 'furniture', name: 'a chifferobe', description: 'A dark walnut chifferobe combines drawers and a wardrobe, its doors revealing dress patterns from the 1960s and sweaters wrapped in tissue paper.', boltedDown: true },
         { prototype: 'furniture', name: 'a built-in wall mirror', description: 'A beveled wall mirror in a gilded frame is mounted permanently to the wall, a dried corsage and a holy card tucked into its frame.', boltedDown: true },
         { prototype: 'table', name: 'a marble-topped nightstand', description: 'A marble-topped nightstand holds a glass of dusty water, a rosary, and a wind-up alarm clock still ticking faintly, frozen at 6:00 AM.', boltedDown: false },
         { prototype: 'furniture', name: 'a prayer kneeler', description: 'A small prayer kneeler upholstered in worn red velvet sits in one corner, a cross mounted on the wall above it.', boltedDown: false },
@@ -501,7 +501,7 @@ export const building = {
         { prototype: 'furniture', name: 'a built-in Murphy ironing board', description: 'A Murphy ironing board folds out from a cabinet in the wall, complete with a built-in sleeve board and a holder for the ancient steam iron.', boltedDown: true },
         { prototype: 'furniture', name: 'built-in display shelves', description: 'Built-in shelves display a collection of porcelain dolls with real hair and glass eyes, their period costumes protected by the glass doors.', boltedDown: true },
         { prototype: 'table', name: 'a dressing table', description: 'A kidney-shaped dressing table with a gathered fabric skirt holds cold cream jars, a bone comb, bobby pins in a crystal dish, and a photo of grandchildren.', boltedDown: false },
-        { prototype: 'furniture', name: 'a cedar chest', description: 'A Lane cedar chest at the foot of the bed holds wedding linens, baby blankets, and the lingering scent of moth crystals.', boltedDown: false },
+        { prototype: 'furniture', name: 'a cedar chest', description: 'A Lane cedar chest at the foot of the bed holds wedding linens, baby blankets, and the lingering scent of moth crystals.', boltedDown: true },
       ],
       sittables: [
         {
