@@ -16,4 +16,13 @@ A bike rack bolted to the sidewalk holds a single frame—no wheels, no handleba
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  exits: {
+    east: {
+      to: 'buildings/quickprint/z0.ts#FRONT',
+      description: 'QuickPrint shop entrance',
+      door: '%FRONT_DOOR',
+    },
+    north: 'y4.ts',
+    south: 'y2.ts',
+  },
 };

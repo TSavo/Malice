@@ -408,6 +408,63 @@ exits: {
 }
 ```
 
+Exits with door objects (recommended for buildings):
+```typescript
+// Define door and lock objects in rooms section
+rooms: {
+  '%FRONT_LOCK': {
+    prototype: 'lock',
+    name: 'Shop Lock',
+    description: 'A simple deadbolt.',
+    difficulty: 3,
+  },
+  '%FRONT_DOOR': {
+    prototype: 'door',
+    name: 'Shop Entrance',
+    description: 'A glass door with signage.',
+    locked: false,
+    open: true,
+    locks: ['%FRONT_LOCK'],
+    material: 'glass',
+    durability: 40,
+  },
+
+  // Reference door in exits
+  '%LOBBY': {
+    name: 'Lobby',
+    description: '...',
+    exits: {
+      west: {
+        to: 'street/y3.ts',
+        description: 'The glass door leads to the street',
+        door: '%FRONT_DOOR',  // Reference to door object
+      },
+    },
+  },
+}
+```
+
+Rentable spaces (apartments, storage units):
+```typescript
+'%APT_LOCK': {
+  prototype: 'rentableLock',
+  name: 'Apartment Lock',
+  description: 'A modern deadbolt.',
+  rentPeriodDays: 30,
+  rentAmount: 500,  // In credits
+},
+'%APT_DOOR': {
+  prototype: 'door',
+  name: 'Apartment Door',
+  description: 'A solid wood door.',
+  locked: true,
+  open: false,
+  locks: ['%APT_LOCK'],
+  material: 'wood',
+  durability: 60,
+},
+```
+
 ### Room Properties
 
 Full room definition:
@@ -435,22 +492,37 @@ Full room definition:
     // etc.
   },
 
-  // Sittable positions (optional)
+  // Sittables (optional) - Furniture agents can sit on
   sittables: [
     {
       name: 'a wooden chair',
       capacity: 1,
-      emptyMsg: 'A wooden chair sits in the corner.',
-      occupiedMsg: '%s sitting on the chair',
+      emptyMsg: 'A wooden chair sits against the wall.',
+      occupiedMsg: '%s sitting on a wooden chair'
     },
     {
       name: 'a long bench',
       capacity: 4,
-      emptyMsg: 'A bench lines the wall.',
-      occupiedMsg: '%s on the bench',
-    },
+      emptyMsg: 'A bench runs along the wall.',
+      occupiedMsg: '%s on the bench'
+    }
   ],
-  
+
+  // Objects (optional) - Items to create and place in room
+  objects: [
+    {
+      prototype: 'furniture',
+      name: 'desk',
+      description: 'A sturdy wooden desk.',
+    },
+    {
+      prototype: 'cabinet',
+      name: 'filing cabinet',
+      aliases: ['cabinet', 'files'],
+      description: 'A metal filing cabinet with four drawers.',
+    }
+  ],
+
   // Elevator-specific (if prototype: 'elevator')
   elevator: {
     floors: [1, 2, 3],
