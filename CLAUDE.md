@@ -763,6 +763,35 @@ await $spatial.ensureRoom(x, y, -5, 'submarine diving');
 await $spatial.ensureRoom(x+1, y, 0, 'abandoned building mentioned in room description to the east');
 ```
 
+### Pioneer Square Underground Network
+
+The game features an extensive underground tunnel network beneath Pioneer Square (Seattle's historic 1889 street level). The system spans multiple levels from z=-2 (upper tunnels) down to z=-6 (deep vaults).
+
+**Key levels:**
+- **z=-2**: Upper tunnels (~267 rooms) - Dense corridor network across the entire district
+- **z=-3**: Transitional layer (~75 rooms) - Deep passages, cisterns, and flooded zones
+- **z=-4**: Lower passages - Gray Cartel operational territory
+- **z=-5**: Deep vaults - Secured cell bases
+- **z=-6**: Submerged zones - Water table boundary
+
+**Major sections:**
+- Western Network (Gray Cartel core territory)
+- Waterfront Underground (piers and tidal caves)
+- Eastside Underground (steam tunnels and utility infrastructure)
+- Yesler Underground (prohibition-era passages)
+- King Street Underground (rail platform connections)
+
+**Surface entry points:**
+- Fabrication building (-21, +10)
+- Smith Tower (-12, +9)
+- Occidental Park (-3, +2)
+- Supply Depot (-21, -5)
+- Yesler Way grating (-7, +12)
+- 4th Avenue utility hatch (+14, 0)
+- King Street Station (+4, -12)
+
+See `docs/city-ai/MAP-UNDERGROUND.md` for detailed maps, room coordinates, and territorial information.
+
 ## Web Map Visualizer
 
 The server provides 3D map visualization at:
