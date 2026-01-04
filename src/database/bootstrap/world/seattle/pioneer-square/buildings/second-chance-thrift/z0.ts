@@ -33,24 +33,6 @@ export const building = {
       material: 'glass',
       durability: 35,
     },
-    '%BACK_LOCK': {
-      prototype: 'lock',
-      name: 'Donation Door Lock',
-      description:
-        'A heavy-duty deadbolt on the donation receiving door, meant to secure unsorted inventory.',
-      difficulty: 4,
-    },
-    '%BACK_DOOR': {
-      prototype: 'door',
-      name: 'Donation Door',
-      description:
-        'A steel door with a slot for after-hours donations. A sign reads: DONATIONS ACCEPTED MON-SAT 9AM-5PM. PLEASE DO NOT LEAVE ITEMS OUTSIDE.',
-      locked: true,
-      open: false,
-      locks: ['%BACK_LOCK'],
-      material: 'metal',
-      durability: 70,
-    },
     '%STAIR_LOCK': {
       prototype: 'lock',
       name: 'Stairwell Lock',
@@ -269,9 +251,7 @@ A door at the back is marked PRIVATE, leading to the stairwell that accesses the
 
 Rolling bins line one wall, labeled by category: WOMEN'S TOPS, MEN'S PANTS, KIDS, HOUSEWARES, TRASH. The taxonomy of donation, the first step toward order. Some bins are overflowing, donations that arrived faster than staff could process. Other bins are nearly empty, the categories that move quickly.
 
-A time clock hangs on the wall, employees' punch cards still in the rack beside it. The last punches are from whenever the end came—some cards show arrivals without departures, the record of a shift that never ended.
-
-The steel donation door leads to the alley behind the building.`,
+A time clock hangs on the wall, employees' punch cards still in the rack beside it. The last punches are from whenever the end came—some cards show arrivals without departures, the record of a shift that never ended.`,
       x: -12,
       y: 6,
       z: 0,
@@ -282,11 +262,6 @@ The steel donation door leads to the alley behind the building.`,
       outdoor: false,
       exits: {
         east: '%MAIN_FLOOR',
-        north: {
-          description: 'The donation door opens to the alley',
-          door: '%BACK_DOOR',
-          to: 'alley/y7.ts',
-        },
       },
       objects: [
         {
