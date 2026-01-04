@@ -99,6 +99,12 @@ The gallery was artist-run, the placard on the wall explains. Twenty members sha
           description: 'A narrow stairway leads to the upper floors',
           to: '%UPPER_SOUTH',
         },
+        down: {
+          to: 'buildings/underground-east/z-2.ts',
+          room: '%OCC_CROSS',
+          description: 'A trapdoor beneath the spiral sculpture leads to darkness',
+          hidden: true,
+        },
       },
       objects: [
         {

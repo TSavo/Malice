@@ -133,7 +133,80 @@ The passage connects the waterfront to the eastern tunnels, a route that require
       exits: {
         west: '%PIER_N4',
         east: '%UPPER_CONN',
+        north: '%FAB_TUNNEL_S',
       },
+    },
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // FABRICATION FACTORY TUNNEL (connecting north to fab factory)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    '%FAB_TUNNEL_S': {
+      name: 'Fabrication Tunnel South',
+      description: `A service tunnel extends north from the debris field, its construction newer than the surrounding passages—poured concrete rather than Victorian brick, installed when the Fabrication Factory was built. The tunnel was designed for utility access but serves other purposes now.
+
+The walls are marked with conduit runs and cable trays, the infrastructure that powers the factory above. Emergency lights still function, their battery backups maintained by someone who values this route.`,
+      x: -20,
+      y: 6,
+      z: -2,
+      population: 0,
+      ambientNoise: 20,
+      lighting: 15,
+      waterLevel: 5,
+      outdoor: false,
+      exits: {
+        south: '%DEBRIS_CRAWL',
+        north: '%FAB_TUNNEL_MID',
+      },
+    },
+
+    '%FAB_TUNNEL_MID': {
+      name: 'Fabrication Tunnel',
+      description: `The tunnel continues north beneath the industrial district, passing through earth that was excavated when the factory's foundations were laid. The passage is utilitarian—bare concrete walls, exposed pipes, functional lighting that flickers occasionally.
+
+Ventilation ducts run along the ceiling, carrying air from the factory's climate control system. The air is warmer here, heated by the machinery that operates overhead. The hum of fabrication equipment is audible through the concrete.`,
+      x: -20,
+      y: 8,
+      z: -2,
+      population: 0,
+      ambientNoise: 30,
+      lighting: 20,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        south: '%FAB_TUNNEL_S',
+        north: '%FAB_BASEMENT',
+      },
+    },
+
+    '%FAB_BASEMENT': {
+      name: 'Fabrication Factory Basement',
+      description: `The tunnel terminates in a basement chamber directly beneath the Fabrication Factory's loading bay. Heavy machinery once occupied this space—the marks of removed equipment still visible on the concrete floor. Now it serves as a nexus between official infrastructure and unofficial routes.
+
+A freight elevator shaft rises toward the factory floor, its cage permanently locked at a level above. The stairs beside it are functional, leading up to a maintenance door that opens into the factory's service corridors. The door is not on any official plans.
+
+The Gray Cartel maintains this access point. The factory's AI either doesn't know about it or has been instructed not to notice.`,
+      x: -20,
+      y: 10,
+      z: -2,
+      population: 0,
+      ambientNoise: 35,
+      lighting: 25,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        south: '%FAB_TUNNEL_MID',
+        up: {
+          to: 'buildings/fabrication-factory/z0.ts',
+          room: '%PUBLIC_SERVICES',
+          description: 'Stairs lead up to the Fabrication Factory',
+          hidden: true,
+        },
+      },
+      objects: [
+        { prototype: 'furniture', name: 'a disabled elevator cage', description: 'A freight elevator cage sits locked one floor up. The controls have been disabled, but the shaft remains—a potential route for those with climbing skills.', boltedDown: true },
+        { prototype: 'sign', name: 'a Cartel marker', description: 'A small gray symbol is scratched into the concrete near the stairs—the Cartel\'s mark, indicating safe passage for those who know.', boltedDown: true },
+      ],
     },
 
     '%UPPER_CONN': {

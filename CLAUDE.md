@@ -773,11 +773,11 @@ await $spatial.ensureRoom(x+1, y, 0, 'abandoned building mentioned in room descr
 The game features an extensive underground tunnel network beneath Pioneer Square (Seattle's historic 1889 street level). The system spans multiple levels from z=-2 (upper tunnels) down to z=-6 (deep vaults).
 
 **Key levels:**
-- **z=-2**: Upper tunnels (~267 rooms) - Dense corridor network across the entire district
-- **z=-3**: Transitional layer (~75 rooms) - Deep passages, cisterns, and flooded zones
-- **z=-4**: Lower passages - Gray Cartel operational territory, Deep Cisterns (pre-fire water infrastructure)
-- **z=-5**: Deep vaults - Secured cell bases
-- **z=-6**: Submerged zones - Water table boundary
+- **z=-2**: Upper tunnels (~320 rooms) - Dense corridor network across the entire district
+- **z=-3**: Transitional layer (~77 rooms) - Deep passages, cisterns, and flooded zones
+- **z=-4**: Lower passages (~59 rooms) - Gray Cartel operational territory (Armory, Medical Bay, Communications Center), Deep Cisterns (pre-fire water infrastructure)
+- **z=-5**: Deep vaults (~16 rooms) - Secured cell bases
+- **z=-6**: Submerged zones (~1 room) - Water table boundary
 
 **Major sections:**
 - Western Network (Gray Cartel core territory)
@@ -786,17 +786,19 @@ The game features an extensive underground tunnel network beneath Pioneer Square
 - Yesler Underground (prohibition-era passages)
 - King Street Underground (rail platform connections)
 - Chinatown Underground (historic Chinese tunnels, gambling dens, opium passages)
+- Southeast Underground (utility tunnels connecting Chinatown to eastside)
 - Underground Tour (preserved tourist route, buried storefronts, homeless shelter areas)
 
 **Surface entry points:**
-- Fabrication building (-21, +10)
-- Smith Tower (-12, +9)
-- Occidental Park (-3, +2)
-- Supply Depot (-21, -5)
-- Underground Tour entrance (-15, -3)
-- Yesler Way grating (-7, +12)
-- 4th Avenue utility hatch (+14, 0)
-- King Street Station (+4, -12)
+- Fabrication Factory (-21, +10) - Public Services → Fab Basement
+- Smith Tower (-12, +9) - Internal escape tunnel
+- Occidental Square (-3, +2) - Gallery trapdoor → Occ Cross
+- Supply Depot (-21, -5) - Loading floor hatch → South Tunnel
+- Yesler Way grating (-7, +12) - Hidden grating → shaft
+- 4th Avenue utility hatch (+14, 0) - Utility access
+- King Street Station (+4, -12) - Platform service shaft
+- Trinity Nightclub (-8, +3) - Underground exit → Occ S1
+- Underground Tour building (-15, -2) - Tour entrance → Descent → Tour Start
 
 **Building basement connections:**
 - Doc Maynard's cellar (-15, 2, -1) → east to underground
