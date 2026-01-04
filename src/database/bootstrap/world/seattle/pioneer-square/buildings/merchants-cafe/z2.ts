@@ -62,9 +62,9 @@ A ladder bolted to the wall leads up through a hatch in the ceiling to the roof.
       exits: {
         down: '%HALL_Z1',
         up: '%ROOF_NW',
-        west: { room: '%OFFICE', door: '%OFFICE_DOOR', locks: ['%OFFICE_LOCK'] },
+        west: '%ARCHIVES',
+        east: { room: '%OFFICE', door: '%OFFICE_DOOR', locks: ['%OFFICE_LOCK'] },
         south: { room: '%STORAGE', door: '%STORAGE_DOOR', locks: ['%STORAGE_LOCK'] },
-        east: '%ARCHIVES',
       },
     },
 
@@ -84,7 +84,7 @@ A small safe sits in the corner, its door slightly ajar. Whatever was inside has
       waterLevel: 0,
       outdoor: false,
       exits: {
-        out: { room: '%HALL_Z2', door: '%OFFICE_DOOR', locks: ['%OFFICE_LOCK'] },
+        west: { room: '%HALL_Z2', door: '%OFFICE_DOOR', locks: ['%OFFICE_LOCK'] },
       },
       objects: [
         {
@@ -158,7 +158,7 @@ Boxes of preserved goods sit on the shelves—canned truffles, dried mushrooms, 
 Boxes of memorabilia fill the shelves: menus from different eras, matchbooks with the restaurant's logo, commemorative plates, napkins with handwritten notes from celebrity guests. The collection spans the entire history of the restaurant, from its founding in 1890 to its final service.
 
 A window looks north toward where the debris wall now stands, blocking the view of downtown that once drew diners to this corner of the city.`,
-      x: -15,
+      x: -16,
       y: -2,
       z: 2,
       population: 0,
@@ -167,7 +167,7 @@ A window looks north toward where the debris wall now stands, blocking the view 
       waterLevel: 0,
       outdoor: false,
       exits: {
-        out: '%HALL_Z2',
+        east: '%HALL_Z2',
       },
     },
   },
