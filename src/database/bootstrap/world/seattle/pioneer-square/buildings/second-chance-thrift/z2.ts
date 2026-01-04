@@ -77,7 +77,7 @@ The view east shows the neighborhood spreading toward the waterfront, rooftops a
       outdoor: true,
       exits: {
         west: '%ROOF_SW',
-        north: '%ROOF_NE',
+        northeast: '%ROOF_NE',
       },
       objects: [
         {
@@ -112,7 +112,7 @@ Someone has set up a makeshift garden here: pots arranged in a cluster, their co
       outdoor: true,
       exits: {
         west: '%ROOF_NW',
-        south: '%ROOF_SE',
+        southwest: '%ROOF_SE',
       },
       objects: [
         {
