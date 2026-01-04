@@ -562,7 +562,7 @@ const result = await $cash.transfer(fromPlayer, toPlayer, 100);
 
 ### $aiImageGen - AI Image Generation
 
-Generate images using Google's Gemini API (Nano Banana) and store in `$blob`.
+Generate images using Nano Banana via [laozhang.ai](https://api.laozhang.ai) and store in `$blob`. 79% cheaper than Google direct.
 
 ```javascript
 // Generate image and store in blob
@@ -574,7 +574,8 @@ const url = $blob.url(result.blobKey, 'thecontinuum.city');
 
 // Generate with options
 const result = await $aiImageGen.generate('A glowing orb', {
-  model: 'gemini-3-pro-image-preview',
+  model: 'gemini-3-pro-image-preview',  // Nano Banana Pro
+  aspectRatio: 'portrait',
   metadata: { createdBy: player.id },
   filename: 'orb.png'
 });
@@ -590,13 +591,11 @@ const models = $aiImageGen.listModels();
 $aiImageGen.setDefaultModel('gemini-3-pro-image-preview');
 ```
 
-**Environment:** Requires `GEMINI_API_KEY` environment variable.
+**Environment:** Requires `LAOZHANG_API_KEY` environment variable.
 
 **Models:**
-- `gemini-2.0-flash-exp-image-generation` (default)
-- `gemini-2.5-flash-image` - Nano Banana
-- `gemini-3-pro-image-preview` - Nano Banana Pro
-- `imagen-4.0-generate-001` (paid)
+- `gemini-2.5-flash-image` - Nano Banana (default, $0.05/image)
+- `gemini-3-pro-image-preview` - Nano Banana Pro with 4K support ($0.05/image)
 
 ### $describable.image() - Object Image Generation
 
@@ -678,7 +677,7 @@ Quick access to prototype objects for inheritance:
 | `$http` | HTTP client for external requests |
 | `$blob` | Binary storage (MongoDB GridFS) |
 | `$email` | Email sending (Resend) |
-| `$aiImageGen` | AI image generation (Gemini/Nano Banana) |
+| `$aiImageGen` | AI image generation (Nano Banana via laozhang.ai) |
 
 ## Special Properties on $
 

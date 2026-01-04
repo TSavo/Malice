@@ -1076,7 +1076,7 @@ player.avatarBlobKey = blobKey;
 
 ### $aiImageGen - AI Image Generation Object
 
-Generate images using Google's Gemini API (Nano Banana) and store them in `$blob`:
+Generate images using Nano Banana via [laozhang.ai](https://api.laozhang.ai) (79% cheaper than Google direct) and store them in `$blob`:
 
 ```typescript
 // Generate image and store in $blob
@@ -1088,7 +1088,8 @@ const url = $blob.url(result.blobKey, 'thecontinuum.city');
 
 // Generate with options
 const result = await $aiImageGen.generate('A glowing orb', {
-  model: 'gemini-3-pro-image-preview',  // Use Nano Banana Pro
+  model: 'gemini-3-pro-image-preview',  // Nano Banana Pro (4K support)
+  aspectRatio: 'portrait',               // 'landscape', 'portrait', 'square'
   metadata: { createdBy: player.id },
   filename: 'orb.png'
 });
@@ -1099,19 +1100,16 @@ const raw = await $aiImageGen.generateRaw('A simple icon');
 
 // List available models
 const models = $aiImageGen.listModels();
-// [{ id: 'gemini-2.0-flash-exp-image-generation', name: '...', tier: 'free' }, ...]
+// [{ id: 'gemini-2.5-flash-image', name: 'Nano Banana (stable)', tier: 'budget' }, ...]
 
 // Change default model
 $aiImageGen.setDefaultModel('gemini-3-pro-image-preview');
 ```
 
-**Environment:** Requires `GEMINI_API_KEY` environment variable.
+**Environment:** Requires `LAOZHANG_API_KEY` environment variable.
 
 **Available models:**
-- `gemini-2.0-flash-exp-image-generation` (default, free tier)
-- `gemini-2.5-flash-image` - Nano Banana (free tier)
-- `gemini-3-pro-image-preview` - Nano Banana Pro (free tier)
-- `imagen-4.0-generate-001` - Imagen 4.0 (paid)
-- `imagen-4.0-ultra-generate-001` - Imagen 4.0 Ultra (paid)
+- `gemini-2.5-flash-image` - Nano Banana (default, $0.05/image)
+- `gemini-3-pro-image-preview` - Nano Banana Pro with 4K support ($0.05/image)
 
 All transports require authentication. Players must first register via `POST /register` on the faction's HTTP server, then connect via WebSocket or Session MCP with their credentials. Connections are tagged with `factionId` for routing to the correct character generation flow.
