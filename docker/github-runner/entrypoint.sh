@@ -27,8 +27,9 @@ if [ -z "$GITHUB_REPOSITORY" ]; then
     exit 1
 fi
 
-# Set defaults
-RUNNER_NAME="${RUNNER_NAME:-$(hostname)}"
+# Set defaults - use prefix + hostname for unique names when scaling
+RUNNER_NAME_PREFIX="${RUNNER_NAME_PREFIX:-malice-runner}"
+RUNNER_NAME="${RUNNER_NAME:-${RUNNER_NAME_PREFIX}-$(hostname)}"
 RUNNER_LABELS="${RUNNER_LABELS:-self-hosted,Linux,X64,malice}"
 RUNNER_WORKDIR="${RUNNER_WORKDIR:-_work}"
 RUNNER_GROUP="${RUNNER_GROUP:-Default}"
