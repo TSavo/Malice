@@ -99,7 +99,7 @@ export const building = {
         { prototype: 'table', name: 'a marble-top console table', description: 'A delicate console table with cabriole legs supports a slab of cream-veined marble. The wood is whitewashed and distressed, showing hints of pale blue paint beneath.', boltedDown: false },
         { prototype: 'furniture', name: 'a provincial kitchenette', description: 'A built-in kitchenette features whitewashed cabinets with carved shell motifs. The ceramic sink is dry, copper fixtures turned green with age.', boltedDown: true },
         { prototype: 'furniture', name: 'a carved wall shelf', description: 'An ornate wall shelf with scrollwork brackets holds a ceramic pitcher, a faded toile tea tin, and a dried lavender bouquet in a cracked vase.', boltedDown: true },
-        { prototype: 'furniture', name: 'a gilt-framed mirror', description: 'An oval mirror in a tarnished gilt frame hangs above the console, its glass clouded at the edges with age spots.', boltedDown: false },
+        { prototype: 'furniture', name: 'a gilt-framed mirror', description: 'An oval mirror in a tarnished gilt frame hangs above the console, its glass clouded at the edges with age spots.', boltedDown: true },
       ],
       sittables: [
         {
@@ -312,7 +312,7 @@ export const building = {
         { prototype: 'table', name: 'a provincial coffee table', description: 'A low table with cabriole legs and a shaped top in whitewashed oak sits before the sofa. A porcelain cachepot with dried flowers rests at its center.', boltedDown: false },
         { prototype: 'furniture', name: 'a provincial display cabinet', description: 'A built-in display cabinet with chicken-wire doors holds provincial pottery, faience plates, and a collection of ceramic roosters.', boltedDown: true },
         { prototype: 'furniture', name: 'a provincial coat closet', description: 'A small closet is built into the wall, its door painted with a faded floral motif. Wire hangers chime softly inside.', boltedDown: true },
-        { prototype: 'furniture', name: 'an ornate gilt mirror', description: 'A large mirror in an elaborate gilt frame carved with roses and ribbons hangs above the sofa, its glass silvered at the edges.', boltedDown: false },
+        { prototype: 'furniture', name: 'an ornate gilt mirror', description: 'A large mirror in an elaborate gilt frame carved with roses and ribbons hangs above the sofa, its glass silvered at the edges.', boltedDown: true },
       ],
       sittables: [
         {
@@ -436,7 +436,7 @@ export const building = {
         { prototype: 'furniture', name: 'a provincial entry cabinet', description: 'A narrow cabinet with carved panels is built into the wall beside the door. Its interior is cedar-lined, still faintly fragrant.', boltedDown: true },
         { prototype: 'furniture', name: 'an antique mail slot', description: 'A brass mail slot with a decorative fleur-de-lis plate is set into the door, tarnished to a warm bronze.', boltedDown: true },
         { prototype: 'table', name: 'a demilune console', description: 'A half-moon console table with cabriole legs holds a faience bowl for keys and a small provincial clock that no longer ticks.', boltedDown: false },
-        { prototype: 'furniture', name: 'a trumeau mirror', description: 'A trumeau mirror hangs above the console, its upper panel painted with a faded pastoral scene of peasants at harvest.', boltedDown: false },
+        { prototype: 'furniture', name: 'a trumeau mirror', description: 'A trumeau mirror hangs above the console, its upper panel painted with a faded pastoral scene of peasants at harvest.', boltedDown: true },
       ],
       sittables: [
         {

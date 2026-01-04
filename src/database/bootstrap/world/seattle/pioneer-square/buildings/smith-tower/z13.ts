@@ -427,7 +427,7 @@ export const building = {
       },
       objects: [
         { prototype: 'bed', name: 'a tatami sleeping area', description: 'The alcove is floored with tatami mats and holds a thick shikibuton futon with a silk coverlet. Shoji screens can be slid closed for privacy.', quality: 'nice' },
-        { prototype: 'furniture', name: 'a tansu wardrobe', description: 'A stepped tansu chest with iron handles serves as a wardrobe, its drawers holding neatly folded garments that smell of cedar.', boltedDown: false },
+        { prototype: 'furniture', name: 'a tansu wardrobe', description: 'A stepped tansu chest with iron handles serves as a wardrobe, its drawers holding neatly folded garments that smell of cedar.', boltedDown: true },
         { prototype: 'furniture', name: 'a round hand mirror', description: 'A simple hand mirror in a bamboo frame hangs on the wall, its glass clouded but still functional.', boltedDown: true },
         { prototype: 'table', name: 'an andon lamp table', description: 'A small table holds an andon paper lantern lamp, its wooden frame delicate and its paper shade yellowed.', boltedDown: false },
       ],
@@ -464,7 +464,7 @@ export const building = {
         { prototype: 'furniture', name: 'an oshiire closet', description: 'A built-in oshiire closet with sliding fusuma doors stores bedding and seasonal items. The paper doors are painted with a subtle bamboo grove motif.', boltedDown: true },
         { prototype: 'furniture', name: 'open timber shelving', description: 'Simple open shelving in natural timber frames the window, holding a collection of tea ware and folded textiles.', boltedDown: true },
         { prototype: 'table', name: 'a foldable chabudai', description: 'A small chabudai table with folding legs sits against the wall, ready to be set up for meals or work.', boltedDown: false },
-        { prototype: 'furniture', name: 'a mizuya cabinet', description: 'A small mizuya tea cabinet holds cups, a teapot, and dried tea leaves in ceramic containers.', boltedDown: false },
+        { prototype: 'furniture', name: 'a mizuya cabinet', description: 'A small mizuya tea cabinet holds cups, a teapot, and dried tea leaves in ceramic containers.', boltedDown: true },
       ],
       sittables: [
         {

@@ -220,7 +220,7 @@ export const building = {
       },
       objects: [
         { prototype: 'furniture', name: 'a rope ladder', description: 'A knotted rope ladder hangs from the mezzanine, swaying slightly. It looks like something from a treehouse.', boltedDown: true },
-        { prototype: 'bed', name: 'a hammock bed', description: 'A wide canvas hammock is strung across the mezzanine space, piled with woven blankets and embroidered pillows.', quality: 'standard' },
+        { prototype: 'bed', name: 'a hammock bed', description: 'A wide canvas hammock is strung across the mezzanine space, piled with woven blankets and embroidered pillows.', quality: 'standard', boltedDown: true },
         { prototype: 'furniture', name: 'a hanging chair', description: 'A wicker hanging chair suspended from a ceiling beam swings gently. A tattered patchwork quilt is draped over its cushion.', boltedDown: true },
         { prototype: 'table', name: 'a milk crate bookshelf', description: 'Stacked milk crates serve as bookshelves, stuffed with dog-eared paperbacks, vinyl records, and dried sage bundles.', boltedDown: false },
       ],
@@ -458,7 +458,7 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a canopy nest', description: 'The alcove is transformed into a nest-like sleeping space with mosquito netting draped from above and the mattress piled with vintage quilts.', quality: 'standard' },
+        { prototype: 'bed', name: 'a canopy nest', description: 'The alcove is transformed into a nest-like sleeping space with mosquito netting draped from above and the mattress piled with vintage quilts.', quality: 'standard', boltedDown: true },
         { prototype: 'furniture', name: 'a painted armoire', description: 'A folk-art painted armoire covered in flowers and birds serves as a wardrobe. Its inside is papered with magazine pages.', boltedDown: false },
         { prototype: 'furniture', name: 'a mirror mosaic', description: 'The wall is covered in a mosaic of broken mirror pieces, reflecting the room in a thousand fragments.', boltedDown: true },
         { prototype: 'table', name: 'an apple crate nightstand', description: 'A wooden apple crate serves as a nightstand, holding beeswax candles, a journal, and a collection of sea glass.', boltedDown: false },

@@ -96,7 +96,7 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a Steinway grand piano', description: 'A full concert grand piano in polished ebony dominates one corner, its lid propped open to reveal pristine ivory keys. Sheet music for Chopin nocturnes rests on the stand.', boltedDown: false },
+        { prototype: 'furniture', name: 'a Steinway grand piano', description: 'A full concert grand piano in polished ebony dominates one corner, its lid propped open to reveal pristine ivory keys. Sheet music for Chopin nocturnes rests on the stand.', boltedDown: true },
         { prototype: 'table', name: 'an onyx coffee table', description: 'A massive onyx coffee table with gold-leaf legs sits before the seating area. The stone surface reflects light like still water, its deep black veins mesmerizing.', boltedDown: false },
         { prototype: 'furniture', name: 'a built-in bar with wine cellar', description: 'A custom bar with marble countertops spans one wall, backed by a temperature-controlled wine cellar visible through glass doors. Baccarat crystal decanters line the counter.', boltedDown: true },
         { prototype: 'furniture', name: 'a gilt-framed oil painting', description: 'A large oil painting in an ornate gilt frame dominates the wall - a moody seascape by an old master, museum-quality and priceless.', boltedDown: true },

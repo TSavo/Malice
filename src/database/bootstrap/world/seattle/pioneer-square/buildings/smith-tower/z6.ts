@@ -140,7 +140,7 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a platform bed', description: 'A low teak platform bed with clean lines. The headboard integrates floating nightstands. White linen bedding is grey with dust.', quality: 'nice' },
+        { prototype: 'bed', name: 'a platform bed', description: 'A low teak platform bed with clean lines. The headboard integrates floating nightstands. White linen bedding is grey with dust.', quality: 'nice', boltedDown: true },
         { prototype: 'furniture', name: 'teak sliding closet', description: 'Sliding closet doors in teak with recessed pulls. Inside, a few suits hang on wooden hangers, mothballs scattered on the floor.', boltedDown: true },
         { prototype: 'furniture', name: 'a Nakashima dresser', description: 'A George Nakashima-style dresser in walnut with live-edge drawer fronts. A masterpiece of woodworking, dusty but intact.', boltedDown: false },
         { prototype: 'furniture', name: 'a pendant lamp', description: 'A white Artichoke pendant lamp hangs over the bed, its leaves slightly askew. Danish design at its finest.', boltedDown: true },
@@ -215,7 +215,7 @@ export const building = {
       },
       objects: [
         { prototype: 'furniture', name: 'a steel ship ladder', description: 'A steep industrial ship ladder in brushed steel leads to the mezzanine. The perforated treads are slip-resistant.', boltedDown: true },
-        { prototype: 'bed', name: 'a Japanese futon', description: 'A traditional Japanese futon rests on a low teak platform in the loft. Minimalist and intentional.', quality: 'standard' },
+        { prototype: 'bed', name: 'a Japanese futon', description: 'A traditional Japanese futon rests on a low teak platform in the loft. Minimalist and intentional.', quality: 'standard', boltedDown: true },
         { prototype: 'furniture', name: 'an Egg chair', description: 'An Arne Jacobsen Egg chair in orange wool sits beneath the loft, its curved shell inviting.', boltedDown: false },
         { prototype: 'table', name: 'a Noguchi coffee table', description: 'An Isamu Noguchi coffee table with its distinctive curved wood base and glass top. Dusty but undamaged.', boltedDown: false },
         { prototype: 'furniture', name: 'a mobile sculpture', description: 'A Calder-style mobile hangs from the ceiling, its shapes gently rotating in any breeze.', boltedDown: true },
@@ -255,7 +255,7 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a built-in sleeping niche', description: 'A sleeping niche is recessed into the wall, Japanese-style. The thin mattress fits precisely, a single reading light recessed above.', quality: 'standard' },
+        { prototype: 'bed', name: 'a built-in sleeping niche', description: 'A sleeping niche is recessed into the wall, Japanese-style. The thin mattress fits precisely, a single reading light recessed above.', quality: 'standard', boltedDown: true },
         { prototype: 'furniture', name: 'a Shaker peg rail', description: 'A long peg rail in the Shaker style runs the length of one wall. Elegant hooks hold nothing now.', boltedDown: true },
         { prototype: 'furniture', name: 'floating shelves', description: 'Teak floating shelves project from the wall in an asymmetric arrangement. A few small sculptures remain.', boltedDown: true },
         { prototype: 'furniture', name: 'rice paper panels', description: 'Shoji-style rice paper panels cover the window, filtering light softly. Some panels are torn.', boltedDown: true },
@@ -449,7 +449,7 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a cantilevered bed', description: 'A platform bed cantilevered from the wall, appearing to float. The effect is dramatic, the engineering sound.', quality: 'nice' },
+        { prototype: 'bed', name: 'a cantilevered bed', description: 'A platform bed cantilevered from the wall, appearing to float. The effect is dramatic, the engineering sound.', quality: 'nice', boltedDown: true },
         { prototype: 'furniture', name: 'a walnut wardrobe', description: 'A freestanding wardrobe in walnut with butterfly joints. The doors open to reveal a cedar-lined interior.', boltedDown: false },
         { prototype: 'furniture', name: 'a floor-to-ceiling mirror', description: 'A frameless mirror runs floor to ceiling, making the room feel twice its size.', boltedDown: true },
         { prototype: 'table', name: 'floating nightstands', description: 'Floating nightstands in walnut bracket the bed. A ceramic Akari lamp sits on one.', boltedDown: true },
@@ -484,7 +484,7 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a built-in captain bed', description: 'A captain bed is built into the wall, drawers beneath for storage. The teak frame is integrated seamlessly.', quality: 'standard' },
+        { prototype: 'bed', name: 'a built-in captain bed', description: 'A captain bed is built into the wall, drawers beneath for storage. The teak frame is integrated seamlessly.', quality: 'standard', boltedDown: true },
         { prototype: 'furniture', name: 'integrated storage', description: 'Floor-to-ceiling storage with teak fronts conceals everything. Recessed pulls maintain clean lines.', boltedDown: true },
         { prototype: 'furniture', name: 'clerestory shelving', description: 'High shelving runs above the window, holding a collection of pottery and small sculptures.', boltedDown: true },
         { prototype: 'table', name: 'a drop-leaf desk', description: 'A drop-leaf desk in walnut folds from the wall. When extended, it provides generous workspace.', boltedDown: true },

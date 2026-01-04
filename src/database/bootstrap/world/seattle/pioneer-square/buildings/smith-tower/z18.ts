@@ -179,7 +179,7 @@ export const building = {
       objects: [
         { prototype: 'furniture', name: 'a micro-kitchen', description: 'A cramped kitchen area holds a cold-brew coffee station, an unplugged mini-fridge covered in startup stickers, and a microwave optimized for reheating takeout.', boltedDown: true },
         { prototype: 'table', name: 'a standing desk', description: 'An adjustable standing desk is frozen at standing height, its motorized base long dead. Dual monitor arms hold nothing but dust.', boltedDown: false },
-        { prototype: 'furniture', name: 'a treadmill desk', description: 'A treadmill desk sits in the corner, the belt cracked and immobile. A laptop stand is mounted on the console.', boltedDown: false },
+        { prototype: 'furniture', name: 'a treadmill desk', description: 'A treadmill desk sits in the corner, the belt cracked and immobile. A laptop stand is mounted on the console.', boltedDown: true },
         { prototype: 'furniture', name: 'a server rack', description: 'A small server rack hums silently—wait, no. It\'s been dead for decades. Blinking LED lights are just a memory.', boltedDown: true },
       ],
       sittables: [
