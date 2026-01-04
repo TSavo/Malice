@@ -8,7 +8,7 @@ export const building = {
   y: -9,
   width: 4,
   height: 3,
-  floors: 3, // z-1 (platforms), z0 (main hall), z1 (mezzanine), z2 (roof)
+  floors: 4, // z-1 (platforms), z0 (main hall), z1 (mezzanine), z2 (roof)
 
   rooms: {
     // ═══════════════════════════════════════════════════════════════════
@@ -77,7 +77,7 @@ The vestibule beyond is a transition space—marble floors, brass fixtures, the 
       outdoor: false,
       exits: {
         south: {
-          to: 's-jackson/x-5.ts',
+          to: 's-jackson/x-5-y-9.ts',
           door: '%MAIN_DOOR',
           description: 'Through the bronze doors to S. Jackson Street',
         },
