@@ -16,4 +16,11 @@ A clock is set into the bank's facade, analog hands frozen at 2:47. The clock ra
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  exits: {
+    west: {
+      to: 'buildings/washington-federal/z0.ts#LOBBY',
+      description: 'Bronze doors lead into Washington Federal Bank',
+      door: 'buildings/washington-federal/z0.ts#MAIN_DOOR',
+    },
+  },
 };
