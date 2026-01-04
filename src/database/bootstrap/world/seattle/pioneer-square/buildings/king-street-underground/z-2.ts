@@ -248,7 +248,9 @@ The junction was built to handle the traffic of a major rail terminus, designed 
 
     '%SECOND_AVE_SOUTH': {
       name: 'Second Avenue South Junction',
-      description: `The passage reaches the junction where the King Street underground meets the routes beneath Second Avenue. The intersection connects the industrial network to the commercial underground, a transition between different worlds beneath the same streets.`,
+      description: `The passage reaches the junction where the King Street underground meets the routes beneath Second Avenue. The intersection connects the industrial network to the commercial underground, a transition between different worlds beneath the same streets.
+
+A shaft descends from here into the arterial tunnel—the express route that runs the length of Pioneer Square from Yesler Way to King Street.`,
       x: 0,
       y: -10,
       z: -2,
@@ -262,6 +264,11 @@ The junction was built to handle the traffic of a major rail terminus, designed 
         north: '%SECOND_SOUTH_PASSAGE',
         east: '%PLATFORM_TUNNEL',
         west: '%BAGGAGE_TUNNEL',
+        down: {
+          to: 'buildings/arterial-tunnel/z-3.ts',
+          room: '%ARTERY_TERMINUS',
+          description: 'A shaft descends to the arterial tunnel terminus',
+        },
       },
     },
 

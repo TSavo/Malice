@@ -105,6 +105,12 @@ The gallery was artist-run, the placard on the wall explains. Twenty members sha
           description: 'A trapdoor beneath the spiral sculpture leads to darkness',
           hidden: true,
         },
+        shaft: {
+          to: 'buildings/arterial-tunnel/z-3.ts',
+          room: '%ARTERY_HUB',
+          description: 'A ventilation shaft behind the display case descends into deep darkness',
+          hidden: true,
+        },
       },
       objects: [
         {
