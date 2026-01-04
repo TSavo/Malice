@@ -48,6 +48,9 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | d
     && apt-get install -y gh \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Claude Code globally (pre-installed for faster job startup)
+RUN npm install -g @anthropic-ai/claude-code
+
 # Create runner user
 RUN useradd -m -s /bin/bash runner \
     && usermod -aG sudo runner \
