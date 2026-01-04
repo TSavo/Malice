@@ -142,7 +142,7 @@ A worn couch faces a window that looks out over Yesler Way. A reading lamp stand
 
 The smell of books is different up here—personal, lived-in, mixed with the other smells of a home: coffee, soap, the faint mustiness of old upholstery.`,
       x: -15,
-      y: 12,
+      y: 11,
       z: 1,
       population: 0,
       ambientNoise: 3,
@@ -188,7 +188,7 @@ Cookbooks are wedged above the cabinets—a bookseller's kitchen has cookbooks e
 
 A small table with two chairs occupies what space remains. The table is cluttered with mail, receipts, the detritus of daily life that accumulated until daily life stopped.`,
       x: -14,
-      y: 13,
+      y: 11,
       z: 1,
       population: 0,
       ambientNoise: 8,

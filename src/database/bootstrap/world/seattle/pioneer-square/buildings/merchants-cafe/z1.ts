@@ -204,7 +204,7 @@ A radiator beneath the west window is cold and silent, its cast iron decorated w
 Despite its awkward access, the room shows signs of more recent occupation than the others. The bed has a mattress that isn't completely rotted. A camping lantern sits on the nightstand. Empty food tins are stacked in one corner—someone lived here, after the hotel closed but before the city fell.
 
 A fire escape landing is visible through the window, the rusted grating providing both an exit and an entrance for anyone who knew to look.`,
-      x: -16,
+      x: -14,
       y: -3,
       z: 1,
       population: 0,
