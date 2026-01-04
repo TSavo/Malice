@@ -159,12 +159,6 @@ The counter is unstaffed. A speaker grille handles customer inquiries. The AI's 
           description: 'Glass doors open onto the Waterfront',
         },
         east: '%ELEVATORS',
-        down: {
-          to: 'z-1.ts:%PROCESSING',
-          description: 'A freight elevator leads down to the basement',
-          door: 'z-1.ts:%BASEMENT_DOOR',
-          locks: ['z-1.ts:%BASEMENT_LOCK'],
-        },
       },
     },
 
