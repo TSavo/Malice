@@ -193,7 +193,7 @@ Sound carries strangely—footsteps from the networks above filter down as dista
       name: 'Arterial Hub',
       description: `The tunnel opens into a chamber that serves as the arterial's central junction—a space large enough to feel almost like a room, the ceiling domed overhead, the walls receding to create a gathering space in the otherwise linear passage. This is the heart of the route.
 
-Passages branch in multiple directions: north and south along the main arterial, east toward the commercial underground, west toward the Gray Cartel territory. The junction is neutral ground, the territorial marks carefully balanced to indicate shared space. Conflicts here would close the route for everyone.
+Passages branch in multiple directions: north and south along the main arterial, east toward the commercial underground, west toward the Gray Cartel territory. The east-west transit corridor also connects here, creating a true crossroads at the heart of the z=-3 network. The junction is neutral ground, the territorial marks carefully balanced to indicate shared space.
 
 A ventilation shaft rises toward the surface, its grating hidden somewhere in Occidental Square. The shaft provides fresh air and, for those who can climb it, an emergency exit. The architects thought of everything.`,
       x: 0,
@@ -213,8 +213,9 @@ A ventilation shaft rises toward the surface, its grating hidden somewhere in Oc
           description: 'A passage leads east toward the sluice channel',
         },
         west: {
-          to: 'underground/transitional/supply-shaft.ts',
-          description: 'A passage leads west toward the supply routes',
+          to: 'buildings/transit-corridor/z-3.ts',
+          room: '%TRANSIT_CENTER',
+          description: 'A passage leads west along the transit corridor',
         },
         up: {
           to: 'buildings/occidental-square/z0.ts',
