@@ -669,6 +669,126 @@ EOF'
 
 ---
 
+## GitHub Actions Self-Hosted Runner
+
+Run GitHub Actions workflows on the production server for faster builds and access to the production environment.
+
+### Why Self-Hosted?
+
+- **Faster builds**: No cold start, Docker layer caching persists
+- **Production access**: Can run integration tests against live services
+- **Cost savings**: Free unlimited minutes (vs GitHub-hosted limits)
+- **Custom environment**: Pre-installed tools (Bun, Node.js, Docker)
+
+### Quick Setup
+
+```bash
+# On production server
+cd /root/Malice
+
+# Set required environment variables
+export GITHUB_TOKEN=ghp_xxxxx  # PAT with 'repo' scope
+export GITHUB_REPOSITORY=yourorg/Malice
+
+# Run setup script
+./scripts/setup-runner.sh
+```
+
+### Manual Setup
+
+1. **Create GitHub Token**
+
+   Go to [GitHub Settings > Tokens](https://github.com/settings/tokens) and create a token with `repo` scope.
+
+2. **Configure Environment**
+
+   Add to `.env`:
+   ```bash
+   GITHUB_TOKEN=ghp_xxxxx
+   GITHUB_REPOSITORY=yourorg/Malice
+   RUNNER_NAME=malice-prod
+   RUNNER_LABELS=self-hosted,Linux,X64,malice,production
+   ```
+
+3. **Start Runner**
+
+   ```bash
+   docker compose -f docker-compose.runner.yml up -d
+   ```
+
+4. **Verify Registration**
+
+   Check https://github.com/yourorg/Malice/settings/actions/runners
+
+### Using the Runner in Workflows
+
+Update your workflow to target the self-hosted runner:
+
+```yaml
+jobs:
+  build:
+    runs-on: [self-hosted, malice]  # or just 'self-hosted'
+    steps:
+      - uses: actions/checkout@v4
+      # ... rest of your job
+```
+
+### Runner Management
+
+```bash
+# View logs
+docker logs -f malice-runner
+
+# Stop runner (deregisters from GitHub)
+docker compose -f docker-compose.runner.yml down
+
+# Restart runner
+docker compose -f docker-compose.runner.yml restart
+
+# Rebuild runner image (after Dockerfile changes)
+docker compose -f docker-compose.runner.yml build --no-cache
+docker compose -f docker-compose.runner.yml up -d
+```
+
+### Runner with Full Stack
+
+Run the runner alongside the game services:
+
+```bash
+# Start everything
+docker compose -f docker-compose.yml -f docker-compose.runner.yml up -d
+
+# Or ensure network exists first
+docker network create --subnet=172.20.0.0/16 malice-network
+docker compose -f docker-compose.runner.yml up -d
+```
+
+### Security Considerations
+
+- The runner has Docker socket access (required for containerized jobs)
+- Only repository collaborators can trigger workflows
+- The runner auto-deregisters on shutdown to prevent orphaned registrations
+- Consider using fine-grained tokens with minimal permissions
+
+### Troubleshooting
+
+**Runner not appearing in GitHub:**
+```bash
+docker logs malice-runner  # Check for registration errors
+```
+
+**Token permission errors:**
+- Ensure token has `repo` scope for private repositories
+- For organization repos, you may need `admin:org` scope
+
+**Docker permission errors:**
+```bash
+# Inside runner container, verify docker access
+docker exec malice-runner docker ps
+```
+
+---
+
 ## Current Production
 
 **Droplet:** `malice-prod`
