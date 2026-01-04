@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   claude-coverage:
-    runs-on: [self-hosted, malice]
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write

@@ -409,7 +409,9 @@ Debris litters the floor: fragments of the building that once stood here, materi
 
     '%STEAM_S2': {
       name: 'Steam Tunnel',
-      description: `The tunnel continues through the steam distribution network, the pipes showing their age in rust and patched insulation. The heat varies as valves open and close automatically, responding to demands from the buildings above.`,
+      description: `The tunnel continues through the steam distribution network, the pipes showing their age in rust and patched insulation. The heat varies as valves open and close automatically, responding to demands from the buildings above.
+
+A warm shaft descends from here toward the transit corridor below, connecting the steam network to the z=-3 express routes.`,
       x: 12,
       y: -1,
       z: -2,
@@ -425,6 +427,11 @@ Debris litters the floor: fragments of the building that once stood here, materi
           to: 'buildings/southeast-underground/z-2.ts',
           room: '%DRAINAGE_CHAMBER',
           description: 'A passage leads south toward the drainage system',
+        },
+        down: {
+          to: 'buildings/transit-corridor/z-3.ts',
+          room: '%TRANSIT_TERMINUS',
+          description: 'A warm shaft descends toward the transit corridor',
         },
       },
     },

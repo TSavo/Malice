@@ -773,7 +773,7 @@ await $spatial.ensureRoom(x+1, y, 0, 'abandoned building mentioned in room descr
 The game features an extensive underground tunnel network beneath Pioneer Square (Seattle's historic 1889 street level). The system spans multiple levels from z=-2 (upper tunnels) down to z=-6 (deep vaults).
 
 **Key levels:**
-- **z=-2**: Upper tunnels (~320 rooms) - Dense corridor network across the entire district
+- **z=-2**: Upper tunnels (~295 rooms) - Dense corridor network across the entire district
 - **z=-3**: Transitional layer (~77 rooms) - Deep passages, cisterns, and flooded zones
 - **z=-4**: Lower passages (~59 rooms) - Gray Cartel operational territory (Armory, Medical Bay, Communications Center), Deep Cisterns (pre-fire water infrastructure)
 - **z=-5**: Deep vaults (~16 rooms) - Secured cell bases
@@ -786,7 +786,6 @@ The game features an extensive underground tunnel network beneath Pioneer Square
 - Yesler Underground (prohibition-era passages)
 - King Street Underground (rail platform connections)
 - Chinatown Underground (historic Chinese tunnels, gambling dens, opium passages)
-- Southeast Underground (utility tunnels connecting Chinatown to eastside)
 - Underground Tour (preserved tourist route, buried storefronts, homeless shelter areas)
 
 **Surface entry points:**
