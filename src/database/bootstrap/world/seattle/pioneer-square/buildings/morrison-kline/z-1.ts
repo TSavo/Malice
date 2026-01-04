@@ -76,7 +76,7 @@ The organization is meticulous despite the cramped conditions. Each row is label
 The air is thick with the smell of old paper and the mineral dampness that seeps through basement walls. A dehumidifier sits in the corner, silent, its reservoir long since overflowed and dried. The paper has begun to suffer in its absence—foxing spreading across documents, mold blooming in the dampest boxes.
 
 A heavy door in the south wall leads to a records vault, its combination lock suggesting contents worth protecting.`,
-      x: -15,
+      x: -14,
       y: 7,
       z: -1,
       population: 0,
@@ -116,7 +116,7 @@ Damaged cargo sits in some cages: waterlogged electronics, salt-corroded machine
 One cage contains personal effects from a wrongful death case—a seaman's gear, family photographs, the things a man carried when he went to work on a ship and never came home. The case file would explain the story. The objects tell it silently.
 
 A section of the wall near the northeast corner shows signs of disturbance—bricks that don't quite match, mortar newer than the surrounding work. Someone walled something up down here.`,
-      x: -15,
+      x: -14,
       y: 7,
       z: -1,
       population: 0,
@@ -208,7 +208,7 @@ In the corner, partially hidden behind the water heater, a floor drain sits lowe
 Filing cabinets line the walls, each drawer locked, each lock requiring a different key. The keys hang on a board by the door—someone abandoned security procedures when they abandoned the building.
 
 A small desk sits in the center of the vault, positioned for reviewing documents without removing them from the secured space. A ledger on the desk logs every file accessed, the last entry dated months ago. The handwriting is shaky, hurried. Someone was looking for something specific.`,
-      x: -15,
+      x: -14,
       y: 6,
       z: -1,
       population: 0,

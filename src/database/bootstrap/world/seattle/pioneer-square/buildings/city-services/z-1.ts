@@ -128,7 +128,7 @@ A situation map covers the opposite wall—Pioneer Square and the surrounding ar
 
 The room feels like a bunker, which it essentially is—hardened against whatever disasters the city planners anticipated. They didn't anticipate this one.`,
       x: -15,
-      y: 9,
+      y: 8,
       z: -1,
       population: 0,
       ambientNoise: 5,

@@ -52,7 +52,7 @@ export const building = {
 The air here is thick with the ghost of roasted coffee—the scent embedded so deeply into the concrete walls that years of abandonment haven't erased it. The smell is comforting and sad, a reminder of rituals that no longer occur.
 
 A bare bulb flickers at the bottom of the stairs, casting shadows that jump with each flicker. The electrical system down here was never meant for the commercial-grade equipment that fills the basement.`,
-      x: -16,
+      x: -15,
       y: 0,
       z: -1,
       population: 0,
@@ -83,7 +83,7 @@ A bare bulb flickers at the bottom of the stairs, casting shadows that jump with
 Burlap sacks are stacked on wooden pallets, stamped with origins that read like a geography lesson: ETHIOPIA YIRGACHEFFE, GUATEMALA HUEHUETENANGO, SUMATRA MANDHELING. The beans inside have lost their freshness, their oils gone rancid, but the sacks remain organized by origin, altitude, and processing method—the taxonomy of specialty coffee.
 
 A small desk holds cupping notes and roast profiles, the handwriting of master roasters documenting their craft. Pages of flavor wheels and tasting scores, the obsessive documentation of people who cared deeply about the difference between "bright" and "vibrant" acidity.`,
-      x: -16,
+      x: -15,
       y: 1,
       z: -1,
       population: 0,

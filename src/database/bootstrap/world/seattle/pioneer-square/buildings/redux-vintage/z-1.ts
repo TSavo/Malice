@@ -43,7 +43,7 @@ export const building = {
 The smell of the shop above—mothballs, old fabric, ghost perfume—mingles with the basement's own scent: damp earth, old cardboard, the particular mustiness of underground spaces.
 
 A single bare bulb hangs at the bottom of the stairs, its pull-chain dangling. The light it casts is yellow and weak, barely reaching the corners of the space below.`,
-      x: -16,
+      x: -15,
       y: 4,
       z: -1,
       population: 0,
@@ -113,7 +113,7 @@ Mannequin parts are piled in one corner: arms, torsos, heads with painted eyes s
 A workbench against the wall holds tools for minor repairs: a sewing kit, fabric glue, a heat gun for reshaping plastic. The repairs stopped mid-project. A zipper replacement sits half-finished, the needle still threaded.
 
 The brick wall on the north side doesn't quite match the rest—newer mortar, slightly different color. Someone sealed something up.`,
-      x: -16,
+      x: -15,
       y: 4,
       z: -1,
       population: 0,

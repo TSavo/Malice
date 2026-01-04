@@ -141,7 +141,7 @@ A large safe sits in one corner, its door slightly ajar, its contents removed by
 The walls are rough brick, the floor packed earth with occasional patches of cobblestone showing through. The passage smells of coal dust and damp earth, the accumulated scent of a century underground.
 
 The passage opens into the larger tunnel network to the east, the buried streets of old Seattle stretching in multiple directions. This building was connected to the underground long before anyone thought to give tours.`,
-      x: -17,
+      x: -18,
       y: 12,
       z: -2,
       population: 0,

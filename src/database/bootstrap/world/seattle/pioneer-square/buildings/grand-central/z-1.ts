@@ -38,7 +38,7 @@ The basement stretches beneath the entire arcade footprint, a maze of storage ro
 
 The stairwell opens into a main corridor that runs the length of the building, rooms branching off to either side.`,
       x: -14,
-      y: 1,
+      y: 0,
       z: -1,
       population: 0,
       ambientNoise: 5,
@@ -74,7 +74,7 @@ Doors line both sides of the corridor, most closed, some hanging open to reveal 
 
 Electrical conduit runs along the ceiling, a later addition that brought power to the basement spaces. The wiring is ancient, insulation cracked, a fire hazard that never quite caught fire.`,
       x: -15,
-      y: 1,
+      y: 0,
       z: -1,
       population: 0,
       ambientNoise: 6,
@@ -183,7 +183,7 @@ One pipe is larger than the others, a culvert of sorts that leads south into the
 One cage still holds merchandise—crates of china marked SQUIRE & SONS, the dry goods store that operated above. The china is intact, protected by its crate, a treasure trove of Victorian dinnerware that no one has thought to claim.
 
 The ceiling is lower here, the floor uneven. Water has pooled in the southwest corner, seeping through the wall from some unknown source. The pool never quite dries, never quite grows—just persists.`,
-      x: -16,
+      x: -15,
       y: 0,
       z: -1,
       population: 0,
