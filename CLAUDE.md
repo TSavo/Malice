@@ -1076,7 +1076,7 @@ player.avatarBlobKey = blobKey;
 
 ### $aiImageGen - AI Image Generation Object
 
-Generate images using Runware API and store them in `$blob`:
+Generate images using Nano Banana via [laozhang.ai](https://api.laozhang.ai) (79% cheaper than Google direct) and store them in `$blob`:
 
 ```typescript
 // Generate image and store in $blob
@@ -1088,7 +1088,8 @@ const url = $blob.url(result.blobKey, 'thecontinuum.city');
 
 // Generate with options
 const result = await $aiImageGen.generate('A glowing orb', {
-  model: 'civitai:139562@297320',  // Realistic Vision model
+  model: 'gemini-3-pro-image-preview',  // Nano Banana Pro (4K support)
+  aspectRatio: 'portrait',               // 'landscape', 'portrait', 'square'
   metadata: { createdBy: player.id },
   filename: 'orb.png'
 });
@@ -1099,18 +1100,16 @@ const raw = await $aiImageGen.generateRaw('A simple icon');
 
 // List available models
 const models = $aiImageGen.listModels();
-// [{ id: 'runware:101@1', name: 'Stable Diffusion XL Base', tier: 'budget' }, ...]
+// [{ id: 'gemini-2.5-flash-image', name: 'Nano Banana (stable)', tier: 'budget' }, ...]
 
 // Change default model
-$aiImageGen.setDefaultModel('runware:100@1');
+$aiImageGen.setDefaultModel('gemini-3-pro-image-preview');
 ```
 
-**Environment:** Requires `RUNWARE_API_KEY` environment variable.
+**Environment:** Requires `LAOZHANG_API_KEY` environment variable.
 
 **Available models:**
-- `runware:101@1` - Stable Diffusion XL Base (default, ~$0.015/image)
-- `civitai:102438@133677` - SDXL Turbo (~$0.008/image)
-- `runware:100@1` - Stable Diffusion 1.5 (~$0.005/image, cheapest)
-- `civitai:139562@297320` - Realistic Vision (~$0.02/image, higher quality)
+- `gemini-2.5-flash-image` - Nano Banana (default, $0.05/image)
+- `gemini-3-pro-image-preview` - Nano Banana Pro with 4K support ($0.05/image)
 
 All transports require authentication. Players must first register via `POST /register` on the faction's HTTP server, then connect via WebSocket or Session MCP with their credentials. Connections are tagged with `factionId` for routing to the correct character generation flow.

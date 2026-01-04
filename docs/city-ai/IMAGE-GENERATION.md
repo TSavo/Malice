@@ -40,7 +40,7 @@ const blobKey = await map.image();
 
 For generating images directly (used internally by `$describable.image()`).
 
-Uses [Runware API](https://runware.ai) - ~8x cheaper than Google Gemini at ~$0.005-0.02/image.
+Uses Nano Banana via [laozhang.ai](https://api.laozhang.ai) - 79% cheaper than Google direct at $0.05/image.
 
 ### generate(prompt, options?)
 
@@ -64,13 +64,10 @@ const url = $blob.url(result.blobKey, 'thecontinuum.city');
 
 ```javascript
 await $aiImageGen.generate('A glowing orb', {
-  model: 'civitai:139562@297320',        // Override default model (Realistic Vision)
+  model: 'gemini-3-pro-image-preview',   // Nano Banana Pro (4K support)
   aspectRatio: 'portrait',               // 'landscape', 'portrait', 'square'
   metadata: { createdBy: player.id },    // Stored with blob
-  filename: 'orb.png',                   // Optional filename
-  negativePrompt: 'blurry, distorted',   // What to avoid
-  steps: 30,                             // Diffusion steps (more = higher quality)
-  cfgScale: 7.5                          // Prompt adherence (higher = stricter)
+  filename: 'orb.png'                    // Optional filename
 });
 ```
 
@@ -96,16 +93,14 @@ const result = await $aiImageGen.generateRaw('An icon');
 ```javascript
 const models = $aiImageGen.listModels();
 // [
-//   { id: 'runware:101@1', name: 'Stable Diffusion XL Base', tier: 'budget', pricePerImage: 0.015 },
-//   { id: 'civitai:102438@133677', name: 'SDXL Turbo', tier: 'budget', pricePerImage: 0.008 },
-//   { id: 'runware:100@1', name: 'Stable Diffusion 1.5', tier: 'cheapest', pricePerImage: 0.005 },
-//   { id: 'civitai:139562@297320', name: 'Realistic Vision', tier: 'quality', pricePerImage: 0.02 }
+//   { id: 'gemini-2.5-flash-image', name: 'Nano Banana (stable)', tier: 'budget', pricePerImage: 0.05 },
+//   { id: 'gemini-3-pro-image-preview', name: 'Nano Banana Pro (4K support)', tier: 'quality', pricePerImage: 0.05 }
 // ]
 
-$aiImageGen.setDefaultModel('runware:100@1');  // Use cheapest model
+$aiImageGen.setDefaultModel('gemini-3-pro-image-preview');  // Use Pro model
 ```
 
-**Environment:** Requires `RUNWARE_API_KEY` environment variable.
+**Environment:** Requires `LAOZHANG_API_KEY` environment variable.
 
 ---
 

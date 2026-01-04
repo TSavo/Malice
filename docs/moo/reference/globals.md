@@ -562,7 +562,7 @@ const result = await $cash.transfer(fromPlayer, toPlayer, 100);
 
 ### $aiImageGen - AI Image Generation
 
-Generate images using [Runware API](https://runware.ai) and store in `$blob`. ~8x cheaper than Google Gemini.
+Generate images using Nano Banana via [laozhang.ai](https://api.laozhang.ai) and store in `$blob`. 79% cheaper than Google direct.
 
 ```javascript
 // Generate image and store in blob
@@ -574,7 +574,8 @@ const url = $blob.url(result.blobKey, 'thecontinuum.city');
 
 // Generate with options
 const result = await $aiImageGen.generate('A glowing orb', {
-  model: 'civitai:139562@297320',  // Realistic Vision
+  model: 'gemini-3-pro-image-preview',  // Nano Banana Pro
+  aspectRatio: 'portrait',
   metadata: { createdBy: player.id },
   filename: 'orb.png'
 });
@@ -587,16 +588,14 @@ const raw = await $aiImageGen.generateRaw('An icon');
 const models = $aiImageGen.listModels();
 
 // Change default model
-$aiImageGen.setDefaultModel('runware:100@1');  // Cheapest
+$aiImageGen.setDefaultModel('gemini-3-pro-image-preview');
 ```
 
-**Environment:** Requires `RUNWARE_API_KEY` environment variable.
+**Environment:** Requires `LAOZHANG_API_KEY` environment variable.
 
 **Models:**
-- `runware:101@1` - Stable Diffusion XL Base (default, ~$0.015/image)
-- `civitai:102438@133677` - SDXL Turbo (~$0.008/image)
-- `runware:100@1` - Stable Diffusion 1.5 (~$0.005/image, cheapest)
-- `civitai:139562@297320` - Realistic Vision (~$0.02/image)
+- `gemini-2.5-flash-image` - Nano Banana (default, $0.05/image)
+- `gemini-3-pro-image-preview` - Nano Banana Pro with 4K support ($0.05/image)
 
 ### $describable.image() - Object Image Generation
 
@@ -678,7 +677,7 @@ Quick access to prototype objects for inheritance:
 | `$http` | HTTP client for external requests |
 | `$blob` | Binary storage (MongoDB GridFS) |
 | `$email` | Email sending (Resend) |
-| `$aiImageGen` | AI image generation (Runware) |
+| `$aiImageGen` | AI image generation (Nano Banana via laozhang.ai) |
 
 ## Special Properties on $
 
