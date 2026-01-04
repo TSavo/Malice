@@ -203,7 +203,6 @@ The smell here is different—old paper and leather, the distinctive scent of bo
       outdoor: false,
       exits: {
         south: '%GALLERY_LANDING',
-        west: '%ART_GALLERY',
         up: {
           to: 'z2.ts#ROOF',
           description: 'A ladder leads up to the roof hatch',
