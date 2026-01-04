@@ -343,7 +343,9 @@ The floor is covered in paper debris—old newspapers, magazines, books that swe
 
 A stairwell in the corner leads up, but the stairs themselves have partially collapsed. The landing above is visible, but unreachable without climbing gear. Warning signs—hand-painted, recent—mark the stairwell: DANGER DO NOT CLIMB UNSTABLE.
 
-Storage rooms line the corridor, their doors mostly open to reveal empty shelves. One room contains a collection of cleaning supplies from various eras—buckets, mops, bottles of chemicals with labels that predate modern safety regulations.`,
+Storage rooms line the corridor, their doors mostly open to reveal empty shelves. One room contains a collection of cleaning supplies from various eras—buckets, mops, bottles of chemicals with labels that predate modern safety regulations.
+
+An iron hatch in the floor leads down to the basement—the original 1891 foundation level.`,
       x: -10,
       y: 4,
       z: 0,
@@ -355,6 +357,12 @@ Storage rooms line the corridor, their doors mostly open to reveal empty shelves
       exits: {
         west: '%GC_SHOP_NE',
         south: '%GC_ELEV_LOBBY',
+        down: {
+          to: 'z-1.ts:%BASEMENT_STAIRS',
+          description: 'An iron hatch leads down to the basement',
+          door: 'z-1.ts:%BASEMENT_HATCH',
+          locks: ['z-1.ts:%BASEMENT_LOCK'],
+        },
       },
     },
   },
