@@ -52,7 +52,7 @@ A single bare bulb hangs at the bottom of the stairs, its pull-chain dangling. T
       waterLevel: 0,
       outdoor: false,
       exits: {
-        up: { room: '%BACKROOM', door: '%BASEMENT_TRAPDOOR', locks: ['%BASEMENT_LOCK'] },
+        up: { to: 'z0.ts:%BACKROOM', door: '%BASEMENT_TRAPDOOR', locks: ['%BASEMENT_LOCK'] },
         north: '%OVERFLOW',
         east: '%MAIN_CELLAR',
       },
@@ -114,7 +114,7 @@ A workbench against the wall holds tools for minor repairs: a sewing kit, fabric
 
 The brick wall on the north side doesn't quite match the rest—newer mortar, slightly different color. Someone sealed something up.`,
       x: -16,
-      y: 5,
+      y: 4,
       z: -1,
       population: 0,
       ambientNoise: 2,
@@ -160,7 +160,7 @@ A heavy iron ring is set into the floor, attached to a hatch that leads down int
 
 The walls bear scratched tallies and dates in chalk, some nearly illegible with age. People counted days here. People waited here. The room remembers.`,
       x: -15,
-      y: 5,
+      y: 4,
       z: -1,
       population: 0,
       ambientNoise: 0,
@@ -205,7 +205,7 @@ Metal rungs are bolted into the wall, forming a ladder that descends into the un
 
 The air moves in the shaft, a faint draft rising from the tunnels below, carrying the mineral smell of deep earth and the distant echo of dripping water. The shaft connects to the buried city that lies beneath Seattle—the original streets, entombed when the city rebuilt itself after the great fire.`,
       x: -15,
-      y: 5,
+      y: 4,
       z: -1.5,
       population: 0,
       ambientNoise: 5,
@@ -226,7 +226,7 @@ The passage stretches east and west, connecting to the network of underground tu
 
 This was once a busy street. The storefronts are sealed now, their windows bricked over, their doors leading nowhere. But the passage persists, used by those who need to move unseen—smugglers, fugitives, the forgotten.`,
       x: -15,
-      y: 5,
+      y: 4,
       z: -2,
       population: 0,
       ambientNoise: 8,
