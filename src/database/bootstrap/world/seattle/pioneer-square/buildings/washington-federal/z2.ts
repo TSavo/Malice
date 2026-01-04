@@ -64,7 +64,7 @@ export const building = {
 The door to the roof stands open, someone having forced the padlock at some point. The lock hangs uselessly from the hasp. Beyond the door, grey Seattle sky is visible, and the sound of wind carries into the vestibule.
 
 A window in the door offers a preview of the roof—gravel and tar paper, HVAC equipment, the back of the clock tower that faces the street below.`,
-      x: -3,
+      x: -1,
       y: -2,
       z: 2,
       population: 0,
@@ -194,7 +194,7 @@ Someone has left a camp chair here, weathered and stained, its fabric torn. The 
 
 A fire escape ladder is bolted to the parapet, providing emergency egress to the alley below. The ladder is rusted but structurally sound—tested by whoever left the chair, probably.`,
       x: -2,
-      y: -1,
+      y: -2,
       z: 2,
       population: 0,
       ambientNoise: 30,
@@ -259,7 +259,7 @@ A drainage gutter runs along the parapet, channeling rainwater to downspouts at 
       waterLevel: 0,
       outdoor: true,
       exits: {
-        north: '%ROOF_MAIN',
+        west: '%ROOF_MAIN',
       },
       sittables: [
         {
