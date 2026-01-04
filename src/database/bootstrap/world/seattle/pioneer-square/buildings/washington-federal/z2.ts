@@ -64,7 +64,7 @@ export const building = {
 The door to the roof stands open, someone having forced the padlock at some point. The lock hangs uselessly from the hasp. Beyond the door, grey Seattle sky is visible, and the sound of wind carries into the vestibule.
 
 A window in the door offers a preview of the roof—gravel and tar paper, HVAC equipment, the back of the clock tower that faces the street below.`,
-      x: -1,
+      x: -3,
       y: -2,
       z: 2,
       population: 0,
@@ -74,7 +74,7 @@ A window in the door offers a preview of the roof—gravel and tar paper, HVAC e
       outdoor: false,
       exits: {
         down: 'z1.ts#STAIRWELL_1',
-        out: {
+        east: {
           description: 'The roof access door leads outside',
           door: '%ROOF_DOOR',
           to: '%ROOF_MAIN',
@@ -107,9 +107,9 @@ The view from the roof encompasses Pioneer Square and beyond—other rooftops, t
       outdoor: true,
       exits: {
         west: '%ROOF_ACCESS',
-        east: '%CLOCK_TOWER',
+        south: '%CLOCK_TOWER',
         north: '%ROOF_EDGE',
-        south: '%ROOF_CORNER',
+        east: '%ROOF_CORNER',
       },
       sittables: [
         {
@@ -158,7 +158,7 @@ The clock ran on springs and gears, wound weekly by someone who understood the m
       waterLevel: 0,
       outdoor: true,
       exits: {
-        west: {
+        north: {
           description: 'A maintenance panel leads back to the main roof',
           door: '%CLOCK_DOOR',
           to: '%ROOF_MAIN',
@@ -193,8 +193,8 @@ The clock ran on springs and gears, wound weekly by someone who understood the m
 Someone has left a camp chair here, weathered and stained, its fabric torn. The chair faces north, positioned for watching the street below. Cigarette butts are scattered nearby, filtered and unfiltered, the accumulated evidence of someone who spent time here. Watching. Waiting. The watching ended. The chair remains.
 
 A fire escape ladder is bolted to the parapet, providing emergency egress to the alley below. The ladder is rusted but structurally sound—tested by whoever left the chair, probably.`,
-      x: -1,
-      y: -3,
+      x: -2,
+      y: -1,
       z: 2,
       population: 0,
       ambientNoise: 30,
