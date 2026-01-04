@@ -252,7 +252,7 @@ The cinderblock seal that once closed the old tour entrance has been broken thro
           description: 'A ladder leads up to the bar',
           to: '%BAR',
         },
-        east: {
+        down: {
           to: 'underground/upper-tunnels/x-14-y2.ts',
           description: 'A breach in the cinderblock wall leads into the Underground',
         },
