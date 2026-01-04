@@ -789,51 +789,6 @@ export class MetaDomainBuilder implements Builder {
     `,
     );
 
-    // /map/admin route
-    const mapAdminRoute = await this.createRoute(webRoute, mapRoute, {
-      name: 'Map Admin Page',
-      segment: 'admin',
-      methods: ['GET'],
-      contentType: 'text/html',
-      requiresAuth: 'admin',
-    });
-    mapAdminRoute.setMethod(
-      'handleRequest',
-      `
-      const meta = args[0] || {};
-
-      // Check admin auth
-      if (!meta.isAdmin) {
-        return {
-          status: 403,
-          contentType: 'text/html',
-          body: '<h1>Access Denied</h1><p>Admin access required.</p>'
-        };
-      }
-
-      // Read the HTML file
-      const fs = await import('fs');
-      let html = '';
-      try {
-        html = fs.readFileSync('./world-map-3d.html', 'utf-8');
-        // Inject admin mode
-        html = html.replace('const isAdmin = false;', 'const isAdmin = true;');
-      } catch (err) {
-        return {
-          status: 500,
-          contentType: 'text/html',
-          body: '<h1>Error loading map</h1><p>' + err.message + '</p>'
-        };
-      }
-
-      return {
-        status: 200,
-        contentType: 'text/html',
-        body: html
-      };
-    `,
-    );
-
     // ========== Admin Routes ==========
 
     // /admin routes - require admin auth
@@ -906,7 +861,7 @@ export class MetaDomainBuilder implements Builder {
       </a>
     </div>
     <div class="mt-8 text-malice-muted text-sm">
-      <a href="/map/admin" class="hover:text-malice-accent">3D Map</a> &middot;
+      <a href="/admin/map" class="hover:text-malice-accent">3D Map</a> &middot;
       <a href="/admin/setup" class="hover:text-malice-accent">Setup Wizard</a>
     </div>
   </div>
@@ -914,6 +869,54 @@ export class MetaDomainBuilder implements Builder {
 </html>\`;
 
       return { status: 200, contentType: 'text/html', body: html };
+    `,
+    );
+
+    // /admin/map - 3D world map visualization (admin-only)
+    const adminMapRoute = await this.createRoute(webRoute, adminRoute, {
+      name: 'Admin Map Page',
+      segment: 'map',
+      methods: ['GET'],
+      contentType: 'text/html',
+      requiresAuth: 'admin',
+    });
+    adminMapRoute.setMethod(
+      'handleRequest',
+      `
+      const meta = args[0] || {};
+
+      // Check admin auth
+      if (!meta.isAdmin) {
+        return {
+          status: 401,
+          contentType: 'text/plain',
+          body: 'Admin access required',
+          headers: {
+            'WWW-Authenticate': 'Basic realm="Malice Admin"'
+          }
+        };
+      }
+
+      // Read the HTML file
+      const fs = await import('fs');
+      let html = '';
+      try {
+        html = fs.readFileSync('./world-map-3d.html', 'utf-8');
+        // Inject admin mode
+        html = html.replace('const isAdmin = false;', 'const isAdmin = true;');
+      } catch (err) {
+        return {
+          status: 500,
+          contentType: 'text/html',
+          body: '<h1>Error loading map</h1><p>' + err.message + '</p>'
+        };
+      }
+
+      return {
+        status: 200,
+        contentType: 'text/html',
+        body: html
+      };
     `,
     );
 
