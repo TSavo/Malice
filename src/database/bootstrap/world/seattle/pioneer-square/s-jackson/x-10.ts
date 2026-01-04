@@ -16,4 +16,10 @@ Decorative wire spans the street overhead at intervals, the infrastructure that 
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  exits: {
+    north: {
+      to: '../buildings/jade-noodle/z0.ts#DINING_ROOM',
+      description: 'The jade-green door of Jade Noodle House',
+    },
+  },
 };
