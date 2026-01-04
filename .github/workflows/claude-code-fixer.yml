@@ -51,12 +51,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Rebase on master
-        run: |
-          git fetch origin master
-          git rebase origin/master
-          git push --force-with-lease origin ${{ steps.pr-details.outputs.branch }}
-
       - name: Run Claude Code Fixer
         id: claude-fixer
         uses: anthropics/claude-code-action@v1
@@ -77,11 +71,12 @@ jobs:
             ```
 
             ## Your Task
-            1. Parse the review comment above for specific issues
-            2. For each issue marked with **File:** and **Fix:**, implement the fix
-            3. Stage and commit your changes with a descriptive message
-            4. Push the changes to the PR branch
-            5. Leave a comment summarizing what you fixed
+            1. First, rebase on master: `git fetch origin master && git rebase origin/master`
+            2. Parse the review comment above for specific issues
+            3. For each issue marked with **File:** and **Fix:**, implement the fix
+            4. Stage and commit your changes with a descriptive message
+            5. Push the changes to the PR branch (use --force-with-lease since you rebased)
+            6. Leave a comment summarizing what you fixed
 
             ## Important Rules
             - Only fix issues explicitly mentioned in the review
@@ -91,12 +86,13 @@ jobs:
             - Always run any relevant tests/type checks before committing
 
             ## Workflow
-            1. Read the files mentioned in the review
-            2. Make the requested changes using Edit tool
-            3. Run type checking: `npm run typecheck` (fix any issues you introduced)
-            4. Commit with message: "fix: [description of fix]"
-            5. Push: `git push origin ${{ steps.pr-details.outputs.branch }}`
-            6. Comment on PR: `gh pr comment ${{ github.event.issue.number }} --body "YOUR_SUMMARY"`
+            1. Rebase on master: `git fetch origin master && git rebase origin/master`
+            2. Read the files mentioned in the review
+            3. Make the requested changes using Edit tool
+            4. Run type checking: `npm run typecheck` (fix any issues you introduced)
+            5. Commit with message: "fix: [description of fix]"
+            6. Push: `git push --force-with-lease origin ${{ steps.pr-details.outputs.branch }}`
+            7. Comment on PR: `gh pr comment ${{ github.event.issue.number }} --body "YOUR_SUMMARY"`
 
             Your summary comment MUST begin with exactly these 28 characters (no escaping, no backslashes):
             <!-- CLAUDE_FIXER_MARKER -->
