@@ -214,7 +214,9 @@ A door leads to the basement and building utilities—the furnace room and elect
 
 The furnace is a massive iron beast from the 1950s, a conversion from the original coal-burning system. The furnace is cold now, its pilot light extinguished, but the ductwork that spreads from it runs through the entire building, ready to distribute heat that will never be generated.
 
-Electrical panels line one wall, their breakers labeled in the handwriting of electricians from different decades. Some circuits are tripped. Others remain on, feeding power to systems that still function for reasons no one fully understands.`,
+Electrical panels line one wall, their breakers labeled in the handwriting of electricians from different decades. Some circuits are tripped. Others remain on, feeding power to systems that still function for reasons no one fully understands.
+
+In the eastern wall, behind the furnace, a section of brickwork has been removed—stones stacked neatly beside a passage leading into darkness. The underground network awaits beyond.`,
       x: -13,
       y: 6,
       z: -1,
@@ -225,6 +227,10 @@ Electrical panels line one wall, their breakers labeled in the handwriting of el
       outdoor: false,
       exits: {
         up: '%MAIL_ROOM',
+        east: {
+          to: 'underground/upper-tunnels/x-12-y6.ts:%PASSAGE',
+          description: 'A breach in the foundation wall leads to the underground',
+        },
       },
       objects: [
         {

@@ -796,6 +796,17 @@ The game features an extensive underground tunnel network beneath Pioneer Square
 - 4th Avenue utility hatch (+14, 0)
 - King Street Station (+4, -12)
 
+**Building basement connections:**
+- Doc Maynard's cellar (-15, 2, -1) → east to underground
+- Gargoyle Building coal cellar (-18, 12, -1) → east to underground
+- Grand Central cistern (-15, 0, -1) → south to underground
+- Merchants Cafe basement → underground connection
+- Morrison & Kline basement (-14, 8, -1) → down to underground
+- Owl Cafe basement → underground connection
+- Pioneer Books basement → underground connection
+- Redux Vintage basement (-16, 4, -1) → underground smuggling route
+- Zeitgeist Coffee basement (-10, 11, -1) → underground breach
+
 See `docs/city-ai/MAP-UNDERGROUND.md` for detailed maps, room coordinates, and territorial information.
 
 ## Web Map Visualizer

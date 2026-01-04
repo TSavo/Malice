@@ -149,6 +149,7 @@ The employee schedule still hangs on a corkboard, shifts assigned to people who 
         north: '%SEATING',
         east: '%COUNTER',
         up: { room: '%ROOF_SW', locks: ['%ROOF_HATCH_LOCK'] },
+        down: { room: '%BASEMENT_STAIRS', door: '%BASEMENT_DOOR', locks: ['%BASEMENT_LOCK'] },
       },
       objects: [
         {
