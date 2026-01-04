@@ -11,6 +11,20 @@ export const building = {
 
   rooms: {
     // ═══════════════════════════════════════════════════════════════════
+    // DOORS AND LOCKS
+    // ═══════════════════════════════════════════════════════════════════
+
+    '%BASEMENT_TRAPDOOR': {
+      prototype: 'door',
+      name: 'Basement Trapdoor',
+      description:
+        'A wooden trapdoor in the back room floor, its edges worn smooth from years of opening and closing.',
+      locked: true,
+      open: false,
+      locks: ['%BASEMENT_LOCK'],
+    },
+
+    // ═══════════════════════════════════════════════════════════════════
     // GROUND FLOOR (z=0) - VINTAGE CLOTHING STORE
     // ═══════════════════════════════════════════════════════════════════
 
@@ -132,6 +146,7 @@ A battered couch sits against one wall, the kind employees use for breaks. The u
       exits: {
         east: '%SHOWROOM',
         north: '%STORAGE',
+        down: { room: '%CELLAR_STAIRS', door: '%BASEMENT_TRAPDOOR', locks: ['%BASEMENT_LOCK'] },
       },
       sittables: [
         {
