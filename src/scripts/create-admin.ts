@@ -26,8 +26,21 @@ async function createAdmin() {
     process.exit(1);
   }
 
+  // Get password from environment variable or command-line argument
+  const password = process.env.ADMIN_PASSWORD || process.argv[2];
+  if (!password) {
+    console.error('Error: Password required. Set ADMIN_PASSWORD env var or pass as argument.');
+    await db.disconnect();
+    process.exit(1);
+  }
+  if (password.length < 12) {
+    console.error('Error: Password must be at least 12 characters.');
+    await db.disconnect();
+    process.exit(1);
+  }
+
   // Hash password
-  const passwordHash = await hash('admin123', 10);
+  const passwordHash = await hash(password, 10);
 
   // Create admin player directly using manager.create()
   const admin = await manager.create({
@@ -44,7 +57,6 @@ async function createAdmin() {
   console.log('✅ Created admin user:');
   console.log('   ID:', admin.id);
   console.log('   Username: admin');
-  console.log('   Password: admin123');
   console.log('   isAdmin:', admin.get('isAdmin'));
 
   // Flush writes
