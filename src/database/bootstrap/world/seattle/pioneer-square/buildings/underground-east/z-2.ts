@@ -198,7 +198,8 @@ A vertical shaft rises toward street level, its ladder rungs showing the wear of
       exits: {
         south: '%OCC_N5',
         west: {
-          to: 'underground/upper-tunnels/the-junction.ts',
+          to: 'underground/upper-tunnels/junction-corridor.ts',
+          room: '%JUNCTION_TURN',
           description: 'A passage leads west toward The Junction',
         },
       },

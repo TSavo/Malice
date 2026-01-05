@@ -91,13 +91,38 @@ The junction is maintained despite the decades since its official use ended. Som
       outdoor: false,
       exits: {
         south: '%KING_MID_W',
-        north: '%FIRST_SOUTH_PASSAGE',
+        north: '%FIRST_AVE_TRANS',
         east: '%FREIGHT_CENTRAL',
         west: '%FREIGHT_WEST',
       },
       objects: [
         { prototype: 'sign', name: 'a railway timetable', description: 'A massive iron-framed timetable shows arrivals and departures. The trains listed haven\'t run since 1971, but the board remains, frozen in time.', boltedDown: true },
         { prototype: 'bench', name: 'a cargo scale platform', description: 'A massive industrial scale platform is set into the floor, its dial frozen at 2,347 pounds—the weight of some long-forgotten load.', boltedDown: true },
+      ],
+    },
+
+    '%FIRST_AVE_TRANS': {
+      name: 'First Avenue Transition',
+      description: `The passage passes through a transitional zone where the character of the underground shifts from industrial bulk to commercial refinement. The ceiling drops here, the walls narrow, the space becoming more human-scaled as it approaches the retail basements to the north.
+
+An old freight scale is embedded in the floor, its brass dial frozen at some long-forgotten weight. Workers once used this spot to tally goods moving between the rail yards and the commercial district—counting boxes, weighing barrels, documenting everything in ledgers that rotted decades ago.
+
+Pipes cross overhead, a tangle of gas, water, and steam lines that serve buildings above. Condensation drips from the steam pipes, creating a constant percussion that masks quieter sounds. Someone has hung tin cans from the water pipes—a makeshift alarm system that rattles when vibration travels through the metal.`,
+      x: -14,
+      y: -9,
+      z: -2,
+      population: 0,
+      ambientNoise: 22,
+      lighting: 15,
+      waterLevel: 8,
+      outdoor: false,
+      exits: {
+        south: '%FIRST_AVE_SOUTH',
+        north: '%FIRST_SOUTH_PASSAGE',
+      },
+      objects: [
+        { prototype: 'furniture', name: 'an embedded floor scale', description: 'A brass-faced weighing scale is set into the floor, its platform large enough for cargo pallets. The needle points to 847 lbs, frozen there since someone walked away.', boltedDown: true },
+        { prototype: 'sign', name: 'tin can alarms', description: 'Empty tin cans hang from wires wrapped around the overhead pipes. They rattle when anything heavy moves through the tunnel.', boltedDown: true },
       ],
     },
 
@@ -113,7 +138,7 @@ The junction is maintained despite the decades since its official use ended. Som
       waterLevel: 8,
       outdoor: false,
       exits: {
-        south: '%FIRST_AVE_SOUTH',
+        south: '%FIRST_AVE_TRANS',
         north: '%FIRST_SOUTH_MID',
       },
     },
@@ -135,8 +160,85 @@ The junction is maintained despite the decades since its official use ended. Som
           to: 'underground/upper-tunnels/supply-junction.ts',
           description: 'A passage leads north toward the supply routes',
         },
+        east: '%BOTTLING_WORKS',
+      },
+    },
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // FIRST AVENUE EAST CORRIDOR (y=-6, x=-13 to x=-11)
+    // Connecting First Avenue to Storage Bay
+    // ═══════════════════════════════════════════════════════════════════════
+
+    '%BOTTLING_WORKS': {
+      name: 'Bottling Works Cellar',
+      description: `The passage opens into the basement of what was once a bottling works—a facility that filled bottles with everything from soda water to patent medicines to whiskey during Prohibition. The bottling machinery is long gone, but the infrastructure remains: concrete troughs for washing bottles, drains for spillage, and the iron tracks where crates of filled bottles were pushed toward the loading dock.
+
+Empty bottles litter the floor in drifts—green glass, brown glass, clear glass, each shape designed for a specific product. Some still bear paper labels: "DR. WHITMORE'S VITALITY TONIC", "RAINIER BREWING CO.", "SEATTLE SODA WORKS". The products they held are history. The bottles remain.`,
+      x: -13,
+      y: -6,
+      z: -2,
+      population: 0,
+      ambientNoise: 10,
+      lighting: 12,
+      waterLevel: 5,
+      outdoor: false,
+      exits: {
+        west: '%FIRST_SOUTH_MID',
+        east: '%COOPERAGE',
+      },
+      objects: [
+        { prototype: 'crate', name: 'empty bottle drifts', description: 'Glass bottles in every color and shape cover the floor—soda bottles, medicine bottles, whiskey bottles. Each one held something once.', boltedDown: true },
+        { prototype: 'furniture', name: 'bottle washing troughs', description: 'Concrete troughs where bottles were sterilized before filling. The stains show where cleaning solution pooled.', boltedDown: true },
+        { prototype: 'sign', name: 'old product labels', description: 'Faded paper labels for patent medicines and tonics. "GUARANTEED TO CURE ALL AILMENTS". Nothing was guaranteed.', boltedDown: true },
+      ],
+    },
+
+    '%COOPERAGE': {
+      name: 'Abandoned Cooperage',
+      description: `The chamber served as a cooperage—a barrel-making shop that supplied the breweries and distilleries of early Seattle. The cooper's tools remain: curved drawknives, heading planes, croze cutters, each designed for a specific step in transforming wood into watertight vessels. The smell of oak and char lingers after decades.
+
+Barrel staves are stacked against the walls, wood that was never assembled into barrels. A half-finished barrel sits on the workbench, its hoops loosely fitted, its bottom unset. The cooper walked away mid-project and never returned. The barrel has waited a century for completion.`,
+      x: -12,
+      y: -6,
+      z: -2,
+      population: 0,
+      ambientNoise: 5,
+      lighting: 10,
+      waterLevel: 3,
+      outdoor: false,
+      exits: {
+        west: '%BOTTLING_WORKS',
+        east: '%ICE_VAULT',
+      },
+      objects: [
+        { prototype: 'furniture', name: 'a cooper\'s bench', description: 'A heavy workbench holds barrel-making tools arranged for work that stopped mid-task. The drawknife still sits in the vice.', boltedDown: true },
+        { prototype: 'crate', name: 'barrel staves', description: 'Oak staves are stacked by size—whiskey barrels, beer kegs, pickle barrels. Each stack a different curve, a different capacity.', boltedDown: true },
+        { prototype: 'furniture', name: 'an unfinished barrel', description: 'A barrel sits half-assembled on the bench, its hoops loose, its bottom missing. The cooper never came back to finish it.', boltedDown: true },
+      ],
+    },
+
+    '%ICE_VAULT': {
+      name: 'Ice Vault',
+      description: `Before refrigeration, ice was money. This vault stored blocks cut from frozen lakes, packed in sawdust, sold to restaurants and saloons and anyone who needed to keep food cold. The insulation has rotted away, but the construction tells the story: walls three feet thick, doors that sealed airtight, drains for melt water.
+
+The ice dealers were some of the first businessmen to use the underground—natural refrigeration, hidden from the heat of summer days, cool enough to keep ice frozen for months. The trade died when mechanical refrigeration arrived. The vault found new purposes.`,
+      x: -11,
+      y: -6,
+      z: -2,
+      population: 0,
+      ambientNoise: 8,
+      lighting: 8,
+      waterLevel: 10,
+      outdoor: false,
+      exits: {
+        west: '%COOPERAGE',
         east: '%STORAGE_BAY',
       },
+      objects: [
+        { prototype: 'furniture', name: 'thick vault walls', description: 'The walls are three feet of brick and mortar, designed to hold cold. The insulation between layers has rotted to dust.', boltedDown: true },
+        { prototype: 'sign', name: 'ice merchant\'s scales', description: 'A massive iron scale hangs from the ceiling, capable of weighing 500-pound blocks. The chains are rusted but intact.', boltedDown: true },
+        { prototype: 'crate', name: 'sawdust drifts', description: 'Sawdust that once insulated ice blocks has compressed into solid masses. It crunches like old snow underfoot.', boltedDown: true },
+      ],
     },
 
     '%KING_MAIN': {

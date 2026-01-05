@@ -23,5 +23,10 @@ Chalk marks cluster in the corners—directional symbols, territorial indicators
       denyMessage: 'A heavy padlock secures the hasp. You lack the combination.',
       description: 'A heavy iron grate covers a vertical shaft.',
     },
+    east: {
+      to: 'underground/upper-tunnels/junction-corridor.ts',
+      room: '%JUNCTION_E1',
+      description: 'A passage leads east toward the Occidental network',
+    },
   },
 };

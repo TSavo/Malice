@@ -29,7 +29,7 @@ The air is damp with proximity to the bay, salt seeping in through routes that c
       waterLevel: 12,
       outdoor: false,
       exits: {
-        south: '%YESLER_JUNCTION_W',
+        south: '%YESLER_DESCENT',
         east: '%YESLER_ARCADE_1',
         west: {
           to: 'buildings/waterfront-underground/z-2.ts',
@@ -633,6 +633,31 @@ The hearse is the most intact, its glass windows still clear, its black lacquer 
     // NORTH-SOUTH CONNECTORS (linking Yesler to the main network)
     // ═══════════════════════════════════════════════════════════════════════
 
+    '%YESLER_DESCENT': {
+      name: 'Yesler Descent',
+      description: `The passage slopes downward here as it transitions between the Yesler Way level and the deeper network below. The grade was engineered during the street-raising, designed to connect the buried streets to the new elevation without requiring ladders or stairs.
+
+A set of iron handrails lines the walls, installed for workers who once moved cargo between levels. The rails are worn smooth by a century of gripping hands, the iron warm to the touch in a way that suggests recent use. Someone has wrapped fresh electrical tape around sections where the metal has worn sharp.
+
+Water pools in the low point of the passage where the grade levels out, creating a permanent puddle that never fully drains. Stepping stones have been laid across it—mismatched bricks and flat stones scavenged from collapsed walls, arranged by hands that preferred dry feet.`,
+      x: -14,
+      y: 11,
+      z: -2,
+      population: 0,
+      ambientNoise: 15,
+      lighting: 12,
+      waterLevel: 10,
+      outdoor: false,
+      exits: {
+        north: '%YESLER_WEST',
+        south: '%YESLER_JUNCTION_W',
+      },
+      objects: [
+        { prototype: 'furniture', name: 'iron handrails', description: 'Worn iron handrails line both walls, their surfaces polished by generations of hands. Fresh electrical tape wraps the sharp spots.', boltedDown: true },
+        { prototype: 'sign', name: 'stepping stones', description: 'Mismatched bricks and flat stones form a path across the permanent puddle at the low point.', boltedDown: true },
+      ],
+    },
+
     '%YESLER_JUNCTION_W': {
       name: 'Western Yesler Junction',
       description: `The passage reaches a junction where the Yesler Way underground meets the routes running north from the main network. The junction shows the marks of multiple construction eras—the original street-raising joined by later excavation, the passages meeting in a space that was never planned but has become essential.`,
@@ -645,7 +670,7 @@ The hearse is the most intact, its glass windows still clear, its black lacquer 
       waterLevel: 8,
       outdoor: false,
       exits: {
-        north: '%YESLER_WEST',
+        north: '%YESLER_DESCENT',
         south: '%FIRST_AVE_N',
         east: '%PROHIBITION_HALL',
       },
