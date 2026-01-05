@@ -132,7 +132,7 @@ Passages branch in multiple directions here—the network spreads beneath the pa
         },
         east: '%PARK_E1',
         down: {
-          to: 'buildings/underground-east/z-3.ts',
+          to: 'z-3.ts#%DOCK_SHAFT',
           description: 'A shaft descends into darkness',
         },
       },
@@ -255,7 +255,7 @@ The sluice still functions after a fashion, carrying water that finds its own pa
         north: '%OCC_S3',
         south: '%OCC_S5',
         down: {
-          to: 'buildings/underground-east/z-3.ts',
+          to: 'z-3.ts#%SLUICE_DOWN',
           description: 'A sluice channel descends into darkness',
         },
       },
@@ -774,7 +774,7 @@ But not all the equipment is dead. A newer pump hums quietly in the corner, its 
           description: 'A passage leads west toward the old tour route',
         },
         down: {
-          to: 'buildings/underground-east/z-3.ts',
+          to: 'z-3.ts#%DEEP_PUMP',
           description: 'A shaft descends to the deep pump station',
         },
       },

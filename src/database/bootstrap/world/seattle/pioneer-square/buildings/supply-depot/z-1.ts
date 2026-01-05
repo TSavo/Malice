@@ -54,7 +54,7 @@ Banks of fluorescent lights cast harsh shadows across the sorting floor. The air
       outdoor: false,
       exits: {
         up: {
-          to: 'z0.ts:%RECEIVING',
+          to: 'z0.ts#%RECEIVING',
           description: 'A reinforced door leads up to the receiving bay',
           door: '%BASEMENT_DOOR',
           locks: ['%BASEMENT_LOCK'],
@@ -97,7 +97,7 @@ The room is colder than the sorting floor, the climate control more aggressive. 
       exits: {
         west: '%SORTING',
         east: {
-          to: 'underground/upper-tunnels/x-19-y-5.ts:%PASSAGE',
+          to: 'underground/upper-tunnels/x-19-y-5.ts',
           description:
             'A breach in the wall leads to the underground tunnels',
         },

@@ -47,7 +47,7 @@ A wooden staircase leads up to the kitchen above, its treads worn by waiters who
       outdoor: false,
       exits: {
         up: {
-          to: 'z0.ts:%KITCHEN',
+          to: 'z0.ts#%KITCHEN',
           description: 'Wooden stairs lead up to the kitchen',
           door: '%CELLAR_HATCH',
           locks: ['%CELLAR_LOCK'],

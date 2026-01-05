@@ -61,7 +61,7 @@ A bare bulb flickers at the bottom of the stairs, casting shadows that jump with
       waterLevel: 0,
       outdoor: false,
       exits: {
-        up: { to: 'z0.ts:%BACK', door: '%BASEMENT_DOOR', locks: ['%BASEMENT_LOCK'] },
+        up: { to: 'z0.ts#%BACK', door: '%BASEMENT_DOOR', locks: ['%BASEMENT_LOCK'] },
         north: '%STORAGE',
         east: { room: '%ROASTER', door: '%ROASTER_DOOR', locks: ['%ROASTER_LOCK'] },
       },

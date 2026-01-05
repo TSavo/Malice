@@ -19,8 +19,8 @@ A coffee station sits in an alcove, its pot empty, its creamer curdled, its suga
       waterLevel: 0,
       outdoor: false,
       exits: {
-        down: 'z1.ts:%STAIR_Z1',
-        up: 'z3.ts:%STAIR_Z3',
+        down: 'z1.ts#%STAIR_Z1',
+        up: 'z3.ts#%STAIR_Z3',
         north: '%COURTROOM_5',
         south: '%COURTROOM_6',
         east: '%CIVIL_HALL',

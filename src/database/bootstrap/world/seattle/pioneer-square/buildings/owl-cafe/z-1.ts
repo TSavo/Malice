@@ -47,7 +47,7 @@ The original stone walls are visible behind the refrigeration units—this was a
       outdoor: false,
       exits: {
         up: {
-          to: 'z0.ts:%KITCHEN',
+          to: 'z0.ts#%KITCHEN',
           description: 'Stairs lead up to the kitchen',
           door: '%CELLAR_DOOR',
           locks: ['%CELLAR_LOCK'],

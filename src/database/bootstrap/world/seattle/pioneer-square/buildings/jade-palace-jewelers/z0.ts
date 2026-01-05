@@ -120,12 +120,12 @@ The air smells of decades: dust and the faint chemical memory of jewelry cleaner
         },
         north: '%BACK_ROOM',
         up: {
-          to: 'z1.ts#STAIRWELL',
+          to: 'z1.ts#%STAIRWELL',
           description: 'A door leads to the residential floors above',
           door: '%UPSTAIRS_DOOR',
         },
         down: {
-          to: 'z-1.ts#KARAOKE_STAIRS',
+          to: 'z-1.ts#%KARAOKE_STAIRS',
           description: 'Stairs descend to the basement karaoke bar',
           door: '%BASEMENT_DOOR',
         },

@@ -54,14 +54,14 @@ A stairwell leads up to the processing area. A passage in the western wall opens
       outdoor: false,
       exits: {
         up: {
-          to: 'z0.ts:%PROCESSING',
+          to: 'z0.ts#%PROCESSING',
           description: 'Stairs lead up to the processing area',
           door: '%BASEMENT_DOOR',
           locks: ['%BASEMENT_LOCK'],
         },
         east: '%UTILITY_VAULT',
         west: {
-          to: 'underground/upper-tunnels/x-16-y8.ts:%PASSAGE',
+          to: 'underground/upper-tunnels/x-16-y8.ts',
           description: 'A passage leads into the underground',
         },
       },

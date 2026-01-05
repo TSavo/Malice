@@ -258,7 +258,30 @@ export class WorldBuilder implements Builder {
             const filePath = path.join(dir, file);
             const fileUrl = pathToFileURL(filePath).href;
             const module = await import(fileUrl);
-            const roomDef = module.room as RoomData;
+
+            // Handle 'room' export (standard format)
+            let roomDef = module.room as RoomData;
+
+            // Handle 'building' export (upper-tunnels format) - extract first room
+            if (!roomDef && module.building && module.building.rooms) {
+              const rooms = module.building.rooms as Record<string, RoomData>;
+              const firstRoomKey = Object.keys(rooms)[0];
+              if (firstRoomKey) {
+                roomDef = rooms[firstRoomKey];
+                // Strip exits that reference buildings (handled by BuildingBuilder)
+                if (roomDef.exits) {
+                  const filteredExits: Record<string, ExitData | string> = {};
+                  for (const [dir, exit] of Object.entries(roomDef.exits)) {
+                    const exitData = typeof exit === 'string' ? { to: exit } : exit;
+                    // Keep only exits that don't reference buildings
+                    if (!exitData.to?.startsWith('buildings/')) {
+                      filteredExits[dir] = exit;
+                    }
+                  }
+                  roomDef = { ...roomDef, exits: filteredExits };
+                }
+              }
+            }
 
             if (roomDef && typeof roomDef.x === 'number') {
               const key = this.coordKey(roomDef.x, roomDef.y, roomDef.z || 0);

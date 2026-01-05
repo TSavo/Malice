@@ -358,10 +358,10 @@ An iron hatch in the floor leads down to the basement—the original 1891 founda
         west: '%GC_SHOP_NE',
         south: '%GC_ELEV_LOBBY',
         down: {
-          to: 'z-1.ts:%BASEMENT_STAIRS',
+          to: 'z-1.ts#%BASEMENT_STAIRS',
           description: 'An iron hatch leads down to the basement',
-          door: 'z-1.ts:%BASEMENT_HATCH',
-          locks: ['z-1.ts:%BASEMENT_LOCK'],
+          door: 'z-1.ts#%BASEMENT_HATCH',
+          locks: ['z-1.ts#%BASEMENT_LOCK'],
         },
       },
     },

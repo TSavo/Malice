@@ -62,7 +62,38 @@ interface DeferredWorldExit {
 
 export class BuildingBuilder implements Builder {
   static provides: string[] = []; // Creates individual building room aliases, not a single alias
-  static depends = ['room', 'exit', 'recycler']; // Needs these prototypes
+  // All prototypes used in building definitions must be loaded before building
+  static depends = [
+    'room',
+    'exit',
+    'recycler',
+    // Furniture and containers used in buildings
+    'furniture',
+    'table',
+    'desk',
+    'cabinet',
+    'bed',
+    'chair',
+    'bench',
+    'couch',
+    'crate',
+    'trunk',
+    'safe',
+    'locker',
+    // Locks and doors
+    'door',
+    'lock',
+    'rentableLock',
+    'biometricLock',
+    'guardedExit',
+    // Other
+    'sign',
+    'elevator',
+    'telescope',
+    'incinerator',
+    'vendable',
+    'describable',
+  ];
 
   private buildings: Map<string, Map<string, RuntimeObject>> = new Map();
   private deferredWorldExits: DeferredWorldExit[] = [];
@@ -146,12 +177,14 @@ export class BuildingBuilder implements Builder {
         const fileUrl = pathToFileURL(filePath).href;
         const module = await import(fileUrl);
 
-        if (module.building) {
+        // Accept either 'building' or 'floor' export
+        const floorDef = module.building || module.floor;
+        if (floorDef) {
           const floorName = file.replace('.ts', '');
           await this.buildFloor(
             buildingName,
             floorName,
-            module.building,
+            floorDef,
             sharedPlaceholders,
             postProcessors,
           );
@@ -311,21 +344,44 @@ export class BuildingBuilder implements Builder {
           // Simple form
           destPlaceholder = exitDef;
         } else if (typeof exitDef === 'object' && exitDef !== null) {
-          // Check for world reference (to: path.ts)
-          if ((exitDef as any).to && typeof (exitDef as any).to === 'string') {
-            // Defer this exit - will be resolved after all buildings are built
-            this.deferredWorldExits.push({
-              sourceRoom,
-              direction,
-              toPath: (exitDef as any).to,
-              exitProps: exitDef,
-              description: (exitDef as any).description,
-            });
+          // Check for door-only exit (to: null) - exit has a door but no destination
+          if ((exitDef as any).to === null) {
+            // Skip this exit - it's a placeholder for a door with no implemented destination
             continue;
           }
-          // Complex form with room placeholder
-          destPlaceholder = (exitDef as any).room;
-          exitProps = exitDef;
+          // Check for world reference (to: path.ts) OR cross-floor reference (to: z1.ts#ROOM or to: %ROOM)
+          if ((exitDef as any).to && typeof (exitDef as any).to === 'string') {
+            const toPath = (exitDef as any).to;
+            // Check if this is a placeholder reference (to: '%ROOM')
+            if (toPath.startsWith('%')) {
+              // Direct placeholder reference
+              destPlaceholder = toPath;
+              exitProps = exitDef;
+              // Don't continue - fall through to normal exit creation
+            } else if (toPath.includes('#')) {
+              // Cross-floor reference: 'z1.ts#ROOM_NAME' format
+              const roomName = toPath.split('#')[1];
+              destPlaceholder = roomName.startsWith('%')
+                ? roomName
+                : `%${roomName}`;
+              exitProps = exitDef;
+              // Don't continue - fall through to normal exit creation
+            } else {
+              // Defer this exit - will be resolved after all buildings are built
+              this.deferredWorldExits.push({
+                sourceRoom,
+                direction,
+                toPath: toPath,
+                exitProps: exitDef,
+                description: (exitDef as any).description,
+              });
+              continue;
+            }
+          } else {
+            // Complex form with room placeholder
+            destPlaceholder = (exitDef as any).room;
+            exitProps = exitDef;
+          }
         } else {
           console.warn(
             `    Invalid exit definition in ${placeholder}.${direction}`,
@@ -333,10 +389,20 @@ export class BuildingBuilder implements Builder {
           continue;
         }
 
+        // Handle cross-floor reference format: 'z1.ts#ROOM_NAME' -> '%ROOM_NAME'
+        if (
+          destPlaceholder &&
+          destPlaceholder.includes('.ts#') &&
+          !destPlaceholder.startsWith('%')
+        ) {
+          const roomName = destPlaceholder.split('#')[1];
+          destPlaceholder = roomName.startsWith('%') ? roomName : `%${roomName}`;
+        }
+
         const destRoom = resolvePlaceholder(destPlaceholder);
         if (!destRoom) {
           // Defer cross-floor exits - placeholder might exist on a later floor
-          if (destPlaceholder.startsWith('%')) {
+          if (destPlaceholder && destPlaceholder.startsWith('%')) {
             postProcessors.push(async () => {
               const deferredDest = sharedPlaceholders.get(destPlaceholder);
               if (!deferredDest) {
@@ -725,39 +791,82 @@ export class BuildingBuilder implements Builder {
       const { sourceRoom, direction, toPath, exitProps, description } =
         deferred;
 
-      // Parse the path to extract coordinates
-      // Format: "yesler-way/x-12.ts" or "1st-ave-s/y10.ts"
-      const targetCoords = await this.parsePathToCoordinates(toPath);
-      if (!targetCoords) {
-        console.warn(
-          `    Warning: Could not parse coordinates from path: ${toPath}`,
+      let destRoom: RuntimeObject | null = null;
+
+      // Check if this is a building-to-building reference
+      if (toPath.startsWith('buildings/')) {
+        // Building-to-building exit - resolve via room placeholder
+        const roomPlaceholder = (exitProps as any).room;
+        if (roomPlaceholder && typeof roomPlaceholder === 'string') {
+          const placeholder = roomPlaceholder.startsWith('%')
+            ? roomPlaceholder
+            : `%${roomPlaceholder}`;
+          destRoom =
+            this.allPlaceholders.get(placeholder) ||
+            (await this.findPlaceholderObject(placeholder));
+          if (!destRoom) {
+            console.warn(
+              `    Warning: Building room placeholder ${placeholder} not found for path: ${toPath}`,
+            );
+            continue;
+          }
+        } else {
+          console.warn(
+            `    Warning: Building-to-building exit missing room placeholder for path: ${toPath}`,
+          );
+          continue;
+        }
+      } else if (toPath.startsWith('%')) {
+        // This is a placeholder that got deferred incorrectly - resolve it directly
+        destRoom =
+          this.allPlaceholders.get(toPath) ||
+          (await this.findPlaceholderObject(toPath));
+        if (!destRoom) {
+          console.warn(
+            `    Warning: Room placeholder ${toPath} not found`,
+          );
+          continue;
+        }
+      } else {
+        // World path reference - parse coordinates
+        // Format: "yesler-way/x-12.ts" or "1st-ave-s/y10.ts"
+        const targetCoords = await this.parsePathToCoordinates(toPath);
+        if (!targetCoords) {
+          console.warn(
+            `    Warning: Could not parse coordinates from path: ${toPath}`,
+          );
+          continue;
+        }
+
+        // Find the world room by coordinates
+        destRoom = await this.findRoomByCoordinates(
+          targetCoords.x,
+          targetCoords.y,
+          targetCoords.z,
         );
-        continue;
       }
 
-      // Find the world room by coordinates
-      const worldRoom = await this.findRoomByCoordinates(
-        targetCoords.x,
-        targetCoords.y,
-        targetCoords.z,
-      );
+      const worldRoom = destRoom;
       if (!worldRoom) {
         console.warn(
-          `    Warning: No world room found at (${targetCoords.x}, ${targetCoords.y}, ${targetCoords.z}) for path: ${toPath}`,
+          `    Warning: No room found for path: ${toPath}`,
         );
         continue;
       }
 
-      // Calculate distance
+      // Calculate distance using destination room's coordinates
+      const destX = (worldRoom.get('x') as number) || 0;
+      const destY = (worldRoom.get('y') as number) || 0;
+      const destZ = (worldRoom.get('z') as number) || 0;
       const distance =
         exitProps.distance ||
         this.calculateDistance(
           (sourceRoom.get('x') as number) || 0,
           (sourceRoom.get('y') as number) || 0,
           (sourceRoom.get('z') as number) || 0,
-          targetCoords.x,
-          targetCoords.y,
-          targetCoords.z,
+          destX,
+          destY,
+          destZ,
         );
 
       // Resolve locks if specified (locks are placeholders like '%LOCK_NAME')
@@ -863,18 +972,39 @@ export class BuildingBuilder implements Builder {
     try {
       const fileUrl = pathToFileURL(filePath).href;
       const module = await import(fileUrl);
-      const roomDef = module.room;
 
-      if (
-        roomDef &&
-        typeof roomDef.x === 'number' &&
-        typeof roomDef.y === 'number'
-      ) {
-        return {
-          x: roomDef.x,
-          y: roomDef.y,
-          z: roomDef.z || 0,
-        };
+      // Handle single room export (world streets)
+      if (module.room) {
+        const roomDef = module.room;
+        if (
+          typeof roomDef.x === 'number' &&
+          typeof roomDef.y === 'number'
+        ) {
+          return {
+            x: roomDef.x,
+            y: roomDef.y,
+            z: roomDef.z || 0,
+          };
+        }
+      }
+
+      // Handle building export (underground tunnels) - get first room's coords
+      if (module.building && module.building.rooms) {
+        const rooms = module.building.rooms;
+        const firstRoomKey = Object.keys(rooms)[0];
+        if (firstRoomKey) {
+          const roomDef = rooms[firstRoomKey];
+          if (
+            typeof roomDef.x === 'number' &&
+            typeof roomDef.y === 'number'
+          ) {
+            return {
+              x: roomDef.x,
+              y: roomDef.y,
+              z: roomDef.z || 0,
+            };
+          }
+        }
       }
     } catch (err) {
       console.warn(`    Warning: Could not load room file ${toPath}: ${err}`);

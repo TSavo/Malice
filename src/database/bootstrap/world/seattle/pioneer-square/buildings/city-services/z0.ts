@@ -149,10 +149,10 @@ The room smells of industrial cleaner layered over older, more organic odors. Sa
           description: 'A steel door leads to the alley',
         },
         down: {
-          to: 'z-1.ts:%MECHANICAL',
+          to: 'z-1.ts#%MECHANICAL',
           description: 'Stairs lead down to the mechanical room',
-          door: 'z-1.ts:%BASEMENT_DOOR',
-          locks: ['z-1.ts:%BASEMENT_LOCK'],
+          door: 'z-1.ts#%BASEMENT_DOOR',
+          locks: ['z-1.ts#%BASEMENT_LOCK'],
         },
       },
     },
