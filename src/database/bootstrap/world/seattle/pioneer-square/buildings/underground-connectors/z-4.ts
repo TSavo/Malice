@@ -7,7 +7,15 @@
 // - Central (-5 to 0): Sewer/Cistern system - drains, flooded passages
 // - East (3 to 10): Mixed rat territory and industrial drainage
 
-export const rooms = {
+export const building = {
+  name: 'Lower Passages Z-4',
+  x: -20,
+  y: -20,
+  width: 40,
+  height: 30,
+  floors: 1,
+
+  rooms: {
   // ═══════════════════════════════════════════════════════════════════════════
   // WESTERN RAT KINGDOM (-10 to -8, y=-12 to -16)
   // Ancient tunnels where the rat colonies have established dominion
@@ -976,7 +984,7 @@ This is the transition into industrial territory. Hard hats are recommended but 
     ],
   },
 
-  '%SEWER_LINK': {
+  '%SEWER_NETWORK_LINK': {
     name: 'Sewer Network Link',
     description: `A passage connecting the Eastern Deep Junction to the Sewer Network Access. The tunnel transitions from industrial construction to sewer infrastructure—concrete to brick, dry to wet. The smell changes accordingly.
 
@@ -1004,5 +1012,6 @@ This is where industrial meets municipal. Neither claims responsibility.`,
       { prototype: 'furniture', name: 'construction transition', description: 'Industrial concrete gives way to municipal brick. The change is abrupt and telling.', boltedDown: true },
       { prototype: 'furniture', name: 'jurisdictional signs', description: 'A painted line marks where industrial property ends and city infrastructure begins. Neither side maintains it well.', boltedDown: true },
     ],
+  },
   },
 };
