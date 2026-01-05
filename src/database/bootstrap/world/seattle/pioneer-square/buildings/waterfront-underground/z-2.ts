@@ -175,6 +175,25 @@ Ventilation ducts run along the ceiling, carrying air from the factory's climate
       outdoor: false,
       exits: {
         south: '%FAB_TUNNEL_S',
+        north: '%FAB_CORRIDOR',
+      },
+    },
+
+    '%FAB_CORRIDOR': {
+      name: 'Fabrication Corridor',
+      description: `A narrow industrial corridor links the tunnel system to the factory basement above. Thick power cables snake along the ceiling, their rubber insulation cracked and patched in places where age has taken its toll. The walls are lined with defunct machinery—stamping presses, drill heads, and other equipment too heavy to move when production methods changed.
+
+A persistent vibration from somewhere in the walls suggests active ventilation, or perhaps something else churning away in the darkness. The air smells of machine oil and rust, the accumulated scent of a century of metalwork. Graffiti scratched into the concrete reads "SHIFT CHANGE 3AM - G.C." in letters that catch the dim light.`,
+      x: -20,
+      y: 9,
+      z: -2,
+      population: 0,
+      ambientNoise: 25,
+      lighting: 18,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        south: '%FAB_TUNNEL_MID',
         north: '%FAB_BASEMENT',
       },
     },
@@ -195,7 +214,7 @@ The Gray Cartel maintains this access point. The factory's AI either doesn't kno
       waterLevel: 0,
       outdoor: false,
       exits: {
-        south: '%FAB_TUNNEL_MID',
+        south: '%FAB_CORRIDOR',
         up: {
           to: 'buildings/fabrication-factory/z0.ts',
           room: '%PUBLIC_SERVICES',
@@ -604,12 +623,31 @@ The walls show the marks of past contents: scuffs and scratches at consistent he
       outdoor: false,
       exits: {
         west: '%SOUTH_CAVE',
-        east: '%SOUTH_JUNCTION',
+        east: '%SOUTH_PASSAGE',
         up: {
           to: 'buildings/supply-depot/z0.ts',
           room: '%WAREHOUSE',
           description: 'A steel hatch leads up to the Supply Depot',
         },
+      },
+    },
+
+    '%SOUTH_PASSAGE': {
+      name: 'Southern Passage',
+      description: `The passage threads through a narrow section where the tunnel walls close in, the excavation here constrained by something solid—perhaps bedrock, perhaps the foundations of a long-demolished building. Chisel marks cover the walls where workers fought for every inch of progress.
+
+A rusted iron grate covers a drainage channel in the floor, water from the waterfront seeping eastward toward the city's deeper systems. The air is thick with mineral dampness and the faint salt tang that lingers this close to the bay. Someone has scratched a compass rose into the stone, its cardinal points labeled in Chinese characters now worn nearly smooth.`,
+      x: -19,
+      y: -5,
+      z: -2,
+      population: 0,
+      ambientNoise: 18,
+      lighting: 10,
+      waterLevel: 20,
+      outdoor: false,
+      exits: {
+        west: '%SOUTH_TUNNEL',
+        east: '%SOUTH_JUNCTION',
       },
     },
 
@@ -625,7 +663,7 @@ The walls show the marks of past contents: scuffs and scratches at consistent he
       waterLevel: 15,
       outdoor: false,
       exits: {
-        west: '%SOUTH_TUNNEL',
+        west: '%SOUTH_PASSAGE',
         east: {
           to: 'underground/upper-tunnels/supply-junction.ts',
           description: 'A passage leads east toward the supply routes',

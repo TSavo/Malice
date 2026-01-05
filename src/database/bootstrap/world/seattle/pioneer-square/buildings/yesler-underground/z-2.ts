@@ -159,6 +159,25 @@ A shaft rises toward the surface, its upper end emerging through a grating that 
       outdoor: false,
       exits: {
         north: '%YESLER_JUNCTION_W',
+        south: '%FIRST_AVE_CORRIDOR',
+      },
+    },
+
+    '%FIRST_AVE_CORRIDOR': {
+      name: 'First Avenue Corridor',
+      description: `The corridor passes through what was once a prosperous merchant's basement—the remnants of display cases still line the walls, their glass long since shattered and swept away. A faded sign painted directly on the brick reads "FINE TOBACCO & SUNDRIES" in elegant Victorian lettering, though the merchandise vanished generations ago.
+
+The ceiling here is reinforced with steel I-beams added sometime in the last century, modern engineering shoring up Victorian ambition. Water stains trace dark lines down the walls from some leak overhead that has been dripping for decades. A worn path through the dust shows where travelers habitually pass, avoiding the debris that has accumulated in the corners.`,
+      x: -14,
+      y: 7,
+      z: -2,
+      population: 0,
+      ambientNoise: 12,
+      lighting: 15,
+      waterLevel: 8,
+      outdoor: false,
+      exits: {
+        north: '%FIRST_AVE_N',
         south: '%FIRST_AVE_MID',
       },
     },
@@ -175,7 +194,7 @@ A shaft rises toward the surface, its upper end emerging through a grating that 
       waterLevel: 3,
       outdoor: false,
       exits: {
-        north: '%FIRST_AVE_N',
+        north: '%FIRST_AVE_CORRIDOR',
         south: {
           to: 'underground/upper-tunnels/the-junction.ts',
           description: 'A passage leads south toward The Junction',

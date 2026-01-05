@@ -617,7 +617,7 @@ This section feels more recently maintained than the Occidental tunnels—freshe
         west: '%CONN_E',
         north: '%2ND_N1',
         south: '%2ND_S1',
-        east: '%2ND_EAST',
+        east: '%2ND_TRACK_SPUR',
       },
     },
 
@@ -802,6 +802,25 @@ The ducts connect to the streets above through gratings that were once concealed
     // EASTERN EXTENSION (toward 3rd Ave)
     // ═══════════════════════════════════════════════════════════════════════
 
+    '%2ND_TRACK_SPUR': {
+      name: 'Track Spur',
+      description: `The iron tracks that run through the Second Avenue tunnels curve here into a spur—a loading siding that once served a warehouse long since demolished. The track ends at a concrete bumper, its buffer worn smooth by decades of impacts from cargo carts that no longer run.
+
+A rusted crane mechanism hangs overhead, its chain and hook frozen in position, waiting to lift loads that will never arrive. The walls here are reinforced with timber that's been replaced multiple times—the newest beams showing recent tool marks, evidence that someone still maintains this section of the underground. A faded stencil on the wall reads "BERTH 7 - WEIGHT LIMIT 2000 LBS" in paint that was probably yellow before the decades faded it to cream.`,
+      x: 1,
+      y: 0,
+      z: -2,
+      population: 0,
+      ambientNoise: 10,
+      lighting: 12,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        west: '%2ND_MAIN',
+        east: '%2ND_EAST',
+      },
+    },
+
     '%2ND_EAST': {
       name: 'Eastern Passage',
       description: `The passage continues east through a section that was clearly excavated rather than inherited—the walls show pick marks rather than brick, shoring rather than construction. Someone dug this tunnel after the underground was established, extending the network beyond its original boundaries.
@@ -816,7 +835,7 @@ The excavation is old but the maintenance is new. The tunnel serves a current pu
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: '%2ND_MAIN',
+        west: '%2ND_TRACK_SPUR',
         east: '%3RD_CONN',
       },
     },

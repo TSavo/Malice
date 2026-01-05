@@ -197,8 +197,27 @@ The junction was built to handle the traffic of a major rail terminus, designed 
       outdoor: false,
       exits: {
         south: '%OCCIDENTAL_SOUTH',
-        north: '%OCC_SOUTH_MID',
+        north: '%OCC_TRANSITION',
         west: '%STORAGE_BAY',
+      },
+    },
+
+    '%OCC_TRANSITION': {
+      name: 'Occidental Transition',
+      description: `The passage widens into a chamber that marks the boundary between the industrial south and the commercial network. The change is visible in the architecture—rough-cut stone giving way to dressed brick, iron railway hardware giving way to decorative cast fixtures. Someone built a proper threshold here, a deliberate transition between worlds.
+
+A loading platform juts from the eastern wall, its purpose unclear now but its construction suggesting significant traffic once passed this way. Iron rings are set into the stone at intervals, perhaps for securing cargo, perhaps for other purposes the builders didn't document. The platform is worn smooth by use that continued long after its official function ended.`,
+      x: -7,
+      y: -7,
+      z: -2,
+      population: 0,
+      ambientNoise: 22,
+      lighting: 15,
+      waterLevel: 6,
+      outdoor: false,
+      exits: {
+        south: '%OCC_SOUTH_PASSAGE',
+        north: '%OCC_SOUTH_MID',
       },
     },
 
@@ -214,7 +233,7 @@ The junction was built to handle the traffic of a major rail terminus, designed 
       waterLevel: 5,
       outdoor: false,
       exits: {
-        south: '%OCC_SOUTH_PASSAGE',
+        south: '%OCC_TRANSITION',
         north: {
           to: 'buildings/underground-east/z-2.ts',
           room: '%OCC_S5',
