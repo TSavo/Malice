@@ -16,4 +16,16 @@ The passage east toward Occidental is narrower than the north-south route, its w
   lighting: 15,
   waterLevel: 5,
   outdoor: false,
+  exits: {
+    east: {
+      to: 'underground/upper-tunnels/main-corridor.ts',
+      room: '%MAIN_BANK',
+      description: 'A narrower passage leads east toward Occidental',
+    },
+    west: {
+      to: 'buildings/waterfront-underground/z-2.ts',
+      room: '%FIRST_AVE_CONN',
+      description: 'The passage continues west toward the waterfront',
+    },
+  },
 };

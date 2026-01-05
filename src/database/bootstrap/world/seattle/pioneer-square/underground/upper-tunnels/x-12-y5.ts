@@ -1,18 +1,40 @@
-// Between Grand Central and eastern passages
+// Junction Corridor - Buried Intersection
 
 export const room = {
-  name: 'Underground Passage',
-  description: `The passage connects the Grand Central basement to the network that extends north toward the Junction, the route cutting through what was once the service basement of a department store. The construction shows the scale of retail ambition—high ceilings, wide corridors, the infrastructure of commerce designed for volume.
+  name: 'Buried Intersection',
+  description: `The tunnel passes through what was once a street intersection, the perpendicular passage now collapsed and blocked with rubble. Fragments of wooden sidewalk decking protrude from the ceiling—the undersides of boardwalks that once crossed here, now entombed in fill and forgotten.
 
-Display fixtures remain bolted to the walls, their glass long since broken, their merchandise long since looted, but their frames still standing as evidence of what this space once meant. The fixtures are uniform, institutional, the product of an era when retail was systematized and standardized.
-
-The passage continues in multiple directions, the geometry of the old store creating options that the original builders never intended for navigation. Every direction leads somewhere. The challenge is knowing where.`,
+A brass survey marker embedded in the floor reads "CITY OF SEATTLE 1907," marking when engineers mapped these abandoned spaces for the first time since they were buried. The survey predates the current street grid by decades.`,
   x: -12,
   y: 5,
   z: -2,
   population: 0,
-  ambientNoise: 8,
+  ambientNoise: 10,
   lighting: 12,
-  waterLevel: 0,
+  waterLevel: 5,
   outdoor: false,
+  exits: {
+    west: {
+      to: 'underground/upper-tunnels/x-13-y5.ts',
+      description: 'The passage continues west',
+    },
+    east: {
+      to: 'underground/upper-tunnels/x-11-y5.ts',
+      description: 'The passage continues east',
+    },
+  },
+  objects: [
+    {
+      prototype: 'sign',
+      name: 'brass survey marker',
+      description: 'A brass disc set into the floor, inscribed "CITY OF SEATTLE 1907" with reference numbers that meant something to surveyors over a century ago.',
+      boltedDown: true,
+    },
+    {
+      prototype: 'furniture',
+      name: 'wooden sidewalk fragments',
+      description: 'Splintered remnants of the wooden boardwalks that once spanned the street intersections, now fossilized in the ceiling fill.',
+      boltedDown: true,
+    },
+  ],
 };

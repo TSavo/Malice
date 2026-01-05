@@ -15,6 +15,36 @@ export const building = {
     // MAIN EASTERN CORRIDOR (x=-7, beneath Occidental Ave S, z=-2)
     // ═══════════════════════════════════════════════════════════════════════
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // MAIN STREET CONNECTOR (x=-8, linking Main Crossing to Occidental)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    '%MAIN_ST_CONN': {
+      name: 'Main Street Passage',
+      description: `The passage connects the Main Crossing to the Occidental tunnels through what was once a service alley between two buildings. The construction is rougher here—hastily laid brick, minimal timber support, the work of builders who needed a connection and built one quickly.
+
+A faded advertisement is painted directly on the brick wall: "SEATTLE BREWING & MALTING CO. - RAINIER BEER - DELIVERED DAILY". The delivery route once ran through here, kegs rolling on iron tracks that are now partially buried in accumulated debris. The beer stopped flowing a century ago. The tracks remain.`,
+      x: -8,
+      y: 0,
+      z: -2,
+      population: 0,
+      ambientNoise: 15,
+      lighting: 12,
+      waterLevel: 5,
+      outdoor: false,
+      exits: {
+        west: {
+          to: 'underground/upper-tunnels/main-corridor.ts',
+          room: '%MAIN_NEWSPAPER',
+          description: 'The passage continues west toward the Main Corridor',
+        },
+        east: '%OCC_CROSS',
+      },
+      objects: [
+        { prototype: 'sign', name: 'a beer advertisement', description: 'Faded letters spell out "RAINIER BEER - SEATTLE\'S FINEST" over a painted image of a mountain. The mountain is still recognizable. The brewery is long gone.', boltedDown: true },
+      ],
+    },
+
     '%OCC_CROSS': {
       name: 'Occidental Crossing',
       description: `The tunnel opens into a vaulted chamber beneath what was once the heart of Seattle's commercial district. Brick arches span overhead, their keystone blocks inscribed with dates—1891, 1892, 1893—marking the rapid reconstruction after the fire. The arches supported sidewalks that became ceilings when the streets were raised. Now they support nothing but shadow.
@@ -34,10 +64,7 @@ The passage branches here—north toward the pergola and the park, south toward 
         north: '%OCC_N1',
         south: '%OCC_S1',
         east: '%CONN_W',
-        west: {
-          to: 'underground/upper-tunnels/main-crossing.ts',
-          description: 'A brick passage leads west toward 1st Ave',
-        },
+        west: '%MAIN_ST_CONN',
         up: {
           to: 'buildings/occidental-square/z0.ts',
           room: '%GALLERY',
@@ -171,7 +198,7 @@ A vertical shaft rises toward street level, its ladder rungs showing the wear of
       exits: {
         south: '%OCC_N5',
         west: {
-          to: 'underground/upper-tunnels/the-junction.ts',
+          to: 'underground/upper-tunnels/x-8-y6.ts',
           description: 'A passage leads west toward The Junction',
         },
       },
@@ -254,6 +281,16 @@ The sluice still functions after a fashion, carrying water that finds its own pa
       exits: {
         north: '%OCC_S3',
         south: '%OCC_S5',
+        west: {
+          to: 'buildings/underground-tour/z-2.ts',
+          room: '%MAINT_6',
+          description: 'A flooded passage leads west toward the crematorium passage',
+        },
+        east: {
+          to: 'buildings/underground-tour/z-2.ts',
+          room: '%MAINT_7',
+          description: 'A flooded passage leads east toward the opium den remains',
+        },
         down: {
           to: 'z-3.ts#%SLUICE_DOWN',
           description: 'A sluice channel descends into darkness',
@@ -487,8 +524,7 @@ Gaps in the hasty masonry reveal darkness beyond—space that continues past the
       exits: {
         east: '%OCC_S3',
         west: {
-          to: 'buildings/underground-tour/z-2.ts',
-          room: '%STOREFRONT_ROW',
+          to: 'underground/upper-tunnels/x-10-y-3.ts',
           description: 'A gap in the masonry leads toward the old tour route',
         },
       },
@@ -617,7 +653,7 @@ This section feels more recently maintained than the Occidental tunnels—freshe
         west: '%CONN_E',
         north: '%2ND_N1',
         south: '%2ND_S1',
-        east: '%2ND_EAST',
+        east: '%2ND_TRACK_SPUR',
       },
     },
 
@@ -635,7 +671,10 @@ This section feels more recently maintained than the Occidental tunnels—freshe
       exits: {
         south: '%2ND_MAIN',
         north: '%2ND_N2',
-        west: '%VENT_CHAMBER',
+        west: {
+          to: 'underground/upper-tunnels/x-1-y1.ts',
+          description: 'The passage leads west through the duct junction',
+        },
       },
     },
 
@@ -770,8 +809,8 @@ But not all the equipment is dead. A newer pump hums quietly in the corner, its 
         north: '%2ND_S2',
         west: {
           to: 'buildings/underground-tour/z-2.ts',
-          room: '%TOUR_END',
-          description: 'A passage leads west toward the old tour route',
+          room: '%MAINT_13',
+          description: 'A passage leads west toward the maintenance corridor',
         },
         down: {
           to: 'z-3.ts#%DEEP_PUMP',
@@ -794,13 +833,35 @@ The ducts connect to the streets above through gratings that were once concealed
       waterLevel: 0,
       outdoor: false,
       exits: {
-        east: '%2ND_N1',
+        east: {
+          to: 'underground/upper-tunnels/x-1-y1.ts',
+          description: 'The passage leads east through the duct junction',
+        },
       },
     },
 
     // ═══════════════════════════════════════════════════════════════════════
     // EASTERN EXTENSION (toward 3rd Ave)
     // ═══════════════════════════════════════════════════════════════════════
+
+    '%2ND_TRACK_SPUR': {
+      name: 'Track Spur',
+      description: `The iron tracks that run through the Second Avenue tunnels curve here into a spur—a loading siding that once served a warehouse long since demolished. The track ends at a concrete bumper, its buffer worn smooth by decades of impacts from cargo carts that no longer run.
+
+A rusted crane mechanism hangs overhead, its chain and hook frozen in position, waiting to lift loads that will never arrive. The walls here are reinforced with timber that's been replaced multiple times—the newest beams showing recent tool marks, evidence that someone still maintains this section of the underground. A faded stencil on the wall reads "BERTH 7 - WEIGHT LIMIT 2000 LBS" in paint that was probably yellow before the decades faded it to cream.`,
+      x: 1,
+      y: 0,
+      z: -2,
+      population: 0,
+      ambientNoise: 10,
+      lighting: 12,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        west: '%2ND_MAIN',
+        east: '%2ND_EAST',
+      },
+    },
 
     '%2ND_EAST': {
       name: 'Eastern Passage',
@@ -816,7 +877,7 @@ The excavation is old but the maintenance is new. The tunnel serves a current pu
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: '%2ND_MAIN',
+        west: '%2ND_TRACK_SPUR',
         east: '%3RD_CONN',
       },
     },

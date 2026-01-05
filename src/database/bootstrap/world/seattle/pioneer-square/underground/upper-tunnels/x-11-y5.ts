@@ -1,18 +1,40 @@
-// Connecting Grand Central to Junction area
+// Junction Corridor - Old Commercial Basement
 
 export const room = {
-  name: 'Underground Passage',
-  description: `The passage runs north from the Grand Central basement toward the Junction, the route following what was once a shared basement between commercial buildings. The walls show the party-wall construction of adjacent properties, their boundaries visible as seams in the brickwork where different builders used different materials.
+  name: 'Old Commercial Basement',
+  description: `The passage cuts through the basement of a building that burned in 1889 and was never rebuilt above this level. Iron window grates still cover the wells that once admitted light from the sidewalk—the glass long shattered, the wells filled with dirt and debris from the street regrading.
 
-The passage is wider than most, sized for the commercial traffic that once flowed between the hotel and the businesses to the north. The floor is reinforced with iron plates at intervals, the metal rusted but still solid, installed where heavy carts required additional support.
-
-Old signage remains painted on the walls, arrows pointing toward destinations that have been renamed or demolished. The directions are useless now, but the paint has survived, protected from weather by the perpetual darkness of the underground.`,
+The brick walls bear faded painted signs: "J. MORTON DRY GOODS" on one side, "MINERS SUPPLIES" on the other. The two businesses shared this basement, a common arrangement when Seattle was young and space was at a premium.`,
   x: -11,
   y: 5,
   z: -2,
   population: 0,
-  ambientNoise: 10,
-  lighting: 14,
+  ambientNoise: 8,
+  lighting: 10,
   waterLevel: 0,
   outdoor: false,
+  exits: {
+    west: {
+      to: 'underground/upper-tunnels/x-12-y5.ts',
+      description: 'The passage continues west',
+    },
+    east: {
+      to: 'underground/upper-tunnels/x-10-y5.ts',
+      description: 'The passage continues east',
+    },
+  },
+  objects: [
+    {
+      prototype: 'sign',
+      name: 'faded business signs',
+      description: 'Painted advertisements for J. Morton Dry Goods and a miners supply company, the paint preserved by darkness but slowly flaking away.',
+      boltedDown: true,
+    },
+    {
+      prototype: 'furniture',
+      name: 'iron window grates',
+      description: 'Decorative iron grates that once covered light wells to the sidewalk above, now blocked by a century of accumulated fill.',
+      boltedDown: true,
+    },
+  ],
 };
