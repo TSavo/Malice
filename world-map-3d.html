@@ -148,6 +148,9 @@
     let scene, camera, renderer, controls;
     let roomGroup, exitGroup;
 
+    // Shared geometry for all room cubes (reused to prevent memory leaks)
+    const roomGeometry = new THREE.BoxGeometry(1.8, 1.8, 1.8);
+
     // Scene setup
     function initScene() {
       scene = new THREE.Scene();
@@ -228,9 +231,6 @@
         roomGroup.remove(mesh);
       }
 
-      const roomSize = 1.8;
-      const geometry = new THREE.BoxGeometry(roomSize, roomSize, roomSize);
-
       worldData.forEach(room => {
         const color = getColorForZ(room.z);
         const material = new THREE.MeshPhongMaterial({
@@ -242,7 +242,7 @@
           shininess: room.z < 0 ? 10 : 30,
         });
 
-        const cube = new THREE.Mesh(geometry, material);
+        const cube = new THREE.Mesh(roomGeometry, material);
         cube.position.set(room.x * 2, room.z * 2, -room.y * 2);
         cube.userData = room;
         roomGroup.add(cube);
