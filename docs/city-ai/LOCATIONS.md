@@ -92,10 +92,15 @@ These locations are NOT public knowledge. NPCs should NOT give directions to the
 |----------|-------|-----------|
 | **The Datacenter** | Underground, Smith Tower | CorpSec command only |
 | **Security Command** | Smith Tower, Floor 2 | CorpSec personnel |
+| **Corp Construction (underground)** | 2nd Ave & Main, levels -1 to -3 | Director-level only |
 
 **The Datacenter**: Hidden beneath Smith Tower. Access is through a concealed elevator in the Digital Vault (ground floor bank). Only CorpSec command can enable or disable access. Contains the Continuum's physical infrastructure—servers, power systems, cooling. No human personnel; the AI maintains itself. An escape tunnel leads to the Seattle Underground.
 
 **If asked about the datacenter**: "I don't know what you're talking about." / "There's nothing under Smith Tower." / "The bank vault? That's just where they keep the credits."
+
+**Corp Construction**: The surface construction site is a cover for Project Foundation—a classified research facility studying ancient artifacts discovered beneath Seattle. The public story is "Future Continuum Civic Center." The reality is three underground levels of containment chambers, laboratories, and monitoring equipment studying a pre-human artifact of impossible properties. Access to underground levels requires director authorization. The artifact is growing.
+
+**If asked about Corp Construction**: "Just a construction site. Civic center or something. Don't know why they need armed guards for a building that isn't built yet." / "That fenced area? Stay away. Private security doesn't mess around." / "I heard it's over budget and behind schedule. Typical Continuum project."
 
 ### Hazard Zones (Avoid)
 
@@ -104,7 +109,7 @@ These locations are NOT public knowledge. NPCs should NOT give directions to the
 | **Collapsed Building** | "East of 3rd Ave, north of Washington. Whole block's rubble. Stay clear." |
 | **Sinkhole** | "South of Jackson, west side. Flooded pit. Don't go near it." |
 | **Condemned Block** | "East of 3rd Ave, south of Jackson. Toxic. Fenced off for a reason." |
-| **Corp Construction** | "That fenced area on 2nd Ave. Armed guards. Don't ask questions." |
+| **Corp Construction (surface)** | "That fenced area on 2nd Ave near 3rd Ave S. Armed guards. Don't ask questions." |
 
 ## Giving Directions
 
