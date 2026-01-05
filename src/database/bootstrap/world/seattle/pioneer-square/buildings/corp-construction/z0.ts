@@ -134,9 +134,6 @@ Several paths lead into the site: west toward the equipment yard, north to the o
       outdoor: true,
       exits: {
         east: '%GATE_ENTRANCE',
-        west: '%EQUIPMENT_YARD',
-        north: '%OFFICE_ROW',
-        down: '%PIT_EDGE',
       },
       objects: [
         {
@@ -170,7 +167,6 @@ From here, you can see the full extent of the excavation—a hole that goes down
       waterLevel: 0,
       outdoor: true,
       exits: {
-        south: '%GUARD_POST',
         west: '%SITE_OFFICE',
         north: '%ENGINEERING_TRAILER',
       },
@@ -215,6 +211,7 @@ A large monitor displays security camera feeds from around the site—the gate, 
             open: false,
           },
         },
+        south: '%EQUIPMENT_YARD',
       },
       objects: [
         {
@@ -291,8 +288,8 @@ The equipment yard sits at the edge of the pit, and from here you can see just h
       waterLevel: 0,
       outdoor: true,
       exits: {
-        east: '%GUARD_POST',
-        north: '%PIT_EDGE',
+        east: '%PIT_EDGE',
+        north: '%SITE_OFFICE',
       },
       objects: [
         {
@@ -329,13 +326,8 @@ The scale of the excavation is staggering. They haven't just dug a basement—th
       waterLevel: 0,
       outdoor: true,
       exits: {
-        south: '%EQUIPMENT_YARD',
-        up: '%GUARD_POST',
-        down: {
-          to: '%SHAFT_ACCESS',
-          door: '%SHAFT_DOOR',
-          description: 'A construction elevator descends into the pit',
-        },
+        west: '%EQUIPMENT_YARD',
+        north: '%SHAFT_ACCESS',
       },
       objects: [
         {
@@ -369,8 +361,12 @@ A control panel lists the accessible levels: GROUND, LEVEL -1 (CONSTRUCTION), LE
       waterLevel: 0,
       outdoor: false,
       exits: {
-        up: '%PIT_EDGE',
-        down: 'z-1.ts:%CONSTRUCTION_ZONE',
+        south: '%PIT_EDGE',
+        down: {
+          to: 'z-1.ts:%CONSTRUCTION_ZONE',
+          door: '%SHAFT_DOOR',
+          description: 'A construction elevator descends into the pit',
+        },
       },
       objects: [
         {
