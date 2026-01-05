@@ -223,7 +223,9 @@
     function buildRooms() {
       // Clear existing rooms
       while (roomGroup.children.length > 0) {
-        roomGroup.remove(roomGroup.children[0]);
+        const mesh = roomGroup.children[0];
+        if (mesh.material) mesh.material.dispose();
+        roomGroup.remove(mesh);
       }
 
       const roomSize = 1.8;
@@ -251,7 +253,10 @@
     function buildExits() {
       // Clear existing exits
       while (exitGroup.children.length > 0) {
-        exitGroup.remove(exitGroup.children[0]);
+        const mesh = exitGroup.children[0];
+        if (mesh.geometry) mesh.geometry.dispose();
+        if (mesh.material) mesh.material.dispose();
+        exitGroup.remove(mesh);
       }
 
       const exitMaterial = new THREE.MeshBasicMaterial({
