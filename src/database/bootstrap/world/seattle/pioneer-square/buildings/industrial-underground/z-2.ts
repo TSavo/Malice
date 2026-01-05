@@ -85,7 +85,7 @@ Rusted machinery remains bolted to the floor—can seamers, conveyors, the infra
       exits: {
         north: '%WORKER_TUNNEL',
         east: '%LOADING_TUNNEL',
-        south: '%COLD_STORAGE',
+        south: '%FISH_CORRIDOR',
       },
       objects: [
         { prototype: 'furniture', name: 'a can seaming machine', description: 'A massive can seaming machine stands rusted in place, its gears frozen. The brand plate reads "ATLANTIC CAN COMPANY - 1924".', boltedDown: true },
@@ -174,6 +174,29 @@ The room was locked and abandoned when the factories closed. Whatever tools rema
     // COLD STORAGE AND DOCK ACCESS
     // ═══════════════════════════════════════════════════════════════════════
 
+    '%FISH_CORRIDOR': {
+      name: 'Fish Corridor',
+      description: `A narrow passage connects the cannery to the cold storage below. The walls are lined with remnants of insulation—cork panels that once kept the cold in. The floor slopes gently downward, following the path that freshly-caught salmon took from processing to preservation.
+
+The smell of fish is stronger here, trapped in the porous cork despite decades of abandonment.`,
+      x: 7,
+      y: -14,
+      z: -2,
+      population: 0,
+      ambientNoise: 12,
+      lighting: 10,
+      waterLevel: 12,
+      outdoor: false,
+      exits: {
+        north: '%CANNERY_BASEMENT',
+        south: '%COLD_STORAGE',
+      },
+      objects: [
+        { prototype: 'furniture', name: 'cork insulation panels', description: 'Cork panels line the walls, their original purpose as thermal insulation evident. Many are crumbling, revealing the brick behind.', boltedDown: true },
+        { prototype: 'sign', name: 'a temperature warning', description: 'A painted sign reads: "COLD STORAGE AHEAD - WARM CLOTHING REQUIRED FOR EXTENDED WORK".', boltedDown: true },
+      ],
+    },
+
     '%COLD_STORAGE': {
       name: 'Industrial Cold Storage',
       description: `The passage descends into a cold storage facility built to preserve salmon and other goods before shipment. The insulation is failing, the refrigeration long since dead, but the space retains a chill that feels unnatural—thermal mass from decades of cold holding onto temperature like a memory.
@@ -188,9 +211,9 @@ Ice still forms on the walls in winter. In summer, the condensation drips consta
       waterLevel: 15,
       outdoor: false,
       exits: {
-        north: '%CANNERY_BASEMENT',
+        north: '%FISH_CORRIDOR',
         east: '%MACHINE_SHOP',
-        south: '%DOCK_TUNNEL',
+        south: '%REFRIGERATION_CORRIDOR',
       },
       objects: [
         { prototype: 'cabinet', name: 'fish hanging rails', description: 'Steel rails with hooks run the length of the ceiling, designed for hanging salmon to chill. A few rusted hooks still dangle, swaying.', boltedDown: true },
@@ -254,6 +277,29 @@ The shaft connects the factory level to the tunnels that carry steam, power, and
     // DOCK AND WATERFRONT ACCESS
     // ═══════════════════════════════════════════════════════════════════════
 
+    '%REFRIGERATION_CORRIDOR': {
+      name: 'Refrigeration Corridor',
+      description: `A passage runs between the cold storage and the dock tunnel, lined with the pipes and machinery of the refrigeration system. Ammonia compressors stand silent in alcoves, their copper pipes green with age. The air is still cold here, but no longer frozen.
+
+Condensation drips from every surface, pooling in rust-stained puddles on the floor.`,
+      x: 7,
+      y: -16,
+      z: -2,
+      population: 0,
+      ambientNoise: 15,
+      lighting: 8,
+      waterLevel: 18,
+      outdoor: false,
+      exits: {
+        north: '%COLD_STORAGE',
+        south: '%DOCK_TUNNEL',
+      },
+      objects: [
+        { prototype: 'furniture', name: 'ammonia compressor', description: 'A massive ammonia compressor sits dead in an alcove, its motor housing cracked. Warning labels in faded red mark the refrigerant hazard.', boltedDown: true },
+        { prototype: 'furniture', name: 'copper refrigerant pipes', description: 'Green-patinated copper pipes run along the ceiling, branching off to serve different cold storage zones.', boltedDown: true },
+      ],
+    },
+
     '%DOCK_TUNNEL': {
       name: 'Dock Tunnel',
       description: `The tunnel runs toward the industrial waterfront, connecting the factory underground to the docks where goods were loaded and shipped. The construction is heavy, the passage wide enough for cargo, the floor sloping gradually down toward the water.
@@ -268,9 +314,9 @@ The smell of salt and diesel grows stronger toward the south.`,
       waterLevel: 15,
       outdoor: false,
       exits: {
-        north: '%COLD_STORAGE',
+        north: '%REFRIGERATION_CORRIDOR',
         east: '%BOILER_ACCESS',
-        south: '%WHARF_BASEMENT',
+        south: '%CARGO_PASSAGE',
       },
       objects: [
         { prototype: 'furniture', name: 'dock cart rails', description: 'Rails for cargo carts extend down the tunnel toward the docks. The gauge is narrow, designed for the tunnel\'s constraints.', boltedDown: true },
@@ -303,6 +349,29 @@ Massive valves line the walls, each labeled with the factory it served. Most are
       ],
     },
 
+    '%CARGO_PASSAGE': {
+      name: 'Cargo Passage',
+      description: `A wide passage designed for moving cargo between the dock tunnel and the wharf. The floor is reinforced concrete, worn smooth by decades of heavy carts and handtrucks. Hooks hang from the ceiling—attachment points for block and tackle used to move the heaviest loads.
+
+The walls bear the marks of countless impacts where cargo struck during transport.`,
+      x: 7,
+      y: -18,
+      z: -2,
+      population: 0,
+      ambientNoise: 20,
+      lighting: 10,
+      waterLevel: 20,
+      outdoor: false,
+      exits: {
+        north: '%DOCK_TUNNEL',
+        south: '%WHARF_BASEMENT',
+      },
+      objects: [
+        { prototype: 'furniture', name: 'cargo hooks', description: 'Heavy iron hooks hang from the ceiling on chains, used with block and tackle to lift cargo too heavy for workers alone.', boltedDown: true },
+        { prototype: 'sign', name: 'weight limit sign', description: 'A painted sign warns: "MAX FLOOR LOAD 500 LBS PER SQ FT. NO STACKING ABOVE 6 FT."', boltedDown: true },
+      ],
+    },
+
     '%WHARF_BASEMENT': {
       name: 'Wharf Basement',
       description: `The tunnel opens into the basement of a wharf building—a space that once stored goods between factory and ship. The floor is stained with the residue of a thousand cargoes: oil, fish, grain, machinery. The walls show tide marks where the bay has invaded during extreme events.
@@ -317,7 +386,7 @@ Windows, now sealed, once opened onto the water. The sound of ships and seabirds
       waterLevel: 25,
       outdoor: false,
       exits: {
-        north: '%DOCK_TUNNEL',
+        north: '%CARGO_PASSAGE',
         east: '%PUMP_STATION',
       },
       objects: [
