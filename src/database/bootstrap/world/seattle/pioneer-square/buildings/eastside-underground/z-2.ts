@@ -205,7 +205,10 @@ A vertical shaft rises toward the surface, its maintenance ladder still in regul
       exits: {
         south: '%STEAM_TUNNEL_W',
         north: '%STEAM_N3',
-        east: '%STEAM_N2',
+        east: {
+          to: 'underground/upper-tunnels/x11-y1.ts',
+          description: 'The tunnel continues east through the distribution junction',
+        },
       },
     },
 
@@ -222,7 +225,10 @@ A vertical shaft rises toward the surface, its maintenance ladder still in regul
       outdoor: false,
       exits: {
         south: '%STEAM_MAIN',
-        west: '%STEAM_N1',
+        west: {
+          to: 'underground/upper-tunnels/x11-y1.ts',
+          description: 'The tunnel leads west through the distribution junction',
+        },
         north: '%BOILER_ROOM',
       },
     },
@@ -240,7 +246,10 @@ A vertical shaft rises toward the surface, its maintenance ladder still in regul
       outdoor: false,
       exits: {
         south: '%STEAM_N1',
-        east: '%BOILER_ROOM',
+        east: {
+          to: 'underground/upper-tunnels/x11-y2.ts',
+          description: 'A passage leads east through the abandoned pump station',
+        },
       },
     },
 
@@ -259,7 +268,10 @@ The chamber serves as a waystation in the eastern underground—a space large en
       outdoor: false,
       exits: {
         south: '%STEAM_N2',
-        west: '%STEAM_N3',
+        west: {
+          to: 'underground/upper-tunnels/x11-y2.ts',
+          description: 'A passage leads west through the abandoned pump station',
+        },
         north: '%UTILITY_NORTH',
         east: '%4TH_N2',
       },

@@ -280,7 +280,10 @@ The junction was built to handle the traffic of a major rail terminus, designed 
       outdoor: false,
       exits: {
         south: '%KING_MAIN',
-        north: '%OCC_SOUTH_PASSAGE',
+        north: {
+          to: 'underground/upper-tunnels/x-7-y-9.ts',
+          description: 'The passage leads north toward the Occidental corridor',
+        },
         east: '%BAGGAGE_TUNNEL',
         west: '%FREIGHT_CENTRAL',
       },
@@ -298,7 +301,10 @@ The junction was built to handle the traffic of a major rail terminus, designed 
       waterLevel: 8,
       outdoor: false,
       exits: {
-        south: '%OCCIDENTAL_SOUTH',
+        south: {
+          to: 'underground/upper-tunnels/x-7-y-9.ts',
+          description: 'The passage leads south toward the King Street junction',
+        },
         north: '%OCC_TRANSITION',
         west: '%STORAGE_BAY',
       },

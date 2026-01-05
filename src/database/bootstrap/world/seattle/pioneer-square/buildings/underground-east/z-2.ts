@@ -524,8 +524,7 @@ Gaps in the hasty masonry reveal darkness beyond—space that continues past the
       exits: {
         east: '%OCC_S3',
         west: {
-          to: 'buildings/underground-tour/z-2.ts',
-          room: '%STOREFRONT_ROW',
+          to: 'underground/upper-tunnels/x-10-y-3.ts',
           description: 'A gap in the masonry leads toward the old tour route',
         },
       },
@@ -672,7 +671,10 @@ This section feels more recently maintained than the Occidental tunnels—freshe
       exits: {
         south: '%2ND_MAIN',
         north: '%2ND_N2',
-        west: '%VENT_CHAMBER',
+        west: {
+          to: 'underground/upper-tunnels/x-1-y1.ts',
+          description: 'The passage leads west through the duct junction',
+        },
       },
     },
 
@@ -831,7 +833,10 @@ The ducts connect to the streets above through gratings that were once concealed
       waterLevel: 0,
       outdoor: false,
       exits: {
-        east: '%2ND_N1',
+        east: {
+          to: 'underground/upper-tunnels/x-1-y1.ts',
+          description: 'The passage leads east through the duct junction',
+        },
       },
     },
 

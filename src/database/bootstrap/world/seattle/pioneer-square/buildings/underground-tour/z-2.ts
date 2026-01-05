@@ -94,8 +94,7 @@ The passage opens east into the wider underground network, where the tours never
         west: '%TOUR_START',
         south: '%TOUR_END',
         east: {
-          to: 'buildings/underground-east/z-2.ts',
-          room: '%BRANCH_W1',
+          to: 'underground/upper-tunnels/x-13-y-3.ts',
           description: 'A passage leads east into the broader underground network',
         },
       },

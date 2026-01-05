@@ -729,7 +729,10 @@ The ceiling here is reinforced with steel I-beams added sometime in the last cen
           to: 'underground/upper-tunnels/the-junction.ts',
           description: 'A passage leads south toward The Junction',
         },
-        east: '%GAMBLING_DEN',
+        east: {
+          to: 'underground/upper-tunnels/x-13-y6.ts',
+          description: 'The passage leads east toward the vice district',
+        },
       },
     },
 
@@ -1047,7 +1050,10 @@ The den operated alongside the speakeasy, offering customers a chance to lose th
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: '%FIRST_AVE_MID',
+        west: {
+          to: 'underground/upper-tunnels/x-13-y6.ts',
+          description: 'The passage leads west through the vice district',
+        },
         east: '%SPEAKEASY_HALL',
         down: '%GAMBLING_VAULT',
       },
