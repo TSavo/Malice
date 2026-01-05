@@ -4,8 +4,8 @@
 
 export const building = {
   name: 'Corp Construction',
-  x: 0,
-  y: 1,
+  x: 6,
+  y: 4,
   width: 7,
   height: 4,
   floors: 1,
@@ -54,6 +54,17 @@ export const building = {
         { type: 'retinal', part: 'head', message: 'Authorized personnel only.' },
       ],
       authorizedUsers: {},
+    },
+    '%SHAFT_DOOR': {
+      prototype: 'door',
+      name: 'Elevator Shaft Door',
+      description:
+        'A heavy steel door protecting the elevator shaft access. The door is reinforced and fitted with a biometric scanner.',
+      locked: true,
+      open: false,
+      locks: ['%SHAFT_LOCK'],
+      material: 'steel',
+      durability: 100,
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -114,7 +125,7 @@ A large billboard announces the project: "FUTURE HOME OF CONTINUUM CIVIC CENTER 
 
 Several paths lead into the site: west toward the equipment yard, north to the office trailers, and the main pit yawns in the center.`,
       x: 5,
-      y: 2,
+      y: 1,
       z: 0,
       population: 2,
       ambientNoise: 20,
@@ -319,11 +330,11 @@ The scale of the excavation is staggering. They haven't just dug a basement—th
       outdoor: true,
       exits: {
         south: '%EQUIPMENT_YARD',
-        east: '%GUARD_POST',
+        up: '%GUARD_POST',
         down: {
           to: '%SHAFT_ACCESS',
+          door: '%SHAFT_DOOR',
           description: 'A construction elevator descends into the pit',
-          locks: ['%SHAFT_LOCK'],
         },
       },
       objects: [
