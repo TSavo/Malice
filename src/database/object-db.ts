@@ -59,6 +59,7 @@ export class ObjectDatabase {
   private db!: Db;
   private objects!: Collection<GameObject>;
   private types!: Collection<TypeObject>;
+  private counters!: Collection<{ _id: string; seq: number }>;
   private connected = false;
 
   constructor(
@@ -78,6 +79,7 @@ export class ObjectDatabase {
     this.db = this.client.db(this.dbName);
     this.objects = this.db.collection<GameObject>('objects');
     this.types = this.db.collection<TypeObject>('types');
+    this.counters = this.db.collection<{ _id: string; seq: number }>('counters');
 
     // Ensure indexes (_id is unique by default, no need to specify)
     await this.objects.createIndex({ 'parent.id': 1 });
@@ -358,16 +360,37 @@ export class ObjectDatabase {
 
   /**
    * Get next available object ID (sequential allocation)
+   * Uses atomic findOneAndUpdate to prevent race conditions.
    * Note: ID reuse for recycled objects is handled by $.recycler
    */
   async getNextId(): Promise<number> {
-    const result = await this.objects
-      .find({})
-      .sort({ _id: -1 })
-      .limit(1)
-      .toArray();
+    // First time: initialize the counter based on existing max ID
+    const counter = await this.counters.findOne({ _id: 'objectId' });
+    if (!counter) {
+      // Find the current max ID in the objects collection
+      const result = await this.objects
+        .find({})
+        .sort({ _id: -1 })
+        .limit(1)
+        .toArray();
+      const maxId = result.length > 0 ? (result[0]._id as number) : 0;
 
-    return result.length > 0 ? (result[0]._id as number) + 1 : 1;
+      // Initialize the counter (upsert to handle race on first init)
+      await this.counters.updateOne(
+        { _id: 'objectId' },
+        { $setOnInsert: { seq: maxId } },
+        { upsert: true },
+      );
+    }
+
+    // Atomically increment and return the new value
+    const updated = await this.counters.findOneAndUpdate(
+      { _id: 'objectId' },
+      { $inc: { seq: 1 } },
+      { returnDocument: 'after', upsert: true },
+    );
+
+    return updated!.seq;
   }
 
   /**
