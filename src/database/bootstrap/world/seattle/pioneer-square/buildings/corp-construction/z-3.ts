@@ -4,8 +4,8 @@
 
 export const building = {
   name: 'Corp Construction',
-  x: 0,
-  y: 1,
+  x: 6,
+  y: 4,
   width: 7,
   height: 4,
   floors: 1,
