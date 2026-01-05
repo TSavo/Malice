@@ -911,13 +911,16 @@ The server provides 3D map visualization at:
 - **`/map`** - Public map (above-ground rooms, population heatmap)
 - **`/admin/map`** - Admin map (all rooms including underground, individual agents) - requires HTTP Basic Auth
 
+The map dynamically fetches live data from the API endpoints below.
+
 **Features:**
 - Rooms rendered as 3D cubes with height-based coloring
 - Exit connections shown as red tubes between rooms
 - Population heatmap (5x5 grid aggregation)
 - Agent markers (green = player, blue = NPC)
 - View controls: Top, Side, Reset
-- Auto-refresh: 30s (public), 3s (admin)
+- Auto-refresh toggle: 30s (public), 3s (admin)
+- Loading and error states with retry
 
 **API Endpoints:**
 - `GET /api/map/rooms` - Room coordinates and exits
