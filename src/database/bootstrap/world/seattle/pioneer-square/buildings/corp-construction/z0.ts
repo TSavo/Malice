@@ -123,7 +123,7 @@ The excavation site spreads west and north, a massive pit where buildings used t
 
 A large billboard announces the project: "FUTURE HOME OF CONTINUUM CIVIC CENTER - A Better Tomorrow, Today." The corporate logo gleams. The promise rings hollow.
 
-Several paths lead into the site: west toward the equipment yard, north to the office trailers, and the main pit yawns in the center.`,
+This is a controlled entry point. The guards watch everyone who enters, and you'd need to pass through here again to leave. The main site lies deeper in, beyond this checkpoint.`,
       x: 5,
       y: 1,
       z: 0,
