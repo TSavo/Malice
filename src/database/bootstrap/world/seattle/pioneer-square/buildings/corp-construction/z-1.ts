@@ -184,7 +184,7 @@ An inner door leads to what the blueprints call "PRIMARY CONTAINMENT." It's seal
 The room is circular, thirty feet in diameter, with observation windows looking down into a deeper chamber. The chamber below is lit with harsh white light, and at its center sits something that doesn't belong in Seattle or anywhere else. A structure of black stone and corroded metal, ancient beyond reckoning, excavated from beneath the city and now under constant surveillance.
 
 Banks of monitoring equipment line the walls, tracking readings that shouldn't be possible. The displays show electromagnetic fluctuations, gravitational anomalies, temporal distortions. Whatever they've found, it's not dead.`,
-      x: -1,
+      x: 0,
       y: 3,
       z: -1,
       population: 0,
