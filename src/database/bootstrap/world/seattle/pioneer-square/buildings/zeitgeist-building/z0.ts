@@ -229,10 +229,10 @@ The air is cool and dry, climate-controlled even now—someone understood that a
         east: '%LOBBY',
         north: { room: '%KITCHEN', door: '%SERVICE_DOOR', locks: ['%SERVICE_LOCK'], distance: 30 },
         down: {
-          to: 'z-1.ts:%ART_STORAGE',
+          to: 'z-1.ts#%ART_STORAGE',
           description: 'A trapdoor leads down to basement storage',
-          door: 'z-1.ts:%BASEMENT_DOOR',
-          locks: ['z-1.ts:%BASEMENT_LOCK'],
+          door: 'z-1.ts#%BASEMENT_DOOR',
+          locks: ['z-1.ts#%BASEMENT_LOCK'],
         },
       },
     },

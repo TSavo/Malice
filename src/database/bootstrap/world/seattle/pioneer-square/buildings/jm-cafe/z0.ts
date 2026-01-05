@@ -88,10 +88,10 @@ The walls are covered in photographs and memorabilia: Seattle when it was a fron
           to: '%CARD_ROOM',
         },
         down: {
-          to: 'z-1.ts:%CELLAR',
+          to: 'z-1.ts#%CELLAR',
           description: 'A trapdoor behind the bar leads to the cellar',
-          door: 'z-1.ts:%CELLAR_DOOR',
-          locks: ['z-1.ts:%CELLAR_LOCK'],
+          door: 'z-1.ts#%CELLAR_DOOR',
+          locks: ['z-1.ts#%CELLAR_LOCK'],
         },
       },
       sittables: [

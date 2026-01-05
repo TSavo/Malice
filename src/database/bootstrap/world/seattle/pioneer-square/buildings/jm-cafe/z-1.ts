@@ -47,7 +47,7 @@ The air is cool and damp, smelling of earth and old wood and something faintly y
       outdoor: false,
       exits: {
         up: {
-          to: 'z0.ts:%BAR',
+          to: 'z0.ts#%BAR',
           description: 'A trapdoor leads up to the bar',
           door: '%CELLAR_DOOR',
           locks: ['%CELLAR_LOCK'],
@@ -91,7 +91,7 @@ A heavy door in the north wall leads to a passage beyond—the tunnels the bootl
       exits: {
         south: '%CELLAR',
         north: {
-          to: 'underground/upper-tunnels/x-14-y4.ts:%PASSAGE',
+          to: 'underground/upper-tunnels/x-14-y4.ts',
           description: 'A bootlegger passage leads into the underground',
         },
       },

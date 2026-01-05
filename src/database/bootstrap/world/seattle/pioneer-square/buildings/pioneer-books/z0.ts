@@ -173,10 +173,10 @@ A small desk in the corner was the staff's workspace—inventory lists, special 
         east: '%MAIN',
         up: '%LANDING',
         down: {
-          to: 'z-1.ts:%ARCHIVE',
+          to: 'z-1.ts#%ARCHIVE',
           description: 'A trapdoor leads down to the archive',
-          door: 'z-1.ts:%BASEMENT_HATCH',
-          locks: ['z-1.ts:%BASEMENT_LOCK'],
+          door: 'z-1.ts#%BASEMENT_HATCH',
+          locks: ['z-1.ts#%BASEMENT_LOCK'],
         },
       },
       objects: [

@@ -777,5 +777,28 @@ The liquor is long gone, but the cellar remains as a connection to the deeper ne
         },
       },
     },
+
+    '%BOOTLEGGER_STASH': {
+      name: 'Bootlegger\'s Stash',
+      description: `A hidden alcove off the main passage, its entrance concealed by a rotating brick section that would have been invisible to casual observers. The chamber beyond is small but well-constructed, the walls lined with shelves that once held illegal liquor during Prohibition.
+
+The shelves are empty now, the contraband long since consumed or confiscated, but the hiding spot remains functional. The walls are thick, the entrance well-disguised, the acoustics arranged to muffle sound from within. Someone has been using it for storage again—fresh scratches on the floor suggest recent activity.`,
+      x: -7,
+      y: 10,
+      z: -2,
+      population: 0,
+      ambientNoise: 5,
+      lighting: 5,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        west: {
+          to: 'buildings/homeless-warrens/z-3.ts',
+          room: '%SUPPLY_TUNNEL',
+          description: 'A concealed passage leads west toward the warrens',
+        },
+        east: '%YESLER_MID_W',
+      },
+    },
   },
 };

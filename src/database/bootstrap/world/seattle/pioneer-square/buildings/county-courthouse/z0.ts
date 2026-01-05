@@ -94,7 +94,7 @@ Wide stairs lead up to the courtroom floors. An elevator bank offers the same de
         east: '%CLERKS_OFFICE',
         north: '%RECORDS_HALL',
         south: '%CAFETERIA',
-        up: 'z1.ts:%STAIR_Z1',
+        up: 'z1.ts#%STAIR_Z1',
       },
       sittables: [
         {
@@ -196,7 +196,7 @@ A drinking fountain protrudes from one wall, its basin dry, its chrome spotted w
         south: '%LOBBY',
         east: '%RECORDS_ROOM',
         north: {
-          to: 'z-1.ts:%BASEMENT_STAIRS',
+          to: 'z-1.ts#%BASEMENT_STAIRS',
           description: 'Stairs descend to the basement archives',
         },
       },
@@ -329,7 +329,7 @@ A back door leads to the loading dock, where supplies were once delivered and ga
       exits: {
         west: '%CAFETERIA',
         south: {
-          to: 'alley/y0.ts',
+          to: null,
           description: 'A service door leads to the loading dock',
           locks: ['%SERVICE_LOCK'],
         },

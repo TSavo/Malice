@@ -388,5 +388,28 @@ What waits at the other end is a mystery. Most prefer it that way.`,
         { prototype: 'furniture', name: 'diving cache', description: 'A waterproof container holds emergency supplies: a working flashlight, spare batteries, a knife. Someone maintains this for fellow explorers.', boltedDown: true },
       ],
     },
+
+    '%OVERFLOW_W': {
+      name: 'Western Overflow',
+      description: `The western branch of the overflow system, where excess water from storm events is channeled toward the bay. The passage is wide enough for maintenance crews—or was, before the city stopped maintaining this section.
+
+The walls are slick with algae, the floor submerged under constant water flow. Movement here requires wading through knee-deep water that carries debris from the upper levels.`,
+      x: -8,
+      y: -12,
+      z: -4,
+      population: 0,
+      ambientNoise: 45,
+      lighting: 5,
+      waterLevel: 60,
+      outdoor: false,
+      exits: {
+        east: '%OVERFLOW_CHAMBER',
+        west: {
+          to: 'buildings/deep-connector/z-4.ts',
+          room: '%SEWER_ACCESS',
+          description: 'A flooded passage leads west toward the deep connector',
+        },
+      },
+    },
   },
 };

@@ -19,8 +19,8 @@ A sign points to MEDIATION SERVICES, the attempt to resolve disputes before they
       waterLevel: 0,
       outdoor: false,
       exits: {
-        down: 'z2.ts:%STAIR_Z2',
-        up: 'z4.ts:%STAIR_Z4',
+        down: 'z2.ts#%STAIR_Z2',
+        up: 'z4.ts#%STAIR_Z4',
         north: '%COURTROOM_9',
         south: '%COURTROOM_10',
         east: '%FAMILY_HALL',

@@ -47,7 +47,7 @@ The climate control system hums steadily—dehumidifiers and temperature regulat
       outdoor: false,
       exits: {
         up: {
-          to: 'z0.ts:%STORAGE',
+          to: 'z0.ts#%STORAGE',
           description: 'A trapdoor leads up to ground-floor storage',
           door: '%BASEMENT_DOOR',
           locks: ['%BASEMENT_LOCK'],
@@ -127,7 +127,7 @@ A breach in the western wall opens into darkness—the underground passage netwo
       exits: {
         east: '%ART_STORAGE',
         west: {
-          to: 'underground/upper-tunnels/x-14-y1.ts:%PASSAGE',
+          to: 'underground/upper-tunnels/x-14-y1.ts',
           description: 'A breach in the foundation leads to the underground',
         },
       },

@@ -19,7 +19,7 @@ The atmosphere is hushed, preserved by walls designed to contain confidential co
       waterLevel: 0,
       outdoor: false,
       exits: {
-        down: 'z3.ts:%STAIR_Z3',
+        down: 'z3.ts#%STAIR_Z3',
         up: '%ROOF_ACCESS',
         north: '%CHAMBERS_HALL',
         south: '%LAW_LIBRARY',
@@ -314,7 +314,7 @@ Emergency lighting casts a red glow over the landing, battery backup still funct
       outdoor: false,
       exits: {
         down: '%STAIR_Z4',
-        up: 'z5.ts:%ROOF',
+        up: 'z5.ts#%ROOF',
       },
       objects: [
         {

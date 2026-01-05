@@ -30,7 +30,7 @@ Iron rungs set into the wall provide a precarious ladder for those willing to de
       outdoor: false,
       exits: {
         up: {
-          to: 'buildings/underground-east/z-2.ts',
+          to: 'z-2.ts#%OCC_N4',
           description: 'A shaft rises toward the pergola undercroft',
         },
         down: '%DEEP_OCC',
@@ -52,7 +52,7 @@ The air grows colder with each step down, the temperature dropping as the passag
       outdoor: false,
       exits: {
         up: {
-          to: 'buildings/underground-east/z-2.ts',
+          to: 'z-2.ts#%OCC_S4',
           description: 'A passage rises toward the sluice chamber',
         },
         down: '%DEEP_SLUICE',
@@ -74,7 +74,7 @@ The pumps here are a mix of centuries: cast iron behemoths from the original ins
       outdoor: false,
       exits: {
         up: {
-          to: 'buildings/underground-east/z-2.ts',
+          to: 'z-2.ts#%PUMP_ROOM',
           description: 'A shaft rises toward the pump room',
         },
         south: '%DEEP_2ND_S',
@@ -580,6 +580,30 @@ The Cartel's territory lies to the west, accessible through routes that are watc
           to: 'underground/transitional/junction-shaft.ts',
           description: 'A passage leads west toward the Junction Shaft',
         },
+      },
+    },
+
+    '%SLUICE_CHANNEL': {
+      name: 'Sluice Channel',
+      description: `Water flows through this brick-lined channel, a Victorian engineering marvel designed to manage the constant seepage from the underground. The sluice directs water toward the bay, its iron gates long since rusted open, the flow controlled now only by gravity and the water table.
+
+The channel is wide enough to walk beside the water, the stone ledge slick with accumulated moisture. The walls show high-water marks from decades of flooding, the stains marking the rhythm of wet and dry seasons.`,
+      x: -5,
+      y: -2,
+      z: -3,
+      population: 0,
+      ambientNoise: 40,
+      lighting: 8,
+      waterLevel: 50,
+      outdoor: false,
+      exits: {
+        west: {
+          to: 'buildings/arterial-tunnel/z-3.ts',
+          room: '%ARTERY_HUB',
+          description: 'A passage leads west along the sluice channel',
+        },
+        up: '%SLUICE_DOWN',
+        north: '%DEEP_SLUICE',
       },
     },
   },

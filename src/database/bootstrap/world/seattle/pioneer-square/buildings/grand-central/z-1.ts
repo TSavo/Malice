@@ -47,7 +47,7 @@ The stairwell opens into a main corridor that runs the length of the building, r
       outdoor: false,
       exits: {
         up: {
-          to: 'z0.ts:%GC_SERVICE',
+          to: 'z0.ts#%GC_SERVICE',
           description: 'Iron stairs lead up to the service area',
           door: '%BASEMENT_HATCH',
           locks: ['%BASEMENT_LOCK'],
