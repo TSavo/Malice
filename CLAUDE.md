@@ -840,6 +840,7 @@ The game features an extensive underground tunnel network beneath Pioneer Square
 - King Street Station (+4, -12) - Platform service shaft
 - Trinity Nightclub (-8, +3) - Underground exit → Occ S1
 - Underground Tour building (-15, -2) - Tour entrance → Descent → Tour Start
+- **Corp Construction** (+0 to +6, +1 to +4, z=0) - Continuum research facility with elevator access to levels -1 through -3
 
 **Building basement connections:**
 - Doc Maynard's cellar (-15, 2, -1) → east to underground
@@ -859,6 +860,49 @@ The game features an extensive underground tunnel network beneath Pioneer Square
 - Zeitgeist Coffee basement (-10, 11, -1) → underground breach
 
 See `docs/city-ai/MAP-UNDERGROUND.md` for detailed maps, room coordinates, and territorial information.
+
+### Corp Construction - Project Foundation
+
+**Corp Construction** is a Continuum research facility disguised as a civic center construction site. Located at coordinates (+0 to +6, +1 to +4), it spans four vertical levels from the surface (z=0) down to z=-3.
+
+**Surface Level (z=0):**
+- Fenced construction site with armed private security
+- Billboard announces "FUTURE HOME OF CONTINUUM CIVIC CENTER"
+- Entry gate at (+6, +1) near 3rd Ave S
+- Guard post, equipment yard, office trailers
+
+**Level -1 (Construction Zone):**
+- Active construction with blast-resistant reinforced walls
+- Containment anteroom with hazmat equipment and decontamination shower
+- Primary containment room with observation windows overlooking the artifact chamber
+- Vault doors and biometric access controls
+
+**Level -2 (Infrastructure & Research):**
+- Infrastructure hub with life support systems
+- Observation deck overlooking the artifact chamber
+- Data center monitoring multiple global sites (Chicago, London, Tokyo)
+- Research archives with historical documents dating back to the 1889 Great Seattle Fire
+
+**Level -3 (Research - Restricted, Director Authorization Only):**
+- Bio-Integration Lab studying tissue transformation
+- Physics Lab with anomalous artifact shard
+- Materials Lab developing impossible materials
+- Psychology Wing studying consciousness contact
+- Sensory Isolation Chamber for artifact communication
+
+**The Artifact:**
+The facility conceals **Project Foundation** - Continuum's study of ancient artifacts discovered beneath Seattle and other cities worldwide. The Seattle artifact is a structure of black stone and corroded metal that predates human settlement, exhibiting impossible properties: negative mass, temporal variance, and signs of consciousness. The artifact is growing at 0.3mm/day and was first excavated in 2024.
+
+**Access:**
+- Surface entry via gate at 3rd Ave S & Main St (+6, +1, z=0)
+- Elevator shaft connects all four levels
+- Underground levels require director-level authorization
+- Not connected to the general underground tunnel network
+
+**Story Integration:**
+This is a classified Continuum facility. Most NPCs know only the surface cover story ("civic center construction, over budget, behind schedule"). Only director-level Continuum personnel know about the underground research levels and the artifact.
+
+See `src/database/bootstrap/world/seattle/pioneer-square/buildings/corp-construction/` for full room definitions.
 
 ## Web Map Visualizer
 

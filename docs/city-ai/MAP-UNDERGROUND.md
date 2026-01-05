@@ -69,8 +69,12 @@ Entry points connect surface (z=0) to underground (z=-2) through z=-1 transition
 | E7 | King Street Station | Platform access (+4, -12) | Service shaft | Platform Tunnel (+4, -12) |
 | E8 | Trinity Nightclub | n/a | Underground Exit (-8, +3) | Occ S1 (-7, +3) |
 | E9 | Underground Tour | Tour Entrance (-15, -2, z=0) | Descent (-15, -3, z=-1) | Tour Start (-15, -3, z=-2) |
+| E10 | Corp Construction | Gate Entrance (+6, +1, z=0) | Construction Zone (+2, +3, z=-1) | Infrastructure Hub (+2, +3, z=-2) |
 
 **Note:** E2, E3, E4 use direct down exits (hidden trapdoors/hatches) that skip z=-1.
+
+**Corp Construction (Isolated Facility):**
+Corp Construction is a **separate underground facility** at coordinates (+0 to +6, +1 to +4) spanning z=0 to z=-3. It is **not connected** to the general underground tunnel network. Access is via elevator shaft only, connecting all four levels. This is a classified Continuum research facility studying ancient artifacts beneath the cover of a "civic center construction site."
 
 ---
 
@@ -249,6 +253,9 @@ Rail tunnel connections and deep eastern passages.
 ### Chinatown Deep (NEW)
 Ancient tunnels and cistern access beneath the International District.
 
+### Corp Construction Research Level (Isolated)
+**Not connected to underground network.** Continuum's classified research facility at (+0 to +6, +1 to +4, z=-3). Contains Bio-Integration Lab, Physics Anomalies Lab, Materials Science Lab, and Psychology Wing studying ancient artifact effects. Director-level authorization required. Total: 8 rooms.
+
 ### North-South Arterial Tunnel (NEW)
 A major vertical corridor running from Yesler Way (y=+10) to King Street (y=-9) at z=-3. This WPA-era (1937) tunnel was built during Depression-era public works but never officially completed. It provides an express route bypassing the congested z=-2 level.
 
@@ -330,7 +337,7 @@ Key locations:
 
 **Total: 16 rooms**
 
-**Total z=-3 rooms: ~122** (29 original + 22 waterfront + 18 eastside + 6 yesler + 2 chinatown + 17 arterial + 12 transit + 16 deep-connector)
+**Total z=-3 rooms: ~130** (29 original + 22 waterfront + 18 eastside + 6 yesler + 2 chinatown + 17 arterial + 12 transit + 16 deep-connector + 8 corp-construction)
 
 ---
 
@@ -425,14 +432,15 @@ Ultra-secure chamber below water table. Pluribus cannot see here.
 
 ## Network Statistics
 
-| Level | Original | Waterfront | Eastside | Yesler | King Street | Eastern | Chinatown | Industrial | Deep Cisterns | Tour | Southeast | Arterial | Transit | Deep Conn | Total |
-|-------|----------|------------|----------|--------|-------------|---------|-----------|------------|---------------|------|-----------|----------|---------|-----------|-------|
-| z=-2 | 88 | 29 | 35 | 36 | 39 | 40 | 22 | 14 | 0 | 6 | 11 | 0 | 0 | 0 | **320** |
-| z=-3 | 29 | 22 | 18 | 6 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 17 | 12 | 0 | **106** |
-| z=-4 | 43 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 16 | 0 | 0 | 0 | 0 | 16 | **75** |
-| z=-5 | 16 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **16** |
-| z=-6 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **1** |
-| **Total** | **177** | **51** | **53** | **42** | **39** | **40** | **24** | **14** | **16** | **6** | **11** | **17** | **12** | **16** | **518** |
+| Level | Original | Waterfront | Eastside | Yesler | King Street | Eastern | Chinatown | Industrial | Deep Cisterns | Tour | Southeast | Arterial | Transit | Deep Conn | Corp Const | Total |
+|-------|----------|------------|----------|--------|-------------|---------|-----------|------------|---------------|------|-----------|----------|---------|-----------|------------|-------|
+| z=-1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 5 | **5** |
+| z=-2 | 88 | 29 | 35 | 36 | 39 | 40 | 22 | 14 | 0 | 6 | 11 | 0 | 0 | 0 | 5 | **325** |
+| z=-3 | 29 | 22 | 18 | 6 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 17 | 12 | 0 | 8 | **114** |
+| z=-4 | 43 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 16 | 0 | 0 | 0 | 0 | 16 | 0 | **75** |
+| z=-5 | 16 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **16** |
+| z=-6 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **1** |
+| **Total** | **177** | **51** | **53** | **42** | **39** | **40** | **24** | **14** | **16** | **6** | **11** | **17** | **12** | **16** | **18** | **536** |
 
 ---
 

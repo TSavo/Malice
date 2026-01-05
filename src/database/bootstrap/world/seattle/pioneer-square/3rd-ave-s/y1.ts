@@ -18,4 +18,10 @@ Main Street stretches east and west, empty and wide.`,
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  exits: {
+    west: {
+      to: 'buildings/corp-construction/z0.ts:%GATE_ENTRANCE',
+      description: 'The Corp Construction gate looms on the west side of the avenue',
+    },
+  },
 };
