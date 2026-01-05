@@ -281,8 +281,8 @@ A shaft descends from here into the arterial tunnel—the express route that run
       exits: {
         south: '%KING_MID_E',
         north: '%SECOND_SOUTH_PASSAGE',
-        east: '%PLATFORM_TUNNEL',
-        west: '%BAGGAGE_TUNNEL',
+        east: '%TRACKSIDE_1',
+        west: '%MAIL_VAULT',
         down: {
           to: 'buildings/arterial-tunnel/z-3.ts',
           room: '%ARTERY_TERMINUS',
@@ -361,7 +361,7 @@ A shaft descends from here into the arterial tunnel—the express route that run
       exits: {
         south: '%KING_EAST',
         north: '%THIRD_SOUTH_PASSAGE',
-        west: '%PLATFORM_TUNNEL',
+        west: '%PLATFORM_EAST_2',
       },
     },
 
@@ -553,6 +553,80 @@ The emptiness is useful in its own way. The space accommodates what the current 
       },
     },
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // STATION SERVICE CORRIDOR (y=-10, x=-6 to x=-4)
+    // Infrastructure connecting Occidental to Baggage
+    // ═══════════════════════════════════════════════════════════════════════
+
+    '%STATION_SERVICE_1': {
+      name: 'Steam Plant Passage',
+      description: `The tunnel passes through what was once the steam plant that heated Union Station—massive boilers reduced to rusted hulks, their fireboxes cold for decades. Coal bins line one wall, still filled with anthracite that will never burn. The infrastructure of warmth, frozen in time.
+
+Pipes run overhead in every direction, some still pressurized with something, their valves seized, their gauges reading numbers that may or may not be accurate. The hiss of steam escaping somewhere adds to the ambient noise.`,
+      x: -6,
+      y: -10,
+      z: -2,
+      population: 0,
+      ambientNoise: 40,
+      lighting: 15,
+      waterLevel: 5,
+      outdoor: false,
+      exits: {
+        west: '%OCCIDENTAL_SOUTH',
+        east: '%STATION_SERVICE_2',
+      },
+      objects: [
+        { prototype: 'furniture', name: 'a dead boiler', description: 'A massive industrial boiler, its riveted plates corroded, its gauge glass shattered. "BABCOCK & WILCOX - 1905" is cast into the iron.', boltedDown: true },
+        { prototype: 'crate', name: 'coal storage bins', description: 'Concrete bins still hold tons of coal that will never be burned. The coal has fossilized into a solid mass.', boltedDown: true },
+      ],
+    },
+
+    '%STATION_SERVICE_2': {
+      name: 'Electrical Vault',
+      description: `The tunnel opens into an electrical vault that once powered the station's lights and signals. Switchgear lines the walls, massive knife switches frozen in position, transformers humming with residual magnetism or perhaps still carrying current from some forgotten source.
+
+Warning signs are everywhere: "DANGER - 4160 VOLTS", "AUTHORIZED PERSONNEL ONLY", "LOCKOUT/TAGOUT REQUIRED". The procedures are from another era. The danger may not be.`,
+      x: -5,
+      y: -10,
+      z: -2,
+      population: 0,
+      ambientNoise: 35,
+      lighting: 18,
+      waterLevel: 3,
+      outdoor: false,
+      exits: {
+        west: '%STATION_SERVICE_1',
+        east: '%STATION_SERVICE_3',
+      },
+      objects: [
+        { prototype: 'cabinet', name: 'vintage switchgear', description: 'Rows of electrical switches, each labeled with cryptic designations: "PLATFORM 3 LIGHTS", "SIGNAL TOWER MAIN", "EMERGENCY BACKUP".', boltedDown: true },
+        { prototype: 'sign', name: 'high voltage warnings', description: 'Faded signs warn of lethal voltage. Whether any circuits remain live is unknown and untested.', boltedDown: true },
+      ],
+    },
+
+    '%STATION_SERVICE_3': {
+      name: 'Tool Crib',
+      description: `A chamber that served as the station's maintenance tool storage—pegboards still hold wrenches and hammers, drawers contain bins of bolts sorted by size, shelving holds supplies for repairs that will never be made. The organization is meticulous, the inventory frozen at some moment when someone walked away and never returned.
+
+A time clock on the wall still holds punch cards. The last one stamped: "JAMESON, R. - 03/15/1971 - 5:42 PM". Jameson never punched out.`,
+      x: -4,
+      y: -10,
+      z: -2,
+      population: 0,
+      ambientNoise: 25,
+      lighting: 20,
+      waterLevel: 3,
+      outdoor: false,
+      exits: {
+        west: '%STATION_SERVICE_2',
+        east: '%BAGGAGE_TUNNEL',
+      },
+      objects: [
+        { prototype: 'cabinet', name: 'tool storage', description: 'Pegboards and drawers hold a complete maintenance toolkit, every tool in its place, waiting for hands that will never come.', boltedDown: true },
+        { prototype: 'furniture', name: 'a time clock', description: 'A mechanical time clock with a rack of punch cards. The last entry is dated 1971.', boltedDown: true },
+      ],
+    },
+
     '%BAGGAGE_TUNNEL': {
       name: 'Baggage Tunnel',
       description: `The tunnel runs through what was once the baggage handling infrastructure of the rail station—a passage designed for the movement of luggage and parcels between platforms and the main building. The conveyor systems are long gone, but the route remains, sized for wheeled carts rather than pedestrians.`,
@@ -565,10 +639,199 @@ The emptiness is useful in its own way. The space accommodates what the current 
       waterLevel: 5,
       outdoor: false,
       exits: {
-        west: '%OCCIDENTAL_SOUTH',
-        east: '%SECOND_AVE_SOUTH',
+        west: '%STATION_SERVICE_3',
+        east: '%MAIL_ROOM',
         south: '%BAGGAGE_CLAIM',
       },
+    },
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // POSTAL SERVICE CORRIDOR (y=-10, x=-2 to x=-1)
+    // Railway mail infrastructure
+    // ═══════════════════════════════════════════════════════════════════════
+
+    '%MAIL_ROOM': {
+      name: 'Railway Post Office',
+      description: `The tunnel opens into what was once a Railway Post Office—mail was sorted here while trains waited, then loaded directly into mail cars for destinations across the nation. The sorting frames remain, their pigeonholes labeled with city names: CHICAGO, NEW YORK, LOS ANGELES, DENVER.
+
+A poster on the wall shows the schedule of mail trains, connections color-coded for priority. The last mail train left Seattle in 1967. The poster awaits an update that will never come.`,
+      x: -2,
+      y: -10,
+      z: -2,
+      population: 0,
+      ambientNoise: 20,
+      lighting: 15,
+      waterLevel: 5,
+      outdoor: false,
+      exits: {
+        west: '%BAGGAGE_TUNNEL',
+        east: '%MAIL_VAULT',
+      },
+      objects: [
+        { prototype: 'furniture', name: 'mail sorting frames', description: 'Wooden sorting frames with slots labeled for destinations across America. The wood is worn smooth where hands placed letters for decades.', boltedDown: true },
+        { prototype: 'sign', name: 'a mail train schedule', description: 'A poster shows the Railway Post Office schedule. Connections to every major city. Service terminated 1967.', boltedDown: true },
+      ],
+    },
+
+    '%MAIL_VAULT': {
+      name: 'Registered Mail Vault',
+      description: `A reinforced chamber that once secured registered mail and valuables—the walls are thick, the door is steel, the construction meant to resist anything short of heavy equipment. The vault was emptied when rail mail service ended, but the infrastructure remains, repurposed by those who value secure storage.
+
+Recent graffiti on the walls suggests the vault has found new uses. A gray triangle marks one corner—the Cartel's sign of claimed territory.`,
+      x: -1,
+      y: -10,
+      z: -2,
+      population: 0,
+      ambientNoise: 15,
+      lighting: 12,
+      waterLevel: 3,
+      outdoor: false,
+      exits: {
+        west: '%MAIL_ROOM',
+        east: '%SECOND_AVE_SOUTH',
+      },
+      objects: [
+        { prototype: 'safe', name: 'a mail vault door', description: 'The vault door stands open, its combination lock still functional, its hinges maintained. Someone uses this space.', boltedDown: true },
+        { prototype: 'sign', name: 'a gray triangle', description: 'A small gray triangle scratched into the wall—the Cartel claims this vault.', boltedDown: true },
+      ],
+    },
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // TRACKSIDE CORRIDOR (y=-10, x=1 to x=3)
+    // Under-platform infrastructure between Second Ave and Platform Tunnel
+    // ═══════════════════════════════════════════════════════════════════════
+
+    '%TRACKSIDE_1': {
+      name: 'Signal Maintainer\'s Den',
+      description: `The tunnel opens into a cramped workspace where signal maintainers once calibrated the intricate mechanisms that kept trains from colliding. Workbenches line the walls, covered with the disassembled guts of signal relays—copper contacts, spring tensioners, glass-lensed lamps in every color of the railway rainbow.
+
+A cot in the corner suggests someone lived here, waiting for the next signal failure that would demand immediate attention. The blanket is moth-eaten. The pillow still holds the shape of a head that last rested there decades ago. On the wall, a calendar from 1968 shows a pin-up girl and the notation "MARY'S BIRTHDAY" circled in red on a date long past.`,
+      x: 1,
+      y: -10,
+      z: -2,
+      population: 0,
+      ambientNoise: 25,
+      lighting: 12,
+      waterLevel: 5,
+      outdoor: false,
+      exits: {
+        west: '%SECOND_AVE_SOUTH',
+        east: '%TRACKSIDE_2',
+      },
+      objects: [
+        { prototype: 'furniture', name: 'a signal workbench', description: 'A workbench holds the innards of a position-light signal—four lenses arranged in a diamond, each aimed at a different track. The mechanism is half-reassembled.', boltedDown: true },
+        { prototype: 'furniture', name: 'a maintainer\'s cot', description: 'A narrow army-surplus cot with a thin mattress and moth-eaten blanket. Someone slept here between emergencies.', boltedDown: true },
+        { prototype: 'sign', name: 'a pinup calendar', description: 'A 1968 calendar shows Miss August in a bathing suit. "MARY\'S BIRTHDAY - DON\'T FORGET ROSES" is written in the margin.', boltedDown: true },
+      ],
+    },
+
+    '%TRACKSIDE_2': {
+      name: 'Brake Shoe Storage',
+      description: `The tunnel passes through a storage area for brake equipment—cast iron brake shoes stacked in rusting pyramids, wooden blocks for hand brakes, coils of brake chain hanging from hooks like metallic snakeskins. The infrastructure of stopping, gathered in one place.
+
+The smell of brake dust permeates everything, a fine gray powder that coats every surface. It's the residue of friction, of momentum converted to heat, of the countless times trains were commanded to halt. Each shoe wears the grooves of wheels it once pressed against.
+
+Graffiti on one wall shows a cartoon train with X's for eyes, captioned "RUNAWAY 1947 - NEVER FORGET". Someone memorialized a disaster in brake storage. The irony was probably intentional.`,
+      x: 2,
+      y: -10,
+      z: -2,
+      population: 0,
+      ambientNoise: 20,
+      lighting: 10,
+      waterLevel: 5,
+      outdoor: false,
+      exits: {
+        west: '%TRACKSIDE_1',
+        east: '%TRACKSIDE_3',
+      },
+      objects: [
+        { prototype: 'crate', name: 'brake shoe pyramids', description: 'Cast iron brake shoes are stacked in neat pyramids, each stamped with manufacturer marks: "WESTINGHOUSE AIR BRAKE CO." The iron is pitted with rust.', boltedDown: true },
+        { prototype: 'furniture', name: 'hanging brake chains', description: 'Coils of chain hang from ceiling hooks, each link sized for freight car brakes. Some chains still show grease.', boltedDown: true },
+        { prototype: 'sign', name: 'memorial graffiti', description: 'A cartoon train with X-ed out eyes. "RUNAWAY 1947 - NEVER FORGET". Someone added: "12 dead, 47 injured, 0 accountable".', boltedDown: true },
+      ],
+    },
+
+    '%TRACKSIDE_3': {
+      name: 'Conductor\'s Refuge',
+      description: `A small chamber that served as an emergency refuge for conductors and brakemen caught between trains—a steel-reinforced bunker sized for three men standing, built into the tunnel wall where workers could press themselves flat as locomotives thundered past inches away.
+
+The refuge is wider than most, suggesting this was a known danger point, a place where the geometry of the tunnels created blind spots that required extraordinary caution. The walls are scratched with initials and dates—men who sheltered here and lived to carve their names. Not all names have dates after them.
+
+A notice board holds faded safety bulletins: "ALWAYS WATCH FOR SECOND SECTION", "LISTEN FOR THREE WHISTLES", "WHEN IN DOUBT, TAKE REFUGE". The advice is timeless. The trains that prompted it are gone.`,
+      x: 3,
+      y: -10,
+      z: -2,
+      population: 0,
+      ambientNoise: 30,
+      lighting: 8,
+      waterLevel: 5,
+      outdoor: false,
+      exits: {
+        west: '%TRACKSIDE_2',
+        east: '%PLATFORM_TUNNEL',
+      },
+      objects: [
+        { prototype: 'sign', name: 'carved initials', description: 'Names and dates scratched into the steel walls. "JB 1923", "TOMMY M 1931", "WILSON & CRANE 1945". Some entries have no dates.', boltedDown: true },
+        { prototype: 'sign', name: 'safety bulletins', description: 'Faded paper notices warn of specific dangers: blind curves, deaf spots, known collision points. The ink is brown with age.', boltedDown: true },
+        { prototype: 'furniture', name: 'a refuge bench', description: 'A narrow steel bench is bolted to the wall—room for three men to sit while waiting for danger to pass.', boltedDown: true },
+      ],
+    },
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // EASTERN PLATFORM CORRIDOR (y=-10, x=5 to x=6)
+    // Under-platform infrastructure between Platform Tunnel and Third Ave
+    // ═══════════════════════════════════════════════════════════════════════
+
+    '%PLATFORM_EAST_1': {
+      name: 'Ice House Passage',
+      description: `The tunnel passes through what was once the railway ice house—a refrigerated chamber where blocks of ice were stored to cool passenger cars before air conditioning made them obsolete. The insulation is rotting from the walls, revealing layers of sawdust and cork designed to trap cold.
+
+Massive iron hooks hang from overhead rails, the infrastructure for moving 300-pound ice blocks with relative ease. The hooks are rusted now, the rails frozen, but the geometry of ice handling remains legible in the architecture.
+
+A thermometer mounted on the wall still shows temperature in Fahrenheit. The mercury is pooled at the bottom, escaped from its tube decades ago. The room hasn't been cold for a very long time.`,
+      x: 5,
+      y: -10,
+      z: -2,
+      population: 0,
+      ambientNoise: 15,
+      lighting: 10,
+      waterLevel: 8,
+      outdoor: false,
+      exits: {
+        west: '%PLATFORM_TUNNEL',
+        east: '%PLATFORM_EAST_2',
+      },
+      objects: [
+        { prototype: 'furniture', name: 'ice hooks', description: 'Heavy iron hooks hang from an overhead rail system, designed for sliding 300-pound ice blocks. The rails are frozen with rust.', boltedDown: true },
+        { prototype: 'furniture', name: 'a broken thermometer', description: 'A large wall thermometer shows no reading—the mercury has escaped and pooled at the bottom of its tube.', boltedDown: true },
+        { prototype: 'crate', name: 'rotting insulation', description: 'Chunks of cork and sawdust insulation have fallen from the walls, revealing the brick underneath.', boltedDown: true },
+      ],
+    },
+
+    '%PLATFORM_EAST_2': {
+      name: 'Expressman\'s Office',
+      description: `A small office that once belonged to the Railway Express Agency—the shipping company that handled everything from perishables to prize livestock, from mail-order brides' trousseaus to racing pigeons in ventilated crates. The expressman was a logistics genius, routing packages across a continent using railroads as arteries.
+
+The desk remains, covered with faded routing forms and carbon-paper manifests. A map on the wall shows the American rail network circa 1952, with penciled annotations marking preferred routes for different classes of freight: "EGGS - AVOID MOUNTAIN DIVISION", "LIVESTOCK - WATER STOPS MANDATORY", "DYNAMITE - SPECIAL HANDLING ONLY".
+
+A safe in the corner stands open, its door hanging from one hinge. Whatever cash-on-delivery payments it once held are long gone. The combination is still taped to the inside of the door—someone trusted the isolation more than the lock.`,
+      x: 6,
+      y: -10,
+      z: -2,
+      population: 0,
+      ambientNoise: 18,
+      lighting: 12,
+      waterLevel: 5,
+      outdoor: false,
+      exits: {
+        west: '%PLATFORM_EAST_1',
+        east: '%THIRD_AVE_SOUTH',
+      },
+      objects: [
+        { prototype: 'furniture', name: 'an expressman\'s desk', description: 'A wooden desk buried under faded manifests and routing slips. "REA EXPRESS - NATIONWIDE SERVICE" letterhead on every form.', boltedDown: true },
+        { prototype: 'sign', name: 'a rail network map', description: 'A 1952 railroad map covers one wall, every major line marked, with handwritten routing notes in the margins.', boltedDown: true },
+        { prototype: 'safe', name: 'a broken express safe', description: 'A small safe stands open, its combination taped inside the door: "32-14-7". Whatever it protected is long gone.', boltedDown: true },
+      ],
     },
 
     '%BAGGAGE_CLAIM': {
@@ -608,8 +871,8 @@ The rumble of trains overhead is constant when service is running, the vibration
       waterLevel: 5,
       outdoor: false,
       exits: {
-        west: '%SECOND_AVE_SOUTH',
-        east: '%THIRD_AVE_SOUTH',
+        west: '%TRACKSIDE_3',
+        east: '%PLATFORM_EAST_1',
         south: '%PLATFORM_ACCESS',
       },
     },
