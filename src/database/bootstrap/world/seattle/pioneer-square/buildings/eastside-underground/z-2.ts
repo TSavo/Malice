@@ -34,8 +34,33 @@ The construction is professional but hasty, the engineering adequate but not ele
           room: '%3RD_BASEMENT',
           description: 'A passage leads west toward Third Avenue',
         },
+        east: '%UTILITY_CROSSING',
+      },
+    },
+
+    '%UTILITY_CROSSING': {
+      name: 'Utility Crossing',
+      description: `The passage narrows as it threads through a forest of utility infrastructure—gas mains, water pipes, electrical conduits, and telecommunications cables all converging in a space barely wide enough for a single person. The utilities were installed at different times by different crews, each one following the path of least resistance without regard for what came before.
+
+Tags hang from the pipes: "SEA LIGHT 1952", "PNW BELL 1967", "SEATTLE GAS 1923", each marking the work of hands long since stilled. A fresh tag in bright orange reads "CENTURY LINK 2019"—the infrastructure still grows, still finds its way through these cramped passages.
+
+The heat increases as the passage continues east, the proximity to the steam system making itself felt.`,
+      x: 9,
+      y: 0,
+      z: -2,
+      population: 0,
+      ambientNoise: 22,
+      lighting: 20,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        west: '%3RD_DEEP',
         east: '%STEAM_TUNNEL_W',
       },
+      objects: [
+        { prototype: 'sign', name: 'utility tags', description: 'Metal tags dangle from pipes marking installation dates spanning a century. The newest is orange plastic.', boltedDown: true },
+        { prototype: 'cabinet', name: 'a junction box', description: 'An electrical junction box is bolted to the wall, its cover missing, wires spliced and re-spliced over decades.', boltedDown: true },
+      ],
     },
 
     '%STEAM_TUNNEL_W': {
@@ -52,11 +77,36 @@ The infrastructure is maintained, the pipes insulated, the passages lit with ind
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: '%3RD_DEEP',
-        east: '%STEAM_MAIN',
+        west: '%UTILITY_CROSSING',
+        east: '%BLOWOFF_CHAMBER',
         north: '%STEAM_N1',
         south: '%STEAM_S1',
       },
+    },
+
+    '%BLOWOFF_CHAMBER': {
+      name: 'Blowoff Chamber',
+      description: `The tunnel widens into a chamber built around a massive blowoff valve—a safety mechanism that vents excess steam pressure into the underground rather than letting it rupture the main lines above. The valve hasn't activated in decades, but the infrastructure remains, the chamber's acoustics designed to muffle the roar of escaping steam.
+
+The walls are stained black from past events, the residue of steam carrying years of pipe corrosion onto every surface. A gauge on the main pipe shows pressure in pounds per square inch—the needle hovers in the green zone, but orange and red zones wait beyond.
+
+Someone has built a small camp in the corner, protected from direct steam exposure by a shield of scavenged sheet metal. The bedding is recent. The camp is currently unoccupied.`,
+      x: 11,
+      y: 0,
+      z: -2,
+      population: 0,
+      ambientNoise: 35,
+      lighting: 22,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        west: '%STEAM_TUNNEL_W',
+        east: '%STEAM_MAIN',
+      },
+      objects: [
+        { prototype: 'furniture', name: 'a blowoff valve', description: 'A massive valve with a wheel the size of a steering wheel. "DANGER - AUTOMATIC PRESSURE RELIEF" is stenciled in faded red.', boltedDown: true },
+        { prototype: 'furniture', name: 'a makeshift camp', description: 'A sheet-metal heat shield protects a nest of blankets and sleeping bags. Empty cans and water bottles suggest recent habitation.', boltedDown: true },
+      ],
     },
 
     '%STEAM_MAIN': {
@@ -73,14 +123,39 @@ The heat is significant here—the proximity to live steam making the air thick 
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: '%STEAM_TUNNEL_W',
-        east: '%4TH_ACCESS',
+        west: '%BLOWOFF_CHAMBER',
+        east: '%EXPANSION_LOOP',
         north: '%STEAM_N2',
         south: '%STEAM_S2',
       },
       objects: [
         { prototype: 'sign', name: 'a valve control panel', description: 'A massive panel of valve wheels and pressure gauges, some still functioning. Labels indicate zones: "BLOCK 14", "COURTHOUSE", "KING ST STATION".', boltedDown: true },
         { prototype: 'cabinet', name: 'a utility cabinet', description: 'A metal cabinet bolted to the wall, its door hanging open. Inside are wrenches, pipe tape, and a clipboard with maintenance logs from 1987.', boltedDown: true },
+      ],
+    },
+
+    '%EXPANSION_LOOP': {
+      name: 'Expansion Loop',
+      description: `The steam main passes through a series of expansion loops—massive curved sections of pipe designed to absorb the stress of metal expanding and contracting with temperature changes. The loops rise and fall in graceful arcs, engineering elegance serving practical necessity.
+
+The passage here requires climbing over and under the loops, the route physically demanding but well-traveled. Handholds have been welded to the pipe supports at convenient intervals—unofficial modifications that make the passage easier for those who aren't supposed to be here.
+
+A maintenance placard from 1943 warns: "HOT SURFACES - DO NOT TOUCH". The advice remains relevant.`,
+      x: 13,
+      y: 0,
+      z: -2,
+      population: 0,
+      ambientNoise: 38,
+      lighting: 25,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        west: '%STEAM_MAIN',
+        east: '%4TH_ACCESS',
+      },
+      objects: [
+        { prototype: 'furniture', name: 'expansion loop pipes', description: 'Massive curved pipes rise and fall, designed to flex with temperature. The metal radiates warmth.', boltedDown: true },
+        { prototype: 'sign', name: 'welded handholds', description: 'Someone has welded grab bars to the pipe supports, making the climb easier. The welds are amateur but solid.', boltedDown: true },
       ],
     },
 
@@ -98,7 +173,7 @@ A vertical shaft rises toward the surface, its maintenance ladder still in regul
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: '%STEAM_MAIN',
+        west: '%EXPANSION_LOOP',
         north: '%4TH_N1',
         south: '%4TH_S1',
       },
@@ -130,7 +205,10 @@ A vertical shaft rises toward the surface, its maintenance ladder still in regul
       exits: {
         south: '%STEAM_TUNNEL_W',
         north: '%STEAM_N3',
-        east: '%STEAM_N2',
+        east: {
+          to: 'underground/upper-tunnels/x11-y1.ts',
+          description: 'The tunnel continues east through the distribution junction',
+        },
       },
     },
 
@@ -147,7 +225,10 @@ A vertical shaft rises toward the surface, its maintenance ladder still in regul
       outdoor: false,
       exits: {
         south: '%STEAM_MAIN',
-        west: '%STEAM_N1',
+        west: {
+          to: 'underground/upper-tunnels/x11-y1.ts',
+          description: 'The tunnel leads west through the distribution junction',
+        },
         north: '%BOILER_ROOM',
       },
     },
@@ -165,7 +246,10 @@ A vertical shaft rises toward the surface, its maintenance ladder still in regul
       outdoor: false,
       exits: {
         south: '%STEAM_N1',
-        east: '%BOILER_ROOM',
+        east: {
+          to: 'underground/upper-tunnels/x11-y2.ts',
+          description: 'A passage leads east through the abandoned pump station',
+        },
       },
     },
 
@@ -184,7 +268,10 @@ The chamber serves as a waystation in the eastern underground—a space large en
       outdoor: false,
       exits: {
         south: '%STEAM_N2',
-        west: '%STEAM_N3',
+        west: {
+          to: 'underground/upper-tunnels/x11-y2.ts',
+          description: 'A passage leads west through the abandoned pump station',
+        },
         north: '%UTILITY_NORTH',
         east: '%4TH_N2',
       },

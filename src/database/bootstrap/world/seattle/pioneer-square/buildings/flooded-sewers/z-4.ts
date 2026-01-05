@@ -177,7 +177,7 @@ The splash of tiny bodies is constant. They're always here, always feeding.`,
           room: '%FLOODED_PASSAGE',
           description: 'A flooded tunnel leads up to the rat pits',
         },
-        south: '%TOXIC_POOL',
+        south: '%TOXIC_CORRIDOR',
       },
       objects: [
         { prototype: 'furniture', name: 'rat highways', description: 'Pipes and ledges above the waterline serve as rat highways—dry routes through the wet territory. Traffic is constant.', boltedDown: true },
@@ -236,6 +236,29 @@ The water here has an oily sheen. The smell burns the throat.`,
       ],
     },
 
+    '%TOXIC_CORRIDOR': {
+      name: 'Toxic Corridor',
+      description: `A narrow passage between the rat territories and the toxic pool. The walls are stained with chemical residue, and the air burns with every breath. Rats avoid this corridor—even they know better than to linger here.
+
+The water level rises as you move south, carrying the concentrated runoff toward its final resting place.`,
+      x: 4,
+      y: -15,
+      z: -4,
+      population: 0,
+      ambientNoise: 25,
+      lighting: 2,
+      waterLevel: 60,
+      outdoor: false,
+      exits: {
+        north: '%RAT_OVERFLOW',
+        south: '%TOXIC_POOL',
+      },
+      objects: [
+        { prototype: 'furniture', name: 'chemical stains', description: 'Dark stains streak the walls where chemical runoff has eaten into the concrete. The patterns look almost deliberate.', boltedDown: true },
+        { prototype: 'sign', name: 'warning scratches', description: 'Scratched into the wall: "HOLD BREATH". Sound advice.', boltedDown: true },
+      ],
+    },
+
     '%TOXIC_POOL': {
       name: 'Toxic Pool',
       description: `A dead-end chamber where industrial runoff has accumulated over decades—a pool of chemicals, sewage, and decay. The water glows faintly in complete darkness, bioluminescent bacteria feeding on the toxic soup. Nothing else lives here.
@@ -250,7 +273,7 @@ Entering this water is suicide. Slow, painful suicide.`,
       waterLevel: 80,
       outdoor: false,
       exits: {
-        north: '%RAT_OVERFLOW',
+        north: '%TOXIC_CORRIDOR',
         west: '%INDUSTRIAL_OUTFALL',
       },
       objects: [

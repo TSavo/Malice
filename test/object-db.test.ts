@@ -180,6 +180,31 @@ describe('ObjectDatabase', () => {
       const nextId = await db.getNextId();
       expect(nextId).toBe(16); // One more than highest ID
     });
+
+    it('should handle concurrent calls without race conditions', async () => {
+      // This test verifies the atomic counter implementation prevents
+      // duplicate IDs when getNextId() is called concurrently
+
+      // Create some initial objects
+      await db.create({
+        _id: 500,
+        parent: { type: 'objref', target: 'object', id: 0 },
+        properties: {},
+        methods: {},
+      });
+
+      // Call getNextId() 10 times concurrently
+      const promises = Array.from({ length: 10 }, () => db.getNextId());
+      const ids = await Promise.all(promises);
+
+      // All IDs should be unique
+      const uniqueIds = new Set(ids);
+      expect(uniqueIds.size).toBe(10);
+
+      // All IDs should be sequential starting from 501
+      const sortedIds = [...ids].sort((a, b) => a - b);
+      expect(sortedIds).toEqual([501, 502, 503, 504, 505, 506, 507, 508, 509, 510]);
+    });
   });
 
   describe('get()', () => {

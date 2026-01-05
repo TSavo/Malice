@@ -175,6 +175,25 @@ Ventilation ducts run along the ceiling, carrying air from the factory's climate
       outdoor: false,
       exits: {
         south: '%FAB_TUNNEL_S',
+        north: '%FAB_CORRIDOR',
+      },
+    },
+
+    '%FAB_CORRIDOR': {
+      name: 'Fabrication Corridor',
+      description: `A narrow industrial corridor links the tunnel system to the factory basement above. Thick power cables snake along the ceiling, their rubber insulation cracked and patched in places where age has taken its toll. The walls are lined with defunct machinery—stamping presses, drill heads, and other equipment too heavy to move when production methods changed.
+
+A persistent vibration from somewhere in the walls suggests active ventilation, or perhaps something else churning away in the darkness. The air smells of machine oil and rust, the accumulated scent of a century of metalwork. Graffiti scratched into the concrete reads "SHIFT CHANGE 3AM - G.C." in letters that catch the dim light.`,
+      x: -20,
+      y: 9,
+      z: -2,
+      population: 0,
+      ambientNoise: 25,
+      lighting: 18,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        south: '%FAB_TUNNEL_MID',
         north: '%FAB_BASEMENT',
       },
     },
@@ -195,7 +214,7 @@ The Gray Cartel maintains this access point. The factory's AI either doesn't kno
       waterLevel: 0,
       outdoor: false,
       exits: {
-        south: '%FAB_TUNNEL_MID',
+        south: '%FAB_CORRIDOR',
         up: {
           to: 'buildings/fabrication-factory/z0.ts',
           room: '%PUBLIC_SERVICES',
@@ -411,12 +430,56 @@ A shaft rises toward street level here, its upper end sealed but its route still
       outdoor: false,
       exits: {
         west: '%WHARF_MID',
-        east: {
-          to: 'underground/upper-tunnels/main-crossing.ts',
-          description: 'A passage leads east toward the main underground network',
-        },
+        east: '%FIRST_AVE_E1',
         south: '%WAREHOUSE_N',
       },
+    },
+
+    '%FIRST_AVE_E1': {
+      name: 'First Avenue Passage',
+      description: `The passage continues east through the buried First Avenue, its width matching the original street above. The construction is solid Victorian brick, built to last, built to carry the weight of a city that didn't know it was burying its own history. The bricks are stamped with maker's marks from Seattle's early kilns, each one a record of industry that no longer exists.
+
+A cast-iron column supports the ceiling at regular intervals, the weight of the modern street pressing down through iron and brick onto foundations that have held for over a century. The columns are decorated with floral patterns—someone cared about beauty even in infrastructure.`,
+      x: -16,
+      y: 0,
+      z: -2,
+      population: 0,
+      ambientNoise: 15,
+      lighting: 18,
+      waterLevel: 5,
+      outdoor: false,
+      exits: {
+        west: '%FIRST_AVE_CONN',
+        east: '%FIRST_AVE_E2',
+      },
+      objects: [
+        { prototype: 'furniture', name: 'a decorated column', description: 'A cast-iron support column with floral designs cast into the metal. Victorian infrastructure with Victorian aesthetics.', boltedDown: true },
+      ],
+    },
+
+    '%FIRST_AVE_E2': {
+      name: 'First Avenue Junction',
+      description: `The passage reaches a junction where First Avenue met an alley that no longer exists on any map. The alley was filled in during the street raising, its route preserved only in the underground where the walls still define space that daylight forgot.
+
+A rusted sign hangs above the junction: "SEATTLE ELECTRIC LIGHT CO. - DANGER - HIGH VOLTAGE". The electric company's infrastructure is long gone, replaced by systems that run through different routes, but the warning remains for dangers that no longer exist.`,
+      x: -15,
+      y: 0,
+      z: -2,
+      population: 0,
+      ambientNoise: 12,
+      lighting: 15,
+      waterLevel: 5,
+      outdoor: false,
+      exits: {
+        west: '%FIRST_AVE_E1',
+        east: {
+          to: 'underground/upper-tunnels/main-crossing.ts',
+          description: 'The passage continues east toward the Main Crossing',
+        },
+      },
+      objects: [
+        { prototype: 'sign', name: 'an electric company warning', description: 'A rusted sign reads "SEATTLE ELECTRIC LIGHT CO. - DANGER - HIGH VOLTAGE". The electricity is long gone, but the sign endures.', boltedDown: true },
+      ],
     },
 
     '%TRANSITION_1': {
@@ -604,12 +667,31 @@ The walls show the marks of past contents: scuffs and scratches at consistent he
       outdoor: false,
       exits: {
         west: '%SOUTH_CAVE',
-        east: '%SOUTH_JUNCTION',
+        east: '%SOUTH_PASSAGE',
         up: {
           to: 'buildings/supply-depot/z0.ts',
           room: '%WAREHOUSE',
           description: 'A steel hatch leads up to the Supply Depot',
         },
+      },
+    },
+
+    '%SOUTH_PASSAGE': {
+      name: 'Southern Passage',
+      description: `The passage threads through a narrow section where the tunnel walls close in, the excavation here constrained by something solid—perhaps bedrock, perhaps the foundations of a long-demolished building. Chisel marks cover the walls where workers fought for every inch of progress.
+
+A rusted iron grate covers a drainage channel in the floor, water from the waterfront seeping eastward toward the city's deeper systems. The air is thick with mineral dampness and the faint salt tang that lingers this close to the bay. Someone has scratched a compass rose into the stone, its cardinal points labeled in Chinese characters now worn nearly smooth.`,
+      x: -19,
+      y: -5,
+      z: -2,
+      population: 0,
+      ambientNoise: 18,
+      lighting: 10,
+      waterLevel: 20,
+      outdoor: false,
+      exits: {
+        west: '%SOUTH_TUNNEL',
+        east: '%SOUTH_JUNCTION',
       },
     },
 
@@ -625,15 +707,119 @@ The walls show the marks of past contents: scuffs and scratches at consistent he
       waterLevel: 15,
       outdoor: false,
       exits: {
-        west: '%SOUTH_TUNNEL',
+        west: '%SOUTH_PASSAGE',
         east: {
           to: 'underground/upper-tunnels/supply-junction.ts',
           description: 'A passage leads east toward the supply routes',
         },
+        south: '%CHINESE_RAIL_1',
         down: '%DEEP_SOUTH_CONN',
       },
       objects: [
         { prototype: 'sign', name: 'a scratched message', description: 'Scratched into the stone: "M.C. was here - 1934. Made it to Vancouver. Made it free." The letters are worn but deep.', boltedDown: true },
+      ],
+    },
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // CHINESE RAILROAD WORKERS' PASSAGE (y=-6 to y=-9)
+    // Hidden route used by Chinese workers building the northern rail lines
+    // ═══════════════════════════════════════════════════════════════════════
+
+    '%CHINESE_RAIL_1': {
+      name: 'Railroad Workers\' Passage',
+      description: `The passage continues south through territory that was excavated not by the city's official builders but by hands that worked in secret. Chinese railroad laborers carved this route during the 1880s, connecting their work camps to the waterfront without passing through streets where they weren't welcome.
+
+The walls show the marks of their tools—rock picks and hand drills, the technology of the time wielded by workers who knew how to move mountains. Messages are carved in Chinese characters that glow faintly when lantern light catches them: directions, warnings, and names of workers who never made the history books.`,
+      x: -18,
+      y: -6,
+      z: -2,
+      population: 0,
+      ambientNoise: 15,
+      lighting: 8,
+      waterLevel: 12,
+      outdoor: false,
+      exits: {
+        north: '%SOUTH_JUNCTION',
+        south: '%CHINESE_RAIL_2',
+      },
+      objects: [
+        { prototype: 'sign', name: 'carved Chinese characters', description: 'Characters carved deep into the stone: 鐵路隧道 (railway tunnel). Below them, a list of names—workers who built this passage and were never credited.', boltedDown: true },
+      ],
+    },
+
+    '%CHINESE_RAIL_2': {
+      name: 'Ancestral Shrine Passage',
+      description: `The passage widens into a natural alcove that was transformed into a shrine—a place where workers could honor their ancestors far from the temples they'd left behind. Incense holders are carved directly into the rock walls, their surfaces blackened by a century of offerings. The altar stone remains, its surface worn smooth by countless hands placing fruit, rice, and paper offerings.
+
+The shrine was maintained secretly for decades after the railroad work ended, visited by families who knew the passages. The last dated offering visible is 1952. The shrine waits for worshippers who may never return.`,
+      x: -18,
+      y: -7,
+      z: -2,
+      population: 0,
+      ambientNoise: 5,
+      lighting: 6,
+      waterLevel: 8,
+      outdoor: false,
+      exits: {
+        north: '%CHINESE_RAIL_1',
+        south: '%CHINESE_RAIL_3',
+      },
+      objects: [
+        { prototype: 'furniture', name: 'ancestor altar', description: 'A stone altar worn smooth by a century of offerings. Dried flower stems and faded paper fragments suggest recent visitors still remember this place.', boltedDown: true },
+        { prototype: 'cabinet', name: 'incense holders', description: 'Carved niches in the stone hold the remains of incense—thin sticks reduced to ash, their fragrance long since absorbed into the rock.', boltedDown: true },
+      ],
+    },
+
+    '%CHINESE_RAIL_3': {
+      name: 'Coolies\' Rest',
+      description: `The passage opens into a chamber that was clearly used for sleeping—a dormitory carved from living rock where workers rested between shifts. Sleeping platforms line the walls at two levels, each just wide enough for a single body, each worn concave by the weight of exhausted workers.
+
+A central cooking area shows the blackening of countless fires. Bones in the ash suggest meals that were simple: fish, chicken, occasional pork. The workers ate what they could catch or buy, far from the restaurants above that wouldn't serve them. This was home for men whose labor built a city that pretended they didn't exist.`,
+      x: -18,
+      y: -8,
+      z: -2,
+      population: 0,
+      ambientNoise: 8,
+      lighting: 10,
+      waterLevel: 5,
+      outdoor: false,
+      exits: {
+        north: '%CHINESE_RAIL_2',
+        south: '%CHINESE_RAIL_4',
+        east: {
+          to: 'buildings/chinatown-underground/z-2.ts',
+          room: '%JACKSON_WEST',
+          description: 'A narrow passage leads east toward the Jackson Street tunnels',
+        },
+      },
+      objects: [
+        { prototype: 'bench', name: 'sleeping platforms', description: 'Stone platforms line the walls, each body-length and worn smooth. The rock is stained dark with the sweat and tears of workers who slept here a century ago.', boltedDown: true },
+        { prototype: 'furniture', name: 'cooking hearth', description: 'A central hearth shows generations of cooking fires. Ash contains fragments of bone, shells, and rice—the diet of men building a railroad.', boltedDown: true },
+      ],
+    },
+
+    '%CHINESE_RAIL_4': {
+      name: 'Foreman\'s Chamber',
+      description: `The passage ends at a slightly larger chamber that served as quarters for whoever managed the work crews—the foreman who translated between railroad bosses and laborers, who negotiated wages and distributed provisions, who kept the secret passages secret.
+
+The room contains the remains of furniture that was nicer than the workers' platforms: a wooden bed frame, a desk with iron fittings, a chair that was carved rather than simply hewn. The foreman lived better than his workers, but he lived here too, underground, hidden from a city that tolerated Chinese labor but not Chinese presence.
+
+A sealed passage continues south, bricked up at some point in the past. The bricks are old. Whatever lies beyond has been sealed for a very long time.`,
+      x: -18,
+      y: -9,
+      z: -2,
+      population: 0,
+      ambientNoise: 5,
+      lighting: 12,
+      waterLevel: 5,
+      outdoor: false,
+      exits: {
+        north: '%CHINESE_RAIL_3',
+      },
+      objects: [
+        { prototype: 'furniture', name: 'iron bed frame', description: 'A bed frame of iron and wood, more substantial than the workers\' platforms. The mattress is long gone, but iron rings suggest it was substantial.', boltedDown: true },
+        { prototype: 'furniture', name: 'foreman\'s desk', description: 'A wooden desk with iron fittings, its drawers empty but for dried ink residue. Ledgers were kept here, tracking the work of invisible men.', boltedDown: true },
+        { prototype: 'sign', name: 'sealed passage', description: 'A brick wall blocks the southern passage. The mortar is old, the bricks hand-made. Whatever lies beyond was sealed deliberately, permanently.', boltedDown: true },
       ],
     },
 
