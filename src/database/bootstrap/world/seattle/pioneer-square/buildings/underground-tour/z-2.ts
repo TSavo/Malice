@@ -125,11 +125,7 @@ A door in the south wall leads to passages that weren't on the tour.`,
         north: '%STOREFRONT_ROW',
         west: '%TOUR_MID',
         south: '%UNTOUR_PASSAGE',
-        east: {
-          to: 'buildings/underground-east/z-2.ts',
-          room: '%PUMP_ROOM',
-          description: 'A passage continues east into the maintenance tunnels',
-        },
+        east: '%MAINT_1',
       },
       objects: [
         { prototype: 'sign', name: 'an employees only sign', description: 'A weathered sign reads "EMPLOYEES ONLY - TOUR PARTICIPANTS DO NOT PROCEED". Below it, graffiti adds: "tour\'s over".', boltedDown: true },
@@ -185,6 +181,283 @@ The passage runs south toward the docks, connecting the tour infrastructure to t
       },
       objects: [
         { prototype: 'sign', name: 'scratched directions', description: 'Directions scratched into the brick: "DOCKS ↓" and "CITY →". Someone mapped these passages the old-fashioned way.', boltedDown: true },
+      ],
+    },
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // MAINTENANCE CORRIDOR (y=-4, connecting Tour End to Pump Room)
+    // The passage the tour never showed - 12 rooms of forgotten infrastructure
+    // ═══════════════════════════════════════════════════════════════════════
+
+    '%MAINT_1': {
+      name: 'Abandoned Maintenance Room',
+      description: `Beyond the tour barrier, the first space you encounter is a maintenance room that served the tour operation itself—cleaning supplies long since hardened into useless masses, replacement lightbulbs still in their boxes, a clipboard with inspection checklists dated 1997. The last inspector signed off and never returned.
+
+A pegboard on the wall holds keys to doors that may or may not still exist, each tagged with cryptic codes: "B-7", "PUMP ACCESS", "DO NOT DUPLICATE - SEE MANAGEMENT". Management stopped seeing visitors twenty years ago.`,
+      x: -13,
+      y: -4,
+      z: -2,
+      population: 0,
+      ambientNoise: 8,
+      lighting: 8,
+      waterLevel: 5,
+      outdoor: false,
+      exits: {
+        west: '%TOUR_END',
+        east: '%MAINT_2',
+      },
+      objects: [
+        { prototype: 'cabinet', name: 'a maintenance cabinet', description: 'A metal cabinet with a broken lock. Inside: dried paint cans, stiff brushes, and a hard hat with "BILL" written in marker.', boltedDown: true },
+        { prototype: 'sign', name: 'a key pegboard', description: 'Tagged keys hang from hooks, each promising access to somewhere. The tags are coded, the meanings lost.', boltedDown: true },
+      ],
+    },
+
+    '%MAINT_2': {
+      name: 'The Sorting Room',
+      description: `The passage opens into a chamber where the tour company sorted artifacts—genuine historical items separated from reproductions, things safe to display distinguished from things better left hidden. Wooden crates line the walls, their contents documented on yellowed inventory sheets: "OPIUM PIPES (3) - DO NOT DISPLAY", "CHINESE LOTTERY TICKETS - AUTHENTIC", "HUMAN BONE FRAGMENT - PROVENANCE UNKNOWN".
+
+Someone made careful decisions about what stories to tell and which to bury. The buried stories remain in their crates, waiting for historians who never came.`,
+      x: -12,
+      y: -4,
+      z: -2,
+      population: 0,
+      ambientNoise: 5,
+      lighting: 10,
+      waterLevel: 3,
+      outdoor: false,
+      exits: {
+        west: '%MAINT_1',
+        east: '%MAINT_3',
+      },
+      objects: [
+        { prototype: 'crate', name: 'artifact crates', description: 'Wooden crates stacked with care, their contents inventoried but never catalogued by any museum. "DO NOT DISPLAY" appears on several.', boltedDown: true },
+      ],
+    },
+
+    '%MAINT_3': {
+      name: 'Collapsed Gallery',
+      description: `The passage threads through a section where the ceiling partially gave way, timber beams angled down like broken ribs. The collapse exposed what was behind the tour's false walls: the actual buried storefronts, far less picturesque than the sanitized exhibits. A brothel's advertisement is clearly visible through the gap—"MISS LULU'S ESTABLISHMENT - GENTLEMEN WELCOME" in letters meant to be read from below, not above.
+
+The tour guides walked past this section for decades, never mentioning what lay behind the plaster. The plaster is gone now. Miss Lulu's welcomes no one.`,
+      x: -11,
+      y: -4,
+      z: -2,
+      population: 0,
+      ambientNoise: 10,
+      lighting: 6,
+      waterLevel: 8,
+      outdoor: false,
+      exits: {
+        west: '%MAINT_2',
+        east: '%MAINT_4',
+      },
+    },
+
+    '%MAINT_4': {
+      name: 'The Plague Room',
+      description: `A chamber that the tour company sealed and never reopened. The door's warning signs are direct: "BIOLOGICAL HAZARD - DO NOT ENTER WITHOUT AUTHORIZATION". Inside, the reason becomes clear—this was a quarantine space during the 1899 plague outbreak, and the tour company discovered evidence of hasty burials beneath the floor.
+
+The floorboards have been pried up in places, revealing packed earth that shows the disturbance of digging. Whatever investigation began was never completed. The door was sealed instead. The silence here is different from elsewhere—heavier, more final.`,
+      x: -10,
+      y: -4,
+      z: -2,
+      population: 0,
+      ambientNoise: 0,
+      lighting: 4,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        west: '%MAINT_3',
+        east: '%MAINT_5',
+      },
+      objects: [
+        { prototype: 'sign', name: 'biohazard warning', description: 'A red sign with the biohazard trefoil: "BIOLOGICAL HAZARD - AUTHORIZED PERSONNEL ONLY - REPORT TO SITE SUPERVISOR". No supervisor remains to report to.', boltedDown: true },
+      ],
+    },
+
+    '%MAINT_5': {
+      name: 'Junction of Lost Basements',
+      description: `The passage opens into a junction where several basement spaces once connected, their shared walls long since crumbled. The geography is confusing—you can see through gaps into spaces that seem to repeat, basements behind basements, a recursion of abandoned commerce that defies easy mapping.
+
+Chalk marks on the walls suggest others have tried to navigate this space: arrows pointing in contradictory directions, X marks whose meanings are disputed, a crude map that doesn't match the actual layout. The underground refuses to be charted.`,
+      x: -9,
+      y: -4,
+      z: -2,
+      population: 0,
+      ambientNoise: 12,
+      lighting: 8,
+      waterLevel: 10,
+      outdoor: false,
+      exits: {
+        west: '%MAINT_4',
+        east: '%MAINT_6',
+      },
+      objects: [
+        { prototype: 'sign', name: 'conflicting directions', description: 'Chalk arrows point every direction. Someone wrote "THIS WAY" with an arrow; someone else crossed it out and wrote "NO" with an arrow pointing opposite.', boltedDown: true },
+      ],
+    },
+
+    '%MAINT_6': {
+      name: 'The Crematorium Passage',
+      description: `The walls here are blackened by heat that touched them long ago. A brass plate, still legible, identifies this space: "SEATTLE CREMATION SOCIETY - EST. 1891". The crematorium operated legally for only three years before the city shut it down for reasons the records don't specify.
+
+The furnace is gone, removed by hands that didn't want evidence. But the heat scarring remains, the stones permanently altered by temperatures no grave should require. The passage continues past this unmarked memorial to whatever burned here.`,
+      x: -8,
+      y: -4,
+      z: -2,
+      population: 0,
+      ambientNoise: 5,
+      lighting: 5,
+      waterLevel: 5,
+      outdoor: false,
+      exits: {
+        west: '%MAINT_5',
+        east: {
+          to: 'buildings/underground-east/z-2.ts',
+          room: '%OCC_S4',
+          description: 'A flooded passage leads east toward the sluice chamber',
+        },
+      },
+    },
+
+    '%MAINT_7': {
+      name: 'The Opium Den Remains',
+      description: `The passage passes through what was unmistakably an opium den—the layout still visible in the raised platforms along the walls where smokers once reclined, the niches where lamps were placed, the decorative tiles that survived a century underground. The den was closed by police raids in 1909, according to newspapers of the era. The newspapers didn't mention what happened to those inside when the police came.
+
+Pipes and paraphernalia were removed long ago, but the scorch marks on the platform tiles remain, the chemical residue of dreams that outlasted the dreamers.`,
+      x: -6,
+      y: -4,
+      z: -2,
+      population: 0,
+      ambientNoise: 8,
+      lighting: 6,
+      waterLevel: 15,
+      outdoor: false,
+      exits: {
+        west: {
+          to: 'buildings/underground-east/z-2.ts',
+          room: '%OCC_S4',
+          description: 'A flooded passage leads west toward the sluice chamber',
+        },
+        east: '%MAINT_9',
+      },
+      objects: [
+        { prototype: 'bench', name: 'an opium platform', description: 'A raised wooden platform where smokers once reclined, its surface stained and scorched. The lacquer finish suggests this was an upscale establishment.', boltedDown: true },
+      ],
+    },
+
+    '%MAINT_9': {
+      name: 'The Counting Room',
+      description: `A reinforced chamber that was clearly built for security—iron bars on the single window (now looking onto nothing but earth), a heavy door with multiple locks (all long since broken), and a floor safe that was professionally cut open decades ago. This was where someone counted money that couldn't be counted in daylight.
+
+Ledger pages scattered on the floor record transactions in code: numbers and initials, amounts and dates, the bookkeeping of enterprises that left no legitimate records. The safe is empty. The secrets remain, indecipherable.`,
+      x: -5,
+      y: -4,
+      z: -2,
+      population: 0,
+      ambientNoise: 5,
+      lighting: 10,
+      waterLevel: 8,
+      outdoor: false,
+      exits: {
+        west: '%MAINT_7',
+        east: '%MAINT_10',
+      },
+      objects: [
+        { prototype: 'safe', name: 'a cracked floor safe', description: 'A floor safe with its door cut away by professional tools. The interior shows scorch marks from thermite—someone really wanted in.', boltedDown: true },
+      ],
+    },
+
+    '%MAINT_10': {
+      name: 'Underground Chapel',
+      description: `The passage opens into what was once a chapel—the architecture unmistakable despite the decay. A stone altar stands against the east wall, its surface stained with substances that might be wine or might be something else. Pews have rotted into fragments, their arrangement still suggesting rows of worshippers facing the altar.
+
+The denomination is unclear. The iconography is missing, removed or never present. But the devotion is evident—someone built a place of worship underground, where no congregation could be observed, where no practices could be questioned. What was worshipped here, the stones don't say.`,
+      x: -4,
+      y: -4,
+      z: -2,
+      population: 0,
+      ambientNoise: 3,
+      lighting: 8,
+      waterLevel: 5,
+      outdoor: false,
+      exits: {
+        west: '%MAINT_9',
+        east: '%MAINT_11',
+      },
+      objects: [
+        { prototype: 'furniture', name: 'a stone altar', description: 'A heavy stone altar, its surface stained dark with age and use. No cross or symbol identifies the faith that worshipped here.', boltedDown: true },
+      ],
+    },
+
+    '%MAINT_11': {
+      name: 'The Printing Press',
+      description: `A chamber containing the remains of a printing operation—not the legitimate newspaper press visible on the tour, but something more clandestine. This press produced materials that weren't meant for public consumption: pamphlets advocating labor organization, counterfeit theater tickets, anarchist manifestos, and according to the evidence scattered on the floor, currency.
+
+The press itself is a massive iron beast, its mechanism seized with rust. Type trays spilled across the floor show letters reversed, ready to print. The last run was never completed. Perhaps the printers fled. Perhaps they were found.`,
+      x: -3,
+      y: -4,
+      z: -2,
+      population: 0,
+      ambientNoise: 5,
+      lighting: 10,
+      waterLevel: 5,
+      outdoor: false,
+      exits: {
+        west: '%MAINT_10',
+        east: '%MAINT_12',
+      },
+      objects: [
+        { prototype: 'furniture', name: 'a clandestine press', description: 'An iron printing press, its workings frozen. Scattered type shows fragments of text: "WORKERS OF THE WORLD" and "UNITED STATES TREASURY".', boltedDown: true },
+      ],
+    },
+
+    '%MAINT_12': {
+      name: 'Surgery Theater',
+      description: `The final chamber before the pump room contains the unmistakable architecture of a surgical theater—tiled walls that could be cleaned, drains in the floor for fluids, an operating table of porcelain and steel. But this was no hospital. The straps on the table, the locked cabinet of surgical tools, and the barred windows tell a different story.
+
+What surgeries were performed here, on whom, and by whose consent, the records don't say. The tools remain in their cabinet: bone saws, scalpels, implements for procedures no modern surgeon would recognize. The table is clean—too clean, recently cleaned, suggesting use that continued long after any legitimate purpose ended.`,
+      x: -2,
+      y: -4,
+      z: -2,
+      population: 0,
+      ambientNoise: 8,
+      lighting: 15,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        west: '%MAINT_11',
+        east: '%MAINT_13',
+      },
+      objects: [
+        { prototype: 'furniture', name: 'surgical table', description: 'A porcelain operating table with leather straps at the wrists and ankles. The surface is clean—suspiciously clean for something a century old.', boltedDown: true },
+        { prototype: 'cabinet', name: 'surgical cabinet', description: 'A locked glass cabinet holding instruments that predate anesthesia. Some tools have no obvious medical purpose.', boltedDown: true },
+      ],
+    },
+
+    '%MAINT_13': {
+      name: 'Pump Access Corridor',
+      description: `The passage straightens and widens as it approaches the pump room, the construction becoming more industrial, more modern. This section was renovated in the twentieth century—poured concrete replacing Victorian brick, electrical conduit running along the ceiling, emergency lights that still function on backup batteries.
+
+The Gray Cartel maintains this section. Their marks are subtle but visible to those who know what to look for: a gray triangle scratched near the entrance, fresh grease on the door hinges, the absence of debris that accumulates everywhere else. This route serves current purposes.`,
+      x: -1,
+      y: -4,
+      z: -2,
+      population: 0,
+      ambientNoise: 25,
+      lighting: 20,
+      waterLevel: 10,
+      outdoor: false,
+      exits: {
+        west: '%MAINT_12',
+        east: {
+          to: 'buildings/underground-east/z-2.ts',
+          room: '%PUMP_ROOM',
+          description: 'A corridor leads east to the pump room',
+        },
+      },
+      objects: [
+        { prototype: 'sign', name: 'a gray triangle', description: 'A small gray triangle scratched into the concrete near the doorway—the Cartel\'s mark of safe passage.', boltedDown: true },
       ],
     },
   },
