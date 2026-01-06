@@ -16,6 +16,13 @@ The curb cut here still shows yellow paint where carriages loaded passengers. Th
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  exits: {
+    east: {
+      to: 'buildings/colman-building/z0.ts',
+      room: '%LOBBY',
+      description: 'Glass doors lead into the Colman Building',
+    },
+  },
   sittables: [
     {
       name: 'a hitching post',

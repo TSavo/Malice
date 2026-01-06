@@ -135,6 +135,7 @@ Street ─ sidewalk ─ Building (3 tall) ─ sidewalk ─ Street
 | King Pharmacy | +3 to +5 | -12 to -11 | S: (+4, -12) | 3 floors + roof, hybrid Chinese/Western pharmacy, looted |
 | Washington Federal Bank | -1 to 0 | -3 to -2 | E: (0, -2) | 3 floors, neoclassical bank with sealed vault |
 | King County Courthouse | +8 to +10 | +1 to +3 | W: (+7, +2) | 6 floors (basement through roof), brutalist government building, archives and courtrooms |
+| Colman Building | -13 to -10 | -4 to -1 | W: (-13, -2) | 5 floors (basement through roof), historic 1889 Romanesque Revival, residential apartments with underground tunnel connection |
 
 ## Hazard Zones (Impassable)
 
