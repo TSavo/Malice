@@ -17,6 +17,11 @@ The curb cut here still shows yellow paint where carriages loaded passengers. Th
   waterLevel: 0, // Dry
   outdoor: true, // Street level
   exits: {
+    west: {
+      to: 'buildings/merchants-cafe/z0.ts',
+      room: '%SHOWROOM',
+      description: "The door of Merchant's Cafe is slightly ajar",
+    },
     east: {
       to: 'buildings/colman-building/z0.ts',
       room: '%LOBBY',
