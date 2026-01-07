@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Room Generator Visualizer</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0a0a0f;
+      color: #e0e0e0;
+      overflow: hidden;
+    }
+    #container { width: 100vw; height: 100vh; }
+    #controls {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      background: rgba(20, 20, 30, 0.9);
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      z-index: 100;
+      min-width: 280px;
+    }
+    #controls h2 { 
+      margin-bottom: 12px; 
+      font-size: 14px; 
+      color: #88f;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .control-group {
+      margin-bottom: 12px;
+    }
+    .control-group label {
+      display: block;
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 4px;
+    }
+    .control-group input[type="range"] {
+      width: 100%;
+      accent-color: #66f;
+    }
+    .control-group input[type="number"] {
+      width: 80px;
+      background: #1a1a2a;
+      border: 1px solid #444;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .control-row {
+      display: flex;
+      gap: 12px;
+    }
+    .control-row .control-group { flex: 1; }
+    button {
+      background: linear-gradient(135deg, #44f, #66a);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      width: 100%;
+      margin-top: 8px;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(68, 68, 255, 0.3);
+    }
+    button:active { transform: translateY(0); }
+    #stats {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      background: rgba(20, 20, 30, 0.9);
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      font-size: 12px;
+      z-index: 100;
+    }
+    #stats div { margin: 4px 0; }
+    #stats span { color: #8f8; font-weight: bold; }
+    #info {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      font-size: 11px;
+      color: #666;
+    }
+    .value-display {
+      float: right;
+      color: #aaf;
+      font-weight: bold;
+    }
+    #editor-status {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      background: rgba(20, 20, 30, 0.95);
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid #555;
+      font-size: 12px;
+      z-index: 100;
+    }
+    #editor-status .mode { color: #ff8; font-weight: bold; }
+    #editor-status .z-level { color: #8ff; font-weight: bold; }
+    #editor-status kbd {
+      background: #333;
+      border: 1px solid #555;
+      border-radius: 3px;
+      padding: 2px 6px;
+      margin: 0 2px;
+    }
+    .cursor-preview {
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+  
+  <div id="controls">
+    <h2>Room Generator</h2>
+    
+    <div class="control-group">
+      <label>Seed <span class="value-display" id="seedVal">12345</span></label>
+      <input type="number" id="seed" value="12345" min="1">
+    </div>
+    
+    <div class="control-group">
+      <label>Max Rooms <span class="value-display" id="maxRoomsVal">500</span></label>
+      <input type="range" id="maxRooms" min="50" max="2000" value="500">
+    </div>
+    
+    <div class="control-group">
+      <label>Branch Chance <span class="value-display" id="branchChanceVal">0.20</span></label>
+      <input type="range" id="branchChance" min="0" max="100" value="20">
+    </div>
+    
+    <div class="control-group">
+      <label>Linear Bias <span class="value-display" id="linearBiasVal">0.70</span></label>
+      <input type="range" id="linearBias" min="0" max="200" value="70">
+    </div>
+    
+    <div class="control-group">
+      <label>Center Bias <span class="value-display" id="centerBiasVal">1.20</span></label>
+      <input type="range" id="centerBias" min="0" max="300" value="120">
+    </div>
+    
+    <div class="control-group">
+      <label>Center Penalty <span class="value-display" id="centerPenaltyVal">0.90</span></label>
+      <input type="range" id="centerPenalty" min="0" max="200" value="90">
+    </div>
+    
+    <div class="control-group">
+      <label>Prefab Chance <span class="value-display" id="prefabChanceVal">0.15</span></label>
+      <input type="range" id="prefabChance" min="0" max="100" value="15">
+    </div>
+    
+    
+    <button id="generate">Generate World</button>
+    <button id="randomSeed" style="background: linear-gradient(135deg, #4a4, #6a6);">Random Seed</button>
+  </div>
+  
+  <div id="stats">
+    <div>Rooms: <span id="roomCount">0</span></div>
+    <div>Exits: <span id="exitCount">0</span></div>
+    <div>Prefab Instances: <span id="prefabCount">0</span></div>
+    <div>Connected: <span id="connected">-</span></div>
+  </div>
+  
+  <div id="info">
+    <kbd>WASD</kbd> move • Drag to rotate • Scroll to zoom • Right-drag to pan
+  </div>
+  
+  <div id="editor-status">
+    <div>Mode: <span class="mode" id="editorMode">ROOM</span> | Z: <span class="z-level" id="editorZ">-2</span></div>
+    <div style="margin-top: 6px; color: #888;">
+      <kbd>R</kbd> toggle mode • <kbd>Q</kbd>/<kbd>Z</kbd> adjust Z
+    </div>
+    <div style="margin-top: 4px; color: #888;">
+      <kbd>Click</kbd> add • <kbd>Shift+Click</kbd> delete
+    </div>
+    <div style="margin-top: 4px; color: #888;">
+      <kbd>T</kbd> cycle room type • <kbd>E</kbd> export JSON
+    </div>
+    <div style="margin-top: 6px; font-size: 10px;">
+      <span style="color: #4466aa;">■</span> room
+      <span style="color: #886644;">■</span> railway
+      <span style="color: #44ff44;">■</span> entrance
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { generateWorld } from './roomgen.bundle.js';
+    import { SAMPLE_PREFABS } from './roomgen-prefabs.js';
+
+    // ============ THREE.JS VISUALIZATION ============
+
+    let scene, camera, renderer, controls;
+    let roomMeshes = [], lineMeshes = [];
+    
+    // Editor state
+    let editorMode = 'room'; // 'room' or 'exit'
+    let editorZ = -2;
+    let cursorPreview = null;
+    let exitStartRoomId = null; // Store ID, not reference
+    let currentWorld = null;
+    let currentEntrances = null;
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+    
+    // Click vs drag detection
+    let mouseDownPos = null;
+    const DRAG_THRESHOLD = 5; // pixels
+    
+    // Room types and colors
+    const ROOM_TYPES = ['room', 'railway', 'entrance'];
+    const ROOM_COLORS = {
+      room: { color: 0x4466aa, emissive: 0x112244 },
+      railway: { color: 0x886644, emissive: 0x221100 },
+      entrance: { color: 0x44ff44, emissive: 0x114411 },
+    };
+    
+    // Era based on z-level (for description generation)
+    const Z_ERA = {
+      '-1': 'modern',      // Building basements
+      '-2': 'victorian',   // 1889 buried streets
+      '-3': 'depression',  // 1930s WPA tunnels, cisterns
+      '-4': 'industrial',  // Utility passages
+      '-5': 'deep',        // Core infrastructure
+      '-6': 'ancient',     // Pre-fire, deepest
+    };
+    
+    // Random features pool (seeded by room position)
+    // Features are split into: common (any room), surface_only, deep_only, water_adjacent
+    const FEATURES = {
+      victorian: {
+        common: [
+          'bricked_up_storefront', 'sealed_doorway', 'collapsed_ceiling_section', 'cast_iron_column',
+          'brick_arch', 'rotted_wooden_beam', 'crumbling_plaster', 'faded_painted_sign',
+          'rusted_gas_pipe', 'broken_tile_floor', 'cobblestone_remnant', 'iron_grate_floor',
+          'coal_chute_sealed', 'wooden_support_shoring', 'water_stains_old', 'rat_droppings',
+          'graffiti_1890s', 'candle_wax_residue', 'bootprints_in_dust', 'debris_pile',
+          'fallen_brick', 'exposed_foundation', 'wooden_door_rotted', 'iron_hinges_rusted',
+          'plaster_ceiling_peeling', 'brick_wall_efflorescence', 'mortar_crumbling',
+          'floor_joist_exposed', 'crawlspace_access', 'chimney_base', 'ash_deposit',
+          'broken_glass_fragments', 'newspaper_1890s', 'medicine_bottle_antique',
+          'leather_scrap', 'rusted_barrel_hoop', 'wooden_crate_collapsed',
+        ],
+        surface_only: [
+          'prism_skylight_dark', 'prism_skylight_cracked', 'prism_skylight_missing',
+          'street_grate_above', 'manhole_sealed', 'sidewalk_underside', 'utility_chase',
+          'storefront_window_bricked', 'awning_frame_rusted', 'hitching_ring',
+        ],
+        water_adjacent: [
+          'tidal_mark', 'barnacle_encrusted', 'driftwood_lodged', 'salt_deposit',
+          'seaweed_dried', 'pier_piling_base', 'rope_fragment_rotted',
+        ],
+      },
+      depression: {
+        common: [
+          'concrete_wall_stained', 'steel_i_beam', 'utility_pipe_bundle', 'valve_wheel_rusted',
+          'cistern_grate', 'pump_housing_dead', 'drainage_channel', 'wpa_date_stamp_1937',
+          'emergency_light_dead', 'cable_conduit_old', 'ventilation_grate', 'access_ladder_rusted',
+          'tool_marks_chisel', 'workman_graffiti', 'abandoned_wheelbarrow', 'water_line_mark',
+          'concrete_form_marks', 'rebar_exposed', 'expansion_joint', 'sump_pit',
+          'electrical_junction_1930s', 'fuse_box_obsolete', 'steam_radiator_cold',
+          'pipe_insulation_asbestos', 'gauge_cluster_dead', 'pressure_relief_valve',
+          'hand_rail_pipe', 'concrete_stairs_worn', 'floor_drain_clogged',
+          'lightbulb_socket_empty', 'wire_conduit_surface', 'switchbox_rusted',
+        ],
+        deep_only: [
+          'cistern_dome', 'reservoir_wall', 'water_level_gauge', 'overflow_channel',
+          'sediment_basin', 'intake_grate', 'pump_shaft', 'artesian_well_capped',
+        ],
+      },
+      industrial: {
+        common: [
+          'power_tap_illegal', 'junction_box_spliced', 'steam_pipe_wrapped', 'pressure_gauge_cracked',
+          'maintenance_hatch', 'shutoff_valve', 'cable_bundle_new', 'motion_sensor_hidden',
+          'dead_drop_hollow', 'cache_concealed', 'marker_symbol_cartel', 'tripwire_mount',
+          'surveillance_blind', 'escape_route_marker', 'supply_crate_cartel', 'water_barrel_stored',
+          'battery_bank', 'radio_antenna_hidden', 'medical_cache', 'weapon_rack_empty',
+          'sleeping_pallet', 'cook_stove_camp', 'food_cache_sealed', 'tool_kit_stashed',
+          'map_scratched_wall', 'tally_marks', 'warning_symbol', 'safe_room_door',
+          'air_filter_improvised', 'generator_mount', 'fuel_can_stacked', 'rope_coiled',
+          'ladder_improvised', 'barricade_materials', 'lookout_position', 'signal_mirror',
+        ],
+        cartel_secure: [
+          'biometric_lock', 'blast_door', 'faraday_mesh', 'secure_comms_terminal',
+          'armory_door', 'interrogation_ring', 'command_table', 'map_wall_detailed',
+        ],
+      },
+      modern: {
+        common: [
+          'fluorescent_dead', 'drop_ceiling_sagging', 'hvac_duct_rusted', 'sprinkler_dry',
+          'fire_extinguisher_expired', 'exit_sign_dark', 'electrical_panel_open', 'storage_shelf_empty',
+          'cardboard_debris', 'sleeping_bag_abandoned', 'food_wrapper_recent', 'flashlight_dead',
+          'graffiti_recent', 'shopping_cart', 'mattress_stained', 'blanket_pile',
+          'plastic_bucket', 'propane_tank_empty', 'cooler_broken', 'folding_chair_bent',
+          'milk_crate_stack', 'tarp_hung', 'extension_cord_tangled', 'phone_charger_dead',
+          'cigarette_butts', 'syringe_discarded', 'bottle_collection', 'clothing_pile',
+          'backpack_abandoned', 'bicycle_stripped', 'shopping_bag_stuffed', 'water_jug_empty',
+        ],
+        surface_only: [
+          'basement_window_barred', 'service_entrance', 'dumpster_chute', 'loading_dock_remnant',
+        ],
+      },
+      deep: {
+        common: [
+          'rough_hewn_wall', 'natural_rock_face', 'seepage_stain', 'mineral_deposit_white',
+          'timber_shoring_old', 'ore_cart_track_fragment', 'air_shaft_distant', 'sump_puddle',
+          'echo_point', 'bat_guano', 'root_penetration', 'groundwater_drip',
+          'stalactite_forming', 'flowstone_deposit', 'clay_deposit', 'gravel_fill',
+          'bedrock_exposed', 'fault_line_visible', 'coal_seam', 'sandstone_layer',
+          'boulder_fallen', 'rockfall_debris', 'timber_collapsed', 'mine_cart_rusted',
+          'pick_marks', 'drill_holes_blasting', 'ore_vein_exhausted', 'candle_niche',
+          'tool_cache_miner', 'boot_print_fossilized', 'rope_anchor_iron', 'winch_mount',
+        ],
+        flooded: [
+          'waterline_current', 'submerged_passage', 'water_black', 'ripple_pattern',
+          'algae_growth', 'fish_bones', 'flotsam_collected', 'water_sound_drip',
+        ],
+      },
+      ancient: {
+        common: [
+          'hand_cut_stone', 'lime_mortar_crumbling', 'root_mass_thick', 'partial_collapse',
+          'timber_rotted_through', 'oil_lamp_niche', 'water_channel_dry', 'sediment_layer',
+          'bone_fragments_animal', 'pottery_shard', 'rusted_nail_square', 'inscribed_date_1870s',
+          'wooden_bucket_staves', 'leather_fragment', 'coin_corroded', 'button_bone',
+          'clay_pipe_fragment', 'glass_bottle_hand_blown', 'brick_handmade', 'stone_foundation',
+          'well_shaft_dry', 'spring_box', 'root_cellar_remains', 'ice_house_foundation',
+          'tannery_vat_remains', 'sawdust_layer', 'charcoal_deposit', 'fire_pit_ancient',
+          'midden_heap', 'shell_deposit', 'native_artifact', 'hudson_bay_trade_good',
+        ],
+        water_adjacent: [
+          'tide_gate_rusted', 'wharf_piling_remnant', 'ballast_stone', 'ship_timber_fragment',
+          'anchor_chain_rusted', 'cargo_hook', 'dock_cleat', 'barnacle_fossil',
+        ],
+      },
+    };
+    
+    // Condition modifiers
+    const CONDITIONS = [
+      'pristine', 'preserved', 'weathered', 'damaged', 'flooded', 
+      'collapsed', 'reinforced', 'modified', 'abandoned', 'occupied',
+    ];
+    
+    // Atmosphere descriptors
+    const ATMOSPHERES = [
+      'damp', 'dry', 'musty', 'stale', 'cold', 'warm', 
+      'drafty', 'still', 'echoing', 'muffled',
+    ];
+
+    function key(p) { return `${p.x},${p.y},${p.z}`; }
+    function manhattan(a, b) {
+      return Math.abs(a.x - b.x) + Math.abs(a.y - b.y) + Math.abs(a.z - b.z);
+    }
+
+    function init() {
+      const container = document.getElementById('container');
+      
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0a0a0f);
+      scene.fog = new THREE.Fog(0x0a0a0f, 50, 150);
+
+      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(30, 30, 30);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      container.appendChild(renderer.domElement);
+
+      controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+
+      // Lights
+      const ambient = new THREE.AmbientLight(0x404060, 0.5);
+      scene.add(ambient);
+
+      const directional = new THREE.DirectionalLight(0xffffff, 1);
+      directional.position.set(50, 50, 50);
+      scene.add(directional);
+
+      const directional2 = new THREE.DirectionalLight(0x8888ff, 0.5);
+      directional2.position.set(-50, -30, -50);
+      scene.add(directional2);
+
+      // Grid helper at z=-10
+      const grid = new THREE.GridHelper(100, 100, 0x222233, 0x111122);
+      grid.position.y = -10 * 2; // z=-10, spacing=2
+      scene.add(grid);
+
+      window.addEventListener('resize', onResize);
+      window.addEventListener('keydown', onKeyDown);
+      window.addEventListener('keyup', onKeyUp);
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mousedown', onMouseDown);
+      window.addEventListener('mouseup', onMouseUp);
+      
+      createCursorPreview();
+      setupControls();
+      generate();
+      animate();
+    }
+    
+    function createCursorPreview() {
+      const geometry = new THREE.BoxGeometry(0.7, 0.7, 0.7);
+      const material = new THREE.MeshBasicMaterial({ 
+        color: 0xffff00, 
+        transparent: true, 
+        opacity: 0.4,
+        wireframe: true
+      });
+      cursorPreview = new THREE.Mesh(geometry, material);
+      cursorPreview.visible = false;
+      scene.add(cursorPreview);
+    }
+    
+    // WASD camera movement
+    const moveSpeed = 1;
+    const keys = { w: false, a: false, s: false, d: false };
+    
+    function onKeyDown(e) {
+      const key = e.key.toLowerCase();
+      
+      // WASD movement
+      if (key === 'w') keys.w = true;
+      if (key === 'a') keys.a = true;
+      if (key === 's') keys.s = true;
+      if (key === 'd') keys.d = true;
+      
+      // Editor controls
+      if (e.key === 'r' || e.key === 'R') {
+        editorMode = editorMode === 'room' ? 'exit' : 'room';
+        document.getElementById('editorMode').textContent = editorMode.toUpperCase();
+        exitStartRoomId = null; // Reset exit selection
+        updateCursorPreviewColor();
+      } else if (e.key === 't' || e.key === 'T') {
+        cycleRoomType();
+      } else if (e.key === 'e' || e.key === 'E') {
+        exportWorld();
+      } else if (e.key === 'q' || e.key === 'Q') {
+        editorZ = Math.min(0, editorZ + 1); // Allow up to z=0
+        document.getElementById('editorZ').textContent = editorZ;
+        updateGroundPlane();
+        updateCursorPreviewZ();
+      } else if (key === 'z' && !e.ctrlKey) {
+        editorZ = Math.max(-10, editorZ - 1); // Allow down to z=-10
+        document.getElementById('editorZ').textContent = editorZ;
+        updateGroundPlane();
+        updateCursorPreviewZ();
+      }
+    }
+    
+    function onKeyUp(e) {
+      const key = e.key.toLowerCase();
+      if (key === 'w') keys.w = false;
+      if (key === 'a') keys.a = false;
+      if (key === 's') keys.s = false;
+      if (key === 'd') keys.d = false;
+    }
+    
+    function updateCameraMovement() {
+      const forward = new THREE.Vector3();
+      camera.getWorldDirection(forward);
+      forward.y = 0;
+      forward.normalize();
+      
+      const right = new THREE.Vector3();
+      right.crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
+      
+      if (keys.w) {
+        camera.position.add(forward.multiplyScalar(moveSpeed));
+        controls.target.add(forward);
+      }
+      if (keys.s) {
+        camera.position.sub(forward.multiplyScalar(moveSpeed));
+        controls.target.sub(forward);
+      }
+      if (keys.a) {
+        camera.position.sub(right.multiplyScalar(moveSpeed));
+        controls.target.sub(right);
+      }
+      if (keys.d) {
+        camera.position.add(right.multiplyScalar(moveSpeed));
+        controls.target.add(right);
+      }
+    }
+    
+    function updateGroundPlane() {
+      groundPlane.constant = -editorZ * 2; // spacing = 2
+    }
+    
+    function updateCursorPreviewZ() {
+      if (cursorPreview && cursorPreview.visible) {
+        const spacing = 2;
+        cursorPreview.position.y = editorZ * spacing;
+      }
+    }
+    
+    // Get room under cursor for T key
+    function getHoveredRoom() {
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(roomMeshes);
+      if (intersects.length > 0) {
+        const roomId = intersects[0].object.userData.roomId;
+        if (roomId !== undefined) {
+          return findRoomById(roomId);
+        }
+      }
+      return null;
+    }
+    
+    function cycleRoomType() {
+      const room = getHoveredRoom();
+      if (!room) return;
+      
+      const currentType = room.meta?.roomType || 'tunnel';
+      const currentIndex = ROOM_TYPES.indexOf(currentType);
+      const nextIndex = (currentIndex + 1) % ROOM_TYPES.length;
+      
+      if (!room.meta) room.meta = {};
+      room.meta.roomType = ROOM_TYPES[nextIndex];
+      
+      console.log('Room', room.id, 'type changed to', room.meta.roomType);
+      refreshVisualization();
+    }
+    
+    function classifyRoomTypes() {
+      if (!currentWorld) return;
+      
+      // Build adjacency map
+      const exitCount = new Map();
+      for (const exit of currentWorld.exits) {
+        exitCount.set(exit.from, (exitCount.get(exit.from) || 0) + 1);
+      }
+      
+      const entranceSet = new Set(currentEntrances.map(e => key(e)));
+      
+      for (const room of currentWorld.rooms) {
+        // Skip if already manually set
+        if (room.meta?.roomType) continue;
+        
+        if (!room.meta) room.meta = {};
+        
+        // Entrance rooms
+        if (entranceSet.has(key(room.pos))) {
+          room.meta.roomType = 'entrance';
+        }
+        // Prefab rooms are 'room' type
+        else if (room.meta?.prefabId) {
+          room.meta.roomType = 'room';
+        }
+        // 1-2 exits = railway (linear passages)
+        else if ((exitCount.get(room.id) || 0) <= 2) {
+          room.meta.roomType = 'railway';
+        }
+        // 3+ exits = room
+        else {
+          room.meta.roomType = 'room';
+        }
+      }
+    }
+    
+    // Seeded random for consistent room features
+    function seededRandom(seed) {
+      let s = seed;
+      return function() {
+        s = (s * 1103515245 + 12345) & 0x7fffffff;
+        return s / 0x7fffffff;
+      };
+    }
+    
+    function enrichRoomMetadata() {
+      if (!currentWorld) return;
+      
+      // Build adjacency and exit direction maps
+      const roomById = new Map();
+      const exitsByRoom = new Map();
+      const neighborTypes = new Map();
+      
+      for (const room of currentWorld.rooms) {
+        roomById.set(room.id, room);
+        exitsByRoom.set(room.id, []);
+      }
+      
+      for (const exit of currentWorld.exits) {
+        exitsByRoom.get(exit.from)?.push(exit);
+      }
+      
+      // Calculate depth from nearest entrance (BFS)
+      const entranceSet = new Set(currentEntrances.map(e => key(e)));
+      const entranceRoomIds = currentWorld.rooms
+        .filter(r => entranceSet.has(key(r.pos)))
+        .map(r => r.id);
+      
+      const depth = new Map();
+      const queue = entranceRoomIds.map(id => ({ id, d: 0 }));
+      entranceRoomIds.forEach(id => depth.set(id, 0));
+      
+      while (queue.length) {
+        const { id, d } = queue.shift();
+        for (const exit of exitsByRoom.get(id) || []) {
+          if (!depth.has(exit.to)) {
+            depth.set(exit.to, d + 1);
+            queue.push({ id: exit.to, d: d + 1 });
+          }
+        }
+      }
+      
+      // Enrich each room
+      for (const room of currentWorld.rooms) {
+        if (!room.meta) room.meta = {};
+        
+        const z = room.pos.z;
+        const exits = exitsByRoom.get(room.id) || [];
+        
+        // Era based on z-level
+        room.meta.era = Z_ERA[String(z)] || 'victorian';
+        
+        // Cardinal directions
+        const cardinals = { north: false, south: false, east: false, west: false, up: false, down: false };
+        for (const exit of exits) {
+          const neighbor = roomById.get(exit.to);
+          if (!neighbor) continue;
+          
+          const dx = neighbor.pos.x - room.pos.x;
+          const dy = neighbor.pos.y - room.pos.y;
+          const dz = neighbor.pos.z - room.pos.z;
+          
+          if (dz > 0) cardinals.up = true;
+          else if (dz < 0) cardinals.down = true;
+          else if (dy > 0) cardinals.north = true;
+          else if (dy < 0) cardinals.south = true;
+          else if (dx > 0) cardinals.east = true;
+          else if (dx < 0) cardinals.west = true;
+        }
+        room.meta.exits = cardinals;
+        room.meta.exitCount = exits.length;
+        
+        // Depth from entrance
+        room.meta.depth = depth.get(room.id) ?? 999;
+        
+        // Seeded random features based on position
+        const seed = Math.abs(room.pos.x * 73856093 ^ room.pos.y * 19349663 ^ room.pos.z * 83492791);
+        const rand = seededRandom(seed);
+        
+        // Condition (weighted by depth and z-level)
+        const conditionRoll = rand();
+        if (room.meta.roomType === 'entrance') {
+          room.meta.condition = 'preserved';
+        } else if (z <= -5) {
+          room.meta.condition = conditionRoll < 0.3 ? 'collapsed' : conditionRoll < 0.6 ? 'damaged' : 'weathered';
+        } else if (z === -4) {
+          room.meta.condition = conditionRoll < 0.2 ? 'reinforced' : conditionRoll < 0.5 ? 'modified' : 'industrial';
+        } else if (z === -3) {
+          room.meta.condition = conditionRoll < 0.15 ? 'flooded' : conditionRoll < 0.4 ? 'damp' : 'weathered';
+        } else {
+          room.meta.condition = conditionRoll < 0.1 ? 'collapsed' : conditionRoll < 0.3 ? 'damaged' : 'preserved';
+        }
+        
+        // Atmosphere
+        const atmRoll = rand();
+        const atmIdx = Math.floor(atmRoll * ATMOSPHERES.length);
+        room.meta.atmosphere = ATMOSPHERES[atmIdx];
+        
+        // 2-5 features based on era, with contextual filtering
+        const eraFeatures = FEATURES[room.meta.era] || FEATURES.victorian;
+        const availableFeatures = [...(eraFeatures.common || [])];
+        
+        // Add surface-only features if near surface
+        if (room.meta.nearSurface && eraFeatures.surface_only) {
+          availableFeatures.push(...eraFeatures.surface_only);
+        }
+        
+        // Add deep-only features if deep
+        if (room.meta.isDeep && eraFeatures.deep_only) {
+          availableFeatures.push(...eraFeatures.deep_only);
+        }
+        
+        // Add water-adjacent features if near water
+        if (room.meta.nearWater && eraFeatures.water_adjacent) {
+          availableFeatures.push(...eraFeatures.water_adjacent);
+        }
+        
+        // Add flooded features for deep water areas
+        if (room.meta.isDeep && room.meta.nearWater && eraFeatures.flooded) {
+          availableFeatures.push(...eraFeatures.flooded);
+        }
+        
+        // Add cartel secure features for deep industrial areas
+        if (room.meta.era === 'industrial' && room.meta.isDeep && eraFeatures.cartel_secure) {
+          availableFeatures.push(...eraFeatures.cartel_secure);
+        }
+        
+        const featureCount = 2 + Math.floor(rand() * 4); // 2-5 features
+        room.meta.features = [];
+        const usedFeatures = new Set();
+        for (let i = 0; i < featureCount && availableFeatures.length > 0; i++) {
+          const idx = Math.floor(rand() * availableFeatures.length);
+          const feature = availableFeatures[idx];
+          if (!usedFeatures.has(feature)) {
+            room.meta.features.push(feature);
+            usedFeatures.add(feature);
+          }
+        }
+        
+        // Neighbor context
+        room.meta.neighborTypes = [];
+        for (const exit of exits) {
+          const neighbor = roomById.get(exit.to);
+          if (neighbor?.meta?.roomType && !room.meta.neighborTypes.includes(neighbor.meta.roomType)) {
+            room.meta.neighborTypes.push(neighbor.meta.roomType);
+          }
+        }
+        
+        // Is this a dead end, corridor, junction, or hub?
+        if (exits.length === 1) room.meta.topology = 'dead_end';
+        else if (exits.length === 2) room.meta.topology = 'corridor';
+        else if (exits.length === 3) room.meta.topology = 'junction';
+        else room.meta.topology = 'hub';
+        
+        // Is this near water (low y values near waterfront)?
+        room.meta.nearWater = room.pos.x <= -18 || (room.pos.y <= -10);
+        
+        // Is this near surface?
+        room.meta.nearSurface = room.meta.depth <= 3;
+        
+        // Is this deep underground?
+        room.meta.isDeep = z <= -4;
+      }
+      
+      console.log('Enriched metadata for', currentWorld.rooms.length, 'rooms');
+    }
+    
+    function exportWorld() {
+      if (!currentWorld) {
+        alert('No world to export!');
+        return;
+      }
+      
+      const exportData = {
+        rooms: currentWorld.rooms.map(r => ({
+          id: r.id,
+          pos: r.pos,
+          // Room classification
+          roomType: r.meta?.roomType || 'room',
+          topology: r.meta?.topology || 'corridor',
+          // Era and condition for description generation
+          era: r.meta?.era || 'victorian',
+          condition: r.meta?.condition || 'weathered',
+          atmosphere: r.meta?.atmosphere || 'musty',
+          // Spatial context
+          exits: r.meta?.exits || {},
+          exitCount: r.meta?.exitCount || 0,
+          depth: r.meta?.depth || 0,
+          // Environmental features (seeded random)
+          features: r.meta?.features || [],
+          // Contextual flags
+          nearWater: r.meta?.nearWater || false,
+          nearSurface: r.meta?.nearSurface || false,
+          isDeep: r.meta?.isDeep || false,
+          neighborTypes: r.meta?.neighborTypes || [],
+          // Prefab info if applicable
+          prefabId: r.meta?.prefabId,
+          prefabInstanceId: r.meta?.prefabInstanceId,
+        })),
+        exits: currentWorld.exits.map(e => ({
+          from: e.from,
+          to: e.to,
+          kind: e.kind,
+        })),
+        meta: {
+          entranceCount: currentEntrances.length,
+          roomCount: currentWorld.rooms.length,
+          exitCount: currentWorld.exits.length / 2,
+          exportedAt: new Date().toISOString(),
+          // Feature pools for reference
+          featurePools: FEATURES,
+          conditions: CONDITIONS,
+          atmospheres: ATMOSPHERES,
+          eras: Z_ERA,
+        }
+      };
+      
+      const json = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'underground-world-' + Date.now() + '.json';
+      a.click();
+      
+      URL.revokeObjectURL(url);
+      console.log('Exported world with', exportData.meta.roomCount, 'rooms');
+    }
+    
+    function updateCursorPreviewColor() {
+      if (!cursorPreview) return;
+      const color = editorMode === 'room' ? 0xffff00 : (exitStartRoomId !== null ? 0xff8800 : 0x00ffff);
+      cursorPreview.material.color.setHex(color);
+    }
+    
+    function getGridPosition(e) {
+      mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      
+      raycaster.setFromCamera(mouse, camera);
+      const intersect = new THREE.Vector3();
+      raycaster.ray.intersectPlane(groundPlane, intersect);
+      
+      if (!intersect) return null;
+      
+      const spacing = 2;
+      const x = Math.round(intersect.x / spacing);
+      const y = Math.round(intersect.z / spacing); // z in 3D = y in 2D world
+      const z = editorZ;
+      
+      return { x, y, z };
+    }
+    
+    function onMouseMove(e) {
+      if (!cursorPreview) return;
+      
+      const pos = getGridPosition(e);
+      if (pos) {
+        const spacing = 2;
+        cursorPreview.position.set(pos.x * spacing, pos.z * spacing, pos.y * spacing);
+        cursorPreview.visible = true;
+      } else {
+        cursorPreview.visible = false;
+      }
+    }
+    
+    function findRoomAtPosition(pos) {
+      if (!currentWorld || !pos) return null;
+      return currentWorld.rooms.find(r => 
+        r.pos && r.pos.x === pos.x && r.pos.y === pos.y && r.pos.z === pos.z
+      ) || null;
+    }
+    
+    function findRoomById(id) {
+      if (!currentWorld) return null;
+      return currentWorld.rooms.find(r => r.id === id);
+    }
+    
+    function getRoomUnderMouse(e) {
+      mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(roomMeshes);
+      
+      if (intersects.length > 0) {
+        const roomId = intersects[0].object.userData.roomId;
+        if (roomId !== undefined) {
+          return findRoomById(roomId);
+        }
+      }
+      return null;
+    }
+    
+    function onMouseDown(e) {
+      if (e.button === 0) {
+        mouseDownPos = { x: e.clientX, y: e.clientY };
+      }
+    }
+    
+    function onMouseUp(e) {
+      if (e.button !== 0 || !mouseDownPos) return;
+      
+      // Check if it was a drag (moved more than threshold)
+      const dx = e.clientX - mouseDownPos.x;
+      const dy = e.clientY - mouseDownPos.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      mouseDownPos = null;
+      
+      if (distance > DRAG_THRESHOLD) {
+        // It was a drag, not a click
+        return;
+      }
+      
+      // It was a click - handle it
+      handleClick(e);
+    }
+    
+    function handleClick(e) {
+      // Ignore if clicking on UI
+      if (e.target.closest('#controls') || e.target.closest('#stats') || e.target.closest('#editor-status')) return;
+      
+      const pos = getGridPosition(e);
+      
+      // For exit mode, use raycast to detect rooms directly
+      const clickedRoom = getRoomUnderMouse(e);
+      const existingRoom = clickedRoom || (pos ? findRoomAtPosition(pos) : null);
+      
+      console.log('Click at', pos, 'mode:', editorMode, 'clickedRoom:', clickedRoom?.id, 'existingRoom:', existingRoom?.id, 'roomMeshes:', roomMeshes.length);
+      
+      if (e.shiftKey) {
+        // Delete mode
+        if (existingRoom) {
+          deleteRoom(existingRoom);
+        }
+      } else {
+        // Add mode
+        if (editorMode === 'room') {
+          if (pos && !existingRoom) {
+            addRoom(pos);
+          }
+        } else {
+          // Exit mode - only works on existing rooms
+          if (existingRoom && existingRoom.id) {
+            if (exitStartRoomId === null) {
+              exitStartRoomId = existingRoom.id;
+              console.log('Exit start room:', exitStartRoomId);
+              updateCursorPreviewColor();
+            } else if (exitStartRoomId !== existingRoom.id) {
+              const startRoom = findRoomById(exitStartRoomId);
+              console.log('Creating exit from', exitStartRoomId, 'to', existingRoom.id);
+              if (startRoom && startRoom.id) {
+                addExit(startRoom, existingRoom);
+              }
+              exitStartRoomId = null;
+              updateCursorPreviewColor();
+            }
+          }
+        }
+      }
+    }
+    
+    function addRoom(pos) {
+      if (!currentWorld) return;
+      
+      // Generate a unique string ID (matching the format used by generateWorld)
+      const maxNumericId = currentWorld.rooms
+        .map(r => typeof r.id === 'string' ? parseInt(r.id.replace(/\D/g, '')) || 0 : r.id)
+        .reduce((max, id) => Math.max(max, id), 0);
+      const newId = `r${maxNumericId + 1}`;
+      
+      const newRoom = { id: newId, pos: { ...pos }, meta: { editor: true } };
+      currentWorld.rooms.push(newRoom);
+      console.log('Added room:', newId, 'at', pos);
+      
+      refreshVisualization();
+    }
+    
+    function deleteRoom(room) {
+      if (!currentWorld) return;
+      
+      // Remove room
+      currentWorld.rooms = currentWorld.rooms.filter(r => r.id !== room.id);
+      
+      // Remove exits connected to this room
+      currentWorld.exits = currentWorld.exits.filter(e => e.from !== room.id && e.to !== room.id);
+      
+      refreshVisualization();
+    }
+    
+    function addExit(room1, room2) {
+      if (!currentWorld) {
+        console.log('No currentWorld!');
+        return;
+      }
+      
+      console.log('addExit called:', room1.id, '->', room2.id);
+      console.log('Exits before:', currentWorld.exits.length);
+      
+      // Check if exit already exists
+      const exists = currentWorld.exits.some(e => 
+        (e.from === room1.id && e.to === room2.id) || 
+        (e.from === room2.id && e.to === room1.id)
+      );
+      
+      if (!exists) {
+        currentWorld.exits.push({ from: room1.id, to: room2.id, kind: 'cardinal' });
+        currentWorld.exits.push({ from: room2.id, to: room1.id, kind: 'cardinal' });
+        console.log('Added exits. Total now:', currentWorld.exits.length);
+      } else {
+        console.log('Exit already exists');
+      }
+      
+      refreshVisualization();
+      console.log('Refresh done');
+    }
+    
+    function refreshVisualization() {
+      clearWorld();
+      visualizeWorld(currentWorld, currentEntrances);
+      updateStats(currentWorld);
+      
+      // Re-add cursor preview
+      if (cursorPreview) scene.add(cursorPreview);
+    }
+
+    function onResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function setupControls() {
+      const sliders = ['maxRooms', 'branchChance', 'linearBias', 'centerBias', 'centerPenalty', 'prefabChance'];
+      sliders.forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener('input', () => {
+          const val = id === 'maxRooms' ? el.value : (el.value / 100).toFixed(2);
+          document.getElementById(id + 'Val').textContent = val;
+        });
+      });
+
+      document.getElementById('seed').addEventListener('change', (e) => {
+        document.getElementById('seedVal').textContent = e.target.value;
+      });
+
+      document.getElementById('generate').addEventListener('click', generate);
+      document.getElementById('randomSeed').addEventListener('click', () => {
+        const seed = Math.floor(Math.random() * 1000000);
+        document.getElementById('seed').value = seed;
+        document.getElementById('seedVal').textContent = seed;
+        generate();
+      });
+    }
+
+    function clearWorld() {
+      roomMeshes.forEach(m => scene.remove(m));
+      lineMeshes.forEach(m => scene.remove(m));
+      roomMeshes = [];
+      lineMeshes = [];
+    }
+
+    function generate() {
+      clearWorld();
+      exitStartRoomId = null; // Reset exit selection on regenerate
+      updateCursorPreviewColor();
+
+      const seed = parseInt(document.getElementById('seed').value) || 12345;
+      const maxRooms = parseInt(document.getElementById('maxRooms').value) || 500;
+      const branchChance = parseInt(document.getElementById('branchChance').value) / 100;
+      const linearBias = parseInt(document.getElementById('linearBias').value) / 100;
+      const centerBias = parseInt(document.getElementById('centerBias').value) / 100;
+      const centerPenalty = parseInt(document.getElementById('centerPenalty').value) / 100;
+      const prefabChance = parseInt(document.getElementById('prefabChance').value) / 100;
+
+      const bounds = {
+        min: { x: -25, y: -12, z: -6 },
+        max: { x: 15, y: 15, z: -1 }  // Includes z=-1 for entrances, but generation stays at z=-2 or below
+      };
+
+      // Real Pioneer Square underground entrances (all building basements at z=-1)
+      const entrances = [
+        // === BUILDING BASEMENTS ===
+        { x: -16, y: 8, z: -1 },   // City Services
+        { x: 6, y: 4, z: -1 },     // Corp Construction
+        { x: 9, y: 3, z: -1 },     // County Courthouse
+        { x: -20, y: 8, z: -1 },   // Fabrication Factory
+        { x: -14, y: 1, z: -1 },   // Grand Central
+        { x: -16, y: 10, z: -1 },  // Immigration Services
+        { x: 11, y: -6, z: -1 },   // Jade Palace Jewelers
+        { x: -15, y: 4, z: -1 },   // JM Cafe
+        { x: -12, y: -3, z: -1 },  // Klondike Museum
+        { x: -15, y: -3, z: -1 },  // Merchants Cafe / Underground Tour
+        { x: -14, y: 7, z: -1 },   // Morrison Kline
+        { x: -8, y: 0, z: -1 },    // Occidental Square
+        { x: -16, y: -1, z: -1 },  // Owl Cafe
+        { x: -15, y: 12, z: -1 },  // Pioneer Books
+        { x: -16, y: 7, z: -1 },   // Pioneer Hotel
+        { x: -16, y: 4, z: -1 },   // Redux Vintage
+        { x: -2, y: 11, z: -1 },   // Smith Tower
+        { x: -20, y: -5, z: -1 },  // Supply Depot
+        { x: -16, y: -6, z: -1 },  // Terra Nova Gallery
+        { x: -14, y: 0, z: -1 },   // Trinity Nightclub
+        { x: -5, y: -6, z: -1 },   // Union Station
+        { x: -13, y: 1, z: -1 },   // Zeitgeist Building
+        { x: -16, y: 0, z: -1 },   // Zeitgeist Coffee
+        
+        // === UNDERGROUND ENTRY SHAFTS ===
+        { x: -3, y: 2, z: -1 },    // Occidental Shaft
+        { x: 4, y: 9, z: -1 },     // Pioneer Building
+        
+        // === DEEP UNDERGROUND ANCHORS ===
+        { x: -14, y: 1, z: -6 },   // The Blind
+        { x: -14, y: -2, z: -4 },  // Underground Complex entry
+        
+        // === KEY JUNCTION ===
+        { x: -14, y: 9, z: -2 },   // Tunnel Mouth
+      ];
+
+      const world = generateWorld(entrances, bounds, seed, {
+        maxRooms,
+        branchChance,
+        linearBias,
+        centerBias,
+        centerPenalty,
+        prefabChance,
+        prefabs: SAMPLE_PREFABS,
+        inferCardinalExits: true,
+      });
+
+      currentWorld = world;
+      currentEntrances = entrances;
+      
+      // Auto-classify room types
+      classifyRoomTypes();
+      
+      // Enrich with description context
+      enrichRoomMetadata();
+      
+      visualizeWorld(world, entrances);
+      updateStats(world);
+    }
+
+    function visualizeWorld(world, entrances) {
+      const spacing = 2;
+      const roomSize = 0.6;
+      
+      const roomPosById = new Map();
+
+      // Create room meshes
+      const entranceSet = new Set(entrances.map(e => key(e)));
+      
+      for (const room of world.rooms) {
+        const pos = new THREE.Vector3(room.pos.x * spacing, room.pos.z * spacing, room.pos.y * spacing);
+        roomPosById.set(room.id, pos);
+
+        // Get room type and colors
+        const roomType = room.meta?.roomType || 'room';
+        const colors = ROOM_COLORS[roomType] || ROOM_COLORS.room;
+        let color = colors.color;
+        let emissive = colors.emissive;
+        let scale = roomType === 'entrance' ? 1.3 : 1;
+
+        const geometry = new THREE.BoxGeometry(roomSize * scale, roomSize * scale, roomSize * scale);
+        const material = new THREE.MeshStandardMaterial({
+          color,
+          emissive,
+          metalness: 0.3,
+          roughness: 0.7,
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.copy(pos);
+        mesh.userData.roomId = room.id; // Store room ID for raycast detection
+        
+        if (room.meta?.isPortal) {
+          const wireGeo = new THREE.BoxGeometry(roomSize * scale * 1.2, roomSize * scale * 1.2, roomSize * scale * 1.2);
+          const wireMat = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.3 });
+          const wire = new THREE.Mesh(wireGeo, wireMat);
+          mesh.add(wire);
+        }
+
+        scene.add(mesh);
+        roomMeshes.push(mesh);
+      }
+
+      // Create exit lines (deduplicated bidirectional)
+      const drawnEdges = new Set();
+      const linePoints = [];
+      
+      for (const exit of world.exits) {
+        const edgeKey = [exit.from, exit.to].sort().join('-');
+        if (drawnEdges.has(edgeKey)) continue;
+        drawnEdges.add(edgeKey);
+
+        const p1 = roomPosById.get(exit.from);
+        const p2 = roomPosById.get(exit.to);
+        if (!p1 || !p2) continue;
+
+        linePoints.push(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
+      }
+
+      const lineGeometry = new THREE.BufferGeometry();
+      lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePoints, 3));
+      const lineMaterial = new THREE.LineBasicMaterial({ color: 0x336699, transparent: true, opacity: 0.4 });
+      const lineSegments = new THREE.LineSegments(lineGeometry, lineMaterial);
+      scene.add(lineSegments);
+      lineMeshes.push(lineSegments);
+
+      // Center camera on world
+      const center = new THREE.Vector3();
+      for (const room of world.rooms) {
+        center.add(roomPosById.get(room.id));
+      }
+      center.divideScalar(world.rooms.length);
+      controls.target.copy(center);
+    }
+
+    function updateStats(world) {
+      document.getElementById('roomCount').textContent = world.rooms.length;
+      document.getElementById('exitCount').textContent = world.exits.length / 2; // Bidirectional
+      
+      const prefabInstances = new Set(world.rooms.filter(r => r.meta?.prefabInstanceId).map(r => r.meta.prefabInstanceId));
+      document.getElementById('prefabCount').textContent = prefabInstances.size;
+
+      // Verify connectivity
+      const adj = new Map();
+      for (const ex of world.exits) {
+        if (!adj.has(ex.from)) adj.set(ex.from, []);
+        adj.get(ex.from).push(ex.to);
+      }
+      const visited = new Set();
+      const queue = [world.rooms[0].id];
+      visited.add(queue[0]);
+      while (queue.length) {
+        const cur = queue.shift();
+        for (const n of adj.get(cur) || []) {
+          if (!visited.has(n)) { visited.add(n); queue.push(n); }
+        }
+      }
+      const connected = visited.size === world.rooms.length;
+      const el = document.getElementById('connected');
+      el.textContent = connected ? '✓' : '✗';
+      el.style.color = connected ? '#4f4' : '#f44';
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      updateCameraMovement();
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    init();
+  </script>
+</body>
+</html>
