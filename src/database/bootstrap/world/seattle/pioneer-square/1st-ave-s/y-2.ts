@@ -24,7 +24,7 @@ The curb cut here still shows yellow paint where carriages loaded passengers. Th
     },
     east: {
       to: 'buildings/colman-building/z0.ts',
-      room: '%LOBBY',
+      room: '%WEST_RETAIL',
       description: 'Glass doors lead into the Colman Building',
     },
   },

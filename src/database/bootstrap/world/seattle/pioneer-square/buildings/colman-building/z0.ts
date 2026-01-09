@@ -67,10 +67,6 @@ export const building = {
         east: '%EAST_OFFICE',
         west: '%WEST_RETAIL',
         in: '%E',
-        out: {
-          to: '1st-ave-s/y-2.ts',
-          description: 'Glass doors open onto 1st Ave',
-        },
       },
       elevatorId: '%E',
       objects: [
@@ -148,6 +144,10 @@ For leasing information, contact Employment Terminal.`,
       outdoor: false,
       exits: {
         east: '%LOBBY',
+        west: {
+          to: '1st-ave-s/y-2.ts',
+          description: 'Glass doors open onto 1st Ave S',
+        },
       },
     },
 
