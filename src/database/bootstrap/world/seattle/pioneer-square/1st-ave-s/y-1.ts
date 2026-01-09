@@ -10,6 +10,8 @@ A street lamp leans at a slight angle, its pole bent by some long-ago impact—v
   x: -14,
   y: -1,
   z: 0,
+
+  imageOnDisk: '1st-ave-s-x-14-y-1-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

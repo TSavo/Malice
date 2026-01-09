@@ -2,31 +2,30 @@
 /**
  * Generate images for rooms that don't have imageOnDisk set.
  *
- * Uses Google AI free tier (499/day limit tracked in MongoDB).
+ * Uses MCP to call room.image({ saveToDisk: true }) which:
+ * - Uses the room's getImagePrompt() for context-aware prompts
+ * - Respects daily quota (499/day Google free tier)
+ * - Saves to both MongoDB GridFS and assets/images/
+ *
  * Resumable - skips rooms that already have imageOnDisk.
  *
  * Usage:
- *   bun scripts/generate-room-images.ts [--dry-run] [--limit N] [--buildings-only] [--world-only]
+ *   bun scripts/generate-room-images.ts [--dry-run] [--limit N] [--world-only] [--buildings-only]
  *
  * Options:
- *   --dry-run       Show what would be generated without making API calls
- *   --limit N       Override daily limit (default: reads from MongoDB usage)
- *   --buildings-only Only process building rooms
- *   --world-only    Only process world rooms
+ *   --dry-run         Show what would be generated without making API calls
+ *   --limit N         Max images to generate this run
+ *   --world-only      Only process world rooms (not buildings)
+ *   --buildings-only  Only process building rooms
+ *   --mcp-url URL     MCP server URL (default: http://localhost:3010)
  */
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { MongoClient } from 'mongodb';
 
-const ASSETS_DIR = path.join(process.cwd(), 'assets/images');
 const WORLD_DIR = path.join(process.cwd(), 'src/database/bootstrap/world/seattle/pioneer-square');
 const BUILDINGS_DIR = path.join(WORLD_DIR, 'buildings');
-
-const GOOGLE_API_KEY = process.env.GOOGLE_AI_API_KEY;
-const MONGO_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/malice';
-const DAILY_LIMIT = 499;
 
 interface RoomDef {
   name: string;
@@ -44,6 +43,7 @@ interface RoomFile {
   relativePath: string;
   room: RoomDef;
   type: 'world' | 'building';
+  roomId?: number; // MOO object ID, resolved via MCP
 }
 
 // Parse command line args
@@ -53,44 +53,155 @@ const buildingsOnly = args.includes('--buildings-only');
 const worldOnly = args.includes('--world-only');
 const limitArgIdx = args.indexOf('--limit');
 const overrideLimit = limitArgIdx >= 0 ? parseInt(args[limitArgIdx + 1], 10) : null;
+const mcpUrlIdx = args.indexOf('--mcp-url');
+const MCP_URL = mcpUrlIdx >= 0 ? args[mcpUrlIdx + 1] : 'http://localhost:3010';
 
-// Global MongoDB client for cleanup
-let mongoClient: MongoClient | null = null;
+// MCP session management
+let mcpSessionId: string | null = null;
+
+/**
+ * Initialize MCP session
+ */
+async function initMcpSession(): Promise<string> {
+  const response = await fetch(`${MCP_URL}/mcp`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json, text/event-stream',
+    },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 0,
+      method: 'initialize',
+      params: {
+        protocolVersion: '2024-11-05',
+        capabilities: {},
+        clientInfo: { name: 'generate-room-images', version: '1.0.0' },
+      },
+    }),
+  });
+
+  const sessionId = response.headers.get('mcp-session-id');
+  if (!sessionId) {
+    throw new Error('No session ID returned from MCP initialize');
+  }
+  return sessionId;
+}
+
+/**
+ * Execute MOO code via MCP
+ */
+async function executeMooCode(code: string): Promise<unknown> {
+  // Ensure we have a session
+  if (!mcpSessionId) {
+    mcpSessionId = await initMcpSession();
+  }
+
+  const response = await fetch(`${MCP_URL}/mcp`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json, text/event-stream',
+      'mcp-session-id': mcpSessionId,
+    },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: Date.now(),
+      method: 'tools/call',
+      params: {
+        name: 'execute_moo_code',
+        arguments: { code },
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`MCP request failed: ${response.status} ${response.statusText}`);
+  }
+
+  // Parse SSE response
+  const text = await response.text();
+  const dataLine = text.split('\n').find(l => l.startsWith('data:'));
+  if (!dataLine) {
+    throw new Error('No data in MCP response');
+  }
+
+  const result = JSON.parse(dataLine.substring(5));
+  if (result.error) {
+    throw new Error(`MCP error: ${result.error.message}`);
+  }
+
+  // Parse the result from the tool response
+  const content = result.result?.content?.[0];
+  if (content?.type === 'text') {
+    try {
+      return JSON.parse(content.text);
+    } catch {
+      return content.text;
+    }
+  }
+  return result.result;
+}
+
+/**
+ * Get room ID by coordinates via MCP
+ */
+async function getRoomIdByCoords(x: number, y: number, z: number): Promise<number | null> {
+  const result = await executeMooCode(`
+    const rooms = await $query().parent($room).prop('x').equals(${x}).all();
+    for (const room of rooms) {
+      if (room.y === ${y} && room.z === ${z}) {
+        return room.id;
+      }
+    }
+    return null;
+  `);
+  return result as number | null;
+}
+
+/**
+ * Generate image for a room via MCP
+ */
+async function generateRoomImage(roomId: number): Promise<{ blobKey: string; filename: string | null }> {
+  const result = await executeMooCode(`
+    const room = await $load(${roomId});
+    if (!room) throw new Error('Room not found: ${roomId}');
+    return await room.image({ saveToDisk: true, force: true });
+  `);
+  return result as { blobKey: string; filename: string | null };
+}
+
+/**
+ * Get current usage from MCP
+ */
+async function getUsage(): Promise<{ today: number; limit: number; remaining: number }> {
+  const result = await executeMooCode(`
+    return await $aiImageGen.getUsage();
+  `);
+  return result as { today: number; limit: number; remaining: number };
+}
 
 async function main() {
-  if (!GOOGLE_API_KEY) {
-    console.error('❌ GOOGLE_AI_API_KEY not set');
-    process.exit(1);
-  }
-
-  // Validate Google API key format (should start with AIza)
-  if (!GOOGLE_API_KEY.startsWith('AIza')) {
-    console.error('❌ GOOGLE_AI_API_KEY does not look like a valid Google API key (should start with "AIza")');
-    process.exit(1);
-  }
-
-  console.log('🖼️  Room Image Generator');
-  console.log('========================');
+  console.log('🖼️  Room Image Generator (MCP)');
+  console.log('==============================');
   if (dryRun) console.log('🔍 DRY RUN MODE - no changes will be made\n');
 
-  // Connect to MongoDB to check usage
-  mongoClient = new MongoClient(MONGO_URI);
-  const client = mongoClient;
-  await client.connect();
-  const db = client.db();
-  const usageCollection = db.collection('aiImageGenUsage');
+  // Check MCP connection and get usage
+  let usage: { today: number; limit: number; remaining: number };
+  try {
+    usage = await getUsage();
+    console.log(`📊 Usage today: ${usage.today}/${usage.limit}`);
+    console.log(`📊 Remaining: ${usage.remaining}\n`);
+  } catch (err) {
+    console.error(`❌ Failed to connect to MCP at ${MCP_URL}`);
+    console.error(`   Make sure the server is running: npm start`);
+    console.error(`   Error: ${err}`);
+    process.exit(1);
+  }
 
-  const today = new Date().toISOString().slice(0, 10);
-  const usageDoc = await usageCollection.findOne({ date: today });
-  const usedToday = usageDoc?.count || 0;
-  const remaining = overrideLimit ?? (DAILY_LIMIT - usedToday);
-
-  console.log(`📊 Usage today: ${usedToday}/${DAILY_LIMIT}`);
-  console.log(`📊 Remaining: ${remaining}\n`);
-
-  if (remaining <= 0) {
+  const effectiveLimit = overrideLimit ?? usage.remaining;
+  if (effectiveLimit <= 0) {
     console.log('❌ Daily limit reached. Try again tomorrow.');
-    await client.close();
     process.exit(0);
   }
 
@@ -111,24 +222,19 @@ async function main() {
 
   if (roomsToProcess.length === 0) {
     console.log('✅ All rooms have images!');
-    await client.close();
     process.exit(0);
   }
 
   // Process rooms up to the limit
-  const toGenerate = roomsToProcess.slice(0, remaining);
+  const toGenerate = roomsToProcess.slice(0, effectiveLimit);
   console.log(`🎨 Will generate ${toGenerate.length} images (limited by quota)\n`);
 
   let generated = 0;
   let errors = 0;
 
   for (const roomFile of toGenerate) {
-    const imageFilename = generateImageFilename(roomFile);
-    const imagePath = path.join(ASSETS_DIR, imageFilename);
-
     console.log(`[${generated + 1}/${toGenerate.length}] ${roomFile.room.name}`);
     console.log(`    File: ${roomFile.relativePath}`);
-    console.log(`    Image: ${imageFilename}`);
 
     if (dryRun) {
       console.log(`    ⏭️  Skipped (dry run)\n`);
@@ -137,34 +243,29 @@ async function main() {
     }
 
     try {
-      // Generate image
-      const prompt = buildPrompt(roomFile.room);
-      console.log(`    Prompt: ${prompt.slice(0, 80)}...`);
+      // Resolve room ID by coordinates
+      const { x, y, z } = roomFile.room;
+      if (x === undefined || y === undefined) {
+        console.log(`    ⚠️  No coordinates, skipping\n`);
+        continue;
+      }
 
-      const imageData = await generateImage(prompt);
+      const roomId = await getRoomIdByCoords(x, y, z ?? 0);
+      if (!roomId) {
+        console.log(`    ⚠️  Room not found in MOO at (${x}, ${y}, ${z ?? 0})\n`);
+        continue;
+      }
 
-      // Save to disk
-      fs.writeFileSync(imagePath, Buffer.from(imageData, 'base64'));
-      console.log(`    ✅ Saved ${imageFilename}`);
+      console.log(`    MOO ID: #${roomId}`);
+
+      // Generate image via MCP
+      const result = await generateRoomImage(roomId);
+      console.log(`    ✅ Generated: ${result.filename || result.blobKey}`);
 
       // Update the source file with imageOnDisk
-      await addImageOnDiskToFile(roomFile.filePath, imageFilename);
-      console.log(`    ✅ Updated source file`);
-
-      // Update MongoDB usage - fail fast if it errors
-      try {
-        const updateResult = await usageCollection.updateOne(
-          { date: today },
-          { $inc: { count: 1 }, $setOnInsert: { date: today } },
-          { upsert: true }
-        );
-        if (!updateResult.acknowledged) {
-          throw new Error('MongoDB update not acknowledged');
-        }
-        console.log(`    ✅ Updated usage count\n`);
-      } catch (usageErr) {
-        console.error(`    ❌ Failed to update usage count: ${usageErr}`);
-        throw new Error(`Critical: Usage tracking failed - ${usageErr}`);
+      if (result.filename) {
+        await addImageOnDiskToFile(roomFile.filePath, result.filename);
+        console.log(`    ✅ Updated source file\n`);
       }
 
       generated++;
@@ -174,12 +275,10 @@ async function main() {
     }
   }
 
-  console.log('\n========================');
+  console.log('\n==============================');
   console.log(`✅ Generated: ${generated}`);
   console.log(`❌ Errors: ${errors}`);
-  console.log(`📊 Remaining quota: ${remaining - generated}`);
-
-  await client.close();
+  console.log(`📊 Remaining quota: ${effectiveLimit - generated}`);
 }
 
 async function scanWorldRooms(results: RoomFile[]): Promise<void> {
@@ -205,7 +304,7 @@ async function scanWorldRooms(results: RoomFile[]): Promise<void> {
             type: 'world',
           });
         }
-      } catch (err) {
+      } catch {
         // Skip files that can't be imported
       }
     }
@@ -242,158 +341,11 @@ async function scanBuildingRooms(results: RoomFile[]): Promise<void> {
             }
           }
         }
-      } catch (err) {
+      } catch {
         // Skip files that can't be imported
       }
     }
   }
-}
-
-function generateImageFilename(roomFile: RoomFile): string {
-  // Create a filename from the room name and coordinates
-  const room = roomFile.room;
-  const baseName = room.name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
-    .slice(0, 40);
-
-  if (room.x !== undefined && room.y !== undefined) {
-    const z = room.z ?? 0;
-    return `${baseName}-x${room.x}-y${room.y}-z${z}.png`;
-  }
-
-  // Fallback: use hash of file path
-  const hash = Buffer.from(roomFile.filePath).toString('base64').slice(0, 8);
-  return `${baseName}-${hash}.png`;
-}
-
-function buildPrompt(room: RoomDef): string {
-  const isOutdoor = room.outdoor ?? false;
-  const isUnderground = (room.z ?? 0) < 0;
-  const depth = room.z ?? 0;
-
-  // Style directives for photorealism
-  const style = [
-    'photorealistic',
-    'cinematic lighting',
-    'high detail',
-    'no people',
-    'no humans',
-    'no figures',
-    'empty',
-    'desolate',
-    'abandoned',
-    'run down',
-    'weathered',
-    'gritty',
-    'urban decay',
-  ].join(', ');
-
-  // Negative prompt elements (appended as "without X")
-  const avoid = 'without any people, crowds, pedestrians, or human figures';
-
-  let context = '';
-  if (isUnderground) {
-    // Different underground vibes based on depth
-    if (depth <= -4) {
-      context = 'Deep underground vault beneath Seattle, pitch black except for emergency lighting, ' +
-        'concrete walls with water damage, rusty pipes, flooded floor puddles, claustrophobic, oppressive. ';
-    } else if (depth <= -2) {
-      context = 'Seattle underground tunnel system from 1889, brick and stone walls, ' +
-        'dim flickering lights, debris and rubble, graffiti, homeless camp remnants, rats, damp and musty. ';
-    } else {
-      context = 'Building basement in Seattle, concrete and exposed pipes, ' +
-        'water-stained walls, old storage, industrial decay, dim fluorescent lighting. ';
-    }
-  } else if (isOutdoor) {
-    context = 'Pioneer Square Seattle street scene, overcast grey sky, ' +
-      'historic red brick buildings, cobblestone streets, overgrown weeds through cracks, ' +
-      'boarded up storefronts, broken windows, abandoned cars, trash and debris, post-apocalyptic atmosphere. ';
-  } else {
-    // Indoor - try to detect room type from name/description
-    const nameAndDesc = `${room.name} ${room.description}`.toLowerCase();
-
-    if (nameAndDesc.includes('office') || nameAndDesc.includes('corporate')) {
-      context = 'Abandoned corporate office interior, overturned desks, scattered papers, ' +
-        'broken computer monitors, water-stained ceiling tiles, dead plants, dust everywhere. ';
-    } else if (nameAndDesc.includes('lobby') || nameAndDesc.includes('foyer')) {
-      context = 'Abandoned building lobby, grand but decayed, broken chandelier, ' +
-        'marble floor covered in dust and debris, graffiti on walls, shattered glass. ';
-    } else if (nameAndDesc.includes('bar') || nameAndDesc.includes('pub') || nameAndDesc.includes('tavern')) {
-      context = 'Abandoned dive bar interior, overturned stools, broken bottles, ' +
-        'dusty bar counter, neon signs dark, grimy floors, cigarette burns. ';
-    } else if (nameAndDesc.includes('warehouse') || nameAndDesc.includes('storage')) {
-      context = 'Abandoned warehouse interior, empty shelving units, ' +
-        'concrete floor with oil stains, broken skylights, pigeons nesting, industrial decay. ';
-    } else if (nameAndDesc.includes('apartment') || nameAndDesc.includes('bedroom') || nameAndDesc.includes('living')) {
-      context = 'Abandoned apartment interior, furniture covered in dust sheets, ' +
-        'peeling wallpaper, water damage on ceiling, broken windows with curtains blowing. ';
-    } else if (nameAndDesc.includes('kitchen') || nameAndDesc.includes('diner') || nameAndDesc.includes('restaurant')) {
-      context = 'Abandoned restaurant kitchen, rusted appliances, ' +
-        'broken tiles, grease stains, rotting food remnants, pest droppings. ';
-    } else if (nameAndDesc.includes('hospital') || nameAndDesc.includes('medical') || nameAndDesc.includes('clinic')) {
-      context = 'Abandoned medical facility, overturned gurneys, ' +
-        'scattered medical supplies, broken equipment, biohazard signs, eerie sterile decay. ';
-    } else if (nameAndDesc.includes('church') || nameAndDesc.includes('chapel')) {
-      context = 'Abandoned church interior, broken pews, ' +
-        'shattered stained glass, altar covered in debris, pigeons roosting, haunting atmosphere. ';
-    } else if (nameAndDesc.includes('gallery') || nameAndDesc.includes('museum')) {
-      context = 'Abandoned art gallery, empty frames on walls, ' +
-        'pedestals knocked over, skylight covered in grime, dust motes in light beams. ';
-    } else if (nameAndDesc.includes('shop') || nameAndDesc.includes('store') || nameAndDesc.includes('retail')) {
-      context = 'Abandoned retail store, empty shelves and racks, ' +
-        'mannequins toppled over, shattered display cases, faded sale signs, looted. ';
-    } else {
-      context = 'Abandoned interior space in Seattle, dust and debris everywhere, ' +
-        'water damage, peeling paint, broken furniture, graffiti, urban decay. ';
-    }
-  }
-
-  // Extract key details from description (first 250 chars)
-  const descSnippet = room.description
-    .slice(0, 250)
-    .replace(/\n/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  return `${context}${room.name}: ${descSnippet}. ${style}. ${avoid}. Wide angle shot, 16:9 cinematic composition.`;
-}
-
-async function generateImage(prompt: string): Promise<string> {
-  const resp = await fetch(
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-goog-api-key': GOOGLE_API_KEY!,
-      },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          responseModalities: ['IMAGE'],
-          imageConfig: { aspectRatio: '16:9' },
-        },
-      }),
-    }
-  );
-
-  if (!resp.ok) {
-    const error = await resp.text();
-    throw new Error(`API error ${resp.status}: ${error}`);
-  }
-
-  const data = await resp.json();
-  const parts = data.candidates?.[0]?.content?.parts || [];
-
-  for (const part of parts) {
-    if (part.inlineData?.data) {
-      return part.inlineData.data;
-    }
-  }
-
-  throw new Error('No image in response');
 }
 
 async function addImageOnDiskToFile(filePath: string, imageFilename: string): Promise<void> {
@@ -409,49 +361,20 @@ async function addImageOnDiskToFile(filePath: string, imageFilename: string): Pr
 
   // For world rooms, add imageOnDisk after z coordinate
   // Look for pattern: z: N, or z: N (with possible comment)
-  // Make it robust to handle CRLF and trailing commas
-  const zPattern = /(\s+z:\s*-?\d+)(,?)(\s*\/\/.*)?(\r?\n)/;
+  const zPattern = /(\s+z:\s*-?\d+,?)(\s*\/\/.*)?(\n)/;
   const match = content.match(zPattern);
 
   if (match) {
     const indent = match[0].match(/^\s*/)?.[0] || '  ';
-    const hasComma = match[2]; // Preserve existing comma if present
-    const comment = match[3] || ''; // Preserve comment if present
-    const lineEnding = match[4]; // Preserve line ending (LF or CRLF)
-    const insertion = `${match[1]}${hasComma}${comment}${lineEnding}${indent}// Pre-generated image${lineEnding}${indent}imageOnDisk: '${imageFilename}',`;
-    content = content.replace(zPattern, insertion);
+    const insertion = `${match[1]}${match[2] || ''}\n${indent}imageOnDisk: '${imageFilename}',`;
+    content = content.replace(zPattern, insertion + '\n');
     fs.writeFileSync(filePath, content);
   } else {
     console.log(`    ⚠️  Could not find z coordinate to insert after`);
   }
 }
 
-// Ensure MongoDB cleanup on exit
-async function cleanup() {
-  if (mongoClient) {
-    try {
-      await mongoClient.close();
-      console.log('\n🔌 MongoDB connection closed');
-    } catch (err) {
-      console.error('Error closing MongoDB:', err);
-    }
-  }
-}
-
-process.on('SIGINT', async () => {
-  console.log('\n\n⚠️  Interrupted by user');
-  await cleanup();
-  process.exit(130);
-});
-
-process.on('SIGTERM', async () => {
-  console.log('\n\n⚠️  Terminated');
-  await cleanup();
-  process.exit(143);
-});
-
-main().catch(async err => {
+main().catch(err => {
   console.error('Fatal error:', err);
-  await cleanup();
   process.exit(1);
 });
