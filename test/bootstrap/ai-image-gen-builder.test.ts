@@ -451,4 +451,78 @@ describe('AiImageGenBuilder', () => {
       expect(result?.error).toContain('Model ID is required');
     });
   });
+
+  describe('getUsage() method behavior', () => {
+    it('should return current usage stats', async () => {
+      const builder = new AiImageGenBuilder(manager);
+      await builder.build();
+
+      const aiImageGen = await manager.load('aiImageGen');
+      const usage = await aiImageGen?.call('getUsage');
+
+      expect(usage).toBeTruthy();
+      expect(typeof usage?.today).toBe('number');
+      expect(typeof usage?.limit).toBe('number');
+      expect(typeof usage?.remaining).toBe('number');
+      expect(typeof usage?.date).toBe('string');
+      expect(usage?.limit).toBe(499);
+      expect(usage?.remaining).toBe(usage?.limit - usage?.today);
+    });
+
+    it('should return zero usage when no usage doc exists', async () => {
+      const builder = new AiImageGenBuilder(manager);
+      await builder.build();
+
+      const aiImageGen = await manager.load('aiImageGen');
+      const usage = await aiImageGen?.call('getUsage');
+
+      expect(usage?.today).toBe(0);
+      expect(usage?.remaining).toBe(499);
+    });
+
+    it('should read usage from MongoDB correctly', async () => {
+      // Manually insert usage doc
+      const today = new Date().toISOString().slice(0, 10);
+      const usageCollection = db.getDatabase().collection('aiImageGenUsage');
+      await usageCollection.insertOne({ date: today, count: 42 });
+
+      const builder = new AiImageGenBuilder(manager);
+      await builder.build();
+
+      const aiImageGen = await manager.load('aiImageGen');
+      const usage = await aiImageGen?.call('getUsage');
+
+      expect(usage?.today).toBe(42);
+      expect(usage?.remaining).toBe(457);
+      expect(usage?.date).toBe(today);
+    });
+  });
+
+  describe('getRemainingQuota() method behavior', () => {
+    it('should return remaining quota as number', async () => {
+      const builder = new AiImageGenBuilder(manager);
+      await builder.build();
+
+      const aiImageGen = await manager.load('aiImageGen');
+      const remaining = await aiImageGen?.call('getRemainingQuota');
+
+      expect(typeof remaining).toBe('number');
+      expect(remaining).toBe(499); // Default when no usage
+    });
+
+    it('should calculate remaining quota correctly with existing usage', async () => {
+      // Insert usage doc
+      const today = new Date().toISOString().slice(0, 10);
+      const usageCollection = db.getDatabase().collection('aiImageGenUsage');
+      await usageCollection.insertOne({ date: today, count: 100 });
+
+      const builder = new AiImageGenBuilder(manager);
+      await builder.build();
+
+      const aiImageGen = await manager.load('aiImageGen');
+      const remaining = await aiImageGen?.call('getRemainingQuota');
+
+      expect(remaining).toBe(399);
+    });
+  });
 });

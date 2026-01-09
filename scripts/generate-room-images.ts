@@ -54,9 +54,18 @@ const worldOnly = args.includes('--world-only');
 const limitArgIdx = args.indexOf('--limit');
 const overrideLimit = limitArgIdx >= 0 ? parseInt(args[limitArgIdx + 1], 10) : null;
 
+// Global MongoDB client for cleanup
+let mongoClient: MongoClient | null = null;
+
 async function main() {
   if (!GOOGLE_API_KEY) {
     console.error('❌ GOOGLE_AI_API_KEY not set');
+    process.exit(1);
+  }
+
+  // Validate Google API key format (should start with AIza)
+  if (!GOOGLE_API_KEY.startsWith('AIza')) {
+    console.error('❌ GOOGLE_AI_API_KEY does not look like a valid Google API key (should start with "AIza")');
     process.exit(1);
   }
 
@@ -65,7 +74,8 @@ async function main() {
   if (dryRun) console.log('🔍 DRY RUN MODE - no changes will be made\n');
 
   // Connect to MongoDB to check usage
-  const client = new MongoClient(MONGO_URI);
+  mongoClient = new MongoClient(MONGO_URI);
+  const client = mongoClient;
   await client.connect();
   const db = client.db();
   const usageCollection = db.collection('aiImageGenUsage');
@@ -139,14 +149,23 @@ async function main() {
 
       // Update the source file with imageOnDisk
       await addImageOnDiskToFile(roomFile.filePath, imageFilename);
-      console.log(`    ✅ Updated source file\n`);
+      console.log(`    ✅ Updated source file`);
 
-      // Update MongoDB usage
-      await usageCollection.updateOne(
-        { date: today },
-        { $inc: { count: 1 }, $setOnInsert: { date: today } },
-        { upsert: true }
-      );
+      // Update MongoDB usage - fail fast if it errors
+      try {
+        const updateResult = await usageCollection.updateOne(
+          { date: today },
+          { $inc: { count: 1 }, $setOnInsert: { date: today } },
+          { upsert: true }
+        );
+        if (!updateResult.acknowledged) {
+          throw new Error('MongoDB update not acknowledged');
+        }
+        console.log(`    ✅ Updated usage count\n`);
+      } catch (usageErr) {
+        console.error(`    ❌ Failed to update usage count: ${usageErr}`);
+        throw new Error(`Critical: Usage tracking failed - ${usageErr}`);
+      }
 
       generated++;
     } catch (err) {
@@ -390,20 +409,49 @@ async function addImageOnDiskToFile(filePath: string, imageFilename: string): Pr
 
   // For world rooms, add imageOnDisk after z coordinate
   // Look for pattern: z: N, or z: N (with possible comment)
-  const zPattern = /(\s+z:\s*-?\d+,?)(\s*\/\/.*)?(\n)/;
+  // Make it robust to handle CRLF and trailing commas
+  const zPattern = /(\s+z:\s*-?\d+)(,?)(\s*\/\/.*)?(\r?\n)/;
   const match = content.match(zPattern);
 
   if (match) {
     const indent = match[0].match(/^\s*/)?.[0] || '  ';
-    const insertion = `${match[1]}${match[2] || ''}\n${indent}// Pre-generated image\n${indent}imageOnDisk: '${imageFilename}',`;
-    content = content.replace(zPattern, insertion + '\n');
+    const hasComma = match[2]; // Preserve existing comma if present
+    const comment = match[3] || ''; // Preserve comment if present
+    const lineEnding = match[4]; // Preserve line ending (LF or CRLF)
+    const insertion = `${match[1]}${hasComma}${comment}${lineEnding}${indent}// Pre-generated image${lineEnding}${indent}imageOnDisk: '${imageFilename}',`;
+    content = content.replace(zPattern, insertion);
     fs.writeFileSync(filePath, content);
   } else {
     console.log(`    ⚠️  Could not find z coordinate to insert after`);
   }
 }
 
-main().catch(err => {
+// Ensure MongoDB cleanup on exit
+async function cleanup() {
+  if (mongoClient) {
+    try {
+      await mongoClient.close();
+      console.log('\n🔌 MongoDB connection closed');
+    } catch (err) {
+      console.error('Error closing MongoDB:', err);
+    }
+  }
+}
+
+process.on('SIGINT', async () => {
+  console.log('\n\n⚠️  Interrupted by user');
+  await cleanup();
+  process.exit(130);
+});
+
+process.on('SIGTERM', async () => {
+  console.log('\n\n⚠️  Terminated');
+  await cleanup();
+  process.exit(143);
+});
+
+main().catch(async err => {
   console.error('Fatal error:', err);
+  await cleanup();
   process.exit(1);
 });

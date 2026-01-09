@@ -183,10 +183,13 @@ export class AiImageGenBuilder implements Builder {
         if (!imageData) {
           // Rollback usage count if we incremented it
           if (useGoogle) {
-            await usageCollection.updateOne(
-              { date: today },
+            const rollbackResult = await usageCollection.updateOne(
+              { date: today, count: { $gt: 0 } },
               { $inc: { count: -1 } }
             );
+            if (rollbackResult.matchedCount === 0) {
+              console.error('[AI Image Gen] Failed to rollback usage count - count may already be 0');
+            }
           }
           return { success: false, error: 'No image in response', textResponse, provider };
         }
@@ -224,10 +227,13 @@ export class AiImageGenBuilder implements Builder {
         clearTimeout(timeoutId);
         // Rollback usage count on error
         if (useGoogle) {
-          await usageCollection.updateOne(
-            { date: today },
+          const rollbackResult = await usageCollection.updateOne(
+            { date: today, count: { $gt: 0 } },
             { $inc: { count: -1 } }
           );
+          if (rollbackResult.matchedCount === 0) {
+            console.error('[AI Image Gen] Failed to rollback usage count - count may already be 0');
+          }
         }
         if (err.name === 'AbortError') {
           return { success: false, error: 'Request timeout (120s)', provider };
@@ -388,10 +394,13 @@ export class AiImageGenBuilder implements Builder {
         clearTimeout(timeoutId);
         // Rollback usage count on error
         if (useGoogle) {
-          await usageCollection.updateOne(
-            { date: today },
+          const rollbackResult = await usageCollection.updateOne(
+            { date: today, count: { $gt: 0 } },
             { $inc: { count: -1 } }
           );
+          if (rollbackResult.matchedCount === 0) {
+            console.error('[AI Image Gen] Failed to rollback usage count - count may already be 0');
+          }
         }
         if (err.name === 'AbortError') {
           return { success: false, error: 'Request timeout (120s)', provider };
