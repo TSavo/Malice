@@ -5,8 +5,8 @@ import { type Builder, registerBuilder } from './builder-registry';
 /**
  * Builds $aiImageGen MOO object for AI image generation
  *
- * Uses Google AI Studio direct API (Nano Banana / Gemini image models).
- * Free tier: 499 images/day tracked in MongoDB, then falls back to laozhang.ai.
+ * Uses laozhang.ai by default ($0.05/image).
+ * Falls back to Google AI Studio free tier (499/day) if GOOGLE_AI_API_KEY is set.
  * Stores generated images in $blob for persistence.
  *
  * Usage from MOO code:
@@ -45,7 +45,7 @@ export class AiImageGenBuilder implements Builder {
         parent: root!,
         properties: {
           name: 'AI Image Generator',
-          description: 'Generate images using Google AI (Nano Banana)',
+          description: 'Generate images using laozhang.ai (with Google AI fallback)',
           defaultModel: 'gemini-2.5-flash-image', // Nano Banana (stable)
           dailyLimit: 499, // Free tier limit (Google allows 500, we use 499 for safety)
         },
@@ -57,8 +57,8 @@ export class AiImageGenBuilder implements Builder {
       'generate',
       `
       /**
-       * Generate an image and store in $blob using Google AI (Nano Banana)
-       * Uses free tier (499/day) then falls back to laozhang.ai
+       * Generate an image and store in $blob
+       * Uses laozhang.ai by default, falls back to Google AI if key is set and quota available
        * @param prompt - Text description of the image to generate
        * @param options - { model?, metadata?, filename?, aspectRatio? }
        *   aspectRatio: 'landscape' (default), 'portrait', 'square'
@@ -93,28 +93,21 @@ export class AiImageGenBuilder implements Builder {
       const todayCount = usageDoc?.count || 0;
       const dailyLimit = self.dailyLimit || 499;
 
-      // Determine provider: Google free tier or laozhang.ai fallback
+      // Determine provider: laozhang.ai by default, Google as fallback
       const googleKey = process.env.GOOGLE_AI_API_KEY;
       const laozhangKey = process.env.LAOZHANG_API_KEY;
 
-      let useGoogle = googleKey && todayCount < dailyLimit;
-      let provider = useGoogle ? 'google' : 'laozhang';
+      // Use laozhang by default, fall back to Google if laozhang key not set but Google key is
+      let useLaozhang = !!laozhangKey;
+      let useGoogle = !useLaozhang && googleKey && todayCount < dailyLimit;
+      let provider = useLaozhang ? 'laozhang' : 'google';
 
       if (!googleKey && !laozhangKey) {
-        return { success: false, error: 'No API key set (GOOGLE_AI_API_KEY or LAOZHANG_API_KEY)' };
+        return { success: false, error: 'No API key set (LAOZHANG_API_KEY or GOOGLE_AI_API_KEY)' };
       }
 
-      if (!useGoogle && !laozhangKey) {
-        return { success: false, error: 'Daily limit reached (' + dailyLimit + ') and no LAOZHANG_API_KEY fallback' };
-      }
-
-      // Increment usage count BEFORE API call to prevent race condition
-      if (useGoogle) {
-        await usageCollection.updateOne(
-          { date: today },
-          { $inc: { count: 1 }, $setOnInsert: { date: today } },
-          { upsert: true }
-        );
+      if (!useLaozhang && !useGoogle) {
+        return { success: false, error: 'Google daily limit reached (' + dailyLimit + ') and no LAOZHANG_API_KEY set' };
       }
 
       const controller = new AbortController();
@@ -123,27 +116,24 @@ export class AiImageGenBuilder implements Builder {
       try {
         let apiUrl, headers;
 
-        if (useGoogle) {
-          apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent';
-          headers = {
-            'Content-Type': 'application/json',
-            'x-goog-api-key': googleKey,
-          };
-        } else {
+        if (useLaozhang) {
           apiUrl = 'https://api.laozhang.ai/v1beta/models/' + model + ':generateContent';
           headers = {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + laozhangKey,
           };
+        } else {
+          apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent';
+          headers = {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': googleKey,
+          };
         }
 
-        // Build generationConfig
-        // Google API uses nested imageConfig.aspectRatio
-        // laozhang API uses top-level aspectRatio
-        // This difference is due to API specification differences between providers
-        const generationConfig = useGoogle
-          ? { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: aspectRatio } }
-          : { responseModalities: ['IMAGE'], aspectRatio: aspectRatio };
+        // Build generationConfig - laozhang uses top-level aspectRatio, Google uses imageConfig
+        const generationConfig = useLaozhang
+          ? { responseModalities: ['IMAGE'], aspectRatio: aspectRatio }
+          : { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: aspectRatio } };
 
         const resp = await fetch(apiUrl, {
           method: 'POST',
@@ -159,13 +149,6 @@ export class AiImageGenBuilder implements Builder {
 
         if (!resp.ok) {
           const errorBody = await resp.text();
-          // Rollback usage count if we incremented it
-          if (useGoogle) {
-            await usageCollection.updateOne(
-              { date: today, count: { $gt: 0 } },
-              { $inc: { count: -1 } }
-            );
-          }
           return { success: false, error: 'API error ' + resp.status + ': ' + errorBody, provider };
         }
 
@@ -188,29 +171,21 @@ export class AiImageGenBuilder implements Builder {
         }
 
         if (!imageData) {
-          // Rollback usage count if we incremented it
-          if (useGoogle) {
-            const rollbackResult = await usageCollection.updateOne(
-              { date: today, count: { $gt: 0 } },
-              { $inc: { count: -1 } }
-            );
-            if (rollbackResult.matchedCount === 0) {
-              console.error('[AI Image Gen] Failed to rollback usage count - count may already be 0');
-            }
-          }
           return { success: false, error: 'No image in response', textResponse, provider };
+        }
+
+        // Increment usage count if we used Google (not laozhang)
+        if (!useLaozhang) {
+          await usageCollection.updateOne(
+            { date: today },
+            { $inc: { count: 1 }, $setOnInsert: { date: today } },
+            { upsert: true }
+          );
         }
 
         // Store in $blob
         const blob = $blob;
         if (!blob) {
-          // Rollback usage count if we incremented it
-          if (useGoogle) {
-            await usageCollection.updateOne(
-              { date: today, count: { $gt: 0 } },
-              { $inc: { count: -1 } }
-            );
-          }
           return { success: false, error: '$blob not available' };
         }
 
@@ -239,16 +214,6 @@ export class AiImageGenBuilder implements Builder {
         };
       } catch (err) {
         clearTimeout(timeoutId);
-        // Rollback usage count on error
-        if (useGoogle) {
-          const rollbackResult = await usageCollection.updateOne(
-            { date: today, count: { $gt: 0 } },
-            { $inc: { count: -1 } }
-          );
-          if (rollbackResult.matchedCount === 0) {
-            console.error('[AI Image Gen] Failed to rollback usage count - count may already be 0');
-          }
-        }
         if (err.name === 'AbortError') {
           return { success: false, error: 'Request timeout (120s)', provider };
         }
@@ -262,8 +227,8 @@ export class AiImageGenBuilder implements Builder {
       'generateRaw',
       `
       /**
-       * Generate an image and return base64 directly (not stored) using Google AI
-       * Uses free tier (499/day) then falls back to laozhang.ai
+       * Generate an image and return base64 directly (not stored)
+       * Uses laozhang.ai by default, falls back to Google AI if key is set and quota available
        * @param prompt - Text description of the image to generate
        * @param options - { model?, aspectRatio? }
        * @returns { success, data, aspectRatio, contentType, prompt, provider?, error? }
@@ -297,28 +262,21 @@ export class AiImageGenBuilder implements Builder {
       const todayCount = usageDoc?.count || 0;
       const dailyLimit = self.dailyLimit || 499;
 
-      // Determine provider: Google free tier or laozhang.ai fallback
+      // Determine provider: laozhang.ai by default, Google as fallback
       const googleKey = process.env.GOOGLE_AI_API_KEY;
       const laozhangKey = process.env.LAOZHANG_API_KEY;
 
-      let useGoogle = googleKey && todayCount < dailyLimit;
-      let provider = useGoogle ? 'google' : 'laozhang';
+      // Use laozhang by default, fall back to Google if laozhang key not set but Google key is
+      let useLaozhang = !!laozhangKey;
+      let useGoogle = !useLaozhang && googleKey && todayCount < dailyLimit;
+      let provider = useLaozhang ? 'laozhang' : 'google';
 
       if (!googleKey && !laozhangKey) {
-        return { success: false, error: 'No API key set (GOOGLE_AI_API_KEY or LAOZHANG_API_KEY)' };
+        return { success: false, error: 'No API key set (LAOZHANG_API_KEY or GOOGLE_AI_API_KEY)' };
       }
 
-      if (!useGoogle && !laozhangKey) {
-        return { success: false, error: 'Daily limit reached (' + dailyLimit + ') and no LAOZHANG_API_KEY fallback' };
-      }
-
-      // Increment usage count BEFORE API call to prevent race condition
-      if (useGoogle) {
-        await usageCollection.updateOne(
-          { date: today },
-          { $inc: { count: 1 }, $setOnInsert: { date: today } },
-          { upsert: true }
-        );
+      if (!useLaozhang && !useGoogle) {
+        return { success: false, error: 'Google daily limit reached (' + dailyLimit + ') and no LAOZHANG_API_KEY set' };
       }
 
       const controller = new AbortController();
@@ -327,27 +285,24 @@ export class AiImageGenBuilder implements Builder {
       try {
         let apiUrl, headers;
 
-        if (useGoogle) {
-          apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent';
-          headers = {
-            'Content-Type': 'application/json',
-            'x-goog-api-key': googleKey,
-          };
-        } else {
+        if (useLaozhang) {
           apiUrl = 'https://api.laozhang.ai/v1beta/models/' + model + ':generateContent';
           headers = {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + laozhangKey,
           };
+        } else {
+          apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent';
+          headers = {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': googleKey,
+          };
         }
 
-        // Build generationConfig
-        // Google API uses nested imageConfig.aspectRatio
-        // laozhang API uses top-level aspectRatio
-        // This difference is due to API specification differences between providers
-        const generationConfig = useGoogle
-          ? { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: aspectRatio } }
-          : { responseModalities: ['IMAGE'], aspectRatio: aspectRatio };
+        // Build generationConfig - laozhang uses top-level aspectRatio, Google uses imageConfig
+        const generationConfig = useLaozhang
+          ? { responseModalities: ['IMAGE'], aspectRatio: aspectRatio }
+          : { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: aspectRatio } };
 
         const resp = await fetch(apiUrl, {
           method: 'POST',
@@ -363,13 +318,6 @@ export class AiImageGenBuilder implements Builder {
 
         if (!resp.ok) {
           const errorBody = await resp.text();
-          // Rollback usage count if we incremented it
-          if (useGoogle) {
-            await usageCollection.updateOne(
-              { date: today, count: { $gt: 0 } },
-              { $inc: { count: -1 } }
-            );
-          }
           return { success: false, error: 'API error ' + resp.status + ': ' + errorBody, provider };
         }
 
@@ -392,17 +340,16 @@ export class AiImageGenBuilder implements Builder {
         }
 
         if (!imageData) {
-          // Rollback usage count if we incremented it
-          if (useGoogle) {
-            const rollbackResult = await usageCollection.updateOne(
-              { date: today, count: { $gt: 0 } },
-              { $inc: { count: -1 } }
-            );
-            if (rollbackResult.matchedCount === 0) {
-              console.error('[AI Image Gen] Failed to rollback usage count - count may already be 0');
-            }
-          }
           return { success: false, error: 'No image in response', textResponse, provider };
+        }
+
+        // Increment usage count if we used Google (not laozhang)
+        if (!useLaozhang) {
+          await usageCollection.updateOne(
+            { date: today },
+            { $inc: { count: 1 }, $setOnInsert: { date: today } },
+            { upsert: true }
+          );
         }
 
         return {
@@ -416,16 +363,6 @@ export class AiImageGenBuilder implements Builder {
         };
       } catch (err) {
         clearTimeout(timeoutId);
-        // Rollback usage count on error
-        if (useGoogle) {
-          const rollbackResult = await usageCollection.updateOne(
-            { date: today, count: { $gt: 0 } },
-            { $inc: { count: -1 } }
-          );
-          if (rollbackResult.matchedCount === 0) {
-            console.error('[AI Image Gen] Failed to rollback usage count - count may already be 0');
-          }
-        }
         if (err.name === 'AbortError') {
           return { success: false, error: 'Request timeout (120s)', provider };
         }
@@ -471,19 +408,6 @@ export class AiImageGenBuilder implements Builder {
         remaining: Math.max(0, dailyLimit - todayCount),
         date: today,
       };
-    `,
-    );
-
-    // Get remaining quota (convenience method)
-    this.aiImageGen.setMethod(
-      'getRemainingQuota',
-      `
-      /**
-       * Get remaining quota for Google free tier today
-       * @returns Number of images remaining in free tier
-       */
-      const usage = await self.getUsage();
-      return usage.remaining;
     `,
     );
 

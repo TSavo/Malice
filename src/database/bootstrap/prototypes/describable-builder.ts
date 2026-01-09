@@ -47,6 +47,8 @@ export class DescribableBuilder implements Builder {
           interactionSession: null, // string - session ID for conversation continuity
           // TTS voice for speech synthesis
           voiceId: null, // string - TTS voice ID (alloy, echo, fable, onyx, nova, shimmer)
+          // Image generation prompt template with ${variable} substitution
+          imagePrompt: null, // string - template for AI image generation
         },
         methods: {},
       });
@@ -668,17 +670,81 @@ export class DescribableBuilder implements Builder {
     // IMAGE GENERATION - AI-generated images for objects
     // ═══════════════════════════════════════════════════════════════════
 
+    // getImagePrompt() - Get prompt for AI image generation with variable substitution
+    obj.setMethod(
+      'getImagePrompt',
+      `
+      /** Get the image generation prompt for this object with variable substitution.
+       *  Walks inheritance chain to find imagePrompt property.
+       *  Substitutes \${variable} placeholders with object properties.
+       *
+       *  Available variables:
+       *    \${name} - object name
+       *    \${description} - object description
+       *    \${abilities} - object abilities
+       *    \${x}, \${y}, \${z} - coordinates (for rooms)
+       *    \${outdoor} - whether outdoor (for rooms)
+       *    \${lighting} - lighting level (for rooms)
+       *    Any other property on the object
+       *
+       *  @returns Substituted prompt string, or null if no imagePrompt defined
+       */
+
+      // Find imagePrompt walking inheritance chain
+      let prompt = null;
+      let current = self;
+      while (current && !prompt) {
+        if (current.imagePrompt) {
+          prompt = current.imagePrompt;
+          break;
+        }
+        current = current.getParent ? current.getParent() : null;
+        // Prevent infinite loop at root
+        if (current && current.id === self.id) break;
+      }
+
+      if (!prompt) {
+        return null;
+      }
+
+      // Substitute \${variable} placeholders
+      // Match \${varName} patterns
+      const substituted = prompt.replace(/\\$\\{(\\w+)\\}/g, (match, varName) => {
+        // Try to get property value
+        const value = self[varName];
+
+        if (value === undefined || value === null) {
+          return ''; // Remove undefined/null placeholders
+        }
+
+        if (typeof value === 'object') {
+          // For objects/arrays, try to stringify meaningfully
+          if (Array.isArray(value)) {
+            return value.join(', ');
+          }
+          return JSON.stringify(value);
+        }
+
+        return String(value);
+      });
+
+      return substituted;
+    `,
+    );
+
     // image() - Get or generate an image for this object
     obj.setMethod(
       'image',
       `
       /** Get or generate an image for this object at the specified aspect ratio.
        *  Images are cached by aspect ratio in self.images property.
-       *  @param options - { force?, prompt?, model?, aspectRatio? }
+       *  @param options - { force?, prompt?, model?, aspectRatio?, saveToDisk?, filename? }
        *    aspectRatio: 'landscape' (default), 'portrait', 'square', or '16:9', '9:16', '4:3', '3:4', '1:1'
        *    force: regenerate even if cached
-       *    prompt: custom prompt (default: from describe())
-       *  @returns blobKey string, or null on error
+       *    prompt: custom prompt (default: from getImagePrompt() or describe())
+       *    saveToDisk: if true, also saves to assets/images/ directory
+       *    filename: custom filename for saveToDisk (without extension)
+       *  @returns { blobKey, filename? } - blobKey always, filename if saveToDisk was used
        */
       const options = args[0] || {};
 
@@ -696,7 +762,7 @@ export class DescribableBuilder implements Builder {
       // Check if we already have an image for this aspect ratio
       const images = self.images || {};
       if (images[aspectRatio] && !options.force) {
-        return images[aspectRatio];
+        return { blobKey: images[aspectRatio] };
       }
 
       // Check if $aiImageGen is available
@@ -705,8 +771,14 @@ export class DescribableBuilder implements Builder {
         throw new Error('$aiImageGen not available');
       }
 
-      // Build prompt from describe() or custom
-      const prompt = options.prompt || await self.describe();
+      // Build prompt: custom > getImagePrompt() > describe()
+      let prompt = options.prompt;
+      if (!prompt) {
+        prompt = await self.getImagePrompt();
+      }
+      if (!prompt) {
+        prompt = await self.describe();
+      }
 
       // Generate the image
       const result = await aiImageGen.generate(prompt, {
@@ -728,7 +800,45 @@ export class DescribableBuilder implements Builder {
       images[aspectRatio] = result.blobKey;
       self.images = images;
 
-      return result.blobKey;
+      // Optionally save to disk for bootstrap/version control
+      let diskFilename = null;
+      if (options.saveToDisk) {
+        const fs = await import('node:fs');
+        const path = await import('node:path');
+
+        // Generate filename from object name and coordinates if available
+        const baseName = options.filename || (
+          self.name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '')
+            .slice(0, 40)
+        );
+
+        // Add coordinates if this is a room
+        let coords = '';
+        if (self.x !== undefined && self.y !== undefined) {
+          const z = self.z ?? 0;
+          coords = '-x' + self.x + '-y' + self.y + '-z' + z;
+        }
+
+        diskFilename = baseName + coords + '.png';
+        const assetsDir = path.join(process.cwd(), 'assets/images');
+
+        // Ensure directory exists
+        if (!fs.existsSync(assetsDir)) {
+          fs.mkdirSync(assetsDir, { recursive: true });
+        }
+
+        // Read from blob and write to disk
+        const imageData = await $blob.read(result.blobKey);
+        if (imageData) {
+          const filePath = path.join(assetsDir, diskFilename);
+          fs.writeFileSync(filePath, Buffer.from(imageData, 'base64'));
+        }
+      }
+
+      return { blobKey: result.blobKey, filename: diskFilename };
     `,
     );
 
@@ -744,13 +854,13 @@ export class DescribableBuilder implements Builder {
       const arg = args[0];
       const options = typeof arg === 'string' ? { domain: arg } : (arg || {});
 
-      const blobKey = await self.image({
+      const result = await self.image({
         aspectRatio: options.aspectRatio,
         force: options.force,
         prompt: options.prompt,
       });
 
-      return $blob.url(blobKey, options.domain);
+      return $blob.url(result.blobKey, options.domain);
     `,
     );
 
@@ -949,6 +1059,10 @@ export class DescribableBuilder implements Builder {
     obj.setPropertyDescription(
       'voiceId',
       'TTS voice ID for speech synthesis (alloy, echo, fable, onyx, nova, shimmer)',
+    );
+    obj.setPropertyDescription(
+      'imagePrompt',
+      'Template for AI image generation with ${variable} substitution (e.g., "${name}: ${description}")',
     );
 
     this.obj = obj;
