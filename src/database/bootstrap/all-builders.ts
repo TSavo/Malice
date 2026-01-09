@@ -310,6 +310,7 @@ import './client/malice-client-builder';
 import './http-builder';
 import './blob-builder';
 import './ai-image-gen-builder';
+import './image-bootstrap-builder';
 import './email-builder';
 import './npm-builder';
 import './format-builder';
