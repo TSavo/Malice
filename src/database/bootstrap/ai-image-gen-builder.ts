@@ -128,9 +128,9 @@ export class AiImageGenBuilder implements Builder {
           };
         }
 
-        // Build generationConfig - Google doesn't support aspectRatio, laozhang does
+        // Build generationConfig - Google uses imageConfig, laozhang uses top-level aspectRatio
         const generationConfig = useGoogle
-          ? { responseModalities: ['IMAGE'] }
+          ? { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: aspectRatio } }
           : { responseModalities: ['IMAGE'], aspectRatio: aspectRatio };
 
         const resp = await fetch(apiUrl, {
@@ -295,9 +295,9 @@ export class AiImageGenBuilder implements Builder {
           };
         }
 
-        // Build generationConfig - Google doesn't support aspectRatio, laozhang does
+        // Build generationConfig - Google uses imageConfig, laozhang uses top-level aspectRatio
         const generationConfig = useGoogle
-          ? { responseModalities: ['IMAGE'] }
+          ? { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: aspectRatio } }
           : { responseModalities: ['IMAGE'], aspectRatio: aspectRatio };
 
         const resp = await fetch(apiUrl, {
@@ -319,6 +319,7 @@ export class AiImageGenBuilder implements Builder {
 
         const data = await resp.json();
 
+        // Extract first image from response (generateRaw method)
         const parts = data.candidates?.[0]?.content?.parts || [];
         let imageData = null;
         let mimeType = 'image/png';
