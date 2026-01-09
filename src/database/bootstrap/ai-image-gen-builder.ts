@@ -108,6 +108,15 @@ export class AiImageGenBuilder implements Builder {
         return { success: false, error: 'Daily limit reached (' + dailyLimit + ') and no LAOZHANG_API_KEY fallback' };
       }
 
+      // Increment usage count BEFORE API call to prevent race condition
+      if (useGoogle) {
+        await usageCollection.updateOne(
+          { date: today },
+          { $inc: { count: 1 }, $setOnInsert: { date: today } },
+          { upsert: true }
+        );
+      }
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min timeout
 
@@ -128,7 +137,10 @@ export class AiImageGenBuilder implements Builder {
           };
         }
 
-        // Build generationConfig - Google uses imageConfig, laozhang uses top-level aspectRatio
+        // Build generationConfig
+        // Google API uses nested imageConfig.aspectRatio
+        // laozhang API uses top-level aspectRatio
+        // This difference is due to API specification differences between providers
         const generationConfig = useGoogle
           ? { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: aspectRatio } }
           : { responseModalities: ['IMAGE'], aspectRatio: aspectRatio };
@@ -169,16 +181,14 @@ export class AiImageGenBuilder implements Builder {
         }
 
         if (!imageData) {
+          // Rollback usage count if we incremented it
+          if (useGoogle) {
+            await usageCollection.updateOne(
+              { date: today },
+              { $inc: { count: -1 } }
+            );
+          }
           return { success: false, error: 'No image in response', textResponse, provider };
-        }
-
-        // Increment usage count if we used Google
-        if (useGoogle) {
-          await usageCollection.updateOne(
-            { date: today },
-            { $inc: { count: 1 }, $setOnInsert: { date: today } },
-            { upsert: true }
-          );
         }
 
         // Store in $blob
@@ -212,6 +222,13 @@ export class AiImageGenBuilder implements Builder {
         };
       } catch (err) {
         clearTimeout(timeoutId);
+        // Rollback usage count on error
+        if (useGoogle) {
+          await usageCollection.updateOne(
+            { date: today },
+            { $inc: { count: -1 } }
+          );
+        }
         if (err.name === 'AbortError') {
           return { success: false, error: 'Request timeout (120s)', provider };
         }
@@ -275,6 +292,15 @@ export class AiImageGenBuilder implements Builder {
         return { success: false, error: 'Daily limit reached (' + dailyLimit + ') and no LAOZHANG_API_KEY fallback' };
       }
 
+      // Increment usage count BEFORE API call to prevent race condition
+      if (useGoogle) {
+        await usageCollection.updateOne(
+          { date: today },
+          { $inc: { count: 1 }, $setOnInsert: { date: today } },
+          { upsert: true }
+        );
+      }
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 120000);
 
@@ -295,7 +321,10 @@ export class AiImageGenBuilder implements Builder {
           };
         }
 
-        // Build generationConfig - Google uses imageConfig, laozhang uses top-level aspectRatio
+        // Build generationConfig
+        // Google API uses nested imageConfig.aspectRatio
+        // laozhang API uses top-level aspectRatio
+        // This difference is due to API specification differences between providers
         const generationConfig = useGoogle
           ? { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: aspectRatio } }
           : { responseModalities: ['IMAGE'], aspectRatio: aspectRatio };
@@ -336,16 +365,14 @@ export class AiImageGenBuilder implements Builder {
         }
 
         if (!imageData) {
+          // Rollback usage count if we incremented it
+          if (useGoogle) {
+            await usageCollection.updateOne(
+              { date: today },
+              { $inc: { count: -1 } }
+            );
+          }
           return { success: false, error: 'No image in response', textResponse, provider };
-        }
-
-        // Increment usage count if we used Google
-        if (useGoogle) {
-          await usageCollection.updateOne(
-            { date: today },
-            { $inc: { count: 1 }, $setOnInsert: { date: today } },
-            { upsert: true }
-          );
         }
 
         return {
@@ -359,6 +386,13 @@ export class AiImageGenBuilder implements Builder {
         };
       } catch (err) {
         clearTimeout(timeoutId);
+        // Rollback usage count on error
+        if (useGoogle) {
+          await usageCollection.updateOne(
+            { date: today },
+            { $inc: { count: -1 } }
+          );
+        }
         if (err.name === 'AbortError') {
           return { success: false, error: 'Request timeout (120s)', provider };
         }
@@ -404,6 +438,19 @@ export class AiImageGenBuilder implements Builder {
         remaining: Math.max(0, dailyLimit - todayCount),
         date: today,
       };
+    `,
+    );
+
+    // Get remaining quota (convenience method)
+    this.aiImageGen.setMethod(
+      'getRemainingQuota',
+      `
+      /**
+       * Get remaining quota for Google free tier today
+       * @returns Number of images remaining in free tier
+       */
+      const usage = await self.getUsage();
+      return usage.remaining;
     `,
     );
 
