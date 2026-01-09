@@ -190,7 +190,7 @@ export const building = {
       name: 'Colman Building - Floor 2 - Unit C Balcony',
       description: `A small balcony overlooking the alley, enclosed by a wrought iron railing. Two chairs and a small table occupy the space. The view is of brick walls and fire escapes, but the fresh air is welcome. Pigeons coo from nearby ledges.`,
       x: -12,
-      y: -4,
+      y: -3,
       z: 2,
       population: 0,
       ambientNoise: 8,

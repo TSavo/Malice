@@ -19,7 +19,7 @@ The curb cut here still shows yellow paint where carriages loaded passengers. Th
   exits: {
     west: {
       to: 'buildings/merchants-cafe/z0.ts',
-      room: '%SHOWROOM',
+      room: '%BAR',
       description: "The door of Merchant's Cafe is slightly ajar",
     },
     east: {
