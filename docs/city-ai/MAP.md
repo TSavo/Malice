@@ -135,6 +135,27 @@ Street ─ sidewalk ─ Building (3 tall) ─ sidewalk ─ Street
 | King Pharmacy | +3 to +5 | -12 to -11 | S: (+4, -12) | 3 floors + roof, hybrid Chinese/Western pharmacy, looted |
 | Washington Federal Bank | -1 to 0 | -3 to -2 | E: (0, -2) | 3 floors, neoclassical bank with sealed vault |
 | King County Courthouse | +8 to +10 | +1 to +3 | W: (+7, +2) | 6 floors (basement through roof), brutalist government building, archives and courtrooms |
+| Colman Building | -13 to -11 | -3 to -1 | W: (-13, -2) | 5 floors (basement through roof), historic 1889 Romanesque Revival, residential apartments with underground tunnel connection |
+| Doc Maynard's Public House | -15 to -14 | +2 to +3 | W: (-15, +2) | 1 floor, historic saloon and restaurant, established 1889 |
+| Gargoyle Building | -18 to -17 | +12 to +13 | W: (-18, +12) | 5 floors, historic warehouse converted to offices, coal cellar access |
+| Golden Gate Bakery | 5 to 5 | -12 to -11 | N: (5, -11) | 3 floors (ground bakery + apartment + roof), Chinese bakery |
+| Jade Palace Jewelers | +12 to +16 | -4 to -2 | N: (+11, -4) | 4 floors, jewelry store with underground smuggling routes |
+| J&M Cafe | -15 to -14 | +4 to +5 | W: (-15, +4) | 2 floors, bar and restaurant |
+| Klondike Gold Rush Museum | -12 to -11 | -3 to -2 | E: (+2, -3) | 2 floors, historic exhibits, basement with underground access |
+| Merchants Cafe | -15 to -14 | -2 to -1 | Internal only | 5 floors, cafe and bar with underground connection |
+| Morrison & Kline | -14 to -13 | +7 to +8 | W: (-14, +7) | 3 floors (ground + 2 residential), law offices |
+| Owl Cafe | -15 to -14 | -1 to 0 | W: (-15, -1) | 2 floors, diner |
+| Pioneer Books | -14 to -13 | +13 to +15 | W: (-14, +13) | 4 floors, bookstore with basement smuggling route |
+| Pioneer Hotel | -16 to -15 | +7 to +7 | W: (-16, +7) | 7 floors (basement through roof), historic hotel, underground access |
+| Pioneer Pawn & Loan | +5 to +6 | +14 to +16 | N: (+5, +14) | 2 floors, pawn shop |
+| QuickPrint | -12 to -11 | +4 to +6 | E: (-11, +4) | 3 floors (ground + 2 residential), print shop |
+| Redux Vintage | -15 to -14 | +4 to +5 | Internal only | 3 floors, vintage clothing with underground smuggling route |
+| Second Chance Thrift | -10 to -8 | +8 to +10 | N: (-11, +8) | 3 floors, thrift store |
+| Terra Nova Gallery | -15 to -14 | -5 to -4 | W: (-15, -5) | 3 floors, art gallery with basement art vault |
+| Trinity Nightclub | -14 to -11 | 0 to +2 | W: (-14, +2) | 3 floors, nightclub with basement entrance to underground |
+| Waterfall Garden Park | -6 to -5 | -4 to -3 | E: (-6, -3) | 1 floor (z=0), open park |
+| Zeitgeist Building | -13 to -11 | +1 to +3 | W: (-13, +1) | 6 floors, mixed-use building |
+| Zeitgeist Coffee | -15 to -14 | +1 to +2 | W: (-15, +1) | 3 floors (ground cafe + 2 residential), coffee shop |
 
 ## Hazard Zones (Impassable)
 
@@ -148,7 +169,8 @@ Street ─ sidewalk ─ Building (3 tall) ─ sidewalk ─ Street
 
 | Name | X Range | Y Range | Notes |
 |------|---------|---------|-------|
-| Occidental Park | -6 to -1 | +1 to +4 | Plaza, dead trees, ⊕ underground access |
+| Occidental Square | -8 to -7 | 0 to +2 | Plaza with underground access (trapdoor) |
+| Waterfall Garden Park | -6 to -5 | -4 to -3 | Open park with waterfall feature |
 
 ## Underground (z < 0)
 

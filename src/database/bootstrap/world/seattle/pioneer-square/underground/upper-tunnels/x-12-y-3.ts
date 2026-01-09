@@ -22,12 +22,17 @@ The stench is powerful: mold and stagnant water and something sweeter beneath it
       to: 'underground/upper-tunnels/x-11-y-3.ts',
       description: 'A raised walkway leads east',
     },
+    north: {
+      to: 'underground/upper-tunnels/x-12-y-2.ts',
+      description: 'A narrow shaft leads north toward a building foundation',
+    },
   },
   objects: [
     {
       prototype: 'cabinet',
       name: 'collapsed shelving',
-      description: 'Metal shelving has fallen into the muck, its contents—ancient canned goods—now shapeless lumps of rust.',
+      description:
+        'Metal shelving has fallen into the muck, its contents—ancient canned goods—now shapeless lumps of rust.',
       boltedDown: true,
     },
   ],
