@@ -159,6 +159,13 @@ export class AiImageGenBuilder implements Builder {
 
         if (!resp.ok) {
           const errorBody = await resp.text();
+          // Rollback usage count if we incremented it
+          if (useGoogle) {
+            await usageCollection.updateOne(
+              { date: today, count: { $gt: 0 } },
+              { $inc: { count: -1 } }
+            );
+          }
           return { success: false, error: 'API error ' + resp.status + ': ' + errorBody, provider };
         }
 
@@ -197,6 +204,13 @@ export class AiImageGenBuilder implements Builder {
         // Store in $blob
         const blob = $blob;
         if (!blob) {
+          // Rollback usage count if we incremented it
+          if (useGoogle) {
+            await usageCollection.updateOne(
+              { date: today, count: { $gt: 0 } },
+              { $inc: { count: -1 } }
+            );
+          }
           return { success: false, error: '$blob not available' };
         }
 
@@ -349,6 +363,13 @@ export class AiImageGenBuilder implements Builder {
 
         if (!resp.ok) {
           const errorBody = await resp.text();
+          // Rollback usage count if we incremented it
+          if (useGoogle) {
+            await usageCollection.updateOne(
+              { date: today, count: { $gt: 0 } },
+              { $inc: { count: -1 } }
+            );
+          }
           return { success: false, error: 'API error ' + resp.status + ': ' + errorBody, provider };
         }
 
@@ -373,10 +394,13 @@ export class AiImageGenBuilder implements Builder {
         if (!imageData) {
           // Rollback usage count if we incremented it
           if (useGoogle) {
-            await usageCollection.updateOne(
-              { date: today },
+            const rollbackResult = await usageCollection.updateOne(
+              { date: today, count: { $gt: 0 } },
               { $inc: { count: -1 } }
             );
+            if (rollbackResult.matchedCount === 0) {
+              console.error('[AI Image Gen] Failed to rollback usage count - count may already be 0');
+            }
           }
           return { success: false, error: 'No image in response', textResponse, provider };
         }
