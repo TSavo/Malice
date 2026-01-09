@@ -9,8 +9,7 @@ services:
     environment:
       - MONGO_INITDB_DATABASE=malice
     networks:
-      malice-network:
-        ipv4_address: 172.20.0.2
+      - malice-network
     healthcheck:
       test: ["CMD-SHELL", "mongosh --eval 'db.adminCommand(\"ping\")' --quiet || exit 1"]
       interval: 5s
@@ -53,8 +52,7 @@ services:
       mongodb:
         condition: service_healthy
     networks:
-      malice-network:
-        ipv4_address: 172.20.0.10
+      - malice-network
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 3010 || exit 1"]
       interval: 5s
@@ -82,8 +80,7 @@ services:
       game:
         condition: service_healthy
     networks:
-      malice-network:
-        ipv4_address: 172.20.0.50
+      - malice-network
 
 volumes:
   mongodb_data:
@@ -98,7 +95,3 @@ volumes:
 networks:
   malice-network:
     driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.20.0.0/16
