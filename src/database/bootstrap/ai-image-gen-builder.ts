@@ -5,7 +5,8 @@ import { type Builder, registerBuilder } from './builder-registry';
 /**
  * Builds $aiImageGen MOO object for AI image generation
  *
- * Uses laozhang.ai API proxy for Nano Banana (79% cheaper than Google direct).
+ * Uses Google AI Studio direct API (Nano Banana / Gemini image models).
+ * Free tier: 499 images/day tracked in MongoDB, then falls back to laozhang.ai.
  * Stores generated images in $blob for persistence.
  *
  * Usage from MOO code:
@@ -14,6 +15,9 @@ import { type Builder, registerBuilder } from './builder-registry';
  *
  *   const base64 = await $aiImageGen.generateRaw('A glowing orb');
  *   // Returns base64 string directly
+ *
+ *   const usage = await $aiImageGen.getUsage();
+ *   // { today: 42, limit: 499, remaining: 457 }
  */
 export class AiImageGenBuilder implements Builder {
   static provides = ['aiImageGen'];
@@ -41,8 +45,9 @@ export class AiImageGenBuilder implements Builder {
         parent: root!,
         properties: {
           name: 'AI Image Generator',
-          description: 'Generate images using Nano Banana via laozhang.ai',
+          description: 'Generate images using Google AI (Nano Banana)',
           defaultModel: 'gemini-2.5-flash-image', // Nano Banana (stable)
+          dailyLimit: 499, // Free tier limit (Google allows 500, we use 499 for safety)
         },
       });
     }
@@ -52,23 +57,18 @@ export class AiImageGenBuilder implements Builder {
       'generate',
       `
       /**
-       * Generate an image and store in $blob using Nano Banana via laozhang.ai
+       * Generate an image and store in $blob using Google AI (Nano Banana)
+       * Uses free tier (499/day) then falls back to laozhang.ai
        * @param prompt - Text description of the image to generate
        * @param options - { model?, metadata?, filename?, aspectRatio? }
        *   aspectRatio: 'landscape' (default), 'portrait', 'square'
-       * @returns { success, blobKey, aspectRatio, contentType, prompt, error? }
+       * @returns { success, blobKey, aspectRatio, contentType, prompt, provider?, error? }
        */
       const prompt = args[0];
       const options = args[1] || {};
 
       if (!prompt || typeof prompt !== 'string') {
         return { success: false, error: 'Prompt is required' };
-      }
-
-      // Get API key from environment (laozhang.ai key)
-      const apiKey = process.env.LAOZHANG_API_KEY;
-      if (!apiKey) {
-        return { success: false, error: 'LAOZHANG_API_KEY not set in environment' };
       }
 
       const model = options.model || self.defaultModel;
@@ -84,19 +84,53 @@ export class AiImageGenBuilder implements Builder {
       const rawRatio = options.aspectRatio || 'landscape';
       const aspectRatio = aspectRatioMap[rawRatio] || rawRatio;
 
+      // Check daily usage and determine which provider to use
+      const db = $db.getDatabase();
+      const usageCollection = db.collection('aiImageGenUsage');
+      const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+      const usageDoc = await usageCollection.findOne({ date: today });
+      const todayCount = usageDoc?.count || 0;
+      const dailyLimit = self.dailyLimit || 499;
+
+      // Determine provider: Google free tier or laozhang.ai fallback
+      const googleKey = process.env.GOOGLE_AI_API_KEY;
+      const laozhangKey = process.env.LAOZHANG_API_KEY;
+
+      let useGoogle = googleKey && todayCount < dailyLimit;
+      let provider = useGoogle ? 'google' : 'laozhang';
+
+      if (!googleKey && !laozhangKey) {
+        return { success: false, error: 'No API key set (GOOGLE_AI_API_KEY or LAOZHANG_API_KEY)' };
+      }
+
+      if (!useGoogle && !laozhangKey) {
+        return { success: false, error: 'Daily limit reached (' + dailyLimit + ') and no LAOZHANG_API_KEY fallback' };
+      }
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min timeout
 
       try {
-        // Use laozhang.ai's Google-native format endpoint
-        const apiUrl = 'https://api.laozhang.ai/v1beta/models/' + model + ':generateContent';
+        let apiUrl, headers;
+
+        if (useGoogle) {
+          apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent';
+          headers = {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': googleKey,
+          };
+        } else {
+          apiUrl = 'https://api.laozhang.ai/v1beta/models/' + model + ':generateContent';
+          headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + laozhangKey,
+          };
+        }
 
         const resp = await fetch(apiUrl, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + apiKey,
-          },
+          headers: headers,
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
@@ -111,7 +145,7 @@ export class AiImageGenBuilder implements Builder {
 
         if (!resp.ok) {
           const errorBody = await resp.text();
-          return { success: false, error: 'API error ' + resp.status + ': ' + errorBody };
+          return { success: false, error: 'API error ' + resp.status + ': ' + errorBody, provider };
         }
 
         const data = await resp.json();
@@ -133,7 +167,16 @@ export class AiImageGenBuilder implements Builder {
         }
 
         if (!imageData) {
-          return { success: false, error: 'No image in response', textResponse };
+          return { success: false, error: 'No image in response', textResponse, provider };
+        }
+
+        // Increment usage count if we used Google
+        if (useGoogle) {
+          await usageCollection.updateOne(
+            { date: today },
+            { $inc: { count: 1 }, $setOnInsert: { date: today } },
+            { upsert: true }
+          );
         }
 
         // Store in $blob
@@ -150,6 +193,7 @@ export class AiImageGenBuilder implements Builder {
           model: model,
           aspectRatio: aspectRatio,
           generatedAt: new Date().toISOString(),
+          provider: provider,
           ...(options.metadata || {}),
         };
 
@@ -162,13 +206,14 @@ export class AiImageGenBuilder implements Builder {
           prompt: prompt,
           aspectRatio: aspectRatio,
           textResponse: textResponse,
+          provider: provider,
         };
       } catch (err) {
         clearTimeout(timeoutId);
         if (err.name === 'AbortError') {
-          return { success: false, error: 'Request timeout (120s)' };
+          return { success: false, error: 'Request timeout (120s)', provider };
         }
-        return { success: false, error: err.message || String(err) };
+        return { success: false, error: err.message || String(err), provider };
       }
     `,
     );
@@ -178,21 +223,17 @@ export class AiImageGenBuilder implements Builder {
       'generateRaw',
       `
       /**
-       * Generate an image and return base64 directly (not stored) using Nano Banana
+       * Generate an image and return base64 directly (not stored) using Google AI
+       * Uses free tier (499/day) then falls back to laozhang.ai
        * @param prompt - Text description of the image to generate
        * @param options - { model?, aspectRatio? }
-       * @returns { success, data, aspectRatio, contentType, prompt, error? }
+       * @returns { success, data, aspectRatio, contentType, prompt, provider?, error? }
        */
       const prompt = args[0];
       const options = args[1] || {};
 
       if (!prompt || typeof prompt !== 'string') {
         return { success: false, error: 'Prompt is required' };
-      }
-
-      const apiKey = process.env.LAOZHANG_API_KEY;
-      if (!apiKey) {
-        return { success: false, error: 'LAOZHANG_API_KEY not set in environment' };
       }
 
       const model = options.model || self.defaultModel;
@@ -208,18 +249,53 @@ export class AiImageGenBuilder implements Builder {
       const rawRatio = options.aspectRatio || 'landscape';
       const aspectRatio = aspectRatioMap[rawRatio] || rawRatio;
 
+      // Check daily usage and determine which provider to use
+      const db = $db.getDatabase();
+      const usageCollection = db.collection('aiImageGenUsage');
+      const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+      const usageDoc = await usageCollection.findOne({ date: today });
+      const todayCount = usageDoc?.count || 0;
+      const dailyLimit = self.dailyLimit || 499;
+
+      // Determine provider: Google free tier or laozhang.ai fallback
+      const googleKey = process.env.GOOGLE_AI_API_KEY;
+      const laozhangKey = process.env.LAOZHANG_API_KEY;
+
+      let useGoogle = googleKey && todayCount < dailyLimit;
+      let provider = useGoogle ? 'google' : 'laozhang';
+
+      if (!googleKey && !laozhangKey) {
+        return { success: false, error: 'No API key set (GOOGLE_AI_API_KEY or LAOZHANG_API_KEY)' };
+      }
+
+      if (!useGoogle && !laozhangKey) {
+        return { success: false, error: 'Daily limit reached (' + dailyLimit + ') and no LAOZHANG_API_KEY fallback' };
+      }
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 120000);
 
       try {
-        const apiUrl = 'https://api.laozhang.ai/v1beta/models/' + model + ':generateContent';
+        let apiUrl, headers;
+
+        if (useGoogle) {
+          apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent';
+          headers = {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': googleKey,
+          };
+        } else {
+          apiUrl = 'https://api.laozhang.ai/v1beta/models/' + model + ':generateContent';
+          headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + laozhangKey,
+          };
+        }
 
         const resp = await fetch(apiUrl, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + apiKey,
-          },
+          headers: headers,
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
@@ -234,7 +310,7 @@ export class AiImageGenBuilder implements Builder {
 
         if (!resp.ok) {
           const errorBody = await resp.text();
-          return { success: false, error: 'API error ' + resp.status + ': ' + errorBody };
+          return { success: false, error: 'API error ' + resp.status + ': ' + errorBody, provider };
         }
 
         const data = await resp.json();
@@ -255,7 +331,16 @@ export class AiImageGenBuilder implements Builder {
         }
 
         if (!imageData) {
-          return { success: false, error: 'No image in response', textResponse };
+          return { success: false, error: 'No image in response', textResponse, provider };
+        }
+
+        // Increment usage count if we used Google
+        if (useGoogle) {
+          await usageCollection.updateOne(
+            { date: today },
+            { $inc: { count: 1 }, $setOnInsert: { date: today } },
+            { upsert: true }
+          );
         }
 
         return {
@@ -265,13 +350,14 @@ export class AiImageGenBuilder implements Builder {
           prompt: prompt,
           aspectRatio: aspectRatio,
           textResponse: textResponse,
+          provider: provider,
         };
       } catch (err) {
         clearTimeout(timeoutId);
         if (err.name === 'AbortError') {
-          return { success: false, error: 'Request timeout (120s)' };
+          return { success: false, error: 'Request timeout (120s)', provider };
         }
-        return { success: false, error: err.message || String(err) };
+        return { success: false, error: err.message || String(err), provider };
       }
     `,
     );
@@ -281,13 +367,38 @@ export class AiImageGenBuilder implements Builder {
       'listModels',
       `
       /**
-       * List available Nano Banana models via laozhang.ai
+       * List available Nano Banana models
        * @returns Array of model info
        */
       return [
-        { id: 'gemini-2.5-flash-image', name: 'Nano Banana (stable)', tier: 'budget', pricePerImage: 0.05 },
-        { id: 'gemini-3-pro-image-preview', name: 'Nano Banana Pro (4K support)', tier: 'quality', pricePerImage: 0.05 },
+        { id: 'gemini-2.5-flash-image', name: 'Nano Banana (stable)', tier: 'budget', freePerDay: 499 },
+        { id: 'gemini-3-pro-image-preview', name: 'Nano Banana Pro (4K support)', tier: 'quality', freePerDay: 2 },
       ];
+    `,
+    );
+
+    // Get current usage stats
+    this.aiImageGen.setMethod(
+      'getUsage',
+      `
+      /**
+       * Get current daily usage stats for Google free tier
+       * @returns { today, limit, remaining, date }
+       */
+      const db = $db.getDatabase();
+      const usageCollection = db.collection('aiImageGenUsage');
+      const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+      const usageDoc = await usageCollection.findOne({ date: today });
+      const todayCount = usageDoc?.count || 0;
+      const dailyLimit = self.dailyLimit || 499;
+
+      return {
+        today: todayCount,
+        limit: dailyLimit,
+        remaining: Math.max(0, dailyLimit - todayCount),
+        date: today,
+      };
     `,
     );
 
