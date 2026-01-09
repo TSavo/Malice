@@ -6,18 +6,18 @@ import { type Builder, registerBuilder } from './builder-registry';
  * Builds $aiImageGen MOO object for AI image generation
  *
  * Uses laozhang.ai by default ($0.05/image).
- * Falls back to Google AI Studio free tier (499/day) if GOOGLE_AI_API_KEY is set.
+ * Falls back to Google AI Studio free tier (499/day) if LAOZHANG_API_KEY not set.
  * Stores generated images in $blob for persistence.
  *
  * Usage from MOO code:
  *   const result = await $aiImageGen.generate('A cyberpunk banana');
- *   // result = { blobKey, contentType, prompt }
+ *   // result = { blobKey, contentType, prompt, provider }
  *
  *   const base64 = await $aiImageGen.generateRaw('A glowing orb');
  *   // Returns base64 string directly
  *
  *   const usage = await $aiImageGen.getUsage();
- *   // { today: 42, limit: 499, remaining: 457 }
+ *   // { today: 42, limit: 499, remaining: 457 } (Google fallback tracking)
  */
 export class AiImageGenBuilder implements Builder {
   static provides = ['aiImageGen'];
@@ -58,7 +58,7 @@ export class AiImageGenBuilder implements Builder {
       `
       /**
        * Generate an image and store in $blob
-       * Uses laozhang.ai by default, falls back to Google AI if key is set and quota available
+       * Uses laozhang.ai by default, falls back to Google AI if laozhang key not set
        * @param prompt - Text description of the image to generate
        * @param options - { model?, metadata?, filename?, aspectRatio? }
        *   aspectRatio: 'landscape' (default), 'portrait', 'square'
@@ -228,7 +228,7 @@ export class AiImageGenBuilder implements Builder {
       `
       /**
        * Generate an image and return base64 directly (not stored)
-       * Uses laozhang.ai by default, falls back to Google AI if key is set and quota available
+       * Uses laozhang.ai by default, falls back to Google AI if laozhang key not set
        * @param prompt - Text description of the image to generate
        * @param options - { model?, aspectRatio? }
        * @returns { success, data, aspectRatio, contentType, prompt, provider?, error? }
