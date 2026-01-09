@@ -843,6 +843,7 @@ The game features an extensive underground tunnel network beneath Pioneer Square
 - **Corp Construction** (+0 to +6, +1 to +4, z=0) - Continuum research facility with elevator access to levels -1 through -3
 
 **Building basement connections:**
+- Colman Building basement (-12, -2, -1) → east to underground via access shaft
 - Doc Maynard's cellar (-15, 2, -1) → east to underground
 - Fabrication Factory foundry (-19, 10, -1) → south to underground
 - Gargoyle Building coal cellar (-18, 12, -1) → east to underground
