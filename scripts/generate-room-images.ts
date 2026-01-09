@@ -252,20 +252,93 @@ function generateImageFilename(roomFile: RoomFile): string {
 function buildPrompt(room: RoomDef): string {
   const isOutdoor = room.outdoor ?? false;
   const isUnderground = (room.z ?? 0) < 0;
+  const depth = room.z ?? 0;
+
+  // Style directives for photorealism
+  const style = [
+    'photorealistic',
+    'cinematic lighting',
+    'high detail',
+    'no people',
+    'no humans',
+    'no figures',
+    'empty',
+    'desolate',
+    'abandoned',
+    'run down',
+    'weathered',
+    'gritty',
+    'urban decay',
+  ].join(', ');
+
+  // Negative prompt elements (appended as "without X")
+  const avoid = 'without any people, crowds, pedestrians, or human figures';
 
   let context = '';
   if (isUnderground) {
-    context = 'Underground Seattle tunnel, abandoned, dark, industrial. ';
+    // Different underground vibes based on depth
+    if (depth <= -4) {
+      context = 'Deep underground vault beneath Seattle, pitch black except for emergency lighting, ' +
+        'concrete walls with water damage, rusty pipes, flooded floor puddles, claustrophobic, oppressive. ';
+    } else if (depth <= -2) {
+      context = 'Seattle underground tunnel system from 1889, brick and stone walls, ' +
+        'dim flickering lights, debris and rubble, graffiti, homeless camp remnants, rats, damp and musty. ';
+    } else {
+      context = 'Building basement in Seattle, concrete and exposed pipes, ' +
+        'water-stained walls, old storage, industrial decay, dim fluorescent lighting. ';
+    }
   } else if (isOutdoor) {
-    context = 'Pioneer Square Seattle street, abandoned post-apocalyptic, grey overcast sky. ';
+    context = 'Pioneer Square Seattle street scene, overcast grey sky, ' +
+      'historic red brick buildings, cobblestone streets, overgrown weeds through cracks, ' +
+      'boarded up storefronts, broken windows, abandoned cars, trash and debris, post-apocalyptic atmosphere. ';
   } else {
-    context = 'Indoor room, abandoned, dust and debris. ';
+    // Indoor - try to detect room type from name/description
+    const nameAndDesc = `${room.name} ${room.description}`.toLowerCase();
+
+    if (nameAndDesc.includes('office') || nameAndDesc.includes('corporate')) {
+      context = 'Abandoned corporate office interior, overturned desks, scattered papers, ' +
+        'broken computer monitors, water-stained ceiling tiles, dead plants, dust everywhere. ';
+    } else if (nameAndDesc.includes('lobby') || nameAndDesc.includes('foyer')) {
+      context = 'Abandoned building lobby, grand but decayed, broken chandelier, ' +
+        'marble floor covered in dust and debris, graffiti on walls, shattered glass. ';
+    } else if (nameAndDesc.includes('bar') || nameAndDesc.includes('pub') || nameAndDesc.includes('tavern')) {
+      context = 'Abandoned dive bar interior, overturned stools, broken bottles, ' +
+        'dusty bar counter, neon signs dark, grimy floors, cigarette burns. ';
+    } else if (nameAndDesc.includes('warehouse') || nameAndDesc.includes('storage')) {
+      context = 'Abandoned warehouse interior, empty shelving units, ' +
+        'concrete floor with oil stains, broken skylights, pigeons nesting, industrial decay. ';
+    } else if (nameAndDesc.includes('apartment') || nameAndDesc.includes('bedroom') || nameAndDesc.includes('living')) {
+      context = 'Abandoned apartment interior, furniture covered in dust sheets, ' +
+        'peeling wallpaper, water damage on ceiling, broken windows with curtains blowing. ';
+    } else if (nameAndDesc.includes('kitchen') || nameAndDesc.includes('diner') || nameAndDesc.includes('restaurant')) {
+      context = 'Abandoned restaurant kitchen, rusted appliances, ' +
+        'broken tiles, grease stains, rotting food remnants, pest droppings. ';
+    } else if (nameAndDesc.includes('hospital') || nameAndDesc.includes('medical') || nameAndDesc.includes('clinic')) {
+      context = 'Abandoned medical facility, overturned gurneys, ' +
+        'scattered medical supplies, broken equipment, biohazard signs, eerie sterile decay. ';
+    } else if (nameAndDesc.includes('church') || nameAndDesc.includes('chapel')) {
+      context = 'Abandoned church interior, broken pews, ' +
+        'shattered stained glass, altar covered in debris, pigeons roosting, haunting atmosphere. ';
+    } else if (nameAndDesc.includes('gallery') || nameAndDesc.includes('museum')) {
+      context = 'Abandoned art gallery, empty frames on walls, ' +
+        'pedestals knocked over, skylight covered in grime, dust motes in light beams. ';
+    } else if (nameAndDesc.includes('shop') || nameAndDesc.includes('store') || nameAndDesc.includes('retail')) {
+      context = 'Abandoned retail store, empty shelves and racks, ' +
+        'mannequins toppled over, shattered display cases, faded sale signs, looted. ';
+    } else {
+      context = 'Abandoned interior space in Seattle, dust and debris everywhere, ' +
+        'water damage, peeling paint, broken furniture, graffiti, urban decay. ';
+    }
   }
 
-  // Extract key details from description (first 200 chars to avoid too-long prompts)
-  const descSnippet = room.description.slice(0, 300).replace(/\n/g, ' ');
+  // Extract key details from description (first 250 chars)
+  const descSnippet = room.description
+    .slice(0, 250)
+    .replace(/\n/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 
-  return `${context}${room.name}. ${descSnippet}. Photorealistic, wide angle, 16:9 aspect ratio.`;
+  return `${context}${room.name}: ${descSnippet}. ${style}. ${avoid}. Wide angle shot, 16:9 cinematic composition.`;
 }
 
 async function generateImage(prompt: string): Promise<string> {
