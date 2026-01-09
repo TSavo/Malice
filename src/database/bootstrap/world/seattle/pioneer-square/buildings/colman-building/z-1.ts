@@ -66,7 +66,6 @@ A service staircase climbs toward the lobby above. In the floor, a heavy iron ha
         },
         down: {
           to: 'underground/upper-tunnels/x-12-y-2.ts',
-          room: '%ACCESS_SHAFT',
           description: 'A shaft with metal rungs descends into darkness',
           door: '%TUNNEL_DOOR',
         },
