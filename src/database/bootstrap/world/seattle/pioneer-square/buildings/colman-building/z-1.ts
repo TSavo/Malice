@@ -29,9 +29,9 @@ export const building = {
 
     '%TUNNEL_DOOR': {
       prototype: 'door',
-      name: 'Tunnel Access Door',
+      name: 'Tunnel Access Hatch',
       description:
-        'A heavy iron door set into the eastern wall of the basement, painted over many times until the original brick color is barely visible. No lock is visible - the door simply opens when pushed, suggesting it was never meant to be secure.',
+        'A heavy iron hatch set into the basement floor, painted over many times until the original brick color is barely visible. No lock is visible - the hatch simply opens when pulled, suggesting it was never meant to be secure.',
       locked: false,
       open: false,
       material: 'metal',
@@ -48,7 +48,7 @@ export const building = {
 
 Brick walls show the original 1889 construction, their mortar lines dark with age. Overhead, ductwork and pipes snake between the support beams, evidence of modern retrofits. The concrete floor is cracked in places, water stains marking where the basement has flooded over the decades.
 
-A service staircase climbs toward the lobby above. To the east, a heavy iron door in the wall suggests another exit, though its purpose isn't immediately obvious.`,
+A service staircase climbs toward the lobby above. In the floor, a heavy iron hatch suggests access to something below, though its purpose isn't immediately obvious.`,
       x: -12,
       y: -2,
       z: -1,
@@ -64,10 +64,10 @@ A service staircase climbs toward the lobby above. To the east, a heavy iron doo
           door: '%BASEMENT_DOOR',
           locks: ['%BASEMENT_LOCK'],
         },
-        east: {
+        down: {
           to: 'underground/upper-tunnels/x-12-y-2.ts',
           room: '%ACCESS_SHAFT',
-          description: 'A heavy iron door opens to the east',
+          description: 'A shaft with metal rungs descends into darkness',
           door: '%TUNNEL_DOOR',
         },
       },
