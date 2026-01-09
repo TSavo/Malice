@@ -23,6 +23,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: tsavo/malice-base:latest
     container_name: malice-game
     restart: unless-stopped
     ports:
