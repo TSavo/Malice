@@ -1167,12 +1167,12 @@ player.avatarBlobKey = blobKey;
 
 ### $aiImageGen - AI Image Generation Object
 
-Generate images using Nano Banana via [laozhang.ai](https://api.laozhang.ai) (79% cheaper than Google direct) and store them in `$blob`:
+Generate images using Google AI Studio (Nano Banana) with automatic fallback to [laozhang.ai](https://api.laozhang.ai) and store them in `$blob`:
 
 ```typescript
 // Generate image and store in $blob
 const result = await $aiImageGen.generate('A cyberpunk banana with neon lights');
-// { success: true, blobKey: '...', contentType: 'image/png', prompt: '...' }
+// { success: true, blobKey: '...', contentType: 'image/png', prompt: '...', provider: 'google' }
 
 // Get URL for the generated image
 const url = $blob.url(result.blobKey, 'thecontinuum.city');
@@ -1187,7 +1187,14 @@ const result = await $aiImageGen.generate('A glowing orb', {
 
 // Generate without storing (returns base64 directly)
 const raw = await $aiImageGen.generateRaw('A simple icon');
-// { success: true, data: 'base64...', contentType: 'image/png' }
+// { success: true, data: 'base64...', contentType: 'image/png', provider: 'google' }
+
+// Check usage and quota
+const usage = await $aiImageGen.getUsage();
+// { today: 42, limit: 499, remaining: 457 }
+
+const remaining = await $aiImageGen.getRemainingQuota();
+// 457
 
 // List available models
 const models = $aiImageGen.listModels();
@@ -1197,10 +1204,31 @@ const models = $aiImageGen.listModels();
 $aiImageGen.setDefaultModel('gemini-3-pro-image-preview');
 ```
 
-**Environment:** Requires `LAOZHANG_API_KEY` environment variable.
+**Environment:**
+- **Primary:** `GOOGLE_AI_API_KEY` - Google AI Studio API key (free tier: 499 images/day)
+  - Get key from [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
+- **Fallback:** `LAOZHANG_API_KEY` - Used after Google free tier exhausted ($0.05/image)
+  - Get key from [api.laozhang.ai](https://api.laozhang.ai)
+
+**How it works:**
+- Uses Google AI Studio free tier first (499/day limit tracked in MongoDB `aiImageGenUsage` collection)
+- Automatically falls back to laozhang.ai after daily quota exhausted
+- Returns `provider: 'google'` or `provider: 'laozhang'` in response
 
 **Available models:**
-- `gemini-2.5-flash-image` - Nano Banana (default, $0.05/image)
-- `gemini-3-pro-image-preview` - Nano Banana Pro with 4K support ($0.05/image)
+- `gemini-2.5-flash-image` - Nano Banana (default)
+- `gemini-3-pro-image-preview` - Nano Banana Pro with 4K support
+
+**Batch generation script:**
+```bash
+# Generate images for all rooms without imageOnDisk
+bun scripts/generate-room-images.ts
+
+# Options:
+bun scripts/generate-room-images.ts --dry-run         # Preview without generating
+bun scripts/generate-room-images.ts --buildings-only  # Only building rooms
+bun scripts/generate-room-images.ts --world-only      # Only world rooms
+bun scripts/generate-room-images.ts --limit 50        # Override daily limit
+```
 
 All transports require authentication. Players must first register via `POST /register` on the faction's HTTP server, then connect via WebSocket or Session MCP with their credentials. Connections are tagged with `factionId` for routing to the correct character generation flow.
