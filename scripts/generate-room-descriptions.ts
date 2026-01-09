@@ -138,45 +138,33 @@ function buildPrompt(room: Room, neighbors: Room[], worldMeta: WorldExport['meta
     }
   }).join('\n');
 
-  const prompt = `You are writing room descriptions for a text-based cyberpunk survival game set in the Seattle Underground - the buried streets beneath Pioneer Square, sealed since 1889. The year is 2109. The tone is dark, atmospheric, literary noir. Think Neuromancer and Bladerunner.
-
-The rooms are generated procedurally, with various eras represented: Victorian (pre-1889), Depression (1930s WPA), Industrial (Gray Cartel modifications), Modern (recent basements), Deep (natural caves), and Ancient (pre-fire 1870s cisterns). Each room has physical features that reflect its history and condition.
-
-Using the data below, write a vivid, atmospheric description for the specified room. Reference its physical features and any connected rooms that have descriptions but only in passing. Do not assume where the user has come from, or that they can see the other rooms. Convey the sense of a forgotten, dangerous place beneath the city. Avoid mentioning game mechanics, exits, or directions.
+  const prompt = `Write a room description for a text-based cyberpunk noir game set in Seattle's underground (buried 1889 streets). Year: 2109.
 
 ROOM DATA:
 - Type: ${room.roomType} (${room.topology})
 - Era: ${room.era} (${getEraDescription(room.era)})
 - Condition: ${room.condition}
 - Atmosphere: ${room.atmosphere}
-- Depth from surface: ${room.depth} rooms
-- Position: x=${room.pos.x}, y=${room.pos.y}, z=${room.pos.z}
-- Near water: ${room.nearWater}
-- Near surface: ${room.nearSurface}
-- Deep underground: ${room.isDeep}
-- Exits: ${exitDirections.join(', ')}
+- Depth: ${room.depth} levels below street
 
 PHYSICAL FEATURES:
-${featureDescs || 'No special features'}
+${featureDescs || 'Generic underground passage'}
 
 CONNECTED ROOMS:
-${neighborContext || 'No described neighbors yet'}
+${neighborContext || 'None described yet'}
 
-WRITING GUIDELINES:
-- 4-8 sentences, vivid and atmospheric
-- Focus on what the character SEES, SMELLS, HEARS
-- No flowery language - direct, noir prose
-- Reference the physical features and surrounding rooms naturally
-- If neighbors have descriptions, maintain spatial consistency
-- This is a forgotten, dangerous place - convey that
-- No meta-commentary, no "you" statements
-- Cyberpunk, NOT cyberfantasy. Detective noir, NOT heroic adventure/epic.
-- Present tense, third person impersonal
-- Do NOT mention game mechanics, exits, or directions
-- Do NOT include any dialogue or characters
-- Do NOT include objects, atmospheric room descriptions only
+STYLE EXAMPLE (match this tone and format):
+"The brick walls ooze moisture, staining the mortar black. A rusted iron beam sags overhead, bolts bleeding orange down the stone. Somewhere ahead, water drips into a pool with a hollow echo. The air tastes of copper and rot, thick enough to chew."
 
-Write the room description:`;
+RULES:
+1. NO second person (you/your). Describe the space itself.
+2. 4-5 complete sentences. Third person present tense.
+3. Sensory: what can be SEEN, HEARD, SMELLED, FELT.
+4. ERA-appropriate: ${room.era === 'modern' ? 'concrete, steel, LEDs' : room.era === 'victorian' ? 'brick, iron, gas pipes' : 'period materials'}
+5. CONDITION: ${room.condition}
+6. Gritty noir prose. Direct, not flowery.
+
+Description:`;
 
   return prompt;
 }
@@ -216,9 +204,10 @@ async function callOllama(prompt: string): Promise<string> {
       prompt,
       stream: false,
       options: {
-        temperature: 0.8,
-        top_p: 0.9,
-        num_predict: 200,
+        temperature: 0.85,
+        top_p: 0.92,
+        num_predict: 350,  // Increased to prevent cutoff
+        repeat_penalty: 1.15,  // Reduce repetitive phrases
       },
     }),
   });
@@ -257,7 +246,10 @@ async function generateDescriptions(world: WorldExport): Promise<WorldExport> {
   
   while (queue.length > 0) {
     const roomId = queue.shift()!;
-    processOrder.push(roomId);
+    // Only process if room exists
+    if (roomById.has(roomId)) {
+      processOrder.push(roomId);
+    }
     
     for (const neighborId of adjacency.get(roomId) || []) {
       if (!visited.has(neighborId)) {
@@ -277,22 +269,38 @@ async function generateDescriptions(world: WorldExport): Promise<WorldExport> {
   console.log(`Processing ${processOrder.length} rooms in BFS order from ${entrances.length} entrances...`);
   console.log(`Using model: ${MODEL}`);
   console.log(`Ollama URL: ${OLLAMA_URL}`);
+  
+  // Count already-done rooms
+  const alreadyDone = processOrder.filter(id => roomById.get(id)?.description).length;
+  if (alreadyDone > 0) {
+    console.log(`Resuming: ${alreadyDone} rooms already have descriptions, ${processOrder.length - alreadyDone} remaining`);
+  }
   console.log('');
   
   // Process rooms in order
   let completed = 0;
+  let skipped = 0;
   const startTime = Date.now();
   
   for (const roomId of processOrder) {
-    const room = roomById.get(roomId)!;
+    const room = roomById.get(roomId);
+    if (!room) {
+      console.log(`  Skipping ${roomId} - room not found`);
+      continue;
+    }
+    
+    // Skip rooms that already have descriptions (resume support)
+    if (room.description && !room.description.startsWith('[Generation failed')) {
+      skipped++;
+      continue;
+    }
     
     // Get neighbors with their current descriptions (if any)
     const neighborIds = adjacency.get(roomId) || [];
-    const neighbors = neighborIds.map(id => roomById.get(id)!).filter(Boolean);
+    const neighbors = neighborIds.map(id => roomById.get(id)).filter((n): n is Room => n !== undefined);
     
     // Build and send prompt
     const prompt = buildPrompt(room, neighbors, world.meta);
-    
     try {
       const description = await callOllama(prompt);
       room.description = description;
@@ -300,22 +308,22 @@ async function generateDescriptions(world: WorldExport): Promise<WorldExport> {
       completed++;
       const elapsed = (Date.now() - startTime) / 1000;
       const rate = completed / elapsed;
-      const remaining = (processOrder.length - completed) / rate;
+      const totalRemaining = processOrder.length - skipped - completed;
+      const remaining = rate > 0 ? totalRemaining / rate : 0;
       
-      console.log(`[${completed}/${processOrder.length}] ${room.id} (${room.roomType}, ${room.era})`);
+      console.log(`[${skipped + completed}/${processOrder.length}] ${room.id} (${room.roomType}, ${room.era})`);
       console.log(`  ${description.substring(0, 80)}...`);
       console.log(`  ETA: ${Math.round(remaining)}s remaining`);
-      console.log('');
       
-      // Save progress periodically
-      if (completed % 10 === 0) {
-        fs.writeFileSync(OUTPUT_FILE, JSON.stringify(world, null, 2));
-        console.log(`  [Saved progress to ${OUTPUT_FILE}]`);
-      }
+      // Save after EVERY room for resume support
+      fs.writeFileSync(OUTPUT_FILE, JSON.stringify(world, null, 2));
+      console.log('');
       
     } catch (error) {
       console.error(`  Error generating for ${roomId}:`, error);
       room.description = `[Generation failed: ${error}]`;
+      // Still save so we can retry just the failed ones
+      fs.writeFileSync(OUTPUT_FILE, JSON.stringify(world, null, 2));
     }
   }
   

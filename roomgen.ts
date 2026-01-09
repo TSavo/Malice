@@ -66,6 +66,7 @@ export type GrowthParams = {
   linearBias: number;     // e.g. 0.7
   centerBias: number;     // e.g. 1.2
   centerPenalty: number;  // e.g. 0.9
+  linkPreference: number; // e.g. 0.8 - prefer linking to existing rooms over creating new ones
 
   // prefab
   prefabChance: number;   // e.g. 0.25
@@ -469,7 +470,7 @@ function chooseNextStep(
   const target = frontier.target ?? centroid(state);
   const curDist = manhattan(cur, target);
 
-  const candidates: Array<{ pos: Vec3; axis: Axis; score: number }> = [];
+  const candidates: Array<{ pos: Vec3; axis: Axis; score: number; isExisting: boolean }> = [];
 
   for (const axis of AXES) {
     for (const step of [-1, 1] as const) {
@@ -479,7 +480,14 @@ function chooseNextStep(
       // Never go above z=-2 during generation (z=-1 is only for entrance rooms)
       if (nxt.z > -2) continue;
 
+      const isExisting = isOccupied(state, nxt);
       let score = 1.0;
+
+      // LINK PREFERENCE: Strongly prefer connecting to existing rooms
+      // This creates a denser, more interconnected network with fewer isolated branches
+      if (isExisting) {
+        score += params.linkPreference * 3.0; // Big bonus for linking to existing rooms
+      }
 
       // linear bias
       if (frontier.dir && frontier.dir === axis) score += params.linearBias;
@@ -489,7 +497,7 @@ function chooseNextStep(
       if (nextDist < curDist) score += 2.0;  // strongly prefer moving closer
       else if (nextDist > curDist) score -= 0.5;  // mild penalty for moving away
 
-      candidates.push({ pos: nxt, axis, score });
+      candidates.push({ pos: nxt, axis, score, isExisting });
     }
   }
 

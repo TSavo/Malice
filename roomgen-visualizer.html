@@ -165,9 +165,15 @@
       <input type="range" id="prefabChance" min="0" max="100" value="15">
     </div>
     
+    <div class="control-group">
+      <label>Link Preference <span class="value-display" id="linkPreferenceVal">0.80</span></label>
+      <input type="range" id="linkPreference" min="0" max="100" value="80">
+    </div>
     
     <button id="generate">Generate World</button>
     <button id="randomSeed" style="background: linear-gradient(135deg, #4a4, #6a6);">Random Seed</button>
+    <button id="importJson" style="background: linear-gradient(135deg, #a64, #c86);">Import JSON</button>
+    <input type="file" id="jsonFileInput" accept=".json" style="display: none;">
   </div>
   
   <div id="stats">
@@ -187,10 +193,10 @@
       <kbd>R</kbd> toggle mode • <kbd>Q</kbd>/<kbd>Z</kbd> adjust Z
     </div>
     <div style="margin-top: 4px; color: #888;">
-      <kbd>Click</kbd> add • <kbd>Shift+Click</kbd> delete
+      <kbd>Click</kbd> add • <kbd>Shift+Click</kbd> delete room/exit
     </div>
     <div style="margin-top: 4px; color: #888;">
-      <kbd>T</kbd> cycle room type • <kbd>E</kbd> export JSON
+      <kbd>T</kbd> cycle type • <kbd>E</kbd> export • <kbd>I</kbd> import
     </div>
     <div style="margin-top: 6px; font-size: 10px;">
       <span style="color: #4466aa;">■</span> room
@@ -217,7 +223,7 @@
     // ============ THREE.JS VISUALIZATION ============
 
     let scene, camera, renderer, controls;
-    let roomMeshes = [], lineMeshes = [];
+    let roomMeshes = [], lineMeshes = [], exitMeshes = [];
     
     // Editor state
     let editorMode = 'room'; // 'room' or 'exit'
@@ -463,6 +469,8 @@
         cycleRoomType();
       } else if (e.key === 'e' || e.key === 'E') {
         exportWorld();
+      } else if (e.key === 'i' || e.key === 'I') {
+        document.getElementById('jsonFileInput').click();
       } else if (e.key === 'q' || e.key === 'Q') {
         editorZ = Math.min(0, editorZ + 1); // Allow up to z=0
         document.getElementById('editorZ').textContent = editorZ;
@@ -575,13 +583,17 @@
         else if (room.meta?.prefabId) {
           room.meta.roomType = 'room';
         }
-        // 1-2 exits = railway (linear passages)
-        else if ((exitCount.get(room.id) || 0) <= 2) {
-          room.meta.roomType = 'railway';
-        }
-        // 3+ exits = room
         else {
-          room.meta.roomType = 'room';
+          // 50/50 railway vs room based on position seed
+          const seed = Math.abs(room.pos.x * 73856093 ^ room.pos.y * 19349663 ^ room.pos.z * 83492791);
+          const rand = ((seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+          
+          // Rooms with 3+ exits slightly favor 'room' type (60% room, 40% railway)
+          // Rooms with 1-2 exits favor 'railway' type (40% room, 60% railway)
+          const exits = exitCount.get(room.id) || 0;
+          const roomChance = exits >= 3 ? 0.6 : 0.4;
+          
+          room.meta.roomType = rand < roomChance ? 'room' : 'railway';
         }
       }
     }
@@ -885,6 +897,44 @@
       return null;
     }
     
+    function getExitUnderMouse(e) {
+      mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(exitMeshes);
+      
+      if (intersects.length > 0) {
+        const exitFrom = intersects[0].object.userData.exitFrom;
+        const exitTo = intersects[0].object.userData.exitTo;
+        if (exitFrom !== undefined && exitTo !== undefined) {
+          return { from: exitFrom, to: exitTo };
+        }
+      }
+      return null;
+    }
+    
+    function deleteExit(fromId, toId) {
+      if (!currentWorld) return;
+      
+      // Disable controls temporarily to prevent view jump
+      controls.enabled = false;
+      
+      // Remove both directions of the exit
+      currentWorld.exits = currentWorld.exits.filter(e => 
+        !((e.from === fromId && e.to === toId) || (e.from === toId && e.to === fromId))
+      );
+      
+      console.log('Deleted exit between', fromId, 'and', toId);
+      
+      refreshVisualization();
+      
+      // Re-enable controls after a short delay
+      requestAnimationFrame(() => {
+        controls.enabled = true;
+      });
+    }
+    
     function onMouseDown(e) {
       if (e.button === 0) {
         mouseDownPos = { x: e.clientX, y: e.clientY };
@@ -918,13 +968,20 @@
       
       // For exit mode, use raycast to detect rooms directly
       const clickedRoom = getRoomUnderMouse(e);
+      const clickedExit = getExitUnderMouse(e);
       const existingRoom = clickedRoom || (pos ? findRoomAtPosition(pos) : null);
       
-      console.log('Click at', pos, 'mode:', editorMode, 'clickedRoom:', clickedRoom?.id, 'existingRoom:', existingRoom?.id, 'roomMeshes:', roomMeshes.length);
+      console.log('Click at', pos, 'mode:', editorMode, 'clickedRoom:', clickedRoom?.id, 'clickedExit:', clickedExit, 'existingRoom:', existingRoom?.id);
       
       if (e.shiftKey) {
-        // Delete mode
-        if (existingRoom) {
+        // Delete mode - stop event to prevent camera jump
+        e.stopPropagation();
+        e.preventDefault();
+        
+        // Try deleting exit first (if clicked on one), then room
+        if (clickedExit) {
+          deleteExit(clickedExit.from, clickedExit.to);
+        } else if (existingRoom) {
           deleteRoom(existingRoom);
         }
       } else {
@@ -973,6 +1030,9 @@
     function deleteRoom(room) {
       if (!currentWorld) return;
       
+      // Disable controls temporarily to prevent view jump
+      controls.enabled = false;
+      
       // Remove room
       currentWorld.rooms = currentWorld.rooms.filter(r => r.id !== room.id);
       
@@ -980,6 +1040,11 @@
       currentWorld.exits = currentWorld.exits.filter(e => e.from !== room.id && e.to !== room.id);
       
       refreshVisualization();
+      
+      // Re-enable controls after a short delay
+      requestAnimationFrame(() => {
+        controls.enabled = true;
+      });
     }
     
     function addExit(room1, room2) {
@@ -1025,7 +1090,7 @@
     }
 
     function setupControls() {
-      const sliders = ['maxRooms', 'branchChance', 'linearBias', 'centerBias', 'centerPenalty', 'prefabChance'];
+      const sliders = ['maxRooms', 'branchChance', 'linearBias', 'centerBias', 'centerPenalty', 'prefabChance', 'linkPreference'];
       sliders.forEach(id => {
         const el = document.getElementById(id);
         el.addEventListener('input', () => {
@@ -1045,13 +1110,79 @@
         document.getElementById('seedVal').textContent = seed;
         generate();
       });
+      
+      // Import JSON functionality
+      document.getElementById('importJson').addEventListener('click', () => {
+        document.getElementById('jsonFileInput').click();
+      });
+      
+      document.getElementById('jsonFileInput').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const data = JSON.parse(event.target.result);
+            importWorld(data);
+          } catch (err) {
+            alert('Failed to parse JSON: ' + err.message);
+          }
+        };
+        reader.readAsText(file);
+        e.target.value = ''; // Reset so same file can be loaded again
+      });
+    }
+    
+    function importWorld(data) {
+      clearWorld();
+      exitStartRoomId = null;
+      updateCursorPreviewColor();
+      
+      // Reconstruct world from export format
+      currentWorld = {
+        rooms: data.rooms.map(r => ({
+          id: r.id,
+          pos: r.pos,
+          meta: {
+            roomType: r.roomType,
+            topology: r.topology,
+            era: r.era,
+            condition: r.condition,
+            atmosphere: r.atmosphere,
+            exits: r.exits,
+            exitCount: r.exitCount,
+            depth: r.depth,
+            features: r.features,
+            nearWater: r.nearWater,
+            nearSurface: r.nearSurface,
+            isDeep: r.isDeep,
+            neighborTypes: r.neighborTypes,
+            prefabId: r.prefabId,
+            prefabInstanceId: r.prefabInstanceId,
+          }
+        })),
+        exits: data.exits,
+      };
+      
+      // Reconstruct entrances from entrance-type rooms
+      currentEntrances = data.rooms
+        .filter(r => r.roomType === 'entrance')
+        .map(r => r.pos);
+      
+      visualizeWorld(currentWorld, currentEntrances);
+      updateStats(currentWorld);
+      
+      console.log('Imported world:', currentWorld.rooms.length, 'rooms,', currentWorld.exits.length / 2, 'exits');
     }
 
     function clearWorld() {
       roomMeshes.forEach(m => scene.remove(m));
       lineMeshes.forEach(m => scene.remove(m));
+      exitMeshes.forEach(m => scene.remove(m));
       roomMeshes = [];
       lineMeshes = [];
+      exitMeshes = [];
     }
 
     function generate() {
@@ -1066,6 +1197,7 @@
       const centerBias = parseInt(document.getElementById('centerBias').value) / 100;
       const centerPenalty = parseInt(document.getElementById('centerPenalty').value) / 100;
       const prefabChance = parseInt(document.getElementById('prefabChance').value) / 100;
+      const linkPreference = parseInt(document.getElementById('linkPreference').value) / 100;
 
       const bounds = {
         min: { x: -25, y: -12, z: -6 },
@@ -1118,6 +1250,7 @@
         centerBias,
         centerPenalty,
         prefabChance,
+        linkPreference,
         prefabs: SAMPLE_PREFABS,
         inferCardinalExits: true,
       });
@@ -1191,6 +1324,26 @@
         if (!p1 || !p2) continue;
 
         linePoints.push(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
+        
+        // Create individual clickable tube for this exit
+        const direction = new THREE.Vector3().subVectors(p2, p1);
+        const length = direction.length();
+        const midpoint = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+        
+        // Use a thin cylinder for better raycasting than lines
+        const tubeGeometry = new THREE.CylinderGeometry(0.15, 0.15, length, 4);
+        const tubeMaterial = new THREE.MeshBasicMaterial({ 
+          color: 0x336699, 
+          transparent: true, 
+          opacity: 0.01 // Nearly invisible - the LineSegments handle visual
+        });
+        const tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
+        tube.position.copy(midpoint);
+        tube.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize());
+        tube.userData.exitFrom = exit.from;
+        tube.userData.exitTo = exit.to;
+        scene.add(tube);
+        exitMeshes.push(tube);
       }
 
       const lineGeometry = new THREE.BufferGeometry();

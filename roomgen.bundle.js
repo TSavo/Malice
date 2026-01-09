@@ -280,12 +280,16 @@ function chooseNextStep(state, bounds, rand, frontier, params) {
       const nxt = { ...cur, [axis]: cur[axis] + step };
       if (!inBounds(nxt, bounds)) continue;
       if (nxt.z > -2) continue;
+      const isExisting = isOccupied(state, nxt);
       let score = 1;
+      if (isExisting) {
+        score += params.linkPreference * 3;
+      }
       if (frontier.dir && frontier.dir === axis) score += params.linearBias;
       const nextDist = manhattan(nxt, target);
       if (nextDist < curDist) score += 2;
       else if (nextDist > curDist) score -= 0.5;
-      candidates.push({ pos: nxt, axis, score });
+      candidates.push({ pos: nxt, axis, score, isExisting });
     }
   }
   if (candidates.length === 0) return null;
