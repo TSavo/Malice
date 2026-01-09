@@ -3,6 +3,11 @@
 ARG BASE_IMAGE=tsavo/malice-base:latest
 FROM ${BASE_IMAGE}
 
+WORKDIR /app
+
+# Copy dependency files to ensure they match the base image
+COPY --chown=bun:bun package.json bun.lock ./
+
 # Copy source code (deps already installed in base)
 COPY --chown=bun:bun src ./src
 COPY --chown=bun:bun types ./types
