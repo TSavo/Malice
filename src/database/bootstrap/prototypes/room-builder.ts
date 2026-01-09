@@ -70,6 +70,16 @@ export class RoomBuilder implements Builder {
           // Environment
           outdoor: true, // Is this room outdoors? (affects weather, natural light)
 
+          // Image generation prompt template for rooms
+          // Uses ${variable} substitution - see getImagePrompt()
+          imagePrompt: `Photorealistic wide-angle photograph, 16:9 cinematic composition, high detail, cinematic lighting.
+Abandoned, run down, weathered, gritty, urban decay, desolate, empty.
+No people, no humans, no figures, no crowds, no pedestrians.
+No visible text, no signs, no letters, no words, no labels, no readable writing.
+No logos, no brand names, no storefronts with legible names.
+
+\${name}: \${description}`,
+
           abilities: `Physical space that agents can occupy and traverse.
 
 COORDINATES: x, y, z position in meters. Used for distance calculations between rooms. z negative = underground.
@@ -886,6 +896,52 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       });
 
       return '';
+    `,
+    );
+
+    // Override getImagePrompt to add context based on z-level and outdoor status
+    obj.setMethod(
+      'getImagePrompt',
+      `
+      /** Get image prompt with room-specific context prepended.
+       *  Adds underground/outdoor/indoor context based on z and outdoor properties.
+       */
+      const z = self.z ?? 0;
+      const isOutdoor = self.outdoor ?? false;
+
+      // Build context prefix based on room type
+      let context = '';
+
+      if (z < 0) {
+        // Underground - different vibes by depth
+        if (z <= -4) {
+          context = 'Deep underground vault beneath Seattle, pitch black except for emergency lighting, ' +
+            'concrete walls with water damage, rusty pipes, flooded floor puddles, claustrophobic, oppressive. ';
+        } else if (z <= -2) {
+          context = 'Seattle underground tunnel system from 1889, brick and stone walls, ' +
+            'dim flickering lights, debris and rubble, damp and musty. ';
+        } else {
+          context = 'Building basement in Seattle, concrete and exposed pipes, ' +
+            'water-stained walls, old storage, industrial decay, dim fluorescent lighting. ';
+        }
+      } else if (isOutdoor) {
+        context = 'Pioneer Square Seattle street scene, overcast grey sky, ' +
+          'historic red brick buildings, cobblestone streets, overgrown weeds through cracks, ' +
+          'boarded up storefronts, broken windows, trash and debris, post-apocalyptic atmosphere. ';
+      } else {
+        context = 'Abandoned interior space in Seattle, dust and debris everywhere, ' +
+          'water damage, peeling paint, broken furniture, urban decay. ';
+      }
+
+      // Get base prompt from imagePrompt property (walk inheritance if needed)
+      const basePrompt = await pass();
+
+      if (basePrompt) {
+        return context + basePrompt;
+      }
+
+      // Fallback if no imagePrompt defined
+      return context + self.name + ': ' + (self.description || '');
     `,
     );
 

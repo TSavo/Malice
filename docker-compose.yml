@@ -23,8 +23,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        BASE_IMAGE: tsavo/malice-base:latest
     container_name: malice-game
     restart: unless-stopped
     ports:
@@ -49,8 +47,11 @@ services:
       - NODE_ENV=production
       - FORCE_BOOTSTRAP=${FORCE_BOOTSTRAP:-false}
       - EMAIL_API_KEY=${EMAIL_API_KEY:-}
+      - GOOGLE_AI_API_KEY=${GOOGLE_AI_API_KEY:-}
+      - LAOZHANG_API_KEY=${LAOZHANG_API_KEY:-}
     volumes:
       - claude_sessions:/home/bun/.claude
+      - ./assets/images:/app/assets/images
     depends_on:
       mongodb:
         condition: service_healthy

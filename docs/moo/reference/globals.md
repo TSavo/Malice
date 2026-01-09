@@ -562,12 +562,12 @@ const result = await $cash.transfer(fromPlayer, toPlayer, 100);
 
 ### $aiImageGen - AI Image Generation
 
-Generate images using Google AI Studio (Nano Banana) with free tier (499/day), then automatic fallback to [laozhang.ai](https://api.laozhang.ai) ($0.05/image).
+Generate images using Nano Banana via [laozhang.ai](https://api.laozhang.ai) ($0.05/image) with automatic fallback to Google AI Studio free tier (499/day).
 
 ```javascript
 // Generate image and store in blob
 const result = await $aiImageGen.generate('A cyberpunk banana');
-// { success: true, blobKey: '...', contentType: 'image/png', prompt: '...', provider: 'google' }
+// { success: true, blobKey: '...', contentType: 'image/png', prompt: '...', provider: 'laozhang' }
 
 // Get URL for the image
 const url = $blob.url(result.blobKey, 'thecontinuum.city');
@@ -582,9 +582,9 @@ const result = await $aiImageGen.generate('A glowing orb', {
 
 // Generate without storing (returns base64)
 const raw = await $aiImageGen.generateRaw('An icon');
-// { success: true, data: 'base64...', contentType: 'image/png', provider: 'google' }
+// { success: true, data: 'base64...', contentType: 'image/png', provider: 'laozhang' }
 
-// Check usage and quota
+// Check usage and quota (for Google fallback tracking)
 const usage = await $aiImageGen.getUsage();
 // { today: 42, limit: 499, remaining: 457 }
 
@@ -599,8 +599,8 @@ $aiImageGen.setDefaultModel('gemini-3-pro-image-preview');
 ```
 
 **Environment:**
-- **Primary:** `GOOGLE_AI_API_KEY` - Google AI Studio API key (free tier: 499/day)
-- **Fallback:** `LAOZHANG_API_KEY` - Used after free tier exhausted ($0.05/image)
+- **Primary:** `LAOZHANG_API_KEY` - laozhang.ai API key ($0.05/image)
+- **Fallback:** `GOOGLE_AI_API_KEY` - Google AI Studio API key (free tier: 499/day, used when laozhang key not set)
 
 **Models:**
 - `gemini-2.5-flash-image` - Nano Banana (default)

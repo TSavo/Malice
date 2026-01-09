@@ -10,24 +10,24 @@ The curb cut here still shows yellow paint where carriages loaded passengers. Th
   x: -14,
   y: -2,
   z: 0,
+  // Exit connections
+  exits: {
+    west: {
+      to: 'buildings/merchants-cafe/z0.ts#%BAR',
+      description: "The glass-paneled door of Merchant's Cafe",
+      door: 'buildings/merchants-cafe/z0.ts#%FRONT_DOOR',
+    },
+    east: {
+      to: 'buildings/colman-building/z0.ts#%WEST_RETAIL',
+      description: 'Glass doors lead into the vacant Colman Building retail space',
+    },
+  },
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
-  exits: {
-    west: {
-      to: 'buildings/merchants-cafe/z0.ts',
-      room: '%BAR',
-      description: "The door of Merchant's Cafe is slightly ajar",
-    },
-    east: {
-      to: 'buildings/colman-building/z0.ts',
-      room: '%WEST_RETAIL',
-      description: 'Glass doors lead into the Colman Building',
-    },
-  },
   sittables: [
     {
       name: 'a hitching post',

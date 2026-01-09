@@ -40,7 +40,7 @@ const blobKey = await map.image();
 
 For generating images directly (used internally by `$describable.image()`).
 
-Uses Google AI Studio (Nano Banana) with **free tier (499/day)**, then automatically falls back to [laozhang.ai](https://api.laozhang.ai) ($0.05/image).
+Uses Nano Banana via [laozhang.ai](https://api.laozhang.ai) ($0.05/image) with automatic fallback to Google AI Studio free tier (499/day).
 
 ### generate(prompt, options?)
 
@@ -53,8 +53,7 @@ const result = await $aiImageGen.generate('A cyberpunk banana with neon lights')
 //   blobKey: '507f1f77bcf86cd799439011',
 //   contentType: 'image/png',
 //   prompt: 'A cyberpunk banana with neon lights',
-//   aspectRatio: '16:9',
-//   provider: 'google'  // 'google' or 'laozhang'
+//   aspectRatio: '16:9'
 // }
 
 // Get URL for display
@@ -86,19 +85,7 @@ Return base64 directly without storing:
 
 ```javascript
 const result = await $aiImageGen.generateRaw('An icon');
-// { success: true, data: 'base64...', contentType: 'image/png', provider: 'google' }
-```
-
-### Usage Tracking
-
-Check daily quota and remaining free tier images:
-
-```javascript
-const usage = await $aiImageGen.getUsage();
-// { today: 42, limit: 499, remaining: 457 }
-
-const remaining = await $aiImageGen.getRemainingQuota();
-// 457
+// { success: true, data: 'base64...', contentType: 'image/png' }
 ```
 
 ### Available Models
@@ -106,23 +93,16 @@ const remaining = await $aiImageGen.getRemainingQuota();
 ```javascript
 const models = $aiImageGen.listModels();
 // [
-//   { id: 'gemini-2.5-flash-image', name: 'Nano Banana (stable)', tier: 'budget' },
-//   { id: 'gemini-3-pro-image-preview', name: 'Nano Banana Pro (4K support)', tier: 'quality' }
+//   { id: 'gemini-2.5-flash-image', name: 'Nano Banana (stable)', tier: 'budget', pricePerImage: 0.05 },
+//   { id: 'gemini-3-pro-image-preview', name: 'Nano Banana Pro (4K support)', tier: 'quality', pricePerImage: 0.05 }
 // ]
 
 $aiImageGen.setDefaultModel('gemini-3-pro-image-preview');  // Use Pro model
 ```
 
 **Environment:**
-- **Primary:** `GOOGLE_AI_API_KEY` - Google AI Studio API key (free tier: 499/day)
-  - Get key from [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
-- **Fallback:** `LAOZHANG_API_KEY` - Used after free tier exhausted ($0.05/image)
-  - Get key from [api.laozhang.ai](https://api.laozhang.ai)
-
-**How it works:**
-- Uses Google AI Studio free tier first (499/day limit tracked in MongoDB `aiImageGenUsage` collection)
-- Automatically falls back to laozhang.ai after daily quota exhausted
-- Returns `provider: 'google'` or `provider: 'laozhang'` in response
+- **Primary:** `LAOZHANG_API_KEY` - laozhang.ai API key ($0.05/image)
+- **Fallback:** `GOOGLE_AI_API_KEY` - Google AI Studio API key (free tier: 499/day, used when laozhang key not set)
 
 ---
 
@@ -305,10 +285,8 @@ Use this for:
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `generate(prompt, opts?)` | `{ success, blobKey, provider, ... }` | Generate and store in $blob |
-| `generateRaw(prompt, opts?)` | `{ success, data, provider, ... }` | Generate and return base64 |
-| `getUsage()` | `{ today, limit, remaining }` | Check daily quota usage |
-| `getRemainingQuota()` | number | Remaining free tier images |
+| `generate(prompt, opts?)` | `{ success, blobKey, ... }` | Generate and store in $blob |
+| `generateRaw(prompt, opts?)` | `{ success, data, ... }` | Generate and return base64 |
 | `listModels()` | `[{ id, name, tier }]` | Available models |
 | `setDefaultModel(id)` | `{ success, model }` | Change default |
 
