@@ -17,8 +17,8 @@ async function createAdmin() {
   const aliasLoader = new AliasLoader(manager);
   await aliasLoader.loadAliases();
 
-  // Get required objects - types are in typeCache
-  const adminProto = manager.typeCache.get('admin');
+  // Get required objects - use getAliases
+  const adminProto = manager.getAliases().get('admin');
 
   if (!adminProto) {
     console.error('Admin type not found');

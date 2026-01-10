@@ -32,7 +32,7 @@ async function fixAdmin() {
   console.log('  Set chargenComplete: true');
 
   // Get a start room (The Core is #6425)
-  const startRoom = manager.aliases.get('startRoom') || await manager.load(6425);
+  const startRoom = manager.getAliases().get('startRoom') || await manager.load(6425);
   if (startRoom) {
     admin.set('location', { type: 'objref', value: startRoom.id });
     console.log('  Set location:', startRoom.get('name'), '#' + startRoom.id);
