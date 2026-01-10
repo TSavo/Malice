@@ -15,4 +15,14 @@ The Fabrication Factory's loading bay is visible through a gap in the fence to t
   lighting: 70,
   waterLevel: 0,
   outdoor: true,
+  exits: {
+    west: {
+      to: 'buildings/fabrication-factory/z0.ts#%SECURITY',
+      prototype: 'guardedExit',
+      allowedFaction: 'Citizen',
+      denyMessage:
+        'A retinal scanner beside the reinforced door flashes red. "Security personnel only."',
+      description: 'A reinforced security door leads into the Fabrication Factory',
+    },
+  },
 };
