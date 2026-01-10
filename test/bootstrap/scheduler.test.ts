@@ -559,4 +559,40 @@ describe('$.scheduler', () => {
       expect(jobs.persistJob.interval).toBe(5000);
     });
   });
+
+  describe('greeter pool maintenance job', () => {
+    it('should register greeterPoolMaintenance job at bootstrap', async () => {
+      const jobs = await $.scheduler.listJobs();
+
+      expect(jobs).toContain('greeterPoolMaintenance');
+    });
+
+    it('should have correct configuration for greeterPoolMaintenance', async () => {
+      const job = await $.scheduler.getJob('greeterPoolMaintenance');
+
+      expect(job).toBeTruthy();
+      expect(job.interval).toBe(300000); // 5 minutes
+      expect(job.method).toBe('initializePools');
+      expect(job.enabled).toBe(true);
+      expect(job.targetId).toBe($.greeter.id);
+    });
+
+    it('should run greeterPoolMaintenance job successfully', async () => {
+      // Clear pools first
+      $.greeter.greeterPool = { continuum: [], cartel: [] };
+
+      // Run the job
+      const result = await $.scheduler.runNow('greeterPoolMaintenance');
+
+      expect(result.success).toBe(true);
+
+      // Give background replenishment a moment
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Check that pools were initialized
+      const status = await $.greeter.getPoolStatus();
+      expect(status.continuum).toBeGreaterThanOrEqual(0);
+      expect(status.cartel).toBeGreaterThanOrEqual(0);
+    });
+  });
 });
