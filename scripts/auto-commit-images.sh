@@ -9,8 +9,8 @@ echo "Starting auto-commit loop (interval: ${INTERVAL}s)"
 while true; do
     sleep $INTERVAL
 
-    # Count new images
-    NEW_COUNT=$(git status --short assets/images/*.png 2>/dev/null | wc -l)
+    # Count new images (use git status on directory, filter for .png)
+    NEW_COUNT=$(git status --short assets/images/ 2>/dev/null | grep '\.png$' | wc -l)
     TOTAL_COUNT=$(ls -1 assets/images/*.png 2>/dev/null | wc -l)
 
     if [ "$NEW_COUNT" -gt 0 ]; then

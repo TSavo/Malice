@@ -12,6 +12,8 @@ A water fountain stands at the edge of the seating area, dry and silent.`,
   x: -2,
   y: 5,
   z: 0,
+
+  imageOnDisk: 'occidental-mall-x-2-y5-z0.png',
   population: 0,
   ambientNoise: 10,
   lighting: 100,
