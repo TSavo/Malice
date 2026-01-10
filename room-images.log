@@ -1,0 +1,17 @@
+🖼️  Room Image Generator (Midjourney)
+=====================================
+Health check error: TypeError: fetch failed
+    at node:internal/deps/undici/undici:15422:13
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async initMcpSession (/var/tmp/vibe-kanban/worktrees/3209-in-projects-midj/malice/scripts/generate-room-images.ts:84:20)
+    at async executeMooCode (/var/tmp/vibe-kanban/worktrees/3209-in-projects-midj/malice/scripts/generate-room-images.ts:115:20)
+    at async checkMidjourneyHealth (/var/tmp/vibe-kanban/worktrees/3209-in-projects-midj/malice/scripts/generate-room-images.ts:218:20)
+    at async main (/var/tmp/vibe-kanban/worktrees/3209-in-projects-midj/malice/scripts/generate-room-images.ts:256:21) {
+  [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: localhost:3010, timeout: 10000ms)
+      at onConnectTimeout (node:internal/deps/undici/undici:1531:23)
+      at Immediate._onImmediate (node:internal/deps/undici/undici:1512:11)
+      at process.processImmediate (node:internal/timers:505:21) {
+    code: 'UND_ERR_CONNECT_TIMEOUT'
+  }
+}
+❌ Midjourney API is not healthy
