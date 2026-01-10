@@ -11,6 +11,8 @@ A Seattle Times box stands at the corner, its blue paint chalky and faded. Throu
   y: -10,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '1st-ave-s-x-14-y-10-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
