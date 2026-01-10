@@ -65,7 +65,9 @@ const overrideLimit = limitArgIdx >= 0 ? parseInt(args[limitArgIdx + 1], 10) : n
 const mcpUrlIdx = args.indexOf('--mcp-url');
 const MCP_URL = mcpUrlIdx >= 0 ? args[mcpUrlIdx + 1] : 'http://localhost:3010';
 const delayIdx = args.indexOf('--delay');
-const DELAY_MS = delayIdx >= 0 ? parseInt(args[delayIdx + 1], 10) : 5000;
+const DELAY_MS = delayIdx >= 0 ? parseInt(args[delayIdx + 1], 10) : 0; // 0 means use random delay
+const MIN_DELAY_MS = 5000;   // 5 seconds
+const MAX_DELAY_MS = 180000; // 3 minutes
 
 // MCP session management
 let mcpSessionId: string | null = null;
@@ -215,6 +217,15 @@ function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/**
+ * Get delay for next image (random if DELAY_MS is 0, otherwise fixed)
+ */
+function getDelay(): number {
+  if (DELAY_MS > 0) return DELAY_MS;
+  // Random delay between 5 seconds and 3 minutes
+  return Math.floor(Math.random() * (MAX_DELAY_MS - MIN_DELAY_MS + 1)) + MIN_DELAY_MS;
+}
+
 async function main() {
   console.log('🖼️  Room Image Generator (Midjourney)');
   console.log('=====================================');
@@ -278,7 +289,11 @@ async function main() {
   // Process rooms up to the limit
   const toGenerate = overrideLimit ? filtered.slice(0, overrideLimit) : filtered;
   console.log(`🎨 Will generate ${toGenerate.length} images\n`);
-  console.log(`⏱️  Delay between images: ${DELAY_MS}ms\n`);
+  if (DELAY_MS > 0) {
+    console.log(`⏱️  Delay between images: ${DELAY_MS}ms (fixed)\n`);
+  } else {
+    console.log(`⏱️  Delay between images: ${MIN_DELAY_MS / 1000}s - ${MAX_DELAY_MS / 1000}s (random)\n`);
+  }
 
   let generated = 0;
   let errors = 0;
@@ -327,7 +342,9 @@ async function main() {
 
       // Delay between images to avoid rate limiting
       if (generated < toGenerate.length) {
-        await sleep(DELAY_MS);
+        const delay = getDelay();
+        console.log(`    ⏱️  Waiting ${(delay / 1000).toFixed(0)}s before next image...`);
+        await sleep(delay);
       }
     } catch (err) {
       console.error(`    ❌ Error: ${err}`);
