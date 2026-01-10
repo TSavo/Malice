@@ -12,6 +12,8 @@ Wind moves through the open space, carrying the smell of wet brick and growing t
   x: -4,
   y: 5,
   z: 0,
+
+  imageOnDisk: 'occidental-mall-x-4-y5-z0.png',
   population: 0,
   ambientNoise: 12,
   lighting: 100,
