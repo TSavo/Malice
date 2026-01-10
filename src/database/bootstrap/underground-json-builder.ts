@@ -86,6 +86,7 @@ export class UndergroundJsonBuilder implements Builder {
   static depends = ['room', 'exit', 'guardedExit', 'recycler', 'spatial', 'startRoom', 'buildings', 'basements']; // After world & buildings
 
   private rooms: Map<string, RuntimeObject> = new Map();
+  private roomDefs: Map<string, GeneratedRoom> = new Map(); // JSON definitions for exit flags
 
   constructor(private manager: ObjectManager) {}
 
@@ -149,6 +150,9 @@ export class UndergroundJsonBuilder implements Builder {
     for (const roomDef of rooms) {
       const { x, y, z } = roomDef.pos;
       const key = this.coordKey(x, y, z);
+
+      // Store JSON definition for exit flag lookup
+      this.roomDefs.set(key, roomDef);
 
       // Check if room already exists at this coordinate
       const existing = await $.spatial?.getRoomDataAt(x, y, z);
@@ -235,24 +239,40 @@ export class UndergroundJsonBuilder implements Builder {
       { dx: 0, dy: 0, dz: -1, name: 'down', aliases: ['d', 'dn'] },
     ];
 
+    let skippedByJson = 0;
+
     for (const [key, room] of this.rooms) {
       const [x, y, z] = this.parseKey(key);
+      const roomDef = this.roomDefs.get(key);
 
       for (const dir of directions) {
+        // Check JSON exit flags - honor explicit walls/blocked exits
+        // If JSON says exit is false for this direction, don't create it
+        if (roomDef?.exits && roomDef.exits[dir.name] === false) {
+          skippedByJson++;
+          continue;
+        }
+
         const nx = x + dir.dx;
         const ny = y + dir.dy;
         const nz = z + dir.dz;
         const neighborKey = this.coordKey(nx, ny, nz);
 
+        // Also check if the neighbor's JSON says the reverse exit is blocked
+        const neighborDef = this.roomDefs.get(neighborKey);
+        const reverseDir = this.getOppositeDirection(dir.name);
+        if (neighborDef?.exits && neighborDef.exits[reverseDir.name] === false) {
+          skippedByJson++;
+          continue;
+        }
+
         // Check our own rooms first
         let neighbor = this.rooms.get(neighborKey);
-        let fromSpatial = false;
 
         // If not in our rooms, check spatial index (building basements, etc.)
         if (!neighbor) {
           neighbor = await $.spatial?.getRoomDataAt(nx, ny, nz);
           if (neighbor) {
-            fromSpatial = true;
             console.log(`    [SPATIAL] Found room at ${neighborKey}: ${neighbor.get('name')} (#${neighbor.id})`);
           }
         }
@@ -333,6 +353,7 @@ export class UndergroundJsonBuilder implements Builder {
     }
 
     console.log(`    Created ${exitCount} underground exits`);
+    console.log(`    Honored ${skippedByJson} JSON exit flags (walls/blocked passages)`);
     console.log(`    Connected ${connectedToBuildings} rooms to building basements (z=-1)`);
     console.log(`    Guarded ${guardedCount} entries to Sister Gray's domain`);
 
