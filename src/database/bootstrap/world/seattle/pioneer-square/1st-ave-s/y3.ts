@@ -11,6 +11,8 @@ A bike rack bolted to the sidewalk holds a single frame—no wheels, no handleba
   y: 3,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '1st-ave-s-x-14-y3-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

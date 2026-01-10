@@ -13,6 +13,8 @@ A few hardy weeds have pushed through cracks in the sidewalk, the only living th
   y: 11,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '1st-ave-s-x-14-y11-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

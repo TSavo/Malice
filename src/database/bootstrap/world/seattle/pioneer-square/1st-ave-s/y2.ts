@@ -13,6 +13,8 @@ These buildings connect below street level—the Underground passages run beneat
   y: 2,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '1st-ave-s-x-14-y2-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

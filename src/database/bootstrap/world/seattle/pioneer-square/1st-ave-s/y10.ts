@@ -13,6 +13,8 @@ A bus shelter stands at the corner, its plexiglass walls spider-webbed with crac
   y: 10,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '1st-ave-s-x-14-y10-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

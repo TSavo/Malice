@@ -13,6 +13,8 @@ Traffic signals hang dark and useless above the intersection. The last time they
   y: 12,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '1st-ave-s-yesler-way-x-14-y12-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,
