@@ -977,8 +977,8 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       // Get base prompt config from parent (walks inheritance)
       const baseConfig = await pass();
 
-      // Sanitize prompt to remove -- which Midjourney interprets as parameters
-      const sanitize = (p) => p.replace(/--/g, '-').replace(/\\n/g, ' ').replace(/\\s+/g, ' ');
+      // Sanitize prompt to remove --, em-dashes, en-dashes which Midjourney interprets as parameters
+      const sanitize = (p) => p.replace(/--/g, '-').replace(/—/g, '-').replace(/–/g, '-').replace(/\\n/g, ' ').replace(/\\s+/g, ' ');
 
       // Put room-specific description FIRST (more prominent in Midjourney)
       // Then add generic context SECOND (less influence)

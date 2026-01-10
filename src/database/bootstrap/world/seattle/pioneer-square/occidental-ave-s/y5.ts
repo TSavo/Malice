@@ -10,6 +10,8 @@ A decorative iron fence runs along one building's frontage, its bars topped with
   x: -7,
   y: 5,
   z: 0,
+
+  imageOnDisk: 'occidental-ave-s-x-7-y5-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

@@ -11,6 +11,8 @@ A bronze plaque near the gate tells the UPS story—the bicycle messengers, the 
   y: 8,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'occidental-ave-s-x-7-y8-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
