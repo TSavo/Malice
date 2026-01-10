@@ -10,6 +10,8 @@ The cobblestones give way to asphalt as the avenue approaches Main Street, the p
   x: -7,
   y: -1,
   z: 0,
+
+  imageOnDisk: 'occidental-ave-s-x-7-y-1-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,
