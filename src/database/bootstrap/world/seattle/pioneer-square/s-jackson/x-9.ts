@@ -11,6 +11,8 @@ A stone foo dog guards the entrance to the building next door, one of a traditio
   y: -6,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-jackson-st-x-9-y-6-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

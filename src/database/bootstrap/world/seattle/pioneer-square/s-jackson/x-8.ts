@@ -10,6 +10,8 @@ The street narrows slightly where buildings were extended over the sidewalk in t
   x: -8,
   y: -6,
   z: 0,
+
+  imageOnDisk: 's-jackson-st-x-8-y-6-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,
