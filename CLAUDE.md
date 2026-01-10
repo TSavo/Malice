@@ -660,7 +660,7 @@ return {roomId: room.id, torchId: torch.id};
 - `$query()` - Fluent query builder for finding objects
 - `$aiQuery(system, prompt, session?)` - Query Claude AI with MCP tools
 - `$recycler` - Create/destroy objects via recycler pattern
-- All `$aliases` - `$room`, `$player`, `$exit`, `$ai`, `$plot`, `$spatial`, `$faction`, `$factionManager`, `$transports`, `$continuum`, `$cartel`, furniture prototypes (`$bed`, `$table`, `$chair`, `$cabinet`, `$trunk`, `$crate`, `$locker`, `$bench`, `$couch`, `$safe`, `$furniture`), security (`$door`, `$lock`, `$biometricLock`, `$guardedExit`), utilities (`$http`, `$email`, `$blob`, `$aiImageGen`), etc.
+- All `$aliases` - `$room`, `$player`, `$exit`, `$ai`, `$plot`, `$spatial`, `$faction`, `$factionManager`, `$transports`, `$continuum`, `$cartel`, `$greeter`, furniture prototypes (`$bed`, `$table`, `$chair`, `$cabinet`, `$trunk`, `$crate`, `$locker`, `$bench`, `$couch`, `$safe`, `$furniture`), security (`$door`, `$lock`, `$biometricLock`, `$guardedExit`), utilities (`$http`, `$email`, `$blob`, `$aiImageGen`), etc.
 - `player` - Your authenticated player object (if HTTP Basic Auth provided)
 - Full JavaScript - loops, conditionals, async/await, etc.
 
@@ -774,6 +774,97 @@ const status = await $scheduler.describe();
 - `decayTick` - Processes decayable objects every 60s
 - `pluribusWake` - Wakes Pluribus AI every hour (on the hour)
 - `sisterGrayWake` - Wakes Sister Gray AI every hour (on the half-hour)
+- `greeterPoolMaintenance` - Replenishes greeter NPC pools every 5 minutes
+
+## Greeter System ($greeter)
+
+The `$greeter` singleton manages post-character-generation orientation for new players. It uses a **pool-based architecture** to pre-spawn clothed NPCs, eliminating spawn delays during player onboarding.
+
+### Pool Architecture
+
+Instead of spawning greeters on-demand (slow), the system maintains ready-to-assign pools:
+
+```typescript
+// Check pool status
+const status = await $greeter.getPoolStatus();
+// { continuum: 2, cartel: 2, target: 2, replenishing: {} }
+
+// Pools are automatically maintained by the greeterPoolMaintenance scheduler job
+// Manual replenishment if needed:
+await $greeter.replenishPool('continuum');
+await $greeter.replenishPool('cartel');
+
+// Initialize pools (called at startup)
+await $greeter.initializePools();
+```
+
+### Assigning Greeters
+
+```typescript
+// Assign a greeter to a player (instant from pool)
+const greeter = await $greeter.spawnForPlayer(playerId, 'continuum');
+// or
+const greeter = await $greeter.spawnForPlayer(playerId, 'cartel');
+
+// The greeter is automatically:
+// - Assigned to the player
+// - Configured with faction-specific system prompt
+// - Introduced to the player in-character
+```
+
+### Tracking Orientation Progress
+
+```typescript
+// Start orientation (automatically called by spawnForPlayer)
+await $greeter.startOrientation(playerId, greeterId);
+
+// Update phase
+await $greeter.updatePhase(playerId, 'walk-to-square');
+
+// Complete orientation (returns greeter to pool)
+await $greeter.completeOrientation(playerId);
+
+// Player orientation state stored on player object:
+player.orientation = {
+  greeterId: 42,
+  faction: 'continuum',
+  phase: 'welcome',
+  started: '2026-01-10T12:00:00Z',
+  completedPhases: ['welcome', 'walk'],
+  completedAt: '2026-01-10T12:30:00Z'  // Set when complete
+};
+```
+
+### Pool Management Internals
+
+The pool system works by:
+1. **Background spawning**: `greeterPoolMaintenance` job runs every 5 minutes
+2. **Pre-clothing**: NPCs are spawned with `clothed: true` via `$ai.spawn()`
+3. **Ready state**: Pooled greeters are fully dressed and positioned at faction starting locations
+4. **Instant assignment**: `acquireFromPool()` pops a ready greeter (O(1) operation)
+5. **Auto-replenishment**: Pool refills in background after assignment
+6. **Recycling**: Finished greeters are recycled (not reused) to avoid state contamination
+
+```typescript
+// Low-level pool operations (usually not needed directly)
+const greeter = await $greeter.acquireFromPool('continuum');
+await $greeter.returnToPool(greeterId);  // Recycles by default
+await $greeter.spawnPooledGreeter('cartel');  // Spawn one greeter
+```
+
+### Faction-Specific Greeters
+
+**Continuum** (Immigration Services):
+- Role: `continuum-greeter`
+- Names: Officer Chen, Officer Martinez, Officer Reyes, etc.
+- Personality: Professional, efficient, by-the-book CorpSec officer
+- Location: Immigration Services (#42)
+
+**Gray Cartel** (Runner's Den):
+- Role: `cartel-greeter`
+- Names: Sparrow, Ghost, Flicker, Shadow, etc.
+- Personality: Street-smart Runner who uses tunnel slang
+- Location: Runner's Den (underground)
 
 ## Spatial System ($spatial)
 
