@@ -590,6 +590,7 @@ CRITICAL RULES:
       }
 
       // Mark complete
+      orientation.phase = 'complete';
       orientation.completed = true;
       orientation.completedAt = new Date().toISOString();
       player.orientation = orientation;
