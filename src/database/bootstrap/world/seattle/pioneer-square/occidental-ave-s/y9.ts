@@ -10,6 +10,8 @@ A ghost sign is barely visible on one brick facade—white paint faded almost to
   x: -7,
   y: 9,
   z: 0,
+
+  imageOnDisk: 'occidental-ave-s-x-7-y9-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,
