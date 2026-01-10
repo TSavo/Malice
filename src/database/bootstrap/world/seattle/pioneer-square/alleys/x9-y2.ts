@@ -16,6 +16,8 @@ The avenue continues north and south, maintaining its service corridor character
   y: 2,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '3rd-ave-s-x7-y2-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 5, // Quiet, settling metal sounds
   lighting: 35, // Dark (shadowed by loading docks)
