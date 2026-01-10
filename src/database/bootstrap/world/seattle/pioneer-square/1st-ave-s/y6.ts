@@ -10,6 +10,8 @@ Occidental Park is visible to the east, its dead trees marking the open space th
   x: -14,
   y: 6,
   z: 0,
+
+  imageOnDisk: '1st-ave-s-s-washington-st-x-14-y6-z0.png',
   intersection: ['1st Ave S', 'S. Washington St'],
   population: 0,
   ambientNoise: 0,

@@ -10,6 +10,8 @@ A fire escape zigzags down the adjacent building's face, its metal stairs ending
   x: -14,
   y: 5,
   z: 0,
+
+  imageOnDisk: '1st-ave-s-x-14-y5-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

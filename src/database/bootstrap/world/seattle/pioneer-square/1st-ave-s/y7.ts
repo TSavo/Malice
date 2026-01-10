@@ -11,6 +11,8 @@ Someone wedged a bicycle between the building and a dumpster, locked to a drainp
   y: 7,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '1st-ave-s-x-14-y7-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
