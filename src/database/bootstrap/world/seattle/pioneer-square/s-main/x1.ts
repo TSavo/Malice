@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Main St',
-  description: `East of Second Avenue, Main Street loses the last vestiges of Pioneer Square's curated historicism. The buildings here are mid-century plain—concrete and glass, parking structures and municipal offices, architecture that prioritizes function over heritage. The old Seattle gave way to the efficient Seattle somewhere around this line. Now both are equally defunct.
+  description: `The Corp Construction barrier runs along the north side of Main Street here, an unbroken wall of black fabric and chain-link that blocks any view of the massive excavation beyond. Warning signs are posted at regular intervals: AUTHORIZED PERSONNEL ONLY, NO TRESPASSING, VIOLATORS WILL BE PROSECUTED. The signs assume consequences that no longer apply, but the armed guards who patrol the perimeter make their own consequences.
 
-LABOR READY occupies a ground-floor storefront, a day-labor agency that matched workers with employers for warehouse shifts, construction gigs, and the various temporary positions that the economy required when the economy was requiring things. The window display is a bulletin board of job listings, each one describing work that existed for someone—forklift operator wanted, $15/hr, must pass drug test. The listings have been there long enough for the paper to yellow. The drug tests are no longer administered. The forklifts are no longer operated.
+East of Second Avenue, Main Street loses the last vestiges of Pioneer Square's curated historicism. The buildings on the south side are mid-century plain—concrete and glass, parking structures and municipal offices, architecture that prioritizes function over heritage.
 
-TOGO'S GREAT SANDWICHES occupies the building opposite, a chain operation that served the office-worker lunch crowd with submarine sandwiches named after Italian geography. The menu board above the counter lists combinations: #1 ORIGINAL ITALIAN • #4 TURKEY & AVOCADO • #7 PASTRAMI. The prices seemed reasonable once. The sandwiches don't exist anymore. The menu is a document from another economy, another lunch hour, another version of normal that required sandwiches to function.`,
+LABOR READY occupies a ground-floor storefront, a day-labor agency that matched workers with employers for warehouse shifts, construction gigs, and the various temporary positions that the economy required when the economy was requiring things. The window display is a bulletin board of job listings, each one describing work that existed for someone—forklift operator wanted, $15/hr, must pass drug test. The listings have been there long enough for the paper to yellow. The drug tests are no longer administered. The forklifts are no longer operated.`,
   x: 1,
   y: 0,
   z: 0,

@@ -8,7 +8,7 @@ The pier she's tied to groans with each swell. The ropes are fraying. Eventually
 
 A ticket booth stands on the waterfront, its window smashed, its cash drawer hanging open and empty. The schedule posted inside lists departures that will never happen to destinations that don't matter anymore.
 
-The city rises to the east, offering the only passage forward. The water waits to the west, patient and impassable, the same grey expanse that has bounded Seattle since before there was a Seattle.`,
+To the east, the Fabrication Factory's southern wall rises four stories—a solid expanse of industrial concrete and steel, windowless at this level. The muffled vibration of machinery is palpable through the ground. No entrance here; the factory's public doors are further north. The water waits to the west, patient and impassable, the same grey expanse that has bounded Seattle since before there was a Seattle.`,
   x: -21,
   y: 8,
   z: 0,

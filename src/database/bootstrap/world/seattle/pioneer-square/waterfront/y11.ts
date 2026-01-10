@@ -6,7 +6,7 @@ export const room = {
 
 The seawall is fifteen feet high along this stretch, a sheer drop to water that's deeper than it looks. The currents are deceptive, the water cold enough to kill. The bay has always been Pioneer Square's western boundary, and it always will be.
 
-Old warehouse structures line the eastern side, brick and timber construction from when cargo moved by hand. The warehouses are empty now but structurally sound.
+To the east, the Fabrication Factory's loading bay dominates the block—a massive roll-up door built into a converted transport warehouse. The building stretches four stories up, its industrial bulk a monument to the city's automated infrastructure. Through gaps in the door, conveyor belts and gantry cranes are visible, moving materials with mechanical precision. The factory runs day and night, keeping Seattle's systems supplied with replacement parts.
 
 Yesler Way intersection lies just ahead to the north—the crossing point to downtown. South leads back along the waterfront. The bay waits to the west, patient as water always is, offering passage only to those with boats that no longer exist.`,
   x: -21,
@@ -19,4 +19,10 @@ Yesler Way intersection lies just ahead to the north—the crossing point to dow
   outdoor: true,
   // Street furniture
   objects: [{ prototype: 'lamppost', name: 'Street Lamp' }],
+  exits: {
+    east: {
+      to: 'buildings/fabrication-factory/z0.ts#%LOADING_BAY',
+      description: 'A massive roll-up door leads into the Fabrication Factory loading bay',
+    },
+  },
 };

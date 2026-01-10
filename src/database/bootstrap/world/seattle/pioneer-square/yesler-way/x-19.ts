@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `The street's grade steepens here as Yesler Way climbs away from the waterfront, the buildings pressing close together in the dense pattern that early Seattle established. The brick facades show a century of weathering plus fifty-five years of neglect—dark staining where water runs down walls, efflorescence blooming across masonry, the accumulated patina of abandonment.
+  description: `The street's grade steepens here as Yesler Way climbs away from the waterfront. To the south, the Fabrication Factory's warehouse section looms—the converted transport facility that now manufactures infrastructure components for the entire city. The rooftop displays a forest of antennae and sensor arrays; the building's freight elevator housing rises like a watchtower. Conveyor systems are visible through upper-story windows, moving materials between floors in an endless automated dance.
 
-YESLER FURNITURE occupies the ground floor of a three-story building, its display window still showing the inventory: a dining set arranged as if in use, thick with dust, the staging that furniture stores employed to help customers envision pieces in their own homes. The customers stopped coming. The furniture remains, waiting for a household that will never claim it.
+YESLER FURNITURE occupies the ground floor of a building to the north, its display window still showing the inventory: a dining set arranged as if in use, thick with dust, the staging that furniture stores employed to help customers envision pieces in their own homes. The customers stopped coming. The furniture remains, waiting for a household that will never claim it.
 
-The building opposite houses apartments on its upper floors, accessed through a street-level entrance that hangs open on broken hinges. The structure is early twentieth-century construction, solid brick that has outlasted its occupants. Fire escapes climb the exterior, iron platforms rusted brown, ladders missing rungs. The emergency egress leads to rooftops that no one occupies. North is blocked—collapsed structures and accumulated debris sealing off downtown, the barrier that defines Pioneer Square's northern edge.`,
+The debris wall rises beyond the furniture store—collapsed structures and accumulated rubble sealing off downtown, the barrier that defines Pioneer Square's northern edge.`,
   x: -19,
   y: 12,
   z: 0,

@@ -2,7 +2,7 @@
 
 export const room = {
   name: '2nd Ave S',
-  description: `The Pioneer Building rises to the west, its Richardsonian Romanesque arches framing windows that once looked out on the busiest intersection in Seattle. The building has survived everything—the fire, the earthquakes, the wars, the collapse. Two hundred years of standing while the world changed around it. The stone doesn't care about history. It just endures.
+  description: `The Pioneer Building rises to the east, its Richardsonian Romanesque arches framing windows that once looked out on the busiest intersection in Seattle. The building has survived everything—the fire, the earthquakes, the wars, the collapse. More than a century of standing while the world changed around it. The stone doesn't care about history. It just endures. The triple-arched entrance faces this way, its carved sandstone portal darkened by age but still impressive.
 
 Second Avenue climbs slightly toward Yesler Way, following the grade that made the original skid road possible. The incline is gentle but noticeable, especially to legs unused to elevation change. Flat ground has become the baseline. Any slope feels like effort.
 
@@ -17,4 +17,12 @@ A brass plaque on the Pioneer Building's corner commemorates the structure's his
   outdoor: true,
   // Street furniture
   objects: [{ prototype: 'lamppost', name: 'Street Lamp' }],
+  exits: {
+    east: {
+      to: 'buildings/pioneer-building/z0.ts',
+      room: '%LOBBY',
+      door: '%MAIN_DOOR',
+      description: 'The triple-arched portal leads into the Pioneer Building',
+    },
+  },
 };

@@ -2,7 +2,7 @@
 
 export const room = {
   name: '3rd Ave S',
-  description: `The Corp Construction zone ends here, its fence turning east along Main Street. A gate marks the corner, double-wide, meant for vehicle access. The gate is locked with multiple padlocks, chains wrapped through the bars in patterns that suggest paranoia or thoroughness or both.
+  description: `The Corp Construction zone's eastern edge meets 3rd Avenue here. The main gate stands to the west, a double-wide chain-link entrance meant for vehicle access, topped with razor wire that catches the light. A billboard visible inside the fence announces "FUTURE HOME OF CONTINUUM CIVIC CENTER - A Better Tomorrow, Today." Armed guards patrol inside the perimeter, their weapons and posture suggesting military training rather than rent-a-cop boredom.
 
 The courthouse steps rise across the avenue, granite worn smooth by generations of defendants and lawyers and witnesses and everyone else who passed through the justice system. The steps lead to bronze doors that stand slightly ajar. Someone went inside. Whether they came out is unknown.
 

@@ -4,6 +4,8 @@ export const room = {
   name: 'Waterfront',
   description: `The seawall rises higher here, a section rebuilt in the 2020s with modern engineering that was supposed to last a century. The new section is visually distinct from the old—cleaner lines, fewer cracks, the concrete still relatively white compared to the grey-green of the Depression-era walls on either side. The engineering has held up. The city it was meant to protect has not.
 
+To the east, the Supply Depot's loading dock faces the waterfront, its bay doors welded shut. The building is windowless concrete, designed for function over form—a distribution center that once serviced the entire Pioneer Square district. Whatever deliveries happen now go through the personnel entrance to the south.
+
 The ferry terminal is visible to the north, its massive steel structure still standing though no ferries have docked in decades. The terminal was built for the Bainbridge Island and Bremerton routes, carrying commuters across the sound. The routes stopped when the commuters disappeared. The terminal waits for boats that will never come.
 
 The wind off the bay is constant here, salt spray carried on air that never quite stops moving. Beyond the seawall, Elliott Bay stretches west toward the Olympic Peninsula, grey water marking the absolute western boundary of Pioneer Square. Without a boat, the water offers nothing but a view.`,

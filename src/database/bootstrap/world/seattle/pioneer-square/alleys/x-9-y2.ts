@@ -19,4 +19,10 @@ The building's upper floors rise overhead—the iron framework of the partially 
   lighting: 75, // Outdoor, partially shaded
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  exits: {
+    west: {
+      to: 'buildings/grand-central/z0.ts#%GC_ENTRANCE',
+      description: 'The ornate archway leads into Grand Central Arcade',
+    },
+  },
 };

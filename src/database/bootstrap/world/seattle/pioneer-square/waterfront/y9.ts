@@ -6,7 +6,7 @@ export const room = {
 
 To the west, Elliott Bay is an impassable barrier. The seawall drops fifteen feet to cold grey water, deep and treacherous. Without a boat, the bay cannot be crossed. The currents alone would kill you before the cold finished the job.
 
-The pier buildings thin out here, the tourist district giving way to working waterfront. Old warehouse structures line the eastern edge, their brick and timber construction dating to the early twentieth century. The warehouses are empty now but structurally sound.
+To the east, the Fabrication Factory's massive western wall rises without windows or doors at this section—just industrial concrete stained by decades of Seattle rain. The hum of automated machinery filters through the wall. The factory's entrances are north of here; this side of the building is all production floor and heavy equipment.
 
 North leads toward the gap—the only way to downtown. South continues along the waterfront. The bay stretches west, cold and grey and absolute, the same boundary it has always been.`,
   x: -21,

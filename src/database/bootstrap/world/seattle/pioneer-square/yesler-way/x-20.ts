@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `Yesler Way climbs eastward from the waterfront, following the grade that the original "Skid Road" established in the 1850s. Seattle's terrain still asserts itself against the street grid's attempt to impose order—the pitch noticeable here, buildings rising to meet the slope on stepped foundations.
+  description: `Yesler Way climbs eastward from the waterfront, following the grade that the original "Skid Road" established in the 1850s. Seattle's terrain still asserts itself against the street grid's attempt to impose order—the pitch noticeable here, the Fabrication Factory rising to the south where the street levels out.
 
-A Metro bus stop marks this location, its shelter yellowed and cracked, its bench weathered grey. Route maps are still posted behind scratched plexiglass, showing connections to destinations that exist only in memory. The buses stopped running when the fuel ran out. The infrastructure remains, waiting for transit that will never come.
+The factory's loading bay is visible to the south—a massive roll-up door that once accepted shipments from the waterfront. The building stretches four stories up, its northwestern corner showing the original transport warehouse architecture beneath decades of industrial additions. The hum of machinery is constant; the AI-controlled systems never rest.
 
-The ground-floor retail along this stretch is shuttered and dark: a nail salon, a convenience store, small businesses that served local foot traffic. The foot traffic ended. The businesses closed. The buildings are mixed construction—early twentieth-century brick beside mid-century renovation—all of it empty now, the accumulated development of a neighborhood that grew incrementally and died all at once. North leads only to rubble—the debris wall that separates Pioneer Square from downtown blocking all passage in that direction.`,
+A Metro bus stop marks this location, its shelter yellowed and cracked, its bench weathered grey. Route maps are still posted behind scratched plexiglass, showing connections to destinations that exist only in memory. The buses stopped running when the fuel ran out. The infrastructure remains, waiting for transit that will never come. North leads only to rubble—the debris wall that separates Pioneer Square from downtown blocking all passage in that direction.`,
   x: -20,
   y: 12,
   z: 0,

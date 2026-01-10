@@ -20,4 +20,10 @@ The port cranes stand silent to the south, monuments to commerce that no longer 
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  exits: {
+    east: {
+      to: '../buildings/supply-depot/z0.ts#%RECEIVING',
+      description: 'A reinforced steel door leads into the Supply Depot',
+    },
+  },
 };
