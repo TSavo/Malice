@@ -81,7 +81,8 @@ A breach in the far wall leads to the underground—stones removed, edges worn s
       waterLevel: 5,
       outdoor: false,
       exits: {
-        west: '%RECORDS'      },
+        west: '%RECORDS'
+      },
       objects: [
         {
           prototype: 'describable',

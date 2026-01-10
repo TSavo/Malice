@@ -88,7 +88,8 @@ A breach in the northern wall opens to the underground, the edges worn smooth by
       waterLevel: 0,
       outdoor: false,
       exits: {
-        south: '%WORKSHOP'      },
+        south: '%WORKSHOP'
+      },
       objects: [
         {
           prototype: 'cabinet',

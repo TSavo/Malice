@@ -201,7 +201,8 @@ Wooden crates are stacked in the corners, their contents removed, their purpose 
       waterLevel: 0,
       outdoor: false,
       exits: {
-        up: '%ROASTER'      },
+        up: '%ROASTER'
+      },
       objects: [
         {
           prototype: 'describable',

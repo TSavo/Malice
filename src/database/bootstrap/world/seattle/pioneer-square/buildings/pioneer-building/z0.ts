@@ -302,7 +302,8 @@ A door in the eastern wall leads to the Seattle Underground—the network of tun
       waterLevel: 0,
       outdoor: false,
       exits: {
-        up: '%SERVICE_CORRIDOR'      },
+        up: '%SERVICE_CORRIDOR'
+      },
       objects: [
         {
           prototype: 'describable',

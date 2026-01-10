@@ -81,7 +81,8 @@ A breach in the southern wall opens into darkness—the underground tunnel netwo
       waterLevel: 5,
       outdoor: false,
       exits: {
-        north: '%STORAGE'      },
+        north: '%STORAGE'
+      },
       objects: [
         {
           prototype: 'describable',

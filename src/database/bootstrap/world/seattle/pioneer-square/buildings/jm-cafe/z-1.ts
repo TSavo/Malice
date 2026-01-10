@@ -89,7 +89,8 @@ A heavy door in the north wall leads to a passage beyond—the tunnels the bootl
       waterLevel: 0,
       outdoor: false,
       exits: {
-        south: '%CELLAR'      },
+        south: '%CELLAR'
+      },
       objects: [
         {
           prototype: 'cabinet',

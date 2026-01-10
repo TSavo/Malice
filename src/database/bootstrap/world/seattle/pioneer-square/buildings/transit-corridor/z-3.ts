@@ -78,7 +78,8 @@ Crates and containers line the walls, their contents unknown but their presence 
       outdoor: false,
       exits: {
         west: '%TRANSIT_W2',
-        east: '%TRANSIT_W4'      },
+        east: '%TRANSIT_W4'
+      },
       objects: [
         { prototype: 'crate', name: 'unmarked crates', description: 'Wooden crates without markings, their contents sealed and unknown. The crates show handling marks—moved frequently, stored briefly.', boltedDown: false },
       ]

@@ -1,7 +1,7 @@
 /**
  * underground-json-builder.ts - Loads procedurally generated underground rooms from JSON
  *
- * This builder loads the 580 underground rooms (z=-2 through z=-6) from the
+ * This builder loads the 561 underground rooms (z=-2 through z=-6) from the
  * generated JSON file and creates them in the game world. These rooms were
  * procedurally generated with AI descriptions and connect to building basements
  * at z=-1 via coordinate adjacency.
@@ -14,9 +14,9 @@
  *   z=-1: Building basements - from building-builder.ts
  *   z=-2: Upper tunnels (326 rooms) - from this builder
  *   z=-3: Transitional passages (145 rooms) - from this builder
- *   z=-4: Lower passages (61 rooms) - from this builder
- *   z=-5: Deep vaults (37 rooms) - from this builder
- *   z=-6: Ancient depths (11 rooms) - from this builder
+ *   z=-4: Lower passages (51 rooms) - from this builder
+ *   z=-5: Deep vaults (29 rooms) - from this builder
+ *   z=-6: Ancient depths (10 rooms) - from this builder
  */
 
 import * as fs from 'node:fs';

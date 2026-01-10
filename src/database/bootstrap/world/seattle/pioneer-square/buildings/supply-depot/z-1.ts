@@ -95,7 +95,8 @@ The room is colder than the sorting floor, the climate control more aggressive. 
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: '%SORTING'      },
+        west: '%SORTING'
+      },
       objects: [
         {
           prototype: 'cabinet',

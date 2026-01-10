@@ -234,7 +234,8 @@ This was once a busy street. The storefronts are sealed now, their windows brick
       waterLevel: 0,
       outdoor: false,
       exits: {
-        up: '%SHAFT'      }
+        up: '%SHAFT'
+      }
     }
   }
 };

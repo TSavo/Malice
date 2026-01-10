@@ -59,7 +59,8 @@ A stairwell leads up to the processing area. A passage in the western wall opens
           door: '%BASEMENT_DOOR',
           locks: ['%BASEMENT_LOCK']
         },
-        east: '%UTILITY_VAULT'      },
+        east: '%UTILITY_VAULT'
+      },
       objects: [
         {
           prototype: 'furniture',

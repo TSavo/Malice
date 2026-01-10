@@ -170,7 +170,8 @@ In the corner, partially hidden behind the water heater, a floor drain sits lowe
       outdoor: false,
       exits: {
         south: '%STAIRS',
-        west: '%STORAGE'      },
+        west: '%STORAGE'
+      },
       objects: [
         {
           prototype: 'describable',

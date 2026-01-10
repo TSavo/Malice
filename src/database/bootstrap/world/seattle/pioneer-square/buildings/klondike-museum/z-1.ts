@@ -132,7 +132,8 @@ A breach in the western wall leads into darkness—the underground network that 
       waterLevel: 5,
       outdoor: false,
       exits: {
-        east: '%COLLECTION_STORAGE'      },
+        east: '%COLLECTION_STORAGE'
+      },
       objects: [
         {
           prototype: 'describable',

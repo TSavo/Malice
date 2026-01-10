@@ -142,7 +142,8 @@ Sound carries strangely—footsteps from the networks above filter down as dista
       outdoor: false,
       exits: {
         north: '%ARTERY_N5',
-        south: '%ARTERY_CENTER_N2'      }
+        south: '%ARTERY_CENTER_N2'
+      }
     },
 
     '%ARTERY_CENTER_N2': {
