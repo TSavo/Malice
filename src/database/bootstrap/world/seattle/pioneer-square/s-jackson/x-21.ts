@@ -10,6 +10,8 @@ The waterfront promenade extends north from here, the pedestrian path cracked an
   x: -21,
   y: -6,
   z: 0,
+
+  imageOnDisk: 'alaskan-way-s-jackson-st-x-21-y-6-z0.png',
   intersection: ['Alaskan Way', 'S. Jackson St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
