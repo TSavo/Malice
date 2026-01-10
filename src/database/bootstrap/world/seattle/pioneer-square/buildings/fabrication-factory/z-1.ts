@@ -85,7 +85,7 @@ The noise is a constant roar, muffled only slightly by acoustic baffling. The ai
 
 The floor is sand-covered, the traditional medium for casting that no amount of automation has improved upon. Metal shavings and cooled slag accumulate in corners. The space feels older than the rest of the factory—foundry work hasn't changed fundamentally since the industrial revolution, just been made more precise.
 
-A breach in the southern wall opens to the underground tunnels, the edges worn smooth. The connection predates the AI's control of the factory. Someone used this route before the machines took over. Perhaps they still do.`,
+A shaft descends through the floor in the southern corner, its edges worn smooth by decades of use. The opening leads down to the underground tunnel network that predates the AI's control of the factory. Someone used this route before the machines took over. Perhaps they still do.`,
       x: -19,
       y: 8,
       z: -1,
@@ -96,7 +96,8 @@ A breach in the southern wall opens to the underground tunnels, the edges worn s
       outdoor: false,
       exits: {
         west: '%PROCESSING',
-        east: '%GENERATOR'      },
+        east: '%GENERATOR'
+      },
       objects: [
         {
           prototype: 'describable',

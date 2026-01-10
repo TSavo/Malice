@@ -240,7 +240,7 @@ A narrow stairway leads up to the second floor, where the building's original ho
 
 Kegs and cases line the walls, the bar's reserve inventory dusty but intact. An ancient refrigeration unit hums in one corner, somehow still keeping things cold, its compressor rattling with the effort of decades. The unit probably shouldn't work. It does.
 
-The cinderblock seal that once closed the old tour entrance has been broken through—someone removed enough blocks to create a passage. The Underground Tour descended here for sixty years before the tours stopped. Now the passage is open again, leading east into the buried streets of old Seattle.`,
+The cinderblock seal that once closed the old tour entrance remains intact, though someone has scratched at the mortar with crowbars, testing its strength. The Underground Tour descended through here for sixty years before the tours stopped. The passage is sealed now, the buried streets beyond inaccessible from this location.`,
       x: -15,
       y: 2,
       z: -1,
@@ -264,9 +264,9 @@ The cinderblock seal that once closed the old tour entrance has been broken thro
         },
         {
           prototype: 'describable',
-          name: 'breached passage',
-          aliases: ['passage', 'tunnel', 'underground', 'breach'],
-          description: `A rough-cut passage in the east wall where the cinderblock seal was broken through. The blocks lie scattered on the floor, removed with crowbars rather than demolished. Tour groups descended through here for sixty years before the tours stopped. Someone reopened the route. The Underground breathes through the gap, cold air carrying the smell of old brick and older secrets.`
+          name: 'sealed passage',
+          aliases: ['passage', 'seal', 'underground', 'entrance'],
+          description: `The old tour entrance is sealed with cinderblocks, their mortar still holding despite decades of settling. Fresh scratches around the edges show where someone tried prying at the blocks with crowbars, testing whether the seal could be broken. Tour groups descended through here for sixty years before the tours stopped. The passage remains sealed, the Underground inaccessible from this location. The air is still, no draft from the buried streets beyond.`
         },
         {
           prototype: 'furniture',
