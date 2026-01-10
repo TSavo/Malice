@@ -15,4 +15,7 @@ The Fabrication Factory's wall here has a service door, steel and featureless, l
   lighting: 45,
   waterLevel: 0,
   outdoor: true,
+  exits: {
+    west: 'buildings/fabrication-factory/z0.ts#%BREAKROOM',
+  },
 };

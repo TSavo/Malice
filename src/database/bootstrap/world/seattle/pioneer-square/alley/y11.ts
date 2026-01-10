@@ -15,4 +15,7 @@ The Fabrication Factory's loading bay is visible through a gap in the fence to t
   lighting: 70,
   waterLevel: 0,
   outdoor: true,
+  exits: {
+    west: 'buildings/fabrication-factory/z0.ts#%SECURITY',
+  },
 };
