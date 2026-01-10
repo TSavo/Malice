@@ -360,7 +360,7 @@ describe('$greeter - Pool System', () => {
       expect(greeter1.id).toBe(greeter2.id);
     });
 
-    it('should set agentSystemPrompt on assigned greeter', async () => {
+    it('should set systemPrompt on assigned greeter', async () => {
       // Ensure pool is populated
       await $greeter.replenishPool('continuum');
 
@@ -374,9 +374,9 @@ describe('$greeter - Pool System', () => {
         'continuum',
       );
 
-      expect(greeter.agentSystemPrompt).toBeTruthy();
-      expect(greeter.agentSystemPrompt).toContain(testPlayer.name);
-      expect(greeter.agentSystemPrompt).toContain(greeter.name);
+      expect(greeter.systemPrompt).toBeTruthy();
+      expect(greeter.systemPrompt).toContain(testPlayer.name);
+      expect(greeter.systemPrompt).toContain(greeter.name);
     });
   });
 
