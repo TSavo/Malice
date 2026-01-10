@@ -409,11 +409,13 @@ export class SchedulerBuilder implements Builder {
   }
 
   /**
-   * Post-register hook: Register wake jobs for Pluribus and Sister Gray
-   * Called after ALL aliases exist so we can find pluribus/sisterGray
+   * Post-register hook: Register wake jobs for Pluribus and Sister Gray,
+   * and greeter pool maintenance job.
+   * Called after ALL aliases exist so we can find pluribus/sisterGray/greeter
    */
   async postRegister(): Promise<void> {
     await this.registerWakeJobs();
+    await this.registerGreeterPoolJob();
   }
 
   /**
@@ -538,6 +540,38 @@ export class SchedulerBuilder implements Builder {
     if (modified) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       this.scheduler.set('jobs', jobs as any);
+    }
+  }
+
+  /**
+   * Register greeter pool maintenance job
+   * Called separately after greeter alias is registered
+   */
+  async registerGreeterPoolJob(): Promise<void> {
+    if (!this.scheduler) return;
+
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
+
+    const jobs = (this.scheduler.get('jobs') as Record<string, unknown>) || {};
+
+    // Greeter pool maintenance - every 5 minutes
+    // Checks if pools need replenishment and spawns new greeters if needed
+    const greeterId = (await objectManager.call('getAlias', 'greeter')) as
+      | number
+      | undefined;
+    if (greeterId && !jobs.greeterPoolMaintenance) {
+      (jobs as Record<string, unknown>).greeterPoolMaintenance = {
+        interval: 300000, // 5 minutes
+        nextRun: Date.now() + 60000, // first run in 1 minute (after other startup)
+        targetId: greeterId,
+        method: 'initializePools',
+        args: [],
+        enabled: true,
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      this.scheduler.set('jobs', jobs as any);
+      console.log('✅ Registered greeterPoolMaintenance job (every 5 min)');
     }
   }
 }
