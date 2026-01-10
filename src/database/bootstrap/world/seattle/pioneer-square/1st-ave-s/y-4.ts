@@ -10,6 +10,8 @@ Storm drains line the curb, their grates clogged with decades of debris. When it
   x: -14,
   y: -4,
   z: 0,
+
+  imageOnDisk: '1st-ave-s-x-14-y-4-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,
