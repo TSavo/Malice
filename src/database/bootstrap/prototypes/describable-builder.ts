@@ -769,16 +769,21 @@ export class DescribableBuilder implements Builder {
       'image',
       `
       /** Get or generate an image for this object at the specified aspect ratio.
-       *  Images are cached by aspect ratio in self.images property.
-       *  @param options - { force?, prompt?, model?, aspectRatio?, saveToDisk?, filename? }
+       *  Images are cached by aspect ratio + context in self.images property.
+       *  @param options - { force?, prompt?, model?, aspectRatio?, saveToDisk?, filename?, context? }
        *    aspectRatio: 'landscape' (default), 'portrait', 'square', or '16:9', '9:16', '4:3', '3:4', '1:1'
        *    force: regenerate even if cached
        *    prompt: custom prompt (default: from getImagePrompt() or describe())
        *    saveToDisk: if true, also saves to assets/images/ directory
        *    filename: custom filename for saveToDisk (without extension)
+       *    context: object passed to getImagePrompt() - interpretation is type-specific
+       *      For rooms: { timeOfDay: 'day'|'night'|'dusk'|'dawn'|'overcast', weather: 'clear'|'rain'|'fog'|'storm' }
+       *      For items: { condition: 'pristine'|'worn'|'damaged'|'ruined' }
+       *      Default context is used if not specified (e.g., 'overcast' for rooms)
        *  @returns { blobKey, filename? } - blobKey always, filename if saveToDisk was used
        */
       const options = args[0] || {};
+      const context = options.context || {};
 
       // Normalize aspect ratio
       const ratioMap = {
@@ -791,10 +796,18 @@ export class DescribableBuilder implements Builder {
       const rawRatio = options.aspectRatio || 'landscape';
       const aspectRatio = ratioMap[rawRatio] || rawRatio;
 
-      // Check if we already have an image for this aspect ratio
+      // Build cache key from aspect ratio + sorted context values
+      // e.g., "16:9" or "16:9:night:rain"
+      const contextKeys = Object.keys(context).sort();
+      const contextSuffix = contextKeys.length > 0
+        ? ':' + contextKeys.map(k => context[k]).join(':')
+        : '';
+      const cacheKey = aspectRatio + contextSuffix;
+
+      // Check if we already have an image for this cache key
       const images = self.images || {};
-      if (images[aspectRatio] && !options.force) {
-        return { blobKey: images[aspectRatio] };
+      if (images[cacheKey] && !options.force) {
+        return { blobKey: images[cacheKey] };
       }
 
       // Check if $aiImageGen is available
@@ -803,14 +816,14 @@ export class DescribableBuilder implements Builder {
         throw new Error('$aiImageGen not available');
       }
 
-      // Build prompt config: custom > getImagePrompt() > describe()
+      // Build prompt config: custom > getImagePrompt(context) > describe()
       let promptConfig = null;
       if (options.prompt) {
         // Custom prompt - just use as-is
         promptConfig = { prompt: options.prompt };
       } else {
-        // Get structured config from getImagePrompt()
-        promptConfig = await self.getImagePrompt();
+        // Get structured config from getImagePrompt(), passing context
+        promptConfig = await self.getImagePrompt(context);
       }
       if (!promptConfig) {
         // Fallback to describe()
@@ -851,8 +864,8 @@ export class DescribableBuilder implements Builder {
         throw new Error(result.error || 'Image generation failed');
       }
 
-      // Store by aspect ratio
-      images[aspectRatio] = result.blobKey;
+      // Store by cache key (aspect ratio + context)
+      images[cacheKey] = result.blobKey;
       self.images = images;
 
       // Optionally save to disk for bootstrap/version control

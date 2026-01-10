@@ -12,7 +12,6 @@ The curb cut here still shows yellow paint where carriages loaded passengers. Th
   z: 0,
   // Exit connections
 
-  imageOnDisk: '1st-ave-s-x-14-y-2-z0.png',
   exits: {
     west: {
       to: 'buildings/merchants-cafe/z0.ts#%BAR',

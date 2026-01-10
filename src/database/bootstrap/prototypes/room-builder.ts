@@ -72,14 +72,18 @@ export class RoomBuilder implements Builder {
 
           // Image generation prompt template for rooms
           // Uses ${variable} substitution - see getImagePrompt()
-          imagePrompt: `Photorealistic wide-angle photograph, 16:9 cinematic composition, high detail, cinematic lighting.
-Abandoned, run down, weathered, gritty, urban decay, desolate, empty.
+          // Setting: Seattle 2110, after "The Event" - mass disappearance, infrastructure decay
+          imagePrompt: `Photorealistic wide-angle photograph, 16:9 cinematic composition, high detail.
+Seattle 2110, near-future post-apocalyptic, after mass disappearance event.
+Abandoned for decades, nature reclaiming urban spaces, overgrown with moss and vines.
+Weathered, decayed, urban ruins, desolate, hauntingly empty.
+Pacific Northwest atmosphere, perpetual overcast, muted colors.
 
 \${name}: \${description}`,
 
           // Negative prompt for Midjourney --no parameter
           // Things to exclude from generated room images
-          imageNegativePrompt: `people, humans, figures, crowds, pedestrians, visible text, signs, letters, words, labels, readable writing, logos, brand names, storefronts with legible names`,
+          imageNegativePrompt: `people, humans, figures, crowds, pedestrians, visible text, signs, letters, words, labels, readable writing, logos, brand names, storefronts with legible names, modern cars, working vehicles, clean surfaces, well-maintained, pristine, bright colors, sunny blue sky`,
 
           abilities: `Physical space that agents can occupy and traverse.
 
@@ -900,39 +904,76 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
     `,
     );
 
-    // Override getImagePrompt to add context based on z-level and outdoor status
+    // Override getImagePrompt to add context based on z-level, outdoor status, and time of day
     obj.setMethod(
       'getImagePrompt',
       `
       /** Get image prompt with room-specific context prepended.
        *  Adds underground/outdoor/indoor context based on z and outdoor properties.
-       *  Returns structured object: { prompt, no?, stylize?, style? }
+       *
+       *  @param context Optional context object (passed from image()):
+       *    - timeOfDay: 'overcast' (default), 'day', 'night', 'dusk', 'dawn'
+       *    - weather: 'clear', 'rain', 'fog', 'storm'
+       *  @returns { prompt, no?, stylize?, style? }
        */
+      const ctx = args[0] || {};
       const z = self.z ?? 0;
       const isOutdoor = self.outdoor ?? false;
+      const timeOfDay = ctx.timeOfDay || 'overcast'; // Default to overcast (Seattle 2110 perpetual grey)
+      const weather = ctx.weather || null;
+
+      // Time of day lighting descriptions
+      const timeDescriptions = {
+        day: 'diffuse daylight through heavy clouds, grey ambient light',
+        overcast: 'perpetual overcast sky, grey diffuse light, no shadows, flat lighting',
+        dawn: 'pale grey dawn light, mist rising from wet streets, early morning silence',
+        dusk: 'fading twilight, deep blue-grey sky, first lights flickering in the darkness',
+        night: 'deep night, darkness broken only by moonlight and distant emergency lights, deep shadows',
+      };
+
+      const weatherDescriptions = {
+        rain: 'rain falling steadily, wet surfaces reflecting dim light, puddles everywhere',
+        fog: 'thick fog obscuring distance, moisture in the air, visibility reduced',
+        storm: 'heavy rain and wind, dramatic storm clouds, lightning in the distance',
+        clear: '', // No extra description for clear
+      };
 
       // Build context prefix based on room type
       let context = '';
+      const timeDesc = timeDescriptions[timeOfDay] || timeDescriptions.overcast;
+      const weatherDesc = weather ? (weatherDescriptions[weather] || '') : '';
 
       if (z < 0) {
-        // Underground - different vibes by depth
+        // Underground - time of day doesn't matter, but depth does
         if (z <= -4) {
-          context = 'Deep underground vault beneath Seattle, pitch black except for emergency lighting, ' +
-            'concrete walls with water damage, rusty pipes, flooded floor puddles, claustrophobic, oppressive. ';
+          context = 'Deep underground vault beneath Seattle 2110, pitch black except for dying emergency lights, ' +
+            'concrete walls with decades of water damage, rusty corroded pipes, flooded floor puddles, ' +
+            'claustrophobic oppressive atmosphere, forgotten depths. ';
         } else if (z <= -2) {
-          context = 'Seattle underground tunnel system from 1889, brick and stone walls, ' +
-            'dim flickering lights, debris and rubble, damp and musty. ';
+          context = 'Seattle underground tunnel system from 1889, rediscovered in 2110, ' +
+            'crumbling brick and stone walls, dim flickering emergency lights, ' +
+            'decades of debris and rubble, damp and musty air, rats and decay. ';
         } else {
-          context = 'Building basement in Seattle, concrete and exposed pipes, ' +
-            'water-stained walls, old storage, industrial decay, dim fluorescent lighting. ';
+          context = 'Building basement in Seattle 2110, cracked concrete and corroded pipes, ' +
+            'water-stained walls, abandoned storage rotting for decades, ' +
+            'failing fluorescent lights buzzing and flickering. ';
         }
       } else if (isOutdoor) {
-        context = 'Pioneer Square Seattle street scene, overcast grey sky, ' +
-          'historic red brick buildings, cobblestone streets, overgrown weeds through cracks, ' +
-          'boarded up storefronts, broken windows, trash and debris, post-apocalyptic atmosphere. ';
+        context = 'Pioneer Square Seattle 2110, ' + timeDesc + '. ' +
+          (weatherDesc ? weatherDesc + '. ' : '') +
+          'Historic red brick buildings crumbling, streets cracked with weeds and saplings growing through, ' +
+          'nature reclaiming the urban landscape, moss on every surface, ' +
+          'boarded storefronts, shattered windows, abandoned vehicles rusting, post-apocalyptic silence. ';
       } else {
-        context = 'Abandoned interior space in Seattle, dust and debris everywhere, ' +
-          'water damage, peeling paint, broken furniture, urban decay. ';
+        // Indoor above ground - still affected by time via light through windows
+        const indoorTime = z === 0 ?
+          (timeOfDay === 'night' ? 'darkness with moonlight through broken windows' :
+           timeOfDay === 'dusk' ? 'fading light through grimy windows' :
+           'dim grey light filtering through dirty windows') :
+          'artificial lighting only';
+        context = 'Abandoned interior space in Seattle 2110, ' + indoorTime + ', ' +
+          'decades of dust and debris, water damage stains, peeling paint, ' +
+          'broken furniture overturned, urban decay and neglect. ';
       }
 
       // Get base prompt config from parent (walks inheritance)

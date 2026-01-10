@@ -12,7 +12,6 @@ Across the street, a fire escape descends in sharp zigzags, each landing collect
   z: 0,
   // Environmental properties
 
-  imageOnDisk: '1st-ave-s-x-14-y-11-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

@@ -10,6 +10,7 @@ Storm drains line the curb, their grates clogged with decades of debris. When it
   x: -14,
   y: -4,
   z: 0,
+
   population: 0,
   ambientNoise: 0,
   lighting: 100,
