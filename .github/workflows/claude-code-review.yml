@@ -67,10 +67,10 @@ jobs:
             --jq '[.comments[] | select(.body | contains("<!-- CLAUDE_REVIEW_MARKER -->"))] | length')
           echo "review_count=$REVIEW_COUNT" >> $GITHUB_OUTPUT
 
-          # Max 10 iterations to prevent runaway loops
-          if [ "$REVIEW_COUNT" -ge 10 ]; then
+          # Max 20 iterations to prevent runaway loops
+          if [ "$REVIEW_COUNT" -ge 20 ]; then
             echo "skip=true" >> $GITHUB_OUTPUT
-            echo "::warning::Max review iterations (10) reached. Stopping review loop."
+            echo "::warning::Max review iterations (20) reached. Stopping review loop."
           else
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
