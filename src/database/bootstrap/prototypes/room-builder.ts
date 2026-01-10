@@ -979,20 +979,25 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       // Get base prompt config from parent (walks inheritance)
       const baseConfig = await pass();
 
+      // Use Midjourney prompt weighting syntax (::weight)
+      // Context gets weight 0.5, room-specific description gets weight 2
+      // This makes the room's unique details more prominent than generic setting
       if (baseConfig && typeof baseConfig === 'object') {
         // Parent returns { prompt, no?, stylize?, style? }
-        // Prepend context to the prompt, keep other fields
+        // Use :: to separate context (low weight) from room details (high weight)
+        const roomPrompt = baseConfig.prompt || '';
         return {
           ...baseConfig,
-          prompt: context + (baseConfig.prompt || ''),
+          prompt: context + '::0.5 ' + roomPrompt + '::2',
         };
       } else if (baseConfig && typeof baseConfig === 'string') {
         // Legacy fallback if parent returns string
-        return { prompt: context + baseConfig };
+        return { prompt: context + '::0.5 ' + baseConfig + '::2' };
       }
 
       // Fallback if no imagePrompt defined anywhere
-      return { prompt: context + self.name + ': ' + (self.description || '') };
+      const fallbackPrompt = self.name + ': ' + (self.description || '');
+      return { prompt: context + '::0.5 ' + fallbackPrompt + '::2' };
     `,
     );
 
