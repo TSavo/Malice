@@ -43,6 +43,7 @@ export class AiImageGenBuilder implements Builder {
           name: 'AI Image Generator',
           description: 'Generate images using Midjourney',
           apiUrl: process.env.MIDJOURNEY_API_URL || 'http://midjourney-api:3000',
+          defaultModel: '7',
         },
       });
     }
@@ -112,8 +113,8 @@ export class AiImageGenBuilder implements Builder {
       if (options.stylize !== undefined) mjOptions.stylize = options.stylize;
       if (options.chaos !== undefined) mjOptions.chaos = options.chaos;
       if (options.no) mjOptions.no = options.no;
-      // Use explicit version, or fall back to defaultVersion if set
-      const version = options.version || self.defaultVersion;
+      // Use explicit version, or fall back to defaultModel if set
+      const version = options.version || self.defaultModel;
       if (version) mjOptions.version = version;
       if (options.style) mjOptions.style = options.style;
       if (options.seed !== undefined) mjOptions.seed = options.seed;
@@ -279,8 +280,8 @@ export class AiImageGenBuilder implements Builder {
       if (options.stylize !== undefined) mjOptions.stylize = options.stylize;
       if (options.chaos !== undefined) mjOptions.chaos = options.chaos;
       if (options.no) mjOptions.no = options.no;
-      // Use explicit version, or fall back to defaultVersion if set
-      const version = options.version || self.defaultVersion;
+      // Use explicit version, or fall back to defaultModel if set
+      const version = options.version || self.defaultModel;
       if (version) mjOptions.version = version;
       if (options.style) mjOptions.style = options.style;
       if (options.seed !== undefined) mjOptions.seed = options.seed;
@@ -391,8 +392,8 @@ export class AiImageGenBuilder implements Builder {
       if (!version || typeof version !== 'string') {
         return { success: false, error: 'Version ID is required' };
       }
-      self.defaultVersion = version;
-      return { success: true, version: version };
+      self.defaultModel = version;
+      return { success: true, model: version };
     `,
     );
 
