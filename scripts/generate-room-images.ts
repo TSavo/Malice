@@ -30,6 +30,7 @@ import { pathToFileURL } from 'node:url';
 const WORLD_DIR = path.join(process.cwd(), 'src/database/bootstrap/world/seattle/pioneer-square');
 const BUILDINGS_DIR = path.join(WORLD_DIR, 'buildings');
 const ASSETS_DIR = path.join(process.cwd(), 'assets/images');
+const UNDERGROUND_JSON = path.join(process.cwd(), 'underground-world-fresh-described-fixed.json');
 
 interface RoomDef {
   name: string;
@@ -46,8 +47,9 @@ interface RoomFile {
   filePath: string;
   relativePath: string;
   room: RoomDef;
-  type: 'world' | 'building';
+  type: 'world' | 'building' | 'underground-json';
   roomId?: number; // MOO object ID, resolved via MCP
+  jsonRoomId?: string; // For JSON rooms, the room's 'id' field (e.g., 'r1')
 }
 
 // Parse command line args
@@ -57,6 +59,7 @@ const buildingsOnly = args.includes('--buildings-only');
 const worldOnly = args.includes('--world-only');
 const undergroundOnly = args.includes('--underground');
 const surfaceOnly = args.includes('--surface');
+const jsonOnly = args.includes('--json-only'); // Only process underground JSON rooms
 const limitArgIdx = args.indexOf('--limit');
 const overrideLimit = limitArgIdx >= 0 ? parseInt(args[limitArgIdx + 1], 10) : null;
 const mcpUrlIdx = args.indexOf('--mcp-url');
@@ -240,14 +243,19 @@ async function main() {
   // Find all room files without imageOnDisk
   const roomsToProcess: RoomFile[] = [];
 
-  if (!buildingsOnly) {
+  if (!buildingsOnly && !jsonOnly) {
     console.log('🔍 Scanning world rooms...');
     await scanWorldRooms(roomsToProcess);
   }
 
-  if (!worldOnly) {
+  if (!worldOnly && !jsonOnly) {
     console.log('🔍 Scanning building rooms...');
     await scanBuildingRooms(roomsToProcess);
+  }
+
+  if (!worldOnly && !buildingsOnly) {
+    console.log('🔍 Scanning underground JSON rooms...');
+    await scanUndergroundJsonRooms(roomsToProcess);
   }
 
   // Filter by z-level if requested
@@ -309,7 +317,7 @@ async function main() {
 
       // Update the source file with imageOnDisk
       if (result.filename) {
-        await addImageOnDiskToFile(roomFile.filePath, result.filename);
+        await addImageOnDiskToFile(roomFile.filePath, result.filename, roomFile);
         console.log(`    ✅ Updated source file\n`);
       } else {
         console.log(`    ⚠️  No filename returned, blob only\n`);
@@ -400,7 +408,13 @@ async function scanBuildingRooms(results: RoomFile[]): Promise<void> {
   }
 }
 
-async function addImageOnDiskToFile(filePath: string, imageFilename: string): Promise<void> {
+async function addImageOnDiskToFile(filePath: string, imageFilename: string, roomFile?: RoomFile): Promise<void> {
+  // Handle underground JSON rooms specially
+  if (roomFile?.type === 'underground-json' && roomFile.jsonRoomId) {
+    await updateUndergroundJsonImage(roomFile.jsonRoomId, imageFilename);
+    return;
+  }
+
   let content = fs.readFileSync(filePath, 'utf-8');
 
   // Check if it's a building file (has 'building' export with rooms)
@@ -424,6 +438,63 @@ async function addImageOnDiskToFile(filePath: string, imageFilename: string): Pr
   } else {
     console.log(`    ⚠️  Could not find z coordinate to insert after`);
   }
+}
+
+/**
+ * Scan underground JSON file for rooms without images
+ */
+async function scanUndergroundJsonRooms(results: RoomFile[]): Promise<void> {
+  if (!fs.existsSync(UNDERGROUND_JSON)) {
+    console.log('    Underground JSON not found, skipping');
+    return;
+  }
+
+  const data = JSON.parse(fs.readFileSync(UNDERGROUND_JSON, 'utf-8'));
+  const rooms = data.rooms || [];
+
+  for (const roomDef of rooms) {
+    // Skip rooms that already have imageOnDisk
+    if (roomDef.imageOnDisk) continue;
+
+    results.push({
+      filePath: UNDERGROUND_JSON,
+      relativePath: `underground-json:${roomDef.id}`,
+      room: {
+        name: roomDef.id, // JSON rooms don't have names, use ID
+        description: roomDef.description,
+        x: roomDef.pos.x,
+        y: roomDef.pos.y,
+        z: roomDef.pos.z,
+      },
+      type: 'underground-json',
+      jsonRoomId: roomDef.id,
+    });
+  }
+}
+
+/**
+ * Update underground JSON file with imageOnDisk for a specific room
+ */
+async function updateUndergroundJsonImage(roomId: string, imageFilename: string): Promise<void> {
+  if (!fs.existsSync(UNDERGROUND_JSON)) {
+    console.log(`    ⚠️  Underground JSON not found`);
+    return;
+  }
+
+  const data = JSON.parse(fs.readFileSync(UNDERGROUND_JSON, 'utf-8'));
+  const rooms = data.rooms || [];
+
+  // Find the room by ID and add imageOnDisk
+  const roomIndex = rooms.findIndex((r: any) => r.id === roomId);
+  if (roomIndex === -1) {
+    console.log(`    ⚠️  Room ${roomId} not found in JSON`);
+    return;
+  }
+
+  rooms[roomIndex].imageOnDisk = imageFilename;
+
+  // Write back to file with pretty formatting
+  fs.writeFileSync(UNDERGROUND_JSON, JSON.stringify(data, null, 2));
 }
 
 main().catch(err => {

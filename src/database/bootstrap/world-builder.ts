@@ -40,6 +40,7 @@ interface RoomData {
   exits?: Record<string, ExitData | string>; // Custom exit definitions
   objects?: ObjectDef[]; // Objects to spawn in the room
   sittables?: SittableDef[]; // Sittable locations in the room
+  imageOnDisk?: string; // Filename in assets/images/ to load into GridFS
 }
 
 interface StreetConfig {
@@ -335,6 +336,30 @@ export class WorldBuilder implements Builder {
       });
 
       this.rooms.set(key, room);
+
+      // Load image from disk if specified
+      if (data.imageOnDisk && $.blob) {
+        try {
+          const imagePath = path.join(
+            process.cwd(),
+            'assets/images',
+            data.imageOnDisk,
+          );
+          if (fs.existsSync(imagePath)) {
+            const imageData = fs.readFileSync(imagePath);
+            const base64Data = imageData.toString('base64');
+            const blobKey = await $.blob.write(base64Data, {
+              contentType: 'image/png',
+              filename: data.imageOnDisk,
+              createdBy: 'world-builder',
+            });
+            // Store by aspect ratio (default 16:9 for rooms)
+            room.set('images', { '16:9': blobKey });
+          }
+        } catch (err) {
+          console.warn(`    Warning: Failed to load image ${data.imageOnDisk}: ${err}`);
+        }
+      }
 
       // Spawn objects in the room (if specified)
       if (Array.isArray(data.objects)) {

@@ -42,6 +42,7 @@ interface GeneratedRoom {
   isDeep: boolean;
   neighborTypes: string[];
   description: string;
+  imageOnDisk?: string; // Filename in assets/images/ to load into GridFS
 }
 
 interface UndergroundData {
@@ -184,6 +185,30 @@ export class UndergroundJsonBuilder implements Builder {
           undergroundCondition: roomDef.condition,
         },
       });
+
+      // Load image from disk if specified
+      if (roomDef.imageOnDisk && $.blob) {
+        try {
+          const imagePath = path.join(
+            process.cwd(),
+            'assets/images',
+            roomDef.imageOnDisk,
+          );
+          if (fs.existsSync(imagePath)) {
+            const imageData = fs.readFileSync(imagePath);
+            const base64Data = imageData.toString('base64');
+            const blobKey = await $.blob.write(base64Data, {
+              contentType: 'image/png',
+              filename: roomDef.imageOnDisk,
+              createdBy: 'underground-json-builder',
+            });
+            // Store by aspect ratio (default 16:9 for rooms)
+            room.set('images', { '16:9': blobKey });
+          }
+        } catch (err) {
+          console.warn(`    Warning: Failed to load image ${roomDef.imageOnDisk}: ${err}`);
+        }
+      }
 
       this.rooms.set(key, room);
     }
