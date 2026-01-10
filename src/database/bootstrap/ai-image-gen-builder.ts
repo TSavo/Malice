@@ -5,7 +5,7 @@ import { type Builder, registerBuilder } from './builder-registry';
 /**
  * Builds $aiImageGen MOO object for AI image generation
  *
- * Uses laozhang.ai API proxy for Nano Banana (79% cheaper than Google direct).
+ * Uses Midjourney API server for high-quality image generation.
  * Stores generated images in $blob for persistence.
  *
  * Usage from MOO code:
@@ -41,8 +41,8 @@ export class AiImageGenBuilder implements Builder {
         parent: root!,
         properties: {
           name: 'AI Image Generator',
-          description: 'Generate images using Nano Banana via laozhang.ai',
-          defaultModel: 'gemini-2.5-flash-image', // Nano Banana (stable)
+          description: 'Generate images using Midjourney',
+          apiUrl: process.env.MIDJOURNEY_API_URL || 'http://midjourney-api:3000',
         },
       });
     }
@@ -52,11 +52,17 @@ export class AiImageGenBuilder implements Builder {
       'generate',
       `
       /**
-       * Generate an image and store in $blob using Nano Banana via laozhang.ai
+       * Generate an image and store in $blob using Midjourney
        * @param prompt - Text description of the image to generate
-       * @param options - { model?, metadata?, filename?, aspectRatio? }
-       *   aspectRatio: 'landscape' (default), 'portrait', 'square'
-       * @returns { success, blobKey, aspectRatio, contentType, prompt, error? }
+       * @param options - { metadata?, filename?, aspectRatio?, stylize?, chaos?, no?, version?, style? }
+       *   aspectRatio: '16:9' (landscape), '9:16' (portrait), '1:1' (square), etc.
+       *   stylize: 0-1000, artistic influence (default: 100)
+       *   chaos: 0-100, variation/randomness (default: 0)
+       *   no: string, elements to exclude
+       *   version: '5', '6', '7' etc (default: 7)
+       *   style: 'raw' or 'scenic'
+       *   upscaleIndex: 1-4, which image from grid to use (default: 1)
+       * @returns { success, blobKey, aspectRatio, contentType, prompt, error?, uri? }
        */
       const prompt = args[0];
       const options = args[1] || {};
@@ -65,15 +71,9 @@ export class AiImageGenBuilder implements Builder {
         return { success: false, error: 'Prompt is required' };
       }
 
-      // Get API key from environment (laozhang.ai key)
-      const apiKey = process.env.LAOZHANG_API_KEY;
-      if (!apiKey) {
-        return { success: false, error: 'LAOZHANG_API_KEY not set in environment' };
-      }
+      const apiUrl = self.apiUrl || process.env.MIDJOURNEY_API_URL || 'http://midjourney-api:3000';
 
-      const model = options.model || self.defaultModel;
-
-      // Map aspect ratio names to API values
+      // Map friendly aspect ratio names to MJ format
       const aspectRatioMap = {
         'landscape': '16:9',
         'portrait': '9:16',
@@ -84,25 +84,36 @@ export class AiImageGenBuilder implements Builder {
       const rawRatio = options.aspectRatio || 'landscape';
       const aspectRatio = aspectRatioMap[rawRatio] || rawRatio;
 
+      // Build MJ options object
+      const mjOptions = {};
+      if (aspectRatio) mjOptions.aspectRatio = aspectRatio;
+      if (options.stylize !== undefined) mjOptions.stylize = options.stylize;
+      if (options.chaos !== undefined) mjOptions.chaos = options.chaos;
+      if (options.no) mjOptions.no = options.no;
+      // Use explicit version, or fall back to defaultVersion if set
+      const version = options.version || self.defaultVersion;
+      if (version) mjOptions.version = version;
+      if (options.style) mjOptions.style = options.style;
+      if (options.seed !== undefined) mjOptions.seed = options.seed;
+      if (options.quality !== undefined) mjOptions.quality = options.quality;
+      if (options.weird !== undefined) mjOptions.weird = options.weird;
+      if (options.tile) mjOptions.tile = options.tile;
+
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min timeout
+      const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 min timeout for MJ
 
       try {
-        // Use laozhang.ai's Google-native format endpoint
-        const apiUrl = 'https://api.laozhang.ai/v1beta/models/' + model + ':generateContent';
-
-        const resp = await fetch(apiUrl, {
+        // Call Midjourney API /generate endpoint (full pipeline)
+        const resp = await fetch(apiUrl + '/generate', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + apiKey,
           },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: {
-              responseModalities: ['IMAGE'],
-              aspectRatio: aspectRatio,
-            },
+            prompt: prompt,
+            options: Object.keys(mjOptions).length > 0 ? mjOptions : undefined,
+            upscaleIndex: options.upscaleIndex || 1,
+            download: false, // We'll fetch the image ourselves
           }),
           signal: controller.signal,
         });
@@ -111,30 +122,24 @@ export class AiImageGenBuilder implements Builder {
 
         if (!resp.ok) {
           const errorBody = await resp.text();
-          return { success: false, error: 'API error ' + resp.status + ': ' + errorBody };
+          return { success: false, error: 'Midjourney API error ' + resp.status + ': ' + errorBody };
         }
 
         const data = await resp.json();
 
-        // Extract first image from response
-        const parts = data.candidates?.[0]?.content?.parts || [];
-        let imageData = null;
-        let mimeType = 'image/png';
-        let textResponse = null;
-
-        for (const part of parts) {
-          if (part.inlineData && !imageData) {
-            imageData = part.inlineData.data;
-            mimeType = part.inlineData.mimeType || 'image/png';
-          }
-          if (part.text) {
-            textResponse = part.text;
-          }
+        if (!data.uri) {
+          return { success: false, error: 'No image URI in response', data };
         }
 
-        if (!imageData) {
-          return { success: false, error: 'No image in response', textResponse };
+        // Fetch the image from Discord CDN
+        const imageResp = await fetch(data.uri);
+        if (!imageResp.ok) {
+          return { success: false, error: 'Failed to fetch image from CDN: ' + imageResp.status };
         }
+
+        const imageBuffer = await imageResp.arrayBuffer();
+        const imageBase64 = Buffer.from(imageBuffer).toString('base64');
+        const mimeType = imageResp.headers.get('content-type') || 'image/png';
 
         // Store in $blob
         const blob = $blob;
@@ -142,18 +147,19 @@ export class AiImageGenBuilder implements Builder {
           return { success: false, error: '$blob not available' };
         }
 
-        const filename = (options.filename || 'ai_image_' + Date.now()) + '.png';
+        const filename = (options.filename || 'mj_image_' + Date.now()) + '.png';
         const metadata = {
           contentType: mimeType,
           filename: filename,
           prompt: prompt,
-          model: model,
           aspectRatio: aspectRatio,
+          midjourneyId: data.id,
+          midjourneyHash: data.hash,
           generatedAt: new Date().toISOString(),
           ...(options.metadata || {}),
         };
 
-        const blobKey = await blob.write(imageData, metadata);
+        const blobKey = await blob.write(imageBase64, metadata);
 
         return {
           success: true,
@@ -161,12 +167,14 @@ export class AiImageGenBuilder implements Builder {
           contentType: mimeType,
           prompt: prompt,
           aspectRatio: aspectRatio,
-          textResponse: textResponse,
+          uri: data.uri,
+          width: data.width,
+          height: data.height,
         };
       } catch (err) {
         clearTimeout(timeoutId);
         if (err.name === 'AbortError') {
-          return { success: false, error: 'Request timeout (120s)' };
+          return { success: false, error: 'Request timeout (5 minutes)' };
         }
         return { success: false, error: err.message || String(err) };
       }
@@ -178,10 +186,10 @@ export class AiImageGenBuilder implements Builder {
       'generateRaw',
       `
       /**
-       * Generate an image and return base64 directly (not stored) using Nano Banana
+       * Generate an image and return base64 directly (not stored) using Midjourney
        * @param prompt - Text description of the image to generate
-       * @param options - { model?, aspectRatio? }
-       * @returns { success, data, aspectRatio, contentType, prompt, error? }
+       * @param options - { aspectRatio?, stylize?, chaos?, no?, version?, style? }
+       * @returns { success, data, aspectRatio, contentType, prompt, error?, uri? }
        */
       const prompt = args[0];
       const options = args[1] || {};
@@ -190,14 +198,9 @@ export class AiImageGenBuilder implements Builder {
         return { success: false, error: 'Prompt is required' };
       }
 
-      const apiKey = process.env.LAOZHANG_API_KEY;
-      if (!apiKey) {
-        return { success: false, error: 'LAOZHANG_API_KEY not set in environment' };
-      }
+      const apiUrl = self.apiUrl || process.env.MIDJOURNEY_API_URL || 'http://midjourney-api:3000';
 
-      const model = options.model || self.defaultModel;
-
-      // Map aspect ratio names to API values
+      // Map friendly aspect ratio names to MJ format
       const aspectRatioMap = {
         'landscape': '16:9',
         'portrait': '9:16',
@@ -208,24 +211,36 @@ export class AiImageGenBuilder implements Builder {
       const rawRatio = options.aspectRatio || 'landscape';
       const aspectRatio = aspectRatioMap[rawRatio] || rawRatio;
 
+      // Build MJ options object
+      const mjOptions = {};
+      if (aspectRatio) mjOptions.aspectRatio = aspectRatio;
+      if (options.stylize !== undefined) mjOptions.stylize = options.stylize;
+      if (options.chaos !== undefined) mjOptions.chaos = options.chaos;
+      if (options.no) mjOptions.no = options.no;
+      // Use explicit version, or fall back to defaultVersion if set
+      const version = options.version || self.defaultVersion;
+      if (version) mjOptions.version = version;
+      if (options.style) mjOptions.style = options.style;
+      if (options.seed !== undefined) mjOptions.seed = options.seed;
+      if (options.quality !== undefined) mjOptions.quality = options.quality;
+      if (options.weird !== undefined) mjOptions.weird = options.weird;
+      if (options.tile) mjOptions.tile = options.tile;
+
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 120000);
+      const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 min timeout
 
       try {
-        const apiUrl = 'https://api.laozhang.ai/v1beta/models/' + model + ':generateContent';
-
-        const resp = await fetch(apiUrl, {
+        // Call Midjourney API /generate endpoint
+        const resp = await fetch(apiUrl + '/generate', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + apiKey,
           },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: {
-              responseModalities: ['IMAGE'],
-              aspectRatio: aspectRatio,
-            },
+            prompt: prompt,
+            options: Object.keys(mjOptions).length > 0 ? mjOptions : undefined,
+            upscaleIndex: options.upscaleIndex || 1,
+            download: false,
           }),
           signal: controller.signal,
         });
@@ -234,77 +249,137 @@ export class AiImageGenBuilder implements Builder {
 
         if (!resp.ok) {
           const errorBody = await resp.text();
-          return { success: false, error: 'API error ' + resp.status + ': ' + errorBody };
+          return { success: false, error: 'Midjourney API error ' + resp.status + ': ' + errorBody };
         }
 
         const data = await resp.json();
 
-        const parts = data.candidates?.[0]?.content?.parts || [];
-        let imageData = null;
-        let mimeType = 'image/png';
-        let textResponse = null;
-
-        for (const part of parts) {
-          if (part.inlineData && !imageData) {
-            imageData = part.inlineData.data;
-            mimeType = part.inlineData.mimeType || 'image/png';
-          }
-          if (part.text) {
-            textResponse = part.text;
-          }
+        if (!data.uri) {
+          return { success: false, error: 'No image URI in response', data };
         }
 
-        if (!imageData) {
-          return { success: false, error: 'No image in response', textResponse };
+        // Fetch the image from Discord CDN
+        const imageResp = await fetch(data.uri);
+        if (!imageResp.ok) {
+          return { success: false, error: 'Failed to fetch image from CDN: ' + imageResp.status };
         }
+
+        const imageBuffer = await imageResp.arrayBuffer();
+        const imageBase64 = Buffer.from(imageBuffer).toString('base64');
+        const mimeType = imageResp.headers.get('content-type') || 'image/png';
 
         return {
           success: true,
-          data: imageData,
+          data: imageBase64,
           contentType: mimeType,
           prompt: prompt,
           aspectRatio: aspectRatio,
-          textResponse: textResponse,
+          uri: data.uri,
+          width: data.width,
+          height: data.height,
         };
       } catch (err) {
         clearTimeout(timeoutId);
         if (err.name === 'AbortError') {
-          return { success: false, error: 'Request timeout (120s)' };
+          return { success: false, error: 'Request timeout (5 minutes)' };
         }
         return { success: false, error: err.message || String(err) };
       }
     `,
     );
 
-    // List available models
+    // List available options (MJ has many more than the old provider)
     this.aiImageGen.setMethod(
       'listModels',
       `
       /**
-       * List available Nano Banana models via laozhang.ai
-       * @returns Array of model info
+       * List available Midjourney versions/options
+       * @returns Array of version info
        */
       return [
-        { id: 'gemini-2.5-flash-image', name: 'Nano Banana (stable)', tier: 'budget', pricePerImage: 0.05 },
-        { id: 'gemini-3-pro-image-preview', name: 'Nano Banana Pro (4K support)', tier: 'quality', pricePerImage: 0.05 },
+        { id: '7', name: 'Midjourney v7 (latest)', tier: 'quality', default: true },
+        { id: '6.1', name: 'Midjourney v6.1', tier: 'quality' },
+        { id: '6', name: 'Midjourney v6', tier: 'quality' },
+        { id: '5.2', name: 'Midjourney v5.2', tier: 'quality' },
+        { id: 'niji6', name: 'Niji 6 (anime)', tier: 'specialty' },
+        { id: 'niji5', name: 'Niji 5 (anime)', tier: 'specialty' },
       ];
     `,
     );
 
-    // Set default model
+    // Set default model/version
     this.aiImageGen.setMethod(
       'setDefaultModel',
       `
       /**
-       * Set the default model for image generation
-       * @param model - Model ID
+       * Set the default Midjourney version
+       * @param version - Version ID (e.g., '7', '6.1', '6')
        */
-      const model = args[0];
-      if (!model || typeof model !== 'string') {
-        return { success: false, error: 'Model ID is required' };
+      const version = args[0];
+      if (!version || typeof version !== 'string') {
+        return { success: false, error: 'Version ID is required' };
       }
-      self.defaultModel = model;
-      return { success: true, model: model };
+      self.defaultVersion = version;
+      return { success: true, version: version };
+    `,
+    );
+
+    // Health check for the Midjourney API
+    this.aiImageGen.setMethod(
+      'health',
+      `
+      /**
+       * Check if the Midjourney API is available
+       * @returns { success, connected, error? }
+       */
+      const apiUrl = self.apiUrl || process.env.MIDJOURNEY_API_URL || 'http://midjourney-api:3000';
+
+      try {
+        const resp = await fetch(apiUrl + '/health', {
+          method: 'GET',
+          signal: AbortSignal.timeout(5000),
+        });
+
+        if (!resp.ok) {
+          return { success: false, connected: false, error: 'API returned ' + resp.status };
+        }
+
+        const data = await resp.json();
+        return {
+          success: true,
+          connected: data.connected || false,
+          status: data.status,
+        };
+      } catch (err) {
+        return { success: false, connected: false, error: err.message || String(err) };
+      }
+    `,
+    );
+
+    // Get available prompt options documentation
+    this.aiImageGen.setMethod(
+      'getOptions',
+      `
+      /**
+       * Get documentation for available Midjourney prompt options
+       * @returns Object describing all available options
+       */
+      const apiUrl = self.apiUrl || process.env.MIDJOURNEY_API_URL || 'http://midjourney-api:3000';
+
+      try {
+        const resp = await fetch(apiUrl + '/options', {
+          method: 'GET',
+          signal: AbortSignal.timeout(5000),
+        });
+
+        if (!resp.ok) {
+          return { success: false, error: 'API returned ' + resp.status };
+        }
+
+        return await resp.json();
+      } catch (err) {
+        return { success: false, error: err.message || String(err) };
+      }
     `,
     );
   }
