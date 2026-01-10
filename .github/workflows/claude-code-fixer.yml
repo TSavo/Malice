@@ -66,41 +66,90 @@ jobs:
 
             You are the FIXER agent in a two-agent feedback loop. The REVIEWER agent has left feedback that you need to address.
 
-            ## Review Comment to Address
+            ## Triggering Review Comment
             ```
             ${{ github.event.comment.body }}
             ```
 
+            ## CRITICAL: Read ALL PR Comments First
+
+            Before making any fixes, you MUST read the complete PR conversation to understand all feedback:
+
+            ```bash
+            # Get ALL comments (reviews, discussions, line comments)
+            gh pr view ${{ github.event.issue.number }} --json comments,reviews --jq '.comments[], .reviews[]'
+
+            # Get inline review comments on specific lines
+            gh api repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}/comments
+            ```
+
+            ## Categorize All Feedback
+
+            As you read through comments, build a complete list of ALL requested changes:
+
+            1. **CLAUDE_REVIEW_MARKER comments** - Automated reviewer feedback (prioritize these)
+            2. **Human review comments** - Manual feedback from maintainers (important!)
+            3. **Inline code comments** - Line-specific suggestions (gh api output)
+            4. **CLAUDE_FIXER_MARKER comments** - Previous fix attempts (check if issues persist)
+
+            For each piece of feedback, determine:
+            - Is it already fixed? (check current code)
+            - Is it still outstanding?
+            - Was a previous fix attempt unsuccessful?
+
             ## Your Task
-            1. First, rebase on master: `git fetch origin master && git rebase origin/master`
-            2. Parse the review comment above for specific issues
-            3. For each issue marked with **File:** and **Fix:**, implement the fix
-            4. Stage and commit your changes with a descriptive message
-            5. Push the changes to the PR branch (use --force-with-lease since you rebased)
-            6. Leave a comment summarizing what you fixed
+
+            1. **Read all PR comments** using the commands above
+            2. **Build a complete issue list** from ALL sources (not just the triggering comment)
+            3. Rebase on master: `git fetch origin master && git rebase origin/master`
+            4. For each outstanding issue, implement the fix
+            5. Stage and commit your changes
+            6. Push the changes to the PR branch
+            7. Leave a comprehensive summary comment
 
             ## Important Rules
-            - Only fix issues explicitly mentioned in the review
+            - Address ALL outstanding issues from ALL reviewers (human and automated)
+            - Check if issues from previous review cycles are actually fixed
             - Do NOT add new features or make unrelated changes
-            - If you can't fix something, note it in your summary comment
+            - If you can't fix something, explicitly note it in your summary
             - Use atomic commits (one commit per logical fix if multiple issues)
-            - Always run any relevant tests/type checks before committing
+            - Always run type checks before committing
 
             ## Workflow
-            1. Rebase on master: `git fetch origin master && git rebase origin/master`
-            2. Read the files mentioned in the review
-            3. Make the requested changes using Edit tool
-            4. Run type checking: `npm run typecheck` (fix any issues you introduced)
-            5. Commit with message: "fix: [description of fix]"
-            6. Push: `git push --force-with-lease origin ${{ steps.pr-details.outputs.branch }}`
-            7. Comment on PR: `gh pr comment ${{ github.event.issue.number }} --body "YOUR_SUMMARY"`
+            1. Read ALL comments: `gh pr view ${{ github.event.issue.number }} --json comments,reviews`
+            2. Read inline comments: `gh api repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}/comments`
+            3. Build complete list of outstanding issues
+            4. Rebase: `git fetch origin master && git rebase origin/master`
+            5. Read the files mentioned in reviews
+            6. Make the requested changes using Edit tool
+            7. Run type checking: `npm run typecheck` (fix any issues you introduced)
+            8. Commit with message: "fix: [description of fix]"
+            9. Push: `git push --force-with-lease origin ${{ steps.pr-details.outputs.branch }}`
+            10. Comment on PR with comprehensive summary
+
+            ## Summary Comment Format
 
             Your summary comment MUST begin with exactly these 28 characters (no escaping, no backslashes):
             <!-- CLAUDE_FIXER_MARKER -->
 
-            Then add a heading "## 🔧 Fixes Applied" followed by a checklist of what you fixed and the commit hash.
+            Then add:
+            ## 🔧 Fixes Applied
 
-          claude_args: '--allowed-tools "Bash(git:*),Bash(npm run typecheck),Bash(npm test:*),Bash(gh pr comment:*),Bash(gh pr view:*),Read,Edit,Write,Glob,Grep"'
+            ### From Automated Review (iteration N)
+            - [x] Issue 1 - fixed in commit abc123
+            - [x] Issue 2 - fixed in commit abc123
+
+            ### From Human Reviews
+            - [x] @username's feedback on file.ts - fixed in commit def456
+            - [ ] @username's suggestion about X - could not fix because Y
+
+            ### From Inline Comments
+            - [x] Line comment on src/foo.ts:42 - addressed
+
+            ### Previously Reported (verified fixed)
+            - [x] Issue from iteration 1 - confirmed still fixed
+
+          claude_args: '--allowed-tools "Bash(git:*),Bash(npm run typecheck),Bash(npm test:*),Bash(gh pr comment:*),Bash(gh pr view:*),Bash(gh api:*),Read,Edit,Write,Glob,Grep"'
 
       # When PAT_GITHUB_TOKEN is configured, the push automatically triggers all
       # pull_request workflows. When only GITHUB_TOKEN is used, we manually trigger them.
