@@ -72,7 +72,7 @@ const MCP_URL = mcpUrlIdx >= 0 ? args[mcpUrlIdx + 1] : 'http://localhost:3010';
 const delayIdx = args.indexOf('--delay');
 const DELAY_MS = delayIdx >= 0 ? parseInt(args[delayIdx + 1], 10) : 0; // 0 means use random delay
 const MIN_DELAY_MS = 5000;   // 5 seconds
-const MAX_DELAY_MS = 180000; // 3 minutes
+const MAX_DELAY_MS = 25000;  // 25 seconds
 
 // MCP session management
 let mcpSessionId: string | null = null;
