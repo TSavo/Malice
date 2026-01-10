@@ -48,12 +48,19 @@ services:
       - FORCE_BOOTSTRAP=${FORCE_BOOTSTRAP:-false}
       - EMAIL_API_KEY=${EMAIL_API_KEY:-}
       - GOOGLE_AI_API_KEY=${GOOGLE_AI_API_KEY:-}
-      - LAOZHANG_API_KEY=${LAOZHANG_API_KEY:-}
+      - MIDJOURNEY_API_URL=http://midjourney-api:3000
+      - MIDJOURNEY_SERVER_ID=${MIDJOURNEY_SERVER_ID:-}
+      - MIDJOURNEY_CHANNEL_ID=${MIDJOURNEY_CHANNEL_ID:-}
+      - MIDJOURNEY_SALAI_TOKEN=${MIDJOURNEY_SALAI_TOKEN:-}
+      - MIDJOURNEY_DEBUG=${MIDJOURNEY_DEBUG:-false}
+      - HUGGINGFACE_TOKEN=${HUGGINGFACE_TOKEN:-}
     volumes:
       - claude_sessions:/home/bun/.claude
       - ./assets/images:/app/assets/images
     depends_on:
       mongodb:
+        condition: service_healthy
+      midjourney-api:
         condition: service_healthy
     networks:
       malice-network:
@@ -64,6 +71,32 @@ services:
       timeout: 5s
       retries: 30
       start_period: 60s
+
+  # ============================================================
+  # Midjourney API - Discord bot proxy for image generation
+  # Internal service - not exposed to internet
+  # ============================================================
+
+  midjourney-api:
+    image: ghcr.io/erictik/midjourney-api:latest
+    container_name: malice-midjourney-api
+    restart: unless-stopped
+    # No ports exposed - only accessible within Docker network
+    environment:
+      - SERVER_ID=${MIDJOURNEY_SERVER_ID:-}
+      - CHANNEL_ID=${MIDJOURNEY_CHANNEL_ID:-}
+      - SALAI_TOKEN=${MIDJOURNEY_SALAI_TOKEN:-}
+      - DEBUG=${MIDJOURNEY_DEBUG:-false}
+      - HUGGINGFACE_TOKEN=${HUGGINGFACE_TOKEN:-}
+    networks:
+      malice-network:
+        ipv4_address: 172.20.0.20
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:3000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   # ============================================================
   # Caddy - Reverse proxy with automatic HTTPS

@@ -48,15 +48,15 @@ describe('AiImageGenBuilder', () => {
     await objectManager?.call('addAlias', 'blob', blob.id);
 
     // Store original env variable
-    originalEnv = process.env.LAOZHANG_API_KEY;
+    originalEnv = process.env.MIDJOURNEY_API_URL;
   });
 
   afterEach(async () => {
     // Restore original env
     if (originalEnv !== undefined) {
-      process.env.LAOZHANG_API_KEY = originalEnv;
+      process.env.MIDJOURNEY_API_URL = originalEnv;
     } else {
-      delete process.env.LAOZHANG_API_KEY;
+      delete process.env.MIDJOURNEY_API_URL;
     }
     await db.disconnect();
   });
@@ -70,8 +70,8 @@ describe('AiImageGenBuilder', () => {
 
       expect(aiImageGen).toBeTruthy();
       expect(aiImageGen?.get('name')).toBe('AI Image Generator');
-      expect(aiImageGen?.get('description')).toContain('laozhang.ai');
-      expect(aiImageGen?.get('defaultModel')).toBe('gemini-2.5-flash-image');
+      expect(aiImageGen?.get('description')).toContain('Midjourney');
+      expect(aiImageGen?.get('defaultModel')).toBe('7');
     });
 
     it('should have generate method', async () => {
@@ -82,8 +82,8 @@ describe('AiImageGenBuilder', () => {
       const methodCode = await aiImageGen?.getMethodCode('generate');
 
       expect(methodCode).toBeTruthy();
-      expect(methodCode?.code).toContain('LAOZHANG_API_KEY');
-      expect(methodCode?.code).toContain('api.laozhang.ai');
+      expect(methodCode?.code).toContain('MIDJOURNEY_API_URL');
+      expect(methodCode?.code).toContain('midjourney-api:3000');
     });
 
     it('should have generateRaw method', async () => {
@@ -94,8 +94,8 @@ describe('AiImageGenBuilder', () => {
       const methodCode = await aiImageGen?.getMethodCode('generateRaw');
 
       expect(methodCode).toBeTruthy();
-      expect(methodCode?.code).toContain('LAOZHANG_API_KEY');
-      expect(methodCode?.code).toContain('api.laozhang.ai');
+      expect(methodCode?.code).toContain('MIDJOURNEY_API_URL');
+      expect(methodCode?.code).toContain('midjourney-api:3000');
     });
 
     it('should have listModels method', async () => {
@@ -106,11 +106,10 @@ describe('AiImageGenBuilder', () => {
       const models = await aiImageGen?.call('listModels');
 
       expect(Array.isArray(models)).toBe(true);
-      expect(models?.length).toBe(2);
-      expect(models?.[0].id).toBe('gemini-2.5-flash-image');
-      expect(models?.[0].name).toContain('Nano Banana');
-      expect(models?.[0].tier).toBe('budget');
-      expect(models?.[0].pricePerImage).toBe(0.05);
+      expect(models?.length).toBeGreaterThan(0);
+      expect(models?.[0].id).toBe('7');
+      expect(models?.[0].name).toContain('Midjourney v7');
+      expect(models?.[0].tier).toBe('quality');
     });
 
     it('should have setDefaultModel method', async () => {
@@ -120,12 +119,12 @@ describe('AiImageGenBuilder', () => {
       const aiImageGen = await manager.load('aiImageGen');
       const result = await aiImageGen?.call(
         'setDefaultModel',
-        'gemini-3-pro-image-preview',
+        '6.1',
       );
 
       expect(result?.success).toBe(true);
-      expect(result?.model).toBe('gemini-3-pro-image-preview');
-      expect(aiImageGen?.get('defaultModel')).toBe('gemini-3-pro-image-preview');
+      expect(result?.model).toBe('6.1');
+      expect(aiImageGen?.get('defaultModel')).toBe('6.1');
     });
 
     it('should be idempotent (safe to run twice)', async () => {
@@ -173,8 +172,8 @@ describe('AiImageGenBuilder', () => {
       expect(result?.error).toContain('Prompt is required');
     });
 
-    it('should return error when LAOZHANG_API_KEY is not set', async () => {
-      delete process.env.LAOZHANG_API_KEY;
+    it('should return error when Midjourney API is unreachable', async () => {
+      process.env.MIDJOURNEY_API_URL = 'http://invalid-url:9999';
 
       const builder = new AiImageGenBuilder(manager);
       await builder.build();
@@ -183,11 +182,11 @@ describe('AiImageGenBuilder', () => {
       const result = await aiImageGen?.call('generate', 'A test image');
 
       expect(result?.success).toBe(false);
-      expect(result?.error).toContain('LAOZHANG_API_KEY not set');
+      expect(result?.error).toBeTruthy();
     });
 
     it('should use default model when not specified', async () => {
-      process.env.LAOZHANG_API_KEY = 'test-key';
+      process.env.MIDJOURNEY_API_URL = 'http://midjourney-api:3000';
 
       const builder = new AiImageGenBuilder(manager);
       await builder.build();
@@ -196,9 +195,9 @@ describe('AiImageGenBuilder', () => {
 
       // Mock fetch to capture request
       const originalFetch = global.fetch;
-      let capturedUrl = '';
-      global.fetch = vi.fn(async (url: string) => {
-        capturedUrl = url;
+      let capturedBody = '';
+      global.fetch = vi.fn(async (_url: string, options?: any) => {
+        capturedBody = options?.body || '';
         throw new Error('Mock error to prevent actual API call');
       }) as any;
 
@@ -208,13 +207,14 @@ describe('AiImageGenBuilder', () => {
         // Expected to fail
       }
 
-      expect(capturedUrl).toContain('gemini-2.5-flash-image');
+      const parsedBody = JSON.parse(capturedBody);
+      expect(parsedBody.options?.version || '7').toBe('7');
 
       global.fetch = originalFetch;
     });
 
     it('should map aspect ratio names correctly', async () => {
-      process.env.LAOZHANG_API_KEY = 'test-key';
+      process.env.MIDJOURNEY_API_URL = 'http://midjourney-api:3000';
 
       const builder = new AiImageGenBuilder(manager);
       await builder.build();
@@ -238,13 +238,13 @@ describe('AiImageGenBuilder', () => {
       }
 
       const parsedBody = JSON.parse(capturedBody);
-      expect(parsedBody.generationConfig.aspectRatio).toBe('9:16');
+      expect(parsedBody.options.aspectRatio).toBe('9:16');
 
       global.fetch = originalFetch;
     });
 
-    it('should use Authorization Bearer header for laozhang.ai', async () => {
-      process.env.LAOZHANG_API_KEY = 'test-api-key-123';
+    it('should use correct Content-Type header for Midjourney API', async () => {
+      process.env.MIDJOURNEY_API_URL = 'http://midjourney-api:3000';
 
       const builder = new AiImageGenBuilder(manager);
       await builder.build();
@@ -265,14 +265,13 @@ describe('AiImageGenBuilder', () => {
         // Expected to fail
       }
 
-      expect(capturedHeaders['Authorization']).toBe('Bearer test-api-key-123');
-      expect(capturedHeaders['x-goog-api-key']).toBeUndefined();
+      expect(capturedHeaders['Content-Type']).toBe('application/json');
 
       global.fetch = originalFetch;
     });
 
-    it('should use api.laozhang.ai endpoint', async () => {
-      process.env.LAOZHANG_API_KEY = 'test-key';
+    it('should use Midjourney API endpoint', async () => {
+      process.env.MIDJOURNEY_API_URL = 'http://midjourney-api:3000';
 
       const builder = new AiImageGenBuilder(manager);
       await builder.build();
@@ -293,14 +292,14 @@ describe('AiImageGenBuilder', () => {
         // Expected to fail
       }
 
-      expect(capturedUrl).toContain('api.laozhang.ai');
-      expect(capturedUrl).not.toContain('generativelanguage.googleapis.com');
+      expect(capturedUrl).toContain('midjourney-api:3000');
+      expect(capturedUrl).toContain('/generate');
 
       global.fetch = originalFetch;
     });
 
-    it('should only request IMAGE responseModality (not TEXT)', async () => {
-      process.env.LAOZHANG_API_KEY = 'test-key';
+    it('should support Midjourney-specific parameters', async () => {
+      process.env.MIDJOURNEY_API_URL = 'http://midjourney-api:3000';
 
       const builder = new AiImageGenBuilder(manager);
       await builder.build();
@@ -316,16 +315,19 @@ describe('AiImageGenBuilder', () => {
       }) as any;
 
       try {
-        await aiImageGen?.call('generate', 'A test image');
+        await aiImageGen?.call('generate', 'A test image', {
+          stylize: 500,
+          chaos: 50,
+          no: 'text, watermarks',
+        });
       } catch {
         // Expected to fail
       }
 
       const parsedBody = JSON.parse(capturedBody);
-      expect(parsedBody.generationConfig.responseModalities).toEqual(['IMAGE']);
-      expect(parsedBody.generationConfig.responseModalities).not.toContain(
-        'TEXT',
-      );
+      expect(parsedBody.options.stylize).toBe(500);
+      expect(parsedBody.options.chaos).toBe(50);
+      expect(parsedBody.options.no).toBe('text, watermarks');
 
       global.fetch = originalFetch;
     });
@@ -343,8 +345,8 @@ describe('AiImageGenBuilder', () => {
       expect(result?.error).toContain('Prompt is required');
     });
 
-    it('should return error when LAOZHANG_API_KEY is not set', async () => {
-      delete process.env.LAOZHANG_API_KEY;
+    it('should return error when Midjourney API is unreachable', async () => {
+      process.env.MIDJOURNEY_API_URL = 'http://invalid-url:9999';
 
       const builder = new AiImageGenBuilder(manager);
       await builder.build();
@@ -353,7 +355,7 @@ describe('AiImageGenBuilder', () => {
       const result = await aiImageGen?.call('generateRaw', 'A test image');
 
       expect(result?.success).toBe(false);
-      expect(result?.error).toContain('LAOZHANG_API_KEY not set');
+      expect(result?.error).toBeTruthy();
     });
   });
 

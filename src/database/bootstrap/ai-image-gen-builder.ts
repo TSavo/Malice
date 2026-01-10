@@ -84,6 +84,28 @@ export class AiImageGenBuilder implements Builder {
       const rawRatio = options.aspectRatio || 'landscape';
       const aspectRatio = aspectRatioMap[rawRatio] || rawRatio;
 
+      // Validate Midjourney-specific parameters
+      if (options.stylize !== undefined) {
+        if (typeof options.stylize !== 'number' || options.stylize < 0 || options.stylize > 1000) {
+          return { success: false, error: 'stylize must be a number between 0 and 1000' };
+        }
+      }
+      if (options.chaos !== undefined) {
+        if (typeof options.chaos !== 'number' || options.chaos < 0 || options.chaos > 100) {
+          return { success: false, error: 'chaos must be a number between 0 and 100' };
+        }
+      }
+      if (options.weird !== undefined) {
+        if (typeof options.weird !== 'number' || options.weird < 0 || options.weird > 3000) {
+          return { success: false, error: 'weird must be a number between 0 and 3000' };
+        }
+      }
+      if (options.quality !== undefined) {
+        if (typeof options.quality !== 'number' || options.quality < 0.25 || options.quality > 2) {
+          return { success: false, error: 'quality must be a number between 0.25 and 2' };
+        }
+      }
+
       // Build MJ options object
       const mjOptions = {};
       if (aspectRatio) mjOptions.aspectRatio = aspectRatio;
@@ -159,7 +181,15 @@ export class AiImageGenBuilder implements Builder {
           ...(options.metadata || {}),
         };
 
-        const blobKey = await blob.write(imageBase64, metadata);
+        let blobKey;
+        try {
+          blobKey = await blob.write(imageBase64, metadata);
+        } catch (blobErr) {
+          return {
+            success: false,
+            error: 'Failed to store image in blob storage: ' + (blobErr.message || String(blobErr))
+          };
+        }
 
         return {
           success: true,
@@ -174,7 +204,10 @@ export class AiImageGenBuilder implements Builder {
       } catch (err) {
         clearTimeout(timeoutId);
         if (err.name === 'AbortError') {
-          return { success: false, error: 'Request timeout (5 minutes)' };
+          return {
+            success: false,
+            error: 'Midjourney generation timeout (5 minutes). Check API health with health() method and verify Discord bot status.'
+          };
         }
         return { success: false, error: err.message || String(err) };
       }
@@ -210,6 +243,28 @@ export class AiImageGenBuilder implements Builder {
       };
       const rawRatio = options.aspectRatio || 'landscape';
       const aspectRatio = aspectRatioMap[rawRatio] || rawRatio;
+
+      // Validate Midjourney-specific parameters
+      if (options.stylize !== undefined) {
+        if (typeof options.stylize !== 'number' || options.stylize < 0 || options.stylize > 1000) {
+          return { success: false, error: 'stylize must be a number between 0 and 1000' };
+        }
+      }
+      if (options.chaos !== undefined) {
+        if (typeof options.chaos !== 'number' || options.chaos < 0 || options.chaos > 100) {
+          return { success: false, error: 'chaos must be a number between 0 and 100' };
+        }
+      }
+      if (options.weird !== undefined) {
+        if (typeof options.weird !== 'number' || options.weird < 0 || options.weird > 3000) {
+          return { success: false, error: 'weird must be a number between 0 and 3000' };
+        }
+      }
+      if (options.quality !== undefined) {
+        if (typeof options.quality !== 'number' || options.quality < 0.25 || options.quality > 2) {
+          return { success: false, error: 'quality must be a number between 0.25 and 2' };
+        }
+      }
 
       // Build MJ options object
       const mjOptions = {};
@@ -281,7 +336,10 @@ export class AiImageGenBuilder implements Builder {
       } catch (err) {
         clearTimeout(timeoutId);
         if (err.name === 'AbortError') {
-          return { success: false, error: 'Request timeout (5 minutes)' };
+          return {
+            success: false,
+            error: 'Midjourney generation timeout (5 minutes). Check API health with health() method and verify Discord bot status.'
+          };
         }
         return { success: false, error: err.message || String(err) };
       }
