@@ -14,6 +14,8 @@ The building's upper floors rise overhead—the iron framework of the partially 
   y: 2,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '1st-ave-s-sidewalk-x-9-y2-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 8, // Some sound from the arcade
   lighting: 75, // Outdoor, partially shaded

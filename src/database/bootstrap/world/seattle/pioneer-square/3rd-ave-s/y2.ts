@@ -12,6 +12,8 @@ The courthouse steps lead up to the entrance, broad stone worn smooth by decades
   x: 7,
   y: 2,
   z: 0,
+
+  imageOnDisk: '3rd-ave-s-x7-y2-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

@@ -16,6 +16,8 @@ Occidental continues north and south, running between park and buildings.`,
   y: 2,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'occidental-ave-s-x--7-y2-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 10, // Wind from park, distant echoes
   lighting: 55, // Better lit (park-adjacent, less enclosed)

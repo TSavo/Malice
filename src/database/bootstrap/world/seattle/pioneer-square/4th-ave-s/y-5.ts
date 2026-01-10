@@ -13,6 +13,8 @@ Jackson Street intersection is visible to the south. North and south along Fourt
   y: -5,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '4th-ave-s-x14-y-5-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

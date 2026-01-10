@@ -13,6 +13,8 @@ A shopping cart sits in the middle of the avenue, filled with blankets and cans 
   y: -10,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '4th-ave-s-x14-y-10-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

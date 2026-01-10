@@ -10,6 +10,8 @@ Wild grasses have colonized the empty lots, growing waist-high in summer before 
   x: 7,
   y: 5,
   z: 0,
+
+  imageOnDisk: '3rd-ave-s-x7-y5-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

@@ -10,6 +10,8 @@ The Fabrication Factory's wall here has a service door, steel and featureless, l
   x: -17,
   y: 10,
   z: 0,
+
+  imageOnDisk: 'alley-x--17-y10-z0.png',
   population: 0,
   ambientNoise: 18,
   lighting: 45,

@@ -10,6 +10,8 @@ A railroad viaduct once crossed Fourth Avenue here, carrying freight trains to a
   x: 14,
   y: -9,
   z: 0,
+
+  imageOnDisk: '4th-ave-s-x14-y-9-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

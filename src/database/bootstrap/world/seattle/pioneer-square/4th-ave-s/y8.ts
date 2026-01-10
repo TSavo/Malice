@@ -13,6 +13,8 @@ The light rail tracks overhead are silent, their catenary wires slack and swayin
   y: 8,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '4th-ave-s-x14-y8-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

@@ -13,6 +13,8 @@ The elevated tracks hum overhead when the wind blows right. It sounds almost lik
   y: -2,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '4th-ave-s-x14-y-2-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

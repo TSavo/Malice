@@ -10,6 +10,8 @@ A steam vent from the Fabrication Factory exhales warm, damp air that smells of 
   x: -17,
   y: 9,
   z: 0,
+
+  imageOnDisk: 'alley-x--17-y9-z0.png',
   population: 0,
   ambientNoise: 25,
   lighting: 40,

@@ -10,6 +10,8 @@ Fourth Avenue itself feels cleaner here, the pavement less damaged, the building
   x: 14,
   y: -7,
   z: 0,
+
+  imageOnDisk: '4th-ave-s-x14-y-7-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

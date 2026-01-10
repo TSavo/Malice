@@ -10,6 +10,8 @@ Third Avenue ends here, at least for practical purposes. The route continues on 
   x: 7,
   y: 11,
   z: 0,
+
+  imageOnDisk: '3rd-ave-s-x7-y11-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,
