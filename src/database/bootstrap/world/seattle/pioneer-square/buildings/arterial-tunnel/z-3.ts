@@ -32,8 +32,6 @@ The passage below runs straight south, a remarkable feature in an underground wh
       outdoor: false,
       exits: {
         up: {
-          to: 'buildings/yesler-underground/z-2.ts',
-          room: '%SECOND_YESLER',
           description: 'A concealed shaft rises toward the Yesler underground',
           hidden: true
         },
@@ -304,8 +302,6 @@ A natural shaft descends through a crack in the floor, leading to caverns below.
         north: '%ARTERY_CENTER_S3',
         south: '%ARTERY_CENTER_S5',
         east: {
-          to: 'buildings/chinatown-underground/z-2.ts',
-          room: '%DEEP_PASSAGE',
           description: 'A passage leads east toward the Chinatown deep passage'
         },
         down: {
@@ -415,13 +411,9 @@ Routes branch east toward the deep rail access and west toward the freight infra
         north: '%ARTERY_S3',
         south: '%ARTERY_S5',
         east: {
-          to: 'buildings/king-street-underground/z-2.ts',
-          room: '%DEEP_KING_MID',
           description: 'A passage leads east toward the deep King Street corridor'
         },
         west: {
-          to: 'buildings/king-street-underground/z-2.ts',
-          room: '%DEEP_FREIGHT_MAIN',
           description: 'A passage leads west toward the freight infrastructure'
         }
       },
@@ -465,8 +457,6 @@ Water seeps through the unfinished walls more heavily here, the incomplete const
       exits: {
         north: '%ARTERY_S5',
         up: {
-          to: 'buildings/king-street-underground/z-2.ts',
-          room: '%SECOND_AVE_SOUTH',
           description: 'A shaft rises toward the King Street underground'
         }
       },

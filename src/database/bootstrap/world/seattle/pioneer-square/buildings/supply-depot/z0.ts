@@ -103,8 +103,6 @@ This was once a distribution hub for the entire Pacific Northwest. Now it servic
         west: '%RECEIVING',
         north: '%INVENTORY',
         down: {
-          to: 'buildings/waterfront-underground/z-2.ts',
-          room: '%SOUTH_TUNNEL',
           description: 'A floor hatch opens into the underground tunnels',
           hidden: true,
         },

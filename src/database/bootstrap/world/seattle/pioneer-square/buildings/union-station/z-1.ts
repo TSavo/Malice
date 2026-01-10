@@ -294,8 +294,6 @@ Emergency lights are mounted at intervals, their batteries dead, their bulbs dar
         west: '%PLATFORM_END_W',
         east: '%PLATFORM_END_E',
         down: {
-          to: 'buildings/king-street-underground/z-2.ts',
-          room: '%OCC_SOUTH_MID',
           description: 'A service shaft descends into the underground network',
         },
       },

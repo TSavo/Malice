@@ -102,8 +102,6 @@ The junction shows heavier traffic than the corridor, the floor worn smooth by f
         west: '%TRANSIT_W3',
         east: '%TRANSIT_W5',
         north: {
-          to: 'buildings/yesler-underground/z-2.ts',
-          room: '%DEEP_YESLER_W',
           description: 'A shaft rises toward the Yesler deep passage'
         }
       },
@@ -297,8 +295,6 @@ The construction here is newer than the transit corridor, added to connect the t
       exits: {
         west: '%TRANSIT_E5',
         up: {
-          to: 'buildings/eastside-underground/z-2.ts',
-          room: '%STEAM_S2',
           description: 'A warm shaft rises toward the steam tunnels'
         }
       },
