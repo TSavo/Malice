@@ -74,11 +74,12 @@ export class RoomBuilder implements Builder {
           // Uses ${variable} substitution - see getImagePrompt()
           imagePrompt: `Photorealistic wide-angle photograph, 16:9 cinematic composition, high detail, cinematic lighting.
 Abandoned, run down, weathered, gritty, urban decay, desolate, empty.
-No people, no humans, no figures, no crowds, no pedestrians.
-No visible text, no signs, no letters, no words, no labels, no readable writing.
-No logos, no brand names, no storefronts with legible names.
 
 \${name}: \${description}`,
+
+          // Negative prompt for Midjourney --no parameter
+          // Things to exclude from generated room images
+          imageNegativePrompt: `people, humans, figures, crowds, pedestrians, visible text, signs, letters, words, labels, readable writing, logos, brand names, storefronts with legible names`,
 
           abilities: `Physical space that agents can occupy and traverse.
 
@@ -905,6 +906,7 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       `
       /** Get image prompt with room-specific context prepended.
        *  Adds underground/outdoor/indoor context based on z and outdoor properties.
+       *  Returns structured object: { prompt, no?, stylize?, style? }
        */
       const z = self.z ?? 0;
       const isOutdoor = self.outdoor ?? false;
@@ -933,15 +935,23 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
           'water damage, peeling paint, broken furniture, urban decay. ';
       }
 
-      // Get base prompt from imagePrompt property (walk inheritance if needed)
-      const basePrompt = await pass();
+      // Get base prompt config from parent (walks inheritance)
+      const baseConfig = await pass();
 
-      if (basePrompt) {
-        return context + basePrompt;
+      if (baseConfig && typeof baseConfig === 'object') {
+        // Parent returns { prompt, no?, stylize?, style? }
+        // Prepend context to the prompt, keep other fields
+        return {
+          ...baseConfig,
+          prompt: context + (baseConfig.prompt || ''),
+        };
+      } else if (baseConfig && typeof baseConfig === 'string') {
+        // Legacy fallback if parent returns string
+        return { prompt: context + baseConfig };
       }
 
-      // Fallback if no imagePrompt defined
-      return context + self.name + ': ' + (self.description || '');
+      // Fallback if no imagePrompt defined anywhere
+      return { prompt: context + self.name + ': ' + (self.description || '') };
     `,
     );
 

@@ -49,6 +49,11 @@ export class DescribableBuilder implements Builder {
           voiceId: null, // string - TTS voice ID (alloy, echo, fable, onyx, nova, shimmer)
           // Image generation prompt template with ${variable} substitution
           imagePrompt: null, // string - template for AI image generation
+          // Negative prompt for image generation (things to exclude)
+          imageNegativePrompt: null, // string - passed to MJ --no parameter
+          // Image generation style options
+          imageStylize: null, // number 0-1000 - MJ --stylize parameter
+          imageStyle: null, // 'raw' | 'scenic' - MJ --style parameter
         },
         methods: {},
       });
@@ -674,8 +679,8 @@ export class DescribableBuilder implements Builder {
     obj.setMethod(
       'getImagePrompt',
       `
-      /** Get the image generation prompt for this object with variable substitution.
-       *  Walks inheritance chain to find imagePrompt property.
+      /** Get the image generation config for this object with variable substitution.
+       *  Walks inheritance chain to find imagePrompt, imageNegativePrompt, and style options.
        *  Substitutes \${variable} placeholders with object properties.
        *
        *  Available variables:
@@ -687,48 +692,75 @@ export class DescribableBuilder implements Builder {
        *    \${lighting} - lighting level (for rooms)
        *    Any other property on the object
        *
-       *  @returns Substituted prompt string, or null if no imagePrompt defined
+       *  @returns { prompt, no?, stylize?, style? } or null if no imagePrompt defined
        */
 
-      // Find imagePrompt walking inheritance chain
+      // Helper to substitute variables in a string
+      const substitute = (text) => {
+        if (!text) return null;
+        return text.replace(/\\$\\{(\\w+)\\}/g, (match, varName) => {
+          const value = self[varName];
+          if (value === undefined || value === null) return '';
+          if (typeof value === 'object') {
+            if (Array.isArray(value)) return value.join(', ');
+            return JSON.stringify(value);
+          }
+          return String(value);
+        });
+      };
+
+      // Walk inheritance chain to collect image config
       let prompt = null;
+      let negativePrompt = null;
+      let stylize = null;
+      let style = null;
       let current = self;
-      while (current && !prompt) {
-        if (current.imagePrompt) {
+
+      while (current) {
+        if (!prompt && current.imagePrompt) {
           prompt = current.imagePrompt;
-          break;
         }
-        current = current.getParent ? current.getParent() : null;
-        // Prevent infinite loop at root
-        if (current && current.id === self.id) break;
+        if (!negativePrompt && current.imageNegativePrompt) {
+          negativePrompt = current.imageNegativePrompt;
+        }
+        if (stylize === null && current.imageStylize !== null && current.imageStylize !== undefined) {
+          stylize = current.imageStylize;
+        }
+        if (!style && current.imageStyle) {
+          style = current.imageStyle;
+        }
+
+        // Move to parent
+        const parent = current.getParent ? current.getParent() : null;
+        if (!parent || parent.id === current.id) break;
+        current = parent;
       }
 
       if (!prompt) {
         return null;
       }
 
-      // Substitute \${variable} placeholders
-      // Match \${varName} patterns
-      const substituted = prompt.replace(/\\$\\{(\\w+)\\}/g, (match, varName) => {
-        // Try to get property value
-        const value = self[varName];
+      // Build result object with Midjourney options
+      const result = {
+        prompt: substitute(prompt),
+      };
 
-        if (value === undefined || value === null) {
-          return ''; // Remove undefined/null placeholders
-        }
+      // Add negative prompt if defined (for MJ --no parameter)
+      if (negativePrompt) {
+        result.no = substitute(negativePrompt);
+      }
 
-        if (typeof value === 'object') {
-          // For objects/arrays, try to stringify meaningfully
-          if (Array.isArray(value)) {
-            return value.join(', ');
-          }
-          return JSON.stringify(value);
-        }
+      // Add stylize if defined (for MJ --stylize parameter)
+      if (stylize !== null) {
+        result.stylize = stylize;
+      }
 
-        return String(value);
-      });
+      // Add style if defined (for MJ --style parameter)
+      if (style) {
+        result.style = style;
+      }
 
-      return substituted;
+      return result;
     `,
     );
 
@@ -771,18 +803,22 @@ export class DescribableBuilder implements Builder {
         throw new Error('$aiImageGen not available');
       }
 
-      // Build prompt: custom > getImagePrompt() > describe()
-      let prompt = options.prompt;
-      if (!prompt) {
-        prompt = await self.getImagePrompt();
+      // Build prompt config: custom > getImagePrompt() > describe()
+      let promptConfig = null;
+      if (options.prompt) {
+        // Custom prompt - just use as-is
+        promptConfig = { prompt: options.prompt };
+      } else {
+        // Get structured config from getImagePrompt()
+        promptConfig = await self.getImagePrompt();
       }
-      if (!prompt) {
-        prompt = await self.describe();
+      if (!promptConfig) {
+        // Fallback to describe()
+        promptConfig = { prompt: await self.describe() };
       }
 
-      // Generate the image
-      const result = await aiImageGen.generate(prompt, {
-        model: options.model,
+      // Build generation options, merging inherited config with explicit options
+      const genOptions = {
         aspectRatio: aspectRatio,
         metadata: {
           objectId: self.id,
@@ -790,7 +826,26 @@ export class DescribableBuilder implements Builder {
           aspectRatio: aspectRatio,
         },
         filename: 'obj_' + self.id + '_' + aspectRatio.replace(':', 'x') + '_' + Date.now(),
-      });
+      };
+
+      // Apply model if specified
+      if (options.model) genOptions.model = options.model;
+
+      // Apply Midjourney options from config (can be overridden by explicit options)
+      if (promptConfig.no) genOptions.no = promptConfig.no;
+      if (promptConfig.stylize !== undefined) genOptions.stylize = promptConfig.stylize;
+      if (promptConfig.style) genOptions.style = promptConfig.style;
+
+      // Explicit options override config
+      if (options.no) genOptions.no = options.no;
+      if (options.stylize !== undefined) genOptions.stylize = options.stylize;
+      if (options.style) genOptions.style = options.style;
+      if (options.chaos !== undefined) genOptions.chaos = options.chaos;
+      if (options.seed !== undefined) genOptions.seed = options.seed;
+      if (options.version) genOptions.version = options.version;
+
+      // Generate the image
+      const result = await aiImageGen.generate(promptConfig.prompt, genOptions);
 
       if (!result.success) {
         throw new Error(result.error || 'Image generation failed');
