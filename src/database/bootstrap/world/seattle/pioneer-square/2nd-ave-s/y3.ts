@@ -10,6 +10,8 @@ Overhead, fire escapes zigzag up the building faces, their ladders retracted, th
   x: 0,
   y: 3,
   z: 0,
+
+  imageOnDisk: '2nd-ave-s-x0-y3-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,
