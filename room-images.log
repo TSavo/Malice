@@ -6,41 +6,14 @@
 🔍 Scanning building rooms...
 🔍 Scanning underground JSON rooms...
 
-📋 Found 2701 rooms without images
+📋 Found 2706 rooms without images
 
-🎨 Will generate 2701 images
+🎨 Will generate 2706 images
 
 ⏱️  Delay between images: 5s - 180s (random)
 
-[1/2701] 1st Ave S
-    File: src/database/bootstrap/world/seattle/pioneer-square/1st-ave-s/y-4.ts
-    Coords: (-14, -4, 0)
-    MOO ID: #482
-    ⏳ Generating image via Midjourney...
-    ✅ Generated: 1st-ave-s-x-14-y-4-z0.png
-    ✅ Updated source file
-
-    ⏱️  Waiting 82s before next image...
-[2/2701] 1st Ave S
-    File: src/database/bootstrap/world/seattle/pioneer-square/1st-ave-s/y-5.ts
-    Coords: (-14, -5, 0)
-    MOO ID: #484
-    ⏳ Generating image via Midjourney...
-    ✅ Generated: 1st-ave-s-x-14-y-5-z0.png
-    ✅ Updated source file
-
-    ⏱️  Waiting 168s before next image...
-[3/2701] 1st Ave S
-    File: src/database/bootstrap/world/seattle/pioneer-square/1st-ave-s/y1.ts
-    Coords: (-14, 1, 0)
-    MOO ID: #485
-    ⏳ Generating image via Midjourney...
-    ✅ Generated: 1st-ave-s-x-14-y1-z0.png
-    ✅ Updated source file
-
-    ⏱️  Waiting 16s before next image...
-[4/2701] 1st Ave S
-    File: src/database/bootstrap/world/seattle/pioneer-square/1st-ave-s/y10.ts
-    Coords: (-14, 10, 0)
-    MOO ID: #486
+[1/2706] 1st Ave S
+    File: src/database/bootstrap/world/seattle/pioneer-square/1st-ave-s/y-1.ts
+    Coords: (-14, -1, 0)
+    MOO ID: #476
     ⏳ Generating image via Midjourney...
