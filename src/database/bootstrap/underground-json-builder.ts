@@ -126,11 +126,13 @@ export class UndergroundJsonBuilder implements Builder {
     await this.createRooms(data.rooms);
     console.log(`    Created ${this.rooms.size} underground rooms`);
 
+    // Rebuild spatial index BEFORE connecting rooms so we can find building basements
+    // (rooms created via $recycler.create auto-register, but basements were created earlier)
+    await $.spatial.rebuild();
+    console.log('    Rebuilt spatial index for basement connections');
+
     // Connect rooms with exits (within underground and to building basements)
     await this.connectRooms();
-
-    // Rebuild spatial index to include new rooms
-    await $.spatial.rebuild();
 
     console.log('  ✅ Underground JSON rooms loaded');
   }

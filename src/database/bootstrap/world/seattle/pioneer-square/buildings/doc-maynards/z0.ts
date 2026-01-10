@@ -254,6 +254,9 @@ The cinderblock seal that once closed the old tour entrance remains intact, thou
           description: 'A ladder leads up to the bar',
           to: '%BAR'
         }
+        // Note: The "down to underground" exit is created by underground-json-builder
+        // when it finds this room at (-15, 2, -1) via spatial.getRoomDataAt() while
+        // processing the underground room at (-15, 2, -2)
       },
       objects: [
         {
