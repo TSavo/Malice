@@ -11,6 +11,8 @@ One tree has begun to lean, its root system compromised by decades of drought an
   y: 3,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'occidental-park-x-2-y3-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 15, // Open plaza, wind across brick
   lighting: 100, // Full daylight (open space)

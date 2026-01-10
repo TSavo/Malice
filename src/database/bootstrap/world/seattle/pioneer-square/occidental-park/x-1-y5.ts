@@ -12,6 +12,8 @@ The market stretches west behind you. The park opens to the south.`,
   x: -1,
   y: 5,
   z: 0,
+
+  imageOnDisk: 'occidental-mall-x-1-y5-z0.png',
   population: 0,
   ambientNoise: 12,
   lighting: 100,
