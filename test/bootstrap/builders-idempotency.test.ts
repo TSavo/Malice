@@ -424,7 +424,7 @@ describe('Bootstrap Builders Idempotency', () => {
       // Direct DB deletion is not supported - memory is the source of truth
 
       // Create a test object via recycler
-      const recycler = (manager as any).aliases.get('recycler');
+      const recycler = manager.getAliases().get('recycler');
       if (!recycler) {
         // Skip if recycler not available in this test context
         return;
