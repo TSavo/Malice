@@ -16,6 +16,13 @@ The Fabrication Factory's wall here has a service door, steel and featureless, l
   waterLevel: 0,
   outdoor: true,
   exits: {
-    west: 'buildings/fabrication-factory/z0.ts#%BREAKROOM',
+    west: {
+      to: 'buildings/fabrication-factory/z0.ts#%BREAKROOM',
+      prototype: 'guardedExit',
+      allowedFaction: 'Citizen',
+      denyMessage:
+        'The steel emergency exit is locked. A palm scanner glows red beside it.',
+      description: 'A steel emergency exit leads into the Fabrication Factory',
+    },
   },
 };
