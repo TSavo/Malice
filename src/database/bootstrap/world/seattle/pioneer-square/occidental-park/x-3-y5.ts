@@ -12,6 +12,8 @@ Faded photographs are still pinned to some of the stall backboards, protected by
   x: -3,
   y: 5,
   z: 0,
+
+  imageOnDisk: 'occidental-mall-x-3-y5-z0.png',
   population: 0,
   ambientNoise: 10,
   lighting: 100,

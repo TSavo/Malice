@@ -11,6 +11,8 @@ The buildings ringing the park loom dark and empty, their windows reflecting gre
   y: 3,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'occidental-park-x-4-y3-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 15, // Open plaza, wind across brick
   lighting: 100, // Full daylight (open space)
