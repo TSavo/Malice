@@ -576,7 +576,6 @@ export class MetaDomainBuilder implements Builder {
       <div>
         <a href="/blog">Blog</a>
         <a href="/map">Map</a>
-        <a href="https://github.com/TSavo/Malice">Source</a>
       </div>
       <div class="footer-right">
         <span class="ai-credit">Built by AI</span>, directed by a human<br>
