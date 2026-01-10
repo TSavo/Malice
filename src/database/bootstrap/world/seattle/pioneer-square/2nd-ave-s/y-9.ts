@@ -10,6 +10,8 @@ A traffic signal dangles from its wire overhead, swaying slightly in whatever br
   x: 0,
   y: -9,
   z: 0,
+
+  imageOnDisk: '2nd-ave-s-x0-y-9-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

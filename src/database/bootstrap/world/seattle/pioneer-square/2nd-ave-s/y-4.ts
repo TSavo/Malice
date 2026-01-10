@@ -10,6 +10,8 @@ The sidewalk widens here, designed for the foot traffic that once flowed between
   x: 0,
   y: -4,
   z: 0,
+
+  imageOnDisk: '2nd-ave-s-x0-y-4-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

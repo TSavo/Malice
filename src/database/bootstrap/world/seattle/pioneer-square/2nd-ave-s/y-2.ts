@@ -11,6 +11,8 @@ A clock is set into the bank's facade, analog hands frozen at 2:47. The clock ra
   y: -2,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '2nd-ave-s-x0-y-2-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
