@@ -626,6 +626,12 @@ const blobKey = await room.image({ aspectRatio: 'landscape' });  // 16:9
 const blobKey = await npc.image({ aspectRatio: 'portrait' });    // 9:16
 const blobKey = await icon.image({ aspectRatio: 'square' });     // 1:1
 
+// Context-aware image generation (for time/weather variations)
+const blobKey = await room.image({
+  context: { timeOfDay: 'night', weather: 'rain' }
+});
+// Generates prompt with context, caches as '16:9:night:rain'
+
 // Force regeneration
 const blobKey = await item.image({ force: true });
 
@@ -638,10 +644,17 @@ const blobKey = await room.image({
 const url = $blob.url(blobKey, 'thecontinuum.city');
 ```
 
-**Caching:** Images are cached by aspect ratio in `self.images`:
+**Caching:** Images are cached by aspect ratio in `self.images`. When context is provided, cache keys include context values:
 ```javascript
 // After calling image() with different ratios:
 item.images = { '16:9': 'abc123', '9:16': 'def456' }
+
+// With context:
+room.images = {
+  '16:9': 'abc123',              // landscape, day
+  '16:9:night': 'def456',        // landscape, night
+  '16:9:night:rain': 'ghi789'    // landscape, night + rain
+}
 ```
 
 **Showing to Players:**

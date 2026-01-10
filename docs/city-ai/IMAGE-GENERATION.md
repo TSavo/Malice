@@ -149,6 +149,12 @@ const blobKey = await item.image();
 const blobKey = await room.image({ aspectRatio: 'landscape' });
 const blobKey = await npc.image({ aspectRatio: 'portrait' });
 
+// Context-aware image generation (for time/weather variations)
+const blobKey = await room.image({
+  context: { timeOfDay: 'night', weather: 'rain' }
+});
+// Generates prompt with context, caches as '16:9:night:rain'
+
 // Force regeneration (ignore cache)
 const blobKey = await item.image({ force: true });
 
@@ -160,14 +166,21 @@ const blobKey = await room.image({
 
 ### Caching
 
-Images are cached by aspect ratio on `self.images`:
+Images are cached by aspect ratio on `self.images`. When context is provided, cache keys include context values:
 
 ```javascript
 // After calling image() with different ratios:
 item.images = {
-  '16:9': 'abc123...',  // landscape
-  '9:16': 'def456...',  // portrait
-  '1:1': 'ghi789...'    // square
+  '16:9': 'abc123...',  // landscape, no context
+  '9:16': 'def456...',  // portrait, no context
+  '1:1': 'ghi789...'    // square, no context
+}
+
+// After calling with context:
+room.images = {
+  '16:9': 'abc123...',             // landscape, day
+  '16:9:night': 'def456...',       // landscape, night
+  '16:9:night:rain': 'ghi789...'   // landscape, night + rain
 }
 
 // Check existing images
