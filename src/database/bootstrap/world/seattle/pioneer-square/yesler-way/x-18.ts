@@ -2,7 +2,7 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `A parking structure dominates the south side of the street, poured concrete stained dark with fifty-five years of Seattle rain. The entrance ramp descends into blackness. Cars are still visible on the upper levels through the open sides, arranged in rows, waiting for owners who died or fled decades ago. The below-grade levels are flooded—water table rising where pumps no longer run.
+  description: `The Fabrication Factory's northeastern corner rises to the south—four stories of industrial concrete and steel, the building's rooftop bristling with ventilation equipment and exhaust stacks. The factory's operations center and security station are visible through upper windows, banks of monitors displaying data that no human reads. The machinery inside never stops; even here on Yesler Way, you can feel the vibration through your feet.
 
 The building opposite is four stories of brick, YESLER ARTIST LOFTS according to faded signage on the facade. The building was converted to live-work spaces during the neighborhood's gentrification, the creative-class development that preceded the war. The upper floors feature large windows that artists favored—north-facing light for studio work. The windows are dark now. The art is abandoned. The artists left or died like everyone else.
 

@@ -107,7 +107,7 @@ A vintage elevator with brass accordion gates occupies the southeast corner, its
       outdoor: false,
       exits: {
         west: {
-          to: 's-washington/x0.ts',
+          to: '2nd-ave-s/y9.ts',
           description: 'The triple-arched portal leads to 2nd Ave S',
           door: '%MAIN_DOOR'
         },
@@ -256,7 +256,7 @@ A service corridor branches south, leading to the building's mechanical systems 
       name: 'Pioneer Building - Service Corridor',
       description: `The utilitarian heart of the building—a narrow corridor lined with mechanical systems, electrical panels, and the infrastructure that keeps a century-old building functional. The walls are exposed brick, the floor bare concrete, the aesthetic purely practical.
 
-A service elevator sits at the far end, its doors closed, its status indicator dark. The elevator was for freight and maintenance, not the brass-and-mahogany experience of the passenger lift. A heavy door marked LOADING DOCK leads to the alley.
+A service elevator sits at the far end, its doors closed, its status indicator dark. The elevator was for freight and maintenance, not the brass-and-mahogany experience of the passenger lift. A heavy door marked LOADING DOCK leads to the alley to the south. To the east, a service door opens onto 3rd Ave S.
 
 The building's age shows here more than in the public spaces—pipes wrapped in insulation that might be asbestos, wiring that predates modern codes, repairs layered on repairs in a archaeology of maintenance.`,
       x: 4,
@@ -269,6 +269,10 @@ The building's age shows here more than in the public spaces—pipes wrapped in 
       outdoor: false,
       exits: {
         west: '%OFFICES_GROUND',
+        east: {
+          to: '3rd-ave-s/y9.ts',
+          description: 'A service door leads out to 3rd Ave S'
+        },
         south: {
           to: 'alley/y8.ts',
           locks: ['%SERVICE_LOCK'],

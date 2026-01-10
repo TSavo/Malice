@@ -6,6 +6,8 @@ export const room = {
 
 Fire escapes zigzag down the hotel's facade, each landing a small stage. On the fourth floor, someone left a suitcase on the landing—hard-shell Samsonite, the kind with combination locks. It sits there still, latches facing out, whatever's inside sealed away. An evacuation interrupted, or a decision reversed, or just someone who set their bag down for a moment and never picked it up again.
 
+To the west, the City Services building presents its southern face—the old bank architecture from before the Great Fire, repurposed into something more utilitarian. No public entrance on this side, just blank windows and a service alley between buildings. The main doors are around the corner to the north.
+
 The lobby doors are plate glass etched with art deco patterns, geometric sunbursts that catch the grey light. Through them you can see a marble floor, a reception desk with a brass bell, wingback chairs arranged around a fireplace that burns nothing. The clock above the desk stopped at 3:47. Morning or afternoon, impossible to say.`,
   x: -14,
   y: 8,

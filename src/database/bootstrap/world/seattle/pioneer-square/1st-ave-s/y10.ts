@@ -18,4 +18,10 @@ A bus shelter stands at the corner, its plexiglass walls spider-webbed with crac
   lighting: 100, // Daylight (outdoor)
   waterLevel: 0, // Dry
   outdoor: true, // Street level
+  exits: {
+    west: {
+      to: 'buildings/immigration-services/z0.ts#%ENTRY',
+      description: 'Heavy wooden doors lead into Immigration Services',
+    },
+  },
 };

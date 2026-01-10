@@ -18,4 +18,10 @@ To the west, City Services occupies what was once a bank building—the kind of 
   outdoor: true,
   // Street furniture
   objects: [{ prototype: 'lamppost', name: 'Street Lamp' }],
+  exits: {
+    west: {
+      to: 'buildings/city-services/z0.ts#%ENTRY',
+      description: 'Glass doors lead into City Services',
+    },
+  },
 };

@@ -6,6 +6,8 @@ export const room = {
 
 The debris wall dominates the northern view—the collapsed Merrill Building formed a barrier that stretches across the intersection, effectively sealing Pioneer Square from downtown Seattle. Rebar protrudes from the rubble like metal bones. Dust still coats everything, decades later.
 
+To the west, the old Immigration Services building extends from the block south, its upper windows dark and uninviting. The repurposed federal station shows signs of occupation—dim light occasionally visible through grimy glass, the faint smell of habitation drifting from its direction.
+
 A few hardy weeds have pushed through cracks in the sidewalk, the only living things that seem to thrive here. The street is silent except for wind whistling through broken windows.`,
   x: -14,
   y: 11,

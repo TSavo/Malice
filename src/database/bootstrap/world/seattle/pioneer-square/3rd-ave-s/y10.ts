@@ -6,6 +6,8 @@ export const room = {
 
 The wrapped building on the corner extends down this block, its chain-link and black fabric barrier continuing along the avenue. Whatever they were hiding in there, they were serious about it. The fabric has torn in places, but the glimpses reveal only darkness. No structure visible. No equipment. Just void.
 
+To the west, past the debris field, the Pioneer Building stands as a reminder of what survived—six floors of Richardsonian Romanesque architecture, its red sandstone arches and heavy stonework unchanged since 1892. The building anchors the corner where Second Avenue meets Washington Street, a landmark that has outlasted everything the city has thrown at it.
+
 Security cameras on poles still point inward, toward whatever the fabric conceals. Their power source must be internal. Their red recording lights are dark, but the cameras themselves seem intact. Watching nothing. Recording nothing. Waiting.
 
 The Corp Construction zone begins to the south, its fences newer, its purpose equally unclear.`,
