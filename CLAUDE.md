@@ -812,14 +812,17 @@ await $spatial.ensureRoom(x+1, y, 0, 'abandoned building mentioned in room descr
 
 ### Pioneer Square Underground Network
 
-The game features an extensive underground tunnel network beneath Pioneer Square (Seattle's historic 1889 street level). The system spans multiple levels from z=-2 (upper tunnels) down to z=-6 (deep vaults).
+The game features an extensive underground tunnel network beneath Pioneer Square (Seattle's historic 1889 street level). The system spans multiple levels from z=-1 (building basements) down to z=-6 (ancient depths).
+
+Rooms at z=-2 through z=-6 are procedurally generated from JSON (`underground-world-fresh-described-fixed.json`) via `UndergroundJsonBuilder`.
 
 **Key levels:**
-- **z=-2**: Upper tunnels (~295 rooms) - Dense corridor network across the entire district
-- **z=-3**: Transitional layer (~77 rooms) - Deep passages, cisterns, and flooded zones
-- **z=-4**: Lower passages (~59 rooms) - Gray Cartel operational territory (Armory, Medical Bay, Communications Center), Deep Cisterns (pre-fire water infrastructure)
-- **z=-5**: Deep vaults (~16 rooms) - Secured cell bases
-- **z=-6**: Submerged zones (~1 room) - Water table boundary
+- **z=-1**: ~99 building basements - Surface building entry points (TypeScript-defined)
+- **z=-2**: 326 upper tunnels - Dense corridor network across the entire district (Victorian railway, burial chambers)
+- **z=-3**: 145 transitional passages - Deep passages, cisterns, and flooded zones
+- **z=-4**: 51 lower passages - Gray Cartel operational territory (Armory, Medical Bay, Communications Center), Deep Cisterns (pre-fire water infrastructure)
+- **z=-5**: 29 deep vaults - Secured cell bases
+- **z=-6**: 10 ancient depths - Water table boundary, includes The Blind (ancient ritual chamber)
 
 **Major sections:**
 - Western Network (Gray Cartel core territory)
