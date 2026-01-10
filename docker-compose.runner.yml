@@ -25,6 +25,8 @@ services:
     build:
       context: ./docker/github-runner
       dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: ${RUNNER_BASE_IMAGE:-tsavo/malice-runner-base:latest}
     restart: unless-stopped
     environment:
       # Required: GitHub authentication
