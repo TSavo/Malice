@@ -28,4 +28,8 @@ The street grid shifts at this intersection, a quirk of Seattle's founding visib
       direction: ['E', 'W'],
     },
   ],
+  exits: {
+    west: 'yesler-way/x-1.ts',
+    south: '2nd-ave-s/y11.ts',
+  },
 };

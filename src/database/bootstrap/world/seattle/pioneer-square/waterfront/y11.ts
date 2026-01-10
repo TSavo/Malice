@@ -22,6 +22,10 @@ Yesler Way intersection lies just ahead to the north—the crossing point to dow
   exits: {
     east: {
       to: 'buildings/fabrication-factory/z0.ts#%LOADING_BAY',
+      prototype: 'guardedExit',
+      allowedFaction: 'Citizen',
+      denyMessage:
+        'A security scanner beside the loading door flashes red. "Authorized personnel only."',
       description: 'A massive roll-up door leads into the Fabrication Factory loading bay',
     },
   },

@@ -23,6 +23,10 @@ To the west, Elliott Bay offers nothing but grey water and the distant promise o
   exits: {
     east: {
       to: 'buildings/fabrication-factory/z0.ts#%PUBLIC_SERVICES',
+      prototype: 'guardedExit',
+      allowedFaction: 'Citizen',
+      denyMessage:
+        'The glass doors remain locked. A speaker crackles: "Citizens only."',
       description: 'Glass doors lead into the Fabrication Factory',
     },
   },
