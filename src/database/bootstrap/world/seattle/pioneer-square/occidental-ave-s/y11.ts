@@ -10,6 +10,8 @@ A faded mural wraps around one corner, its colors sun-bleached into pastels. The
   x: -7,
   y: 11,
   z: 0,
+
+  imageOnDisk: 'occidental-ave-s-x-7-y11-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

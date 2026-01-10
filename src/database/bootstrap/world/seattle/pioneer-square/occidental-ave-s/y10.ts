@@ -11,6 +11,8 @@ The Occidental Mall ends here in the literal sense—the cobblestones stop ten f
   y: 10,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'occidental-ave-s-x-7-y10-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
