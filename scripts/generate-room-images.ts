@@ -220,9 +220,9 @@ async function checkMidjourneyHealth(): Promise<boolean> {
       return health;
     `);
     const health = result as { status: string; connected?: boolean; error?: string };
-    // Require both connected AND healthy status (if status exists)
+    // Require connected AND ok/healthy status
     if (!health.connected) return false;
-    if (health.status && health.status !== 'healthy') return false;
+    if (health.status && health.status !== 'healthy' && health.status !== 'ok') return false;
     return true;
   } catch (err) {
     console.error('Health check error:', err);
