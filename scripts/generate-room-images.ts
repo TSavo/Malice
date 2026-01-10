@@ -193,9 +193,21 @@ async function generateRoomImage(roomId: number): Promise<ImageGenerationResult>
   const result = await executeMooCode(`
     const room = await $load(${roomId});
     if (!room) throw new Error('Room not found: ${roomId}');
-    return await room.image({ saveToDisk: true, force: true });
+    // Don't use saveToDisk - that saves inside Docker container
+    // We'll download from GridFS to host filesystem separately
+    return await room.image({ force: true });
   `, 600000); // 10 minute timeout for Midjourney generation
   return result as ImageGenerationResult;
+}
+
+/**
+ * Download a blob from GridFS via MCP
+ */
+async function downloadBlob(blobKey: string): Promise<string> {
+  const result = await executeMooCode(`
+    return await $blob.read('${blobKey}');
+  `);
+  return result as string;
 }
 
 /**
@@ -331,17 +343,28 @@ async function main() {
       console.log(`    MOO ID: #${roomId}`);
       console.log(`    ⏳ Generating image via Midjourney...`);
 
-      // Generate image via MCP (this calls room.image())
+      // Generate image via MCP (saves to GridFS)
       const result = await generateRoomImage(roomId);
-      console.log(`    ✅ Generated: ${result.filename || result.blobKey}`);
+      console.log(`    ✅ Generated: ${result.blobKey}`);
+
+      // Download from GridFS and save to host filesystem
+      const { x, y, z: zCoord } = roomFile.room;
+      const baseName = roomFile.room.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 40);
+      const filename = `${baseName}-x${x}-y${y}-z${zCoord ?? 0}.png`;
+
+      console.log(`    📥 Downloading to ${filename}...`);
+      const imageData = await downloadBlob(result.blobKey);
+      const filePath = path.join(ASSETS_DIR, filename);
+      fs.writeFileSync(filePath, Buffer.from(imageData, 'base64'));
+      console.log(`    ✅ Saved to assets/images/${filename}`);
 
       // Update the source file with imageOnDisk
-      if (result.filename) {
-        await addImageOnDiskToFile(roomFile.filePath, result.filename, roomFile);
-        console.log(`    ✅ Updated source file\n`);
-      } else {
-        console.log(`    ⚠️  No filename returned, blob only\n`);
-      }
+      await addImageOnDiskToFile(roomFile.filePath, filename, roomFile);
+      console.log(`    ✅ Updated source file\n`);
 
       generated++;
 
