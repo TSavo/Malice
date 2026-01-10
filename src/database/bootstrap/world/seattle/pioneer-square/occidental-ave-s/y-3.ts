@@ -11,6 +11,8 @@ Pigeons have colonized the rafters, their cooing a constant murmur like distant 
   y: -3,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'occidental-ave-s-x-7-y-3-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

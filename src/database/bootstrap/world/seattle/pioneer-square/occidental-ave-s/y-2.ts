@@ -11,6 +11,8 @@ A sandwich board lies face-down on the cobblestones, knocked over by wind or car
   y: -2,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'occidental-ave-s-x-7-y-2-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
