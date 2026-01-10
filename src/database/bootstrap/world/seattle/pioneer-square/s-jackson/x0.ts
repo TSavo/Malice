@@ -10,6 +10,8 @@ The buildings at this intersection are newer construction, built during the stad
   x: 0,
   y: -6,
   z: 0,
+
+  imageOnDisk: '2nd-ave-s-s-jackson-st-x0-y-6-z0.png',
   intersection: ['2nd Ave S', 'S. Jackson St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
