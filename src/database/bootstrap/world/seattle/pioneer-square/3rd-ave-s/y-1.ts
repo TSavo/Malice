@@ -10,6 +10,8 @@ Newspaper boxes cluster at the corner, their windows showing headlines from the 
   x: 7,
   y: -1,
   z: 0,
+
+  imageOnDisk: '3rd-ave-s-x7-y-1-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

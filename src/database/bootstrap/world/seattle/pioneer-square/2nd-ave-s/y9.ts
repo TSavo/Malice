@@ -10,6 +10,8 @@ A brass plaque on the Pioneer Building's corner commemorates the structure's his
   x: 0,
   y: 9,
   z: 0,
+
+  imageOnDisk: '2nd-ave-s-x0-y9-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

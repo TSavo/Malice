@@ -13,6 +13,8 @@ King Street approaches from the south.`,
   y: -10,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '3rd-ave-s-x7-y-10-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
