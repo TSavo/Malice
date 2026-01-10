@@ -13,6 +13,8 @@ Main Street stretches east and west, empty and wide.`,
   y: 1,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '3rd-ave-s-x7-y1-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
