@@ -300,6 +300,30 @@ export class BuildingBuilder implements Builder {
       // Register globally for cross-building/world exit resolution
       this.allPlaceholders.set(placeholder, room);
 
+      // Load image from disk if specified
+      if (def.imageOnDisk && $.blob) {
+        try {
+          const imagePath = path.join(
+            process.cwd(),
+            'assets/images',
+            def.imageOnDisk,
+          );
+          if (fs.existsSync(imagePath)) {
+            const imageData = fs.readFileSync(imagePath);
+            const base64Data = imageData.toString('base64');
+            const blobKey = await $.blob.write(base64Data, {
+              contentType: 'image/png',
+              filename: def.imageOnDisk,
+              createdBy: 'building-builder',
+            });
+            // Store by aspect ratio (default 16:9 for rooms)
+            room.set('images', { '16:9': blobKey });
+          }
+        } catch (err) {
+          console.warn(`    Warning: Failed to load image ${def.imageOnDisk}: ${err}`);
+        }
+      }
+
       // Register alias if specified (e.g., alias: 'immigrationServices' -> $immigrationServices)
       if (def.alias && objectManager) {
         await objectManager.call('addAlias', def.alias, room.id);
