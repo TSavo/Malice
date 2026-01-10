@@ -42,6 +42,15 @@ FORCE_BOOTSTRAP=true npm start # Rebuild on startup
 # Docker
 docker compose up -d           # Start MongoDB + game server
 npm run docker:rebuild         # Full rebuild with fresh volumes
+
+# Image Generation
+bun scripts/generate-room-images.ts                 # Generate images for all rooms
+bun scripts/generate-room-images.ts --dry-run       # Preview what would be generated
+bun scripts/generate-room-images.ts --limit 10      # Generate max 10 images
+bun scripts/generate-room-images.ts --world-only    # Only world rooms
+bun scripts/generate-room-images.ts --buildings-only # Only building rooms
+bun scripts/generate-room-images.ts --underground   # Only underground rooms (z < 0)
+bun scripts/generate-room-images.ts --surface       # Only surface rooms (z >= 0)
 ```
 
 ## Architecture
