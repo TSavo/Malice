@@ -15,6 +15,8 @@ The park extends south and east from here.`,
   y: 4,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'occidental-park-x-6-y4-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 15, // Open corner, street sounds closer
   lighting: 100, // Full daylight
