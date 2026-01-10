@@ -22,14 +22,14 @@ export const building = {
       description:
         'A heavy steel door with no visible handle or keyhole. The surface is featureless, designed to offer nothing to grip or pry.',
       locked: true,
-      open: false,
+      open: false
     },
 
     '%VAULT_LOCK': {
       prototype: 'biometricLock',
       name: 'Vault Scanner',
       scanners: [{ type: 'palm', part: 'hand' }],
-      authorizedUsers: {},
+      authorizedUsers: {}
     },
 
     '%VAULT_DOOR': {
@@ -39,7 +39,7 @@ export const building = {
         'A reinforced steel door set into a concrete frame. A palm scanner glows faintly beside it.',
       locked: true,
       open: false,
-      locks: ['%VAULT_LOCK'],
+      locks: ['%VAULT_LOCK']
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -50,7 +50,7 @@ export const building = {
       prototype: 'biometricLock',
       name: 'Command Scanner',
       scanners: [{ type: 'retinal', part: 'eye' }],
-      authorizedUsers: {},
+      authorizedUsers: {}
     },
 
     '%COMMAND_DOOR': {
@@ -60,14 +60,14 @@ export const building = {
         'A reinforced door with a retinal scanner mounted beside it. The scanner glows faint red, waiting.',
       locked: true,
       open: false,
-      locks: ['%COMMAND_LOCK'],
+      locks: ['%COMMAND_LOCK']
     },
 
     '%CELLS_LOCK': {
       prototype: 'biometricLock',
       name: 'Detention Scanner',
       scanners: [{ type: 'palm', part: 'hand' }],
-      authorizedUsers: {},
+      authorizedUsers: {}
     },
 
     '%CELLS_DOOR': {
@@ -77,7 +77,7 @@ export const building = {
         'A heavy steel door designed to contain rather than protect. A palm scanner glows beside it.',
       locked: true,
       open: false,
-      locks: ['%CELLS_LOCK'],
+      locks: ['%CELLS_LOCK']
     },
 
     '%VAULT5_LOCK': {
@@ -87,7 +87,7 @@ export const building = {
         { type: 'retinal', part: 'eye' },
         { type: 'palm', part: 'hand' },
       ],
-      authorizedUsers: {},
+      authorizedUsers: {}
     },
 
     '%VAULT5_DOOR': {
@@ -97,7 +97,7 @@ export const building = {
         'The door is massive, industrial, designed for containment beyond mere security. Multiple scanners flank it—retinal and palm, requiring both.',
       locked: true,
       open: false,
-      locks: ['%VAULT5_LOCK'],
+      locks: ['%VAULT5_LOCK']
     },
 
     '%QUARTERS_DOOR': {
@@ -106,7 +106,7 @@ export const building = {
       description:
         'An unmarked door, deliberately anonymous, offering no indication of what lies beyond.',
       locked: true,
-      open: false,
+      open: false
     },
 
     '%BLIND_DOOR': {
@@ -115,7 +115,7 @@ export const building = {
       description:
         'A narrow hatch set into the floor, reinforced beyond any reasonable structural need. The surface shows no handle, no mechanism—nothing that would suggest how to open it.',
       locked: true,
-      open: false,
+      open: false
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -137,19 +137,11 @@ Three passages branch from here: west toward the spine of the deeper network, so
       lighting: 25,
       waterLevel: 0,
       outdoor: false,
-      exits: {
-        up: {
-          to: 'underground/transitional/junction-shaft.ts',
-          description: 'A shaft leads up',
-          prototype: 'guardedExit',
-          allowedFaction: 'gray-cartel',
-          denyMessage: 'The passage below is watched. You are not recognized.',
-        },
-        north: '%CB',
+      exits: {        north: '%CB',
         south: '%Y4',
         west: '%X15Y5',
-        east: '%X13Y5',
-      },
+        east: '%X13Y5'
+      }
     },
 
     '%SH': {
@@ -167,20 +159,12 @@ The shaft downward is newer than the one above, the concrete still relatively br
       lighting: 22,
       waterLevel: 0,
       outdoor: false,
-      exits: {
-        up: {
-          to: 'underground/transitional/supply-shaft.ts',
-          description: 'A shaft leads up',
-          prototype: 'guardedExit',
-          allowedFaction: 'gray-cartel',
-          denyMessage: 'The passage below is watched. You are not recognized.',
-        },
-        down: {
+      exits: {        down: {
           room: '%TD',
-          description: 'A reinforced shaft descends into darkness',
+          description: 'A reinforced shaft descends into darkness'
         },
-        north: '%Y_4',
-      },
+        north: '%Y_4'
+      }
     },
 
     '%RD': {
@@ -199,22 +183,14 @@ Sound from the shaft above filters down clearly—footsteps, voices, the creak o
       lighting: 12,
       waterLevel: 0,
       outdoor: false,
-      exits: {
-        up: {
-          to: 'underground/transitional/park-shaft.ts',
-          description: 'A narrow shaft leads up toward the park',
-          prototype: 'guardedExit',
-          allowedFaction: 'gray-cartel',
-          denyMessage: 'The passage below is watched. You are not recognized.',
-        },
-        south: '%X3Y1',
+      exits: {        south: '%X3Y1'
       },
       objects: [
         { prototype: 'bed', name: 'a salvaged cot', description: 'A cot pushed against the wall, ready to be abandoned at a moment\'s notice.', quality: 'cheap' },
         { prototype: 'bed', name: 'a salvaged cot', description: 'A cot near the exit, sleeping bag rolled at its foot.', quality: 'cheap' },
         { prototype: 'trunk', name: 'a battered footlocker', description: 'A dented metal footlocker, its lock missing.' },
         { prototype: 'crate', name: 'a supply crate', description: 'A crate marked "MRE" in faded stencil.' },
-      ],
+      ]
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -237,7 +213,7 @@ The air here is different: warmer, more organic, carrying the accumulated presen
       waterLevel: 0,
       outdoor: false,
       exits: {
-        south: '%LJ',
+        south: '%LJ'
       },
       objects: [
         { prototype: 'bed', name: 'a salvaged cot', description: 'An old military cot with a thin mattress, pushed against the curved wall.', quality: 'cheap' },
@@ -247,7 +223,7 @@ The air here is different: warmer, more organic, carrying the accumulated presen
         { prototype: 'trunk', name: 'a battered footlocker', description: 'A dented metal footlocker, its lock mechanism worn smooth from use.' },
         { prototype: 'crate', name: 'a supply crate', description: 'A wooden crate stamped with faded shipping marks, repurposed as storage.' },
         { prototype: 'crate', name: 'a supply crate', description: 'A crate serving as an improvised side table between two cots.' },
-      ],
+      ]
     },
 
     '%SW': {
@@ -266,7 +242,7 @@ Scorch marks darken the concrete floor in irregular patterns—the evidence of f
       waterLevel: 0,
       outdoor: false,
       exits: {
-        east: '%X15Y1',
+        east: '%X15Y1'
       },
       objects: [
         { prototype: 'desk', name: 'a salvaged workbench', description: 'A heavy workbench covered in burn marks and soldering residue. Tools hang from a pegboard above it.' },
@@ -274,7 +250,7 @@ Scorch marks darken the concrete floor in irregular patterns—the evidence of f
         { prototype: 'cabinet', name: 'a metal cabinet', description: 'A dented industrial cabinet, its doors secured with a simple padlock.' },
         { prototype: 'crate', name: 'a components crate', description: 'A crate overflowing with salvaged electronics—circuit boards, wire spools, capacitors.' },
         { prototype: 'crate', name: 'a tools crate', description: 'A heavy wooden crate holding hand tools and spare parts.' },
-      ],
+      ]
     },
 
     '%SF': {
@@ -295,14 +271,14 @@ Scratched marks near each passage mouth indicate direction and distance in a cod
       exits: {
         north: '%X12Y1',
         west: '%X13Y0',
-        east: '%X11Y0',
+        east: '%X11Y0'
       },
       objects: [
         { prototype: 'couch', name: 'a threadbare couch', description: 'A sagging couch with springs visible through worn fabric. It has been here a long time.' },
         { prototype: 'chair', name: 'a folding chair', description: 'A metal folding chair positioned near one of the exits.' },
         { prototype: 'chair', name: 'a folding chair', description: 'A folding chair against the wall, its seat dented from use.' },
         { prototype: 'crate', name: 'a supply crate', description: 'A crate containing emergency supplies—water bottles, energy bars, first aid.' },
-      ],
+      ]
     },
 
     '%DD': {
@@ -324,11 +300,11 @@ The floor shows wear patterns that don't match transit—people stop here, turn,
         north: '%X8Y1',
         south: '%X8Y_1',
         west: '%X9Y0',
-        east: '%X7Y0',
+        east: '%X7Y0'
       },
       objects: [
         { prototype: 'crate', name: 'a weathered crate', description: 'An old wooden crate tucked into the alcove, its purpose deliberately unclear.' },
-      ],
+      ]
     },
 
     '%IR': {
@@ -347,12 +323,12 @@ The air is still and close, carrying the mineral smell of old concrete and somet
       waterLevel: 0,
       outdoor: false,
       exits: {
-        north: { room: '%Y_1', door: '%INTERROG_DOOR' },
+        north: { room: '%Y_1', door: '%INTERROG_DOOR' }
       },
       objects: [
         { prototype: 'chair', name: 'a metal chair', description: 'A cold metal chair bolted to the floor in the center of the room.' },
         { prototype: 'desk', name: 'a battered desk', description: 'A small desk pushed against the wall, its surface scarred and stained.' },
-      ],
+      ]
     },
 
     '%KV': {
@@ -374,7 +350,7 @@ The walls show organizational marks—zones indicated by paint that was once bri
         north: '%Y_3',
         south: '%SH',
         west: { room: '%X15Y_4', door: '%VAULT_DOOR' },
-        east: '%X13Y_4',
+        east: '%X13Y_4'
       },
       objects: [
         { prototype: 'cabinet', name: 'a reinforced cabinet', description: 'A heavy steel cabinet with a combination lock, its surface scratched from years of use.' },
@@ -382,7 +358,7 @@ The walls show organizational marks—zones indicated by paint that was once bri
         { prototype: 'crate', name: 'a numbered crate', description: 'A crate marked with faded numbers, its contents unknown.' },
         { prototype: 'crate', name: 'a numbered crate', description: 'A sealed crate with a manifest tag wired to the handle.' },
         { prototype: 'crate', name: 'a numbered crate', description: 'A heavy crate positioned against the reinforced wall.' },
-      ],
+      ]
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -400,7 +376,7 @@ The walls show organizational marks—zones indicated by paint that was once bri
       lighting: 15,
       waterLevel: 0,
       outdoor: false,
-      exits: { north: '%LJ', south: '%Y3' },
+      exits: { north: '%LJ', south: '%Y3' }
     },
 
     '%Y3': {
@@ -414,7 +390,7 @@ The walls show organizational marks—zones indicated by paint that was once bri
       lighting: 18,
       waterLevel: 0,
       outdoor: false,
-      exits: { north: '%Y4', south: '%Y2' },
+      exits: { north: '%Y4', south: '%Y2' }
     },
 
     '%Y2': {
@@ -428,7 +404,7 @@ The walls show organizational marks—zones indicated by paint that was once bri
       lighting: 20,
       waterLevel: 0,
       outdoor: false,
-      exits: { north: '%Y3', south: '%Y1' },
+      exits: { north: '%Y3', south: '%Y1' }
     },
 
     '%Y1': {
@@ -442,7 +418,7 @@ The walls show organizational marks—zones indicated by paint that was once bri
       lighting: 22,
       waterLevel: 0,
       outdoor: false,
-      exits: { north: '%Y2', south: '%Y0', west: '%X15Y1', east: '%X13Y1' },
+      exits: { north: '%Y2', south: '%Y0', west: '%X15Y1', east: '%X13Y1' }
     },
 
     '%Y0': {
@@ -456,7 +432,7 @@ The walls show organizational marks—zones indicated by paint that was once bri
       lighting: 15,
       waterLevel: 0,
       outdoor: false,
-      exits: { north: '%Y1', south: '%Y_1', east: '%X13Y0' },
+      exits: { north: '%Y1', south: '%Y_1', east: '%X13Y0' }
     },
 
     '%Y_1': {
@@ -470,7 +446,7 @@ The walls show organizational marks—zones indicated by paint that was once bri
       lighting: 10,
       waterLevel: 0,
       outdoor: false,
-      exits: { north: '%Y0', south: { room: '%IR', door: '%INTERROG_DOOR' } },
+      exits: { north: '%Y0', south: { room: '%IR', door: '%INTERROG_DOOR' } }
     },
 
     '%Y_3': {
@@ -484,7 +460,7 @@ The walls show organizational marks—zones indicated by paint that was once bri
       lighting: 12,
       waterLevel: 0,
       outdoor: false,
-      exits: { north: '%IR', south: '%KV' },
+      exits: { north: '%IR', south: '%KV' }
     },
 
     '%Y_4': {
@@ -498,7 +474,7 @@ The walls show organizational marks—zones indicated by paint that was once bri
       lighting: 18,
       waterLevel: 0,
       outdoor: false,
-      exits: { north: '%Y_3', south: '%SH' },
+      exits: { north: '%Y_3', south: '%SH' }
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -516,7 +492,7 @@ The walls show organizational marks—zones indicated by paint that was once bri
       lighting: 28,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%SW', east: '%Y1' },
+      exits: { west: '%SW', east: '%Y1' }
     },
 
     '%X15Y5': {
@@ -530,7 +506,7 @@ The walls show organizational marks—zones indicated by paint that was once bri
       lighting: 18,
       waterLevel: 0,
       outdoor: false,
-      exits: { east: '%LJ', west: '%ARMORY' },
+      exits: { east: '%LJ', west: '%ARMORY' }
     },
 
     '%ARMORY': {
@@ -558,7 +534,7 @@ The air smells of oil and solvent, the residue of constant maintenance. Weapons 
         { prototype: 'crate', name: 'an equipment crate', description: 'A crate containing tactical gear: vests, holsters, pouches, the accoutrements of armed operations.' },
         { prototype: 'desk', name: 'a maintenance bench', description: 'A heavy workbench with a vise, cleaning supplies, and spare parts organized in labeled bins.' },
         { prototype: 'sign', name: 'an inventory board', description: 'A chalkboard tracking weapon allocation and maintenance schedules. The chalk is fresh.' },
-      ],
+      ]
     },
 
     '%X13Y5': {
@@ -572,7 +548,7 @@ The air smells of oil and solvent, the residue of constant maintenance. Weapons 
       lighting: 20,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%LJ', east: '%X12Y5' },
+      exits: { west: '%LJ', east: '%X12Y5' }
     },
 
     '%X12Y5': {
@@ -586,7 +562,7 @@ The air smells of oil and solvent, the residue of constant maintenance. Weapons 
       lighting: 22,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%X13Y5', east: '%COMMS_CENTER', north: '%MEDICAL_BAY' },
+      exits: { west: '%X13Y5', east: '%COMMS_CENTER', north: '%MEDICAL_BAY' }
     },
 
     '%COMMS_CENTER': {
@@ -614,7 +590,7 @@ Antenna cables run upward through conduit, connecting to hidden receivers on the
         { prototype: 'cabinet', name: 'a server rack', description: 'A rack of servers humming with activity, processing intercepted data and managing secure communications.' },
         { prototype: 'crate', name: 'a spare parts bin', description: 'A crate containing backup components: circuit boards, cables, antennas, the supplies needed to maintain the systems.' },
         { prototype: 'sign', name: 'frequency charts', description: 'Laminated charts on the wall list frequencies to monitor, encryption protocols, and signal codes.' },
-      ],
+      ]
     },
 
     '%MEDICAL_BAY': {
@@ -643,7 +619,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
         { prototype: 'desk', name: 'a workstation', description: 'A desk with a computer terminal for patient records and medical references.' },
         { prototype: 'crate', name: 'an IV supply crate', description: 'A crate containing IV bags, tubing, and associated supplies.' },
         { prototype: 'sign', name: 'a sterilization chart', description: 'A laminated chart detailing sterilization procedures and emergency protocols.' },
-      ],
+      ]
     },
 
     '%X13Y1': {
@@ -657,7 +633,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 20,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%Y1', east: '%X12Y1' },
+      exits: { west: '%Y1', east: '%X12Y1' }
     },
 
     '%X12Y1': {
@@ -671,7 +647,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 18,
       waterLevel: 0,
       outdoor: false,
-      exits: { north: '%SF', west: '%X13Y1', east: '%X11Y1' },
+      exits: { north: '%SF', west: '%X13Y1', east: '%X11Y1' }
     },
 
     '%X11Y1': {
@@ -685,7 +661,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 18,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%X12Y1', east: '%X10Y1' },
+      exits: { west: '%X12Y1', east: '%X10Y1' }
     },
 
     '%X10Y1': {
@@ -699,7 +675,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 15,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%X11Y1', east: '%X9Y1' },
+      exits: { west: '%X11Y1', east: '%X9Y1' }
     },
 
     '%X9Y1': {
@@ -713,7 +689,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 12,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%X10Y1', east: '%X8Y1' },
+      exits: { west: '%X10Y1', east: '%X8Y1' }
     },
 
     '%X8Y1': {
@@ -727,7 +703,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 15,
       waterLevel: 0,
       outdoor: false,
-      exits: { north: '%DD', south: '%X8Y0', west: '%X9Y1', east: '%X7Y1' },
+      exits: { north: '%DD', south: '%X8Y0', west: '%X9Y1', east: '%X7Y1' }
     },
 
     '%X7Y1': {
@@ -741,7 +717,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 12,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%X8Y1', east: '%X6Y1' },
+      exits: { west: '%X8Y1', east: '%X6Y1' }
     },
 
     '%X6Y1': {
@@ -755,7 +731,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 10,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%X7Y1', east: '%X5Y1' },
+      exits: { west: '%X7Y1', east: '%X5Y1' }
     },
 
     '%X5Y1': {
@@ -769,7 +745,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 14,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%X6Y1', east: '%X4Y1' },
+      exits: { west: '%X6Y1', east: '%X4Y1' }
     },
 
     '%X4Y1': {
@@ -783,7 +759,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 12,
       waterLevel: 0,
       outdoor: false,
-      exits: { east: '%X3Y1', west: '%X5Y1' },
+      exits: { east: '%X3Y1', west: '%X5Y1' }
     },
 
     '%X3Y1': {
@@ -797,7 +773,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 10,
       waterLevel: 0,
       outdoor: false,
-      exits: { north: '%RD', west: '%X4Y1' },
+      exits: { north: '%RD', west: '%X4Y1' }
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -815,7 +791,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 10,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%Y0', east: '%SF' },
+      exits: { west: '%Y0', east: '%SF' }
     },
 
     '%X11Y0': {
@@ -829,7 +805,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 10,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%SF', east: '%X10Y0' },
+      exits: { west: '%SF', east: '%X10Y0' }
     },
 
     '%X10Y0': {
@@ -843,7 +819,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 8,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%X11Y0', east: '%X9Y0' },
+      exits: { west: '%X11Y0', east: '%X9Y0' }
     },
 
     '%X9Y0': {
@@ -857,7 +833,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 6,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%X10Y0', east: '%DD' },
+      exits: { west: '%X10Y0', east: '%DD' }
     },
 
     '%X7Y0': {
@@ -871,7 +847,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 5,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%DD' },
+      exits: { west: '%DD' }
     },
 
     '%X8Y0': {
@@ -885,7 +861,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 10,
       waterLevel: 0,
       outdoor: false,
-      exits: { north: '%X8Y1', south: '%DD' },
+      exits: { north: '%X8Y1', south: '%DD' }
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -903,7 +879,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 12,
       waterLevel: 0,
       outdoor: false,
-      exits: { north: '%DD', south: '%X8Y_2' },
+      exits: { north: '%DD', south: '%X8Y_2' }
     },
 
     '%X8Y_2': {
@@ -917,7 +893,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 14,
       waterLevel: 0,
       outdoor: false,
-      exits: { north: '%X8Y_1', south: '%X8Y_3' },
+      exits: { north: '%X8Y_1', south: '%X8Y_3' }
     },
 
     '%X8Y_3': {
@@ -931,7 +907,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 15,
       waterLevel: 0,
       outdoor: false,
-      exits: { north: '%X8Y_2', south: '%X8Y_4' },
+      exits: { north: '%X8Y_2', south: '%X8Y_4' }
     },
 
     '%X8Y_4': {
@@ -951,9 +927,9 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
         east: {
           to: 'buildings/deep-connector/z-4.ts',
           room: '%DEEP_W1',
-          description: 'A narrow passage leads east into ancient tunnels',
-        },
-      },
+          description: 'A narrow passage leads east into ancient tunnels'
+        }
+      }
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -971,7 +947,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 20,
       waterLevel: 0,
       outdoor: false,
-      exits: { east: { room: '%KV', door: '%VAULT_DOOR' } },
+      exits: { east: { room: '%KV', door: '%VAULT_DOOR' } }
     },
 
     '%X13Y_4': {
@@ -985,7 +961,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 18,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%KV', east: '%X12Y_4' },
+      exits: { west: '%KV', east: '%X12Y_4' }
     },
 
     '%X12Y_4': {
@@ -999,7 +975,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 20,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%X13Y_4', east: '%X11Y_4' },
+      exits: { west: '%X13Y_4', east: '%X11Y_4' }
     },
 
     '%X11Y_4': {
@@ -1013,7 +989,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 18,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%X12Y_4', east: '%X10Y_4' },
+      exits: { west: '%X12Y_4', east: '%X10Y_4' }
     },
 
     '%X10Y_4': {
@@ -1027,7 +1003,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 16,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%X11Y_4', east: '%X9Y_4' },
+      exits: { west: '%X11Y_4', east: '%X9Y_4' }
     },
 
     '%X9Y_4': {
@@ -1041,7 +1017,7 @@ Stains on the floor have been scrubbed but not entirely eliminated. Operations h
       lighting: 15,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%X10Y_4', east: '%X8Y_4' },
+      exits: { west: '%X10Y_4', east: '%X8Y_4' }
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -1065,8 +1041,8 @@ Sound from above is muffled by the shaft's length and the chamber's construction
       outdoor: false,
       exits: {
         up: '%SH',
-        north: '%5Y_4',
-      },
+        north: '%5Y_4'
+      }
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -1094,7 +1070,7 @@ The air carries the hum of powered systems, electronics that serve purposes beyo
         north: '%5Y_2',
         south: '%5Y_4',
         west: '%5X15Y_3',
-        east: { room: '%5X13Y_3', door: '%COMMAND_DOOR' },
+        east: { room: '%5X13Y_3', door: '%COMMAND_DOOR' }
       },
       objects: [
         { prototype: 'desk', name: 'a planning table', description: 'A large table dominates the room\'s center, its surface scarred by years of maps and diagrams.' },
@@ -1104,7 +1080,7 @@ The air carries the hum of powered systems, electronics that serve purposes beyo
         { prototype: 'chair', name: 'a metal chair', description: 'A chair pushed back from the table.' },
         { prototype: 'cabinet', name: 'a locked cabinet', description: 'A steel cabinet with a heavy padlock, its contents restricted.' },
         { prototype: 'cabinet', name: 'a map cabinet', description: 'A flat-file cabinet for storing maps and blueprints.' },
-      ],
+      ]
     },
 
     '%AR': {
@@ -1125,7 +1101,7 @@ The silence here is deeper than elsewhere, the room designed to absorb sound. Se
       waterLevel: 0,
       outdoor: false,
       exits: {
-        east: '%5X15Y_3',
+        east: '%5X15Y_3'
       },
       objects: [
         { prototype: 'cabinet', name: 'a file cabinet', description: 'A tall filing cabinet with numbered drawers, each secured with its own lock.' },
@@ -1133,7 +1109,7 @@ The silence here is deeper than elsewhere, the room designed to absorb sound. Se
         { prototype: 'cabinet', name: 'a file cabinet', description: 'A cabinet with wear marks around certain drawers—frequently accessed information.' },
         { prototype: 'cabinet', name: 'a file cabinet', description: 'A cabinet pushed against the far wall, its locks showing no signs of recent use.' },
         { prototype: 'desk', name: 'a research desk', description: 'A small desk with a reading lamp, positioned for reviewing archived documents.' },
-      ],
+      ]
     },
 
     '%HC': {
@@ -1154,12 +1130,12 @@ The lighting is harsh, flat, designed to eliminate shadows. Concealment has no p
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: { room: '%5X11Y_3', door: '%CELLS_DOOR' },
+        west: { room: '%5X11Y_3', door: '%CELLS_DOOR' }
       },
       objects: [
         { prototype: 'bed', name: 'a detention cot', description: 'A bare metal cot bolted to the floor, mattress thin and stained.', quality: 'cheap' },
         { prototype: 'bed', name: 'a detention cot', description: 'A cot in the far cell, identical to the others—designed for discomfort.', quality: 'cheap' },
-      ],
+      ]
     },
 
     '%TV': {
@@ -1182,12 +1158,12 @@ The silence is perfect, engineered, the room isolated from the network's ambient
       exits: {
         north: '%5Y0',
         south: '%5Y_2',
-        west: { room: '%CC', door: '%VAULT5_DOOR' },
+        west: { room: '%CC', door: '%VAULT5_DOOR' }
       },
       objects: [
         { prototype: 'safe', name: 'a reinforced safe', description: 'A heavy safe set into the wall, its door thick enough to stop more than thieves.' },
         { prototype: 'trunk', name: 'an armored container', description: 'A container of uncertain purpose, its construction suggesting protection against more than physical force.' },
-      ],
+      ]
     },
 
     '%CC': {
@@ -1208,7 +1184,7 @@ The sound-dampening is extreme, conversations contained absolutely within the ch
       waterLevel: 0,
       outdoor: false,
       exits: {
-        east: { room: '%TV', door: '%VAULT5_DOOR' },
+        east: { room: '%TV', door: '%VAULT5_DOOR' }
       },
       objects: [
         { prototype: 'desk', name: 'a council table', description: 'A long table dominates the room, its surface dark wood worn smooth by hands and elbows.' },
@@ -1218,7 +1194,7 @@ The sound-dampening is extreme, conversations contained absolutely within the ch
         { prototype: 'chair', name: 'a council chair', description: 'A chair pushed slightly back from the table.' },
         { prototype: 'chair', name: 'a council chair', description: 'A chair at the table\'s far end.' },
         { prototype: 'chair', name: 'a council chair', description: 'A chair near the door, positioned for easy exit.' },
-      ],
+      ]
     },
 
     '%SQ': {
@@ -1242,16 +1218,16 @@ A passage continues downward, narrow and steep, descending toward depths that th
         down: {
           room: '%TB',
           door: '%BLIND_DOOR',
-          description: 'A hatch leads down into absolute darkness',
+          description: 'A hatch leads down into absolute darkness'
         },
         south: { room: '%5Y0', door: '%QUARTERS_DOOR' },
-        west: '%5X15Y1',
+        west: '%5X15Y1'
       },
       objects: [
         { prototype: 'bed', name: 'a narrow cot', description: 'A cot barely wider than a body, its blanket thin and gray.', quality: 'cheap' },
         { prototype: 'desk', name: 'a simple desk', description: 'A small desk with a single drawer, its surface bare.' },
         { prototype: 'chair', name: 'a wooden chair', description: 'A plain wooden chair, its finish worn through in places.' },
-      ],
+      ]
     },
 
     '%CL': {
@@ -1272,14 +1248,14 @@ The lighting is bright but diffuse, designed to eliminate shadows without creati
       waterLevel: 0,
       outdoor: false,
       exits: {
-        east: '%5X15Y1',
+        east: '%5X15Y1'
       },
       objects: [
         { prototype: 'desk', name: 'a lab workstation', description: 'A sterile white workstation with built-in sinks and specimen trays.' },
         { prototype: 'desk', name: 'a lab workstation', description: 'A workstation with monitoring equipment and specimen containers.' },
         { prototype: 'cabinet', name: 'a specimen cabinet', description: 'A climate-controlled cabinet with glass doors, its contents obscured by condensation.' },
         { prototype: 'cabinet', name: 'a supply cabinet', description: 'A locked cabinet labeled with biohazard symbols.' },
-      ],
+      ]
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -1297,7 +1273,7 @@ The lighting is bright but diffuse, designed to eliminate shadows without creati
       lighting: 25,
       waterLevel: 3,
       outdoor: false,
-      exits: { north: '%WR', south: '%TD' },
+      exits: { north: '%WR', south: '%TD' }
     },
 
     '%5Y_2': {
@@ -1311,7 +1287,7 @@ The lighting is bright but diffuse, designed to eliminate shadows without creati
       lighting: 18,
       waterLevel: 0,
       outdoor: false,
-      exits: { north: '%TV', south: '%WR' },
+      exits: { north: '%TV', south: '%WR' }
     },
 
     '%5Y0': {
@@ -1325,7 +1301,7 @@ The lighting is bright but diffuse, designed to eliminate shadows without creati
       lighting: 15,
       waterLevel: 0,
       outdoor: false,
-      exits: { north: { room: '%SQ', door: '%QUARTERS_DOOR' }, south: '%TV' },
+      exits: { north: { room: '%SQ', door: '%QUARTERS_DOOR' }, south: '%TV' }
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -1343,7 +1319,7 @@ The lighting is bright but diffuse, designed to eliminate shadows without creati
       lighting: 28,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%AR', east: '%WR' },
+      exits: { west: '%AR', east: '%WR' }
     },
 
     '%5X13Y_3': {
@@ -1357,7 +1333,7 @@ The lighting is bright but diffuse, designed to eliminate shadows without creati
       lighting: 32,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: { room: '%WR', door: '%COMMAND_DOOR' }, east: '%5X12Y_3' },
+      exits: { west: { room: '%WR', door: '%COMMAND_DOOR' }, east: '%5X12Y_3' }
     },
 
     '%5X12Y_3': {
@@ -1371,7 +1347,7 @@ The lighting is bright but diffuse, designed to eliminate shadows without creati
       lighting: 30,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%5X13Y_3', east: '%5X11Y_3' },
+      exits: { west: '%5X13Y_3', east: '%5X11Y_3' }
     },
 
     '%5X11Y_3': {
@@ -1385,7 +1361,7 @@ The lighting is bright but diffuse, designed to eliminate shadows without creati
       lighting: 38,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%5X12Y_3', east: { room: '%HC', door: '%CELLS_DOOR' } },
+      exits: { west: '%5X12Y_3', east: { room: '%HC', door: '%CELLS_DOOR' } }
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -1403,7 +1379,7 @@ The lighting is bright but diffuse, designed to eliminate shadows without creati
       lighting: 25,
       waterLevel: 0,
       outdoor: false,
-      exits: { west: '%CL', east: '%SQ' },
+      exits: { west: '%CL', east: '%SQ' }
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -1430,11 +1406,11 @@ Something waits here. Something is kept here. The architecture exists to contain
       waterLevel: 10,
       outdoor: false,
       exits: {
-        up: '%SQ',
+        up: '%SQ'
       },
       objects: [
         { prototype: 'trunk', name: 'a waterproof container', description: 'A sealed container of unknown material, its surface slick with condensation in the perpetual dark.' },
-      ],
-    },
-  },
+      ]
+    }
+  }
 };

@@ -12,7 +12,7 @@ export const building = {
       name: 'Basement Lock',
       description:
         'A heavy padlock, rusted but functional, the kind that takes a serious key.',
-      difficulty: 4,
+      difficulty: 4
     },
     '%BASEMENT_DOOR': {
       prototype: 'door',
@@ -23,7 +23,7 @@ export const building = {
       open: false,
       locks: ['%BASEMENT_LOCK'],
       material: 'metal',
-      durability: 70,
+      durability: 70
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -50,9 +50,9 @@ A heavy metal door leads up to the ground floor. The door was built for security
           to: 'z0.ts#%SERVICES',
           description: 'A reinforced door leads up to the processing hall',
           door: '%BASEMENT_DOOR',
-          locks: ['%BASEMENT_LOCK'],
+          locks: ['%BASEMENT_LOCK']
         },
-        east: '%CELLS',
+        east: '%CELLS'
       },
       objects: [
         {
@@ -60,9 +60,9 @@ A heavy metal door leads up to the ground floor. The door was built for security
           name: 'filing cabinets',
           aliases: ['cabinets', 'files', 'records'],
           description:
-            'Row after row of metal filing cabinets, their drawers labeled by year and category. The categories reveal the building\'s function: ENTRY DENIED, DEPORTATION, APPEALS PENDING, DECEASED. The last category has more files than the others. The paper inside is fragile, the ink faded, but the records remain—evidence of every decision made in this building.',
+            'Row after row of metal filing cabinets, their drawers labeled by year and category. The categories reveal the building\'s function: ENTRY DENIED, DEPORTATION, APPEALS PENDING, DECEASED. The last category has more files than the others. The paper inside is fragile, the ink faded, but the records remain—evidence of every decision made in this building.'
         },
-      ],
+      ]
     },
 
     '%CELLS': {
@@ -81,12 +81,7 @@ A breach in the far wall leads to the underground—stones removed, edges worn s
       waterLevel: 5,
       outdoor: false,
       exits: {
-        west: '%RECORDS',
-        east: {
-          to: 'underground/upper-tunnels/x-14-y10.ts',
-          description:
-            'A breach in the wall leads to the underground tunnels',
-        },
+        west: '%RECORDS'
       },
       objects: [
         {
@@ -94,16 +89,16 @@ A breach in the far wall leads to the underground—stones removed, edges worn s
           name: 'detention cells',
           aliases: ['cells', 'cages', 'bars'],
           description:
-            'Three iron-barred cells, each barely six feet deep and four feet wide. The bars are rusted, the doors stand open, but the function is unmistakable. These were cages for people. The cots are gone, the buckets removed, but the scratches on the walls remain—tallies of days, names of the forgotten, curses in a dozen languages.',
+            'Three iron-barred cells, each barely six feet deep and four feet wide. The bars are rusted, the doors stand open, but the function is unmistakable. These were cages for people. The cots are gone, the buckets removed, but the scratches on the walls remain—tallies of days, names of the forgotten, curses in a dozen languages.'
         },
         {
           prototype: 'describable',
           name: 'wall scratches',
           aliases: ['scratches', 'graffiti', 'marks'],
           description:
-            'The cell walls are covered in scratches and carvings, layered over each other across decades. Tally marks count days. Names are carved deep: CHEN, YAMAMOTO, GONZALEZ, others worn illegible. Some scratches form words in languages the walls can\'t translate. Some form pictures. Some are just damage—the rage of confinement expressed through fingernails and found objects.',
+            'The cell walls are covered in scratches and carvings, layered over each other across decades. Tally marks count days. Names are carved deep: CHEN, YAMAMOTO, GONZALEZ, others worn illegible. Some scratches form words in languages the walls can\'t translate. Some form pictures. Some are just damage—the rage of confinement expressed through fingernails and found objects.'
         },
-      ],
-    },
-  },
+      ]
+    }
+  }
 };

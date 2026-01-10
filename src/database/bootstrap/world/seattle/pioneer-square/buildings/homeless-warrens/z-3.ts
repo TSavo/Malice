@@ -29,8 +29,6 @@ This is the main entrance. The city above pretends not to notice the traffic.`,
       outdoor: false,
       exits: {
         up: {
-          to: 'buildings/underground-tour/z-2.ts',
-          room: '%TOUR_END',
           description: 'A shaft rises to the underground passages above',
         },
         south: '%MAIN_CAMP',
@@ -57,8 +55,6 @@ Water stains on the walls show how high floods have risen. The highest marks are
       outdoor: false,
       exits: {
         up: {
-          to: 'buildings/eastside-underground/z-2.ts',
-          room: '%UTILITY_HUB',
           description: 'A drain rises toward the utility tunnels',
         },
         west: '%FLOOD_ZONE',
@@ -160,8 +156,6 @@ Those who control the market have power. That power is contested.`,
         west: '%STEAM_GRATE_ACCESS',
         south: '%MARKET_CORNER',
         east: {
-          to: 'buildings/yesler-underground/z-2.ts',
-          room: '%BOOTLEGGER_STASH',
           description: 'A tunnel leads east toward the Yesler passages',
         },
       },

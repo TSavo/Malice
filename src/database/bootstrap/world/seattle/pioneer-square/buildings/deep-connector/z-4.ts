@@ -354,8 +354,6 @@ This route is occasionally used by utility workers, the passage showing signs of
       exits: {
         south: '%DEEP_JUNCTION_E',
         up: {
-          to: 'buildings/king-street-underground/z-2.ts',
-          room: '%DEEP_KING_MID',
           description: 'A utility shaft rises toward King Street',
         },
       },

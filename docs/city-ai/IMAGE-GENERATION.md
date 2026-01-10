@@ -40,7 +40,7 @@ const blobKey = await map.image();
 
 For generating images directly (used internally by `$describable.image()`).
 
-Uses Nano Banana via [laozhang.ai](https://api.laozhang.ai) ($0.05/image) with automatic fallback to Google AI Studio free tier (499/day).
+Uses Nano Banana via [laozhang.ai](https://api.laozhang.ai) - 79% cheaper than Google direct at $0.05/image.
 
 ### generate(prompt, options?)
 
@@ -100,9 +100,7 @@ const models = $aiImageGen.listModels();
 $aiImageGen.setDefaultModel('gemini-3-pro-image-preview');  // Use Pro model
 ```
 
-**Environment:**
-- **Primary:** `LAOZHANG_API_KEY` - laozhang.ai API key ($0.05/image)
-- **Fallback:** `GOOGLE_AI_API_KEY` - Google AI Studio API key (free tier: 499/day, used when laozhang key not set)
+**Environment:** Requires `LAOZHANG_API_KEY` environment variable.
 
 ---
 

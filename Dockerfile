@@ -14,6 +14,7 @@ COPY --chown=bun:bun types ./types
 COPY --chown=bun:bun tsconfig.json ./
 COPY --chown=bun:bun docs ./docs
 COPY --chown=bun:bun world-map-3d.html ./
+COPY --chown=bun:bun underground-world-fresh-described-fixed.json ./
 
 USER bun
 EXPOSE 5555 8080

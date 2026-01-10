@@ -399,5 +399,8 @@ import './blog-builder';
 import './cartel-chargen-builder';
 import './neural-log-chargen-builder';
 
+// Underground JSON rooms (procedurally generated, depends on startRoom/spatial)
+import './underground-json-builder';
+
 // Underground upgrades (locks and furniture, depends on sisterGray)
 import './underground-upgrades-builder';

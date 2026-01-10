@@ -29,11 +29,6 @@ interface SittableDef {
   occupiedMsg: string;
 }
 
-interface ImageOnDisk {
-  file: string; // Path relative to assets/images/
-  aspectRatio?: string; // '16:9' (default), '9:16', '1:1'
-}
-
 interface RoomData {
   name: string;
   description: string;
@@ -45,7 +40,6 @@ interface RoomData {
   exits?: Record<string, ExitData | string>; // Custom exit definitions
   objects?: ObjectDef[]; // Objects to spawn in the room
   sittables?: SittableDef[]; // Sittable locations in the room
-  imageOnDisk?: string | ImageOnDisk | ImageOnDisk[]; // Pre-generated image(s) to load from disk
 }
 
 interface StreetConfig {
@@ -342,11 +336,6 @@ export class WorldBuilder implements Builder {
 
       this.rooms.set(key, room);
 
-      // Load pre-generated images from disk (if specified)
-      if (data.imageOnDisk) {
-        await this.loadImagesOnDisk(room, data.imageOnDisk, key);
-      }
-
       // Spawn objects in the room (if specified)
       if (Array.isArray(data.objects)) {
         for (const objDef of data.objects) {
@@ -396,86 +385,6 @@ export class WorldBuilder implements Builder {
 
     if (objectCount > 0) {
       console.log(`    Spawned ${objectCount} objects in rooms`);
-    }
-  }
-
-  /**
-   * Load pre-generated images from disk and attach to object
-   */
-  private async loadImagesOnDisk(
-    target: RuntimeObject,
-    imageSpec: string | ImageOnDisk | ImageOnDisk[],
-    debugKey: string,
-  ): Promise<void> {
-    const $ = this.manager as any;
-    const blob = $.blob;
-
-    if (!blob) {
-      console.warn(`    Warning: $blob not available, skipping images for ${debugKey}`);
-      return;
-    }
-
-    // Normalize to array of ImageOnDisk
-    let specs: ImageOnDisk[];
-    if (typeof imageSpec === 'string') {
-      specs = [{ file: imageSpec, aspectRatio: '16:9' }];
-    } else if (Array.isArray(imageSpec)) {
-      specs = imageSpec;
-    } else {
-      specs = [imageSpec];
-    }
-
-    const assetsDir = path.join(process.cwd(), 'assets/images');
-    const existingImages = (target.get('images') as Record<string, string>) || {};
-    const images: Record<string, string> = { ...existingImages };
-
-    for (const spec of specs) {
-      const aspectRatio = spec.aspectRatio || '16:9';
-
-      // Skip if already have image for this aspect ratio
-      if (images[aspectRatio]) {
-        continue;
-      }
-
-      const imagePath = path.join(assetsDir, spec.file);
-
-      if (!fs.existsSync(imagePath)) {
-        console.warn(`    Warning: Image not found: ${spec.file} for ${debugKey}`);
-        continue;
-      }
-
-      try {
-        // Read image and convert to base64
-        const imageBuffer = fs.readFileSync(imagePath);
-        const base64Data = imageBuffer.toString('base64');
-
-        // Determine content type from extension
-        const ext = spec.file.split('.').pop()?.toLowerCase() || 'png';
-        const contentTypeMap: Record<string, string> = {
-          png: 'image/png',
-          jpg: 'image/jpeg',
-          jpeg: 'image/jpeg',
-          webp: 'image/webp',
-        };
-        const contentType = contentTypeMap[ext] || 'image/png';
-
-        // Upload to GridFS via $blob
-        const blobKey = await blob.call('write', base64Data, {
-          contentType,
-          filename: spec.file.split('/').pop(),
-          source: 'bootstrap',
-          aspectRatio,
-        });
-
-        images[aspectRatio] = blobKey;
-      } catch (err) {
-        console.warn(`    Warning: Failed to load image ${spec.file}: ${err}`);
-      }
-    }
-
-    // Update object's images property if we loaded any
-    if (Object.keys(images).length > 0) {
-      target.set('images', images);
     }
   }
 

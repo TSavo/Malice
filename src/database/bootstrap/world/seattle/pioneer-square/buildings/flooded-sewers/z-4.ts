@@ -61,8 +61,6 @@ Graffiti covers the accessible walls—tags from those who explore these passage
         west: '%OVERFLOW_CHAMBER',
         south: '%DRAIN_JUNCTION',
         east: {
-          to: 'buildings/industrial-underground/z-2.ts',
-          room: '%SEWER_JUNCTION',
           description: 'The drain rises toward the industrial passages',
         },
       },

@@ -12,7 +12,7 @@ export const building = {
       name: 'Basement Door Lock',
       description:
         'A sturdy deadbolt lock on the basement door, the key long since lost.',
-      difficulty: 4,
+      difficulty: 4
     },
     '%BASEMENT_DOOR': {
       prototype: 'door',
@@ -21,7 +21,7 @@ export const building = {
         'A heavy wooden door marked "STORAGE - AUTHORIZED PERSONNEL ONLY" in faded stencil.',
       locked: true,
       open: false,
-      locks: ['%BASEMENT_LOCK'],
+      locks: ['%BASEMENT_LOCK']
     },
 
     '%VAULT_LOCK': {
@@ -29,7 +29,7 @@ export const building = {
       name: 'Records Vault Lock',
       description:
         'A combination lock protecting the records vault, its dial worn smooth from decades of use.',
-      difficulty: 7,
+      difficulty: 7
     },
     '%VAULT_DOOR': {
       prototype: 'door',
@@ -38,7 +38,7 @@ export const building = {
         'A heavy steel door protecting the records vault, its surface painted institutional grey.',
       locked: true,
       open: false,
-      locks: ['%VAULT_LOCK'],
+      locks: ['%VAULT_LOCK']
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -63,8 +63,8 @@ The stairs continue down to a storage area that spans the building's footprint, 
       exits: {
         up: { to: 'z0.ts#%RECEPTION', door: '%BASEMENT_DOOR', locks: ['%BASEMENT_LOCK'] },
         west: '%ARCHIVE_MAIN',
-        north: '%MECHANICAL',
-      },
+        north: '%MECHANICAL'
+      }
     },
 
     '%ARCHIVE_MAIN': {
@@ -87,7 +87,7 @@ A heavy door in the south wall leads to a records vault, its combination lock su
       exits: {
         east: '%STAIRS',
         north: '%STORAGE',
-        south: { room: '%VAULT', door: '%VAULT_DOOR', locks: ['%VAULT_LOCK'] },
+        south: { room: '%VAULT', door: '%VAULT_DOOR', locks: ['%VAULT_LOCK'] }
       },
       objects: [
         {
@@ -95,16 +95,16 @@ A heavy door in the south wall leads to a records vault, its combination lock su
           name: 'archive shelves',
           aliases: ['shelves', 'shelving', 'boxes'],
           description:
-            'Metal shelving units packed with banker\'s boxes, each labeled with case numbers and dates. The oldest boxes are soft with age, their contents slowly returning to pulp.',
+            'Metal shelving units packed with banker\'s boxes, each labeled with case numbers and dates. The oldest boxes are soft with age, their contents slowly returning to pulp.'
         },
         {
           prototype: 'describable',
           name: 'dehumidifier',
           aliases: ['machine'],
           description:
-            'A commercial dehumidifier, its reservoir cracked and empty. Without power, it serves only as a monument to the futility of fighting entropy in basement spaces.',
+            'A commercial dehumidifier, its reservoir cracked and empty. Without power, it serves only as a monument to the futility of fighting entropy in basement spaces.'
         },
-      ],
+      ]
     },
 
     '%STORAGE': {
@@ -126,7 +126,7 @@ A section of the wall near the northeast corner shows signs of disturbance—bri
       outdoor: false,
       exits: {
         south: '%ARCHIVE_MAIN',
-        east: '%MECHANICAL',
+        east: '%MECHANICAL'
       },
       objects: [
         {
@@ -134,23 +134,23 @@ A section of the wall near the northeast corner shows signs of disturbance—bri
           name: 'evidence cage',
           aliases: ['cage', 'locker'],
           description:
-            'A wire mesh cage secured with a heavy padlock, containing damaged cargo from a shipping dispute. The electronics inside are corroded beyond recognition.',
+            'A wire mesh cage secured with a heavy padlock, containing damaged cargo from a shipping dispute. The electronics inside are corroded beyond recognition.'
         },
         {
           prototype: 'crate',
           name: 'exhibit crate',
           aliases: ['crate', 'box'],
           description:
-            'A wooden crate labeled "EXHIBIT A - MV Pacific Fortune Collision" containing a detailed ship model used as courtroom evidence.',
+            'A wooden crate labeled "EXHIBIT A - MV Pacific Fortune Collision" containing a detailed ship model used as courtroom evidence.'
         },
         {
           prototype: 'describable',
           name: 'disturbed wall section',
           aliases: ['wall', 'bricks', 'disturbance'],
           description:
-            'A section of wall where the bricks don\'t quite match—newer mortar, slightly different color. Someone sealed something here, years or decades ago. The work was competent but hasty. Whatever lies beyond, someone wanted it hidden.',
+            'A section of wall where the bricks don\'t quite match—newer mortar, slightly different color. Someone sealed something here, years or decades ago. The work was competent but hasty. Whatever lies beyond, someone wanted it hidden.'
         },
-      ],
+      ]
     },
 
     '%MECHANICAL': {
@@ -170,11 +170,7 @@ In the corner, partially hidden behind the water heater, a floor drain sits lowe
       outdoor: false,
       exits: {
         south: '%STAIRS',
-        west: '%STORAGE',
-        down: {
-          to: 'underground/upper-tunnels/x-14-y7.ts',
-          description: 'A concealed hatch leads down into the underground',
-        },
+        west: '%STORAGE'
       },
       objects: [
         {
@@ -182,23 +178,23 @@ In the corner, partially hidden behind the water heater, a floor drain sits lowe
           name: 'gas furnace',
           aliases: ['furnace', 'heater'],
           description:
-            'A gas furnace from the 1980s, its pilot light extinguished, its ducts disappearing into the ceiling. The unit is surprisingly well-maintained—someone cared about keeping the building warm.',
+            'A gas furnace from the 1980s, its pilot light extinguished, its ducts disappearing into the ceiling. The unit is surprisingly well-maintained—someone cared about keeping the building warm.'
         },
         {
           prototype: 'describable',
           name: 'electrical panel',
           aliases: ['panel', 'breakers', 'fuse box'],
           description:
-            'An electrical panel that has been modified repeatedly over decades. The original fuse box sits beside a modern breaker panel, both connected in ways that would horrify a licensed electrician. Labels in multiple handwriting styles identify circuits that may or may not still exist.',
+            'An electrical panel that has been modified repeatedly over decades. The original fuse box sits beside a modern breaker panel, both connected in ways that would horrify a licensed electrician. Labels in multiple handwriting styles identify circuits that may or may not still exist.'
         },
         {
           prototype: 'describable',
           name: 'concealed hatch',
           aliases: ['hatch', 'drain', 'trapdoor'],
           description:
-            'What appears to be a floor drain is actually a hatch, its edges worn smooth by repeated use. The hatch lifts to reveal a narrow shaft descending into darkness—access to the underground tunnels that thread beneath Pioneer Square. The lawyers upstairs never knew. The building\'s janitors certainly did.',
+            'What appears to be a floor drain is actually a hatch, its edges worn smooth by repeated use. The hatch lifts to reveal a narrow shaft descending into darkness—access to the underground tunnels that thread beneath Pioneer Square. The lawyers upstairs never knew. The building\'s janitors certainly did.'
         },
-      ],
+      ]
     },
 
     '%VAULT': {
@@ -217,7 +213,7 @@ A small desk sits in the center of the vault, positioned for reviewing documents
       waterLevel: 0,
       outdoor: false,
       exits: {
-        north: { room: '%ARCHIVE_MAIN', door: '%VAULT_DOOR', locks: ['%VAULT_LOCK'] },
+        north: { room: '%ARCHIVE_MAIN', door: '%VAULT_DOOR', locks: ['%VAULT_LOCK'] }
       },
       sittables: [
         {
@@ -225,7 +221,7 @@ A small desk sits in the center of the vault, positioned for reviewing documents
           capacity: 1,
           emptyMsg:
             'A simple office chair sits at the review desk, positioned for examining sensitive documents.',
-          occupiedMsg: '%s seated at the vault review desk',
+          occupiedMsg: '%s seated at the vault review desk'
         },
       ],
       objects: [
@@ -234,23 +230,23 @@ A small desk sits in the center of the vault, positioned for reviewing documents
           name: 'secured filing cabinets',
           aliases: ['cabinets', 'files', 'drawers'],
           description:
-            'Heavy filing cabinets with individual drawer locks, designed to protect sensitive documents even if the vault itself is breached. The keys hang on a board by the door—security abandoned along with everything else.',
+            'Heavy filing cabinets with individual drawer locks, designed to protect sensitive documents even if the vault itself is breached. The keys hang on a board by the door—security abandoned along with everything else.'
         },
         {
           prototype: 'desk',
           name: 'review desk',
           aliases: ['desk', 'table'],
           description:
-            'A small desk for reviewing documents without removing them from the vault. An access ledger lies open on the surface, its last entry showing someone accessed the "CONTINUUM CONTRACTS" drawer months ago.',
+            'A small desk for reviewing documents without removing them from the vault. An access ledger lies open on the surface, its last entry showing someone accessed the "CONTINUUM CONTRACTS" drawer months ago.'
         },
         {
           prototype: 'safe',
           name: 'floor safe',
           aliases: ['safe'],
           description:
-            'A floor safe set into the concrete, its door slightly ajar. Whatever was inside has been removed—or was never there at all. The safe\'s purpose was as much psychological as practical: a final layer of security for the most sensitive materials.',
+            'A floor safe set into the concrete, its door slightly ajar. Whatever was inside has been removed—or was never there at all. The safe\'s purpose was as much psychological as practical: a final layer of security for the most sensitive materials.'
         },
-      ],
-    },
-  },
+      ]
+    }
+  }
 };

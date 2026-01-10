@@ -12,7 +12,7 @@ export const building = {
       name: 'Basement Trapdoor Lock',
       description:
         'A sturdy hasp and padlock securing the basement trapdoor, the key hidden somewhere in the back room.',
-      difficulty: 3,
+      difficulty: 3
     },
 
     '%HIDDEN_LOCK': {
@@ -20,7 +20,7 @@ export const building = {
       name: 'Hidden Panel Lock',
       description:
         'A concealed latch mechanism that releases when the correct clothing rod is pulled.',
-      difficulty: 6,
+      difficulty: 6
     },
     '%HIDDEN_PANEL': {
       prototype: 'door',
@@ -29,7 +29,7 @@ export const building = {
         'A section of wall that appears to be solid brick but swings open on hidden hinges.',
       locked: true,
       open: false,
-      locks: ['%HIDDEN_LOCK'],
+      locks: ['%HIDDEN_LOCK']
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -54,8 +54,8 @@ A single bare bulb hangs at the bottom of the stairs, its pull-chain dangling. T
       exits: {
         up: { to: 'z0.ts#%BACKROOM', door: '%BASEMENT_TRAPDOOR', locks: ['%BASEMENT_LOCK'] },
         north: '%OVERFLOW',
-        east: '%MAIN_CELLAR',
-      },
+        east: '%MAIN_CELLAR'
+      }
     },
 
     '%MAIN_CELLAR': {
@@ -77,7 +77,7 @@ A wall of chrome clothing racks dominates the eastern side, hung with garment ba
       outdoor: false,
       exits: {
         west: '%CELLAR_STAIRS',
-        north: '%HIDDEN_ROOM',
+        north: '%HIDDEN_ROOM'
       },
       objects: [
         {
@@ -85,23 +85,23 @@ A wall of chrome clothing racks dominates the eastern side, hung with garment ba
           name: 'labeled boxes',
           aliases: ['boxes', 'cardboard boxes', 'storage'],
           description:
-            'Cardboard boxes stacked to the ceiling, each labeled in faded marker with a code system: "EST-73-A," "CON-85-D." The taxonomy of vintage retail, preserved in Sharpie.',
+            'Cardboard boxes stacked to the ceiling, each labeled in faded marker with a code system: "EST-73-A," "CON-85-D." The taxonomy of vintage retail, preserved in Sharpie.'
         },
         {
           prototype: 'cabinet',
           name: 'garment racks',
           aliases: ['racks', 'clothing racks', 'chrome racks'],
           description:
-            'Chrome racks hung with garment bags, their contents shapeless behind cloudy plastic. These are the premium pieces—designer labels, mint condition, priced for serious collectors who never came.',
+            'Chrome racks hung with garment bags, their contents shapeless behind cloudy plastic. These are the premium pieces—designer labels, mint condition, priced for serious collectors who never came.'
         },
         {
           prototype: 'describable',
           name: 'water stains',
           aliases: ['stains', 'flood marks'],
           description:
-            'Tide lines mark the boxes at various heights, recording floods that rose and fell over the years. The lowest boxes are soft with water damage. The highest remain untouched. The basement remembers every storm.',
+            'Tide lines mark the boxes at various heights, recording floods that rose and fell over the years. The lowest boxes are soft with water damage. The highest remain untouched. The basement remembers every storm.'
         },
-      ],
+      ]
     },
 
     '%OVERFLOW': {
@@ -123,7 +123,7 @@ The brick wall on the north side doesn't quite match the rest—newer mortar, sl
       outdoor: false,
       exits: {
         south: '%CELLAR_STAIRS',
-        east: '%HIDDEN_ROOM',
+        east: '%HIDDEN_ROOM'
       },
       objects: [
         {
@@ -131,23 +131,23 @@ The brick wall on the north side doesn't quite match the rest—newer mortar, sl
           name: 'mannequin parts',
           aliases: ['mannequins', 'limbs', 'parts'],
           description:
-            'A pile of dismembered mannequins—arms reaching, torsos stacked, heads with frozen smiles turned at odd angles. The plastic is sun-bleached and cracked, retired from service upstairs. They seem to be trying to escape the pile.',
+            'A pile of dismembered mannequins—arms reaching, torsos stacked, heads with frozen smiles turned at odd angles. The plastic is sun-bleached and cracked, retired from service upstairs. They seem to be trying to escape the pile.'
         },
         {
           prototype: 'desk',
           name: 'repair workbench',
           aliases: ['workbench', 'bench', 'tools'],
           description:
-            'A workbench with repair tools: a sewing kit, fabric glue, a heat gun. A zipper replacement sits half-finished, the needle still threaded, the work abandoned mid-stitch.',
+            'A workbench with repair tools: a sewing kit, fabric glue, a heat gun. A zipper replacement sits half-finished, the needle still threaded, the work abandoned mid-stitch.'
         },
         {
           prototype: 'describable',
           name: 'sealed wall section',
           aliases: ['wall', 'bricks', 'sealed section'],
           description:
-            'A section of the north wall where the mortar is newer than the surrounding brickwork. Someone bricked up an opening here—recently enough that the difference is visible, long enough ago that no one remembers why.',
+            'A section of the north wall where the mortar is newer than the surrounding brickwork. Someone bricked up an opening here—recently enough that the difference is visible, long enough ago that no one remembers why.'
         },
-      ],
+      ]
     },
 
     '%HIDDEN_ROOM': {
@@ -170,7 +170,7 @@ The walls bear scratched tallies and dates in chalk, some nearly illegible with 
       exits: {
         south: { room: '%MAIN_CELLAR', door: '%HIDDEN_PANEL', locks: ['%HIDDEN_LOCK'] },
         west: '%OVERFLOW',
-        down: '%SHAFT',
+        down: '%SHAFT'
       },
       objects: [
         {
@@ -178,23 +178,23 @@ The walls bear scratched tallies and dates in chalk, some nearly illegible with 
           name: 'iron floor ring',
           aliases: ['ring', 'hatch', 'trapdoor'],
           description:
-            'A heavy iron ring set into the floor, attached to a hatch that leads down into the underground. The iron is worn smooth from use, the hinges oiled recently. Someone maintains this access.',
+            'A heavy iron ring set into the floor, attached to a hatch that leads down into the underground. The iron is worn smooth from use, the hinges oiled recently. Someone maintains this access.'
         },
         {
           prototype: 'describable',
           name: 'chalk tallies',
           aliases: ['tallies', 'marks', 'scratches'],
           description:
-            'Chalk marks on the walls—tallies in groups of five, dates in various handwriting, names that might be aliases. People counted time here, waiting for danger to pass or opportunity to arrive. The oldest marks are nearly illegible. The newest are months old.',
+            'Chalk marks on the walls—tallies in groups of five, dates in various handwriting, names that might be aliases. People counted time here, waiting for danger to pass or opportunity to arrive. The oldest marks are nearly illegible. The newest are months old.'
         },
         {
           prototype: 'crate',
           name: 'empty crates',
           aliases: ['crates', 'boxes'],
           description:
-            'Wooden crates stacked in the corner, their lids pried open, their contents removed. Whatever was stored here has been moved—or delivered. The crates wait for the next shipment.',
+            'Wooden crates stacked in the corner, their lids pried open, their contents removed. Whatever was stored here has been moved—or delivered. The crates wait for the next shipment.'
         },
-      ],
+      ]
     },
 
     '%SHAFT': {
@@ -214,8 +214,8 @@ The air moves in the shaft, a faint draft rising from the tunnels below, carryin
       outdoor: false,
       exits: {
         up: '%HIDDEN_ROOM',
-        down: '%TUNNEL_ACCESS',
-      },
+        down: '%TUNNEL_ACCESS'
+      }
     },
 
     '%TUNNEL_ACCESS': {
@@ -234,12 +234,8 @@ This was once a busy street. The storefronts are sealed now, their windows brick
       waterLevel: 0,
       outdoor: false,
       exits: {
-        up: '%SHAFT',
-        south: {
-          to: 'underground/upper-tunnels/x-15-y4.ts',
-          description: 'The passage continues into the underground tunnel network',
-        },
-      },
-    },
-  },
+        up: '%SHAFT'
+      }
+    }
+  }
 };

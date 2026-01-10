@@ -12,7 +12,7 @@ export const building = {
       name: 'Basement Lock',
       description:
         'A heavy-duty deadbolt installed by the Park Service, its mechanism stiff but functional.',
-      difficulty: 4,
+      difficulty: 4
     },
     '%BASEMENT_DOOR': {
       prototype: 'door',
@@ -23,7 +23,7 @@ export const building = {
       open: false,
       locks: ['%BASEMENT_LOCK'],
       material: 'metal',
-      durability: 80,
+      durability: 80
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -50,10 +50,10 @@ Stairs lead up to the staff area, and a service corridor continues north into th
           to: 'z0.ts#%STAFF_AREA',
           description: 'Stairs lead up to the staff area',
           door: '%BASEMENT_DOOR',
-          locks: ['%BASEMENT_LOCK'],
+          locks: ['%BASEMENT_LOCK']
         },
         north: '%VAULT',
-        west: '%OLD_FOUNDATION',
+        west: '%OLD_FOUNDATION'
       },
       objects: [
         {
@@ -61,16 +61,16 @@ Stairs lead up to the staff area, and a service corridor continues north into th
           name: 'archival shelving',
           aliases: ['shelves', 'archives', 'collection'],
           description:
-            'Metal shelving units loaded with acid-free boxes, each labeled with accession numbers. The labels are meticulous: "1984.003.045 - Gold pan, iron, Chilkoot Pass provenance." The organization represents decades of careful curation. The curators are gone. The organization persists.',
+            'Metal shelving units loaded with acid-free boxes, each labeled with accession numbers. The labels are meticulous: "1984.003.045 - Gold pan, iron, Chilkoot Pass provenance." The organization represents decades of careful curation. The curators are gone. The organization persists.'
         },
         {
           prototype: 'describable',
           name: 'climate control',
           aliases: ['hvac', 'machinery'],
           description:
-            'Climate control equipment mounted along one wall—dehumidifiers, temperature regulators, air filtration. The machinery hums steadily, maintaining 65 degrees and 40% humidity, the conditions specified in the museum\'s collections policy. The policy is followed by machines that never read it.',
+            'Climate control equipment mounted along one wall—dehumidifiers, temperature regulators, air filtration. The machinery hums steadily, maintaining 65 degrees and 40% humidity, the conditions specified in the museum\'s collections policy. The policy is followed by machines that never read it.'
         },
-      ],
+      ]
     },
 
     '%VAULT': {
@@ -89,7 +89,7 @@ The vault also holds the museum's document collection: original letters, mining 
       waterLevel: 0,
       outdoor: false,
       exits: {
-        south: '%COLLECTION_STORAGE',
+        south: '%COLLECTION_STORAGE'
       },
       objects: [
         {
@@ -97,23 +97,23 @@ The vault also holds the museum's document collection: original letters, mining 
           name: 'gold displays',
           aliases: ['gold', 'nuggets', 'display'],
           description:
-            'Glass display cases hold actual gold from the Klondike—nuggets in various sizes, vials of gold dust, a small ingot stamped with a Dawson City assayer\'s mark. The gold catches what little light there is, gleaming with the color that drove men to madness and mountain passes. The gold is worth a fortune. The fortune is meaningless.',
+            'Glass display cases hold actual gold from the Klondike—nuggets in various sizes, vials of gold dust, a small ingot stamped with a Dawson City assayer\'s mark. The gold catches what little light there is, gleaming with the color that drove men to madness and mountain passes. The gold is worth a fortune. The fortune is meaningless.'
         },
         {
           prototype: 'cabinet',
           name: 'document cases',
           aliases: ['documents', 'papers', 'letters'],
           description:
-            'Archival cases hold the paper records of the gold rush: letters home from prospectors, mining claims signed in shaky handwriting, maps with "GOLD HERE" scrawled optimistically in pencil. The documents are fragile, their paper yellowed, their ink fading. The stories they tell are clearer than ever.',
+            'Archival cases hold the paper records of the gold rush: letters home from prospectors, mining claims signed in shaky handwriting, maps with "GOLD HERE" scrawled optimistically in pencil. The documents are fragile, their paper yellowed, their ink fading. The stories they tell are clearer than ever.'
         },
         {
           prototype: 'describable',
           name: 'vault door',
           aliases: ['door', 'safe'],
           description:
-            'A massive vault door, the kind installed in banks in the 1950s—two feet of steel and concrete, combination locks, a handle that takes both hands to turn. The door is open now, swung wide on hinges that still work perfectly. The combination is lost. The door stays open.',
+            'A massive vault door, the kind installed in banks in the 1950s—two feet of steel and concrete, combination locks, a handle that takes both hands to turn. The door is open now, swung wide on hinges that still work perfectly. The combination is lost. The door stays open.'
         },
-      ],
+      ]
     },
 
     '%OLD_FOUNDATION': {
@@ -132,11 +132,7 @@ A breach in the western wall leads into darkness—the underground network that 
       waterLevel: 5,
       outdoor: false,
       exits: {
-        east: '%COLLECTION_STORAGE',
-        west: {
-          to: 'underground/upper-tunnels/x-14-y-3.ts',
-          description: 'A breach in the stone wall leads into the underground',
-        },
+        east: '%COLLECTION_STORAGE'
       },
       objects: [
         {
@@ -144,16 +140,16 @@ A breach in the western wall leads into darkness—the underground network that 
           name: 'stone walls',
           aliases: ['walls', 'foundation', 'stones'],
           description:
-            'The original foundation walls, built from massive stones fitted together before modern construction. The stones are local, quarried from somewhere that no longer produces them. Water stains mark the walls at consistent levels—the memory of floods written in mineral deposits.',
+            'The original foundation walls, built from massive stones fitted together before modern construction. The stones are local, quarried from somewhere that no longer produces them. Water stains mark the walls at consistent levels—the memory of floods written in mineral deposits.'
         },
         {
           prototype: 'describable',
           name: 'wall breach',
           aliases: ['breach', 'passage', 'hole'],
           description:
-            'A section of wall where stones have been removed, creating a passage into the darkness beyond. The breach is old—decades of wear on the edges—but the path beyond is maintained. Someone uses this passage. The underground network connects to the surface in places like this.',
+            'A section of wall where stones have been removed, creating a passage into the darkness beyond. The breach is old—decades of wear on the edges—but the path beyond is maintained. Someone uses this passage. The underground network connects to the surface in places like this.'
         },
-      ],
-    },
-  },
+      ]
+    }
+  }
 };
