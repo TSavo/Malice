@@ -241,6 +241,35 @@ export const building = {
 
 See [SMITH-TOWER-BUILDERS-GUIDE.md](../../SMITH-TOWER-BUILDERS-GUIDE.md) for detailed documentation.
 
+### UndergroundJsonBuilder
+
+Loads 532 procedurally generated underground rooms (z=-2 through z=-6) from JSON:
+
+```typescript
+// Runs after BuildingBuilder to connect basements to underground
+// Loads from: underground-world-fresh-described-fixed.json
+```
+
+**Z-level distribution:**
+- **z=-2**: 326 upper tunnels - Victorian railway, burial chambers
+- **z=-3**: 145 transitional passages - Deep passages, cisterns
+- **z=-4**: 51 lower passages - Gray Cartel territory, Deep Cisterns
+- **z=-5**: 29 deep vaults - Secured cell bases
+- **z=-6**: 10 ancient depths - Water table boundary, The Blind
+
+**Key features:**
+- AI-generated room descriptions via scripts/generate-room-descriptions.ts
+- Automatic coordinate-based exit wiring to building basements (z=-1)
+- Guarded exits for Sister Gray's domain (z=-4 to z=-6 Gray Cartel areas)
+- Flags exits with `exitToSisterGray: true` for entrance checks
+- Idempotent: checks for existing underground rooms before building
+
+**Builder dependencies:**
+- Depends on: `room`, `exit`, `guardedExit`, `recycler`, `spatial`, `buildings`, `basements`
+- Provides: `undergroundRooms`
+
+The JSON file contains rooms with coordinates, descriptions, exit directions, and metadata about room type, era, condition, and atmosphere. The builder creates each room using `$recycler.create($room, {...})` and registers them with `$spatial` for coordinate-based lookup.
+
 ## Creating a Custom Utility Builder
 
 ### Step 1: Create the Builder Class
