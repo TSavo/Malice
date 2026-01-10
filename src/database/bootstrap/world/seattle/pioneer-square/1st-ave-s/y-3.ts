@@ -11,6 +11,8 @@ The underground is still down there, of course. Darker now than ever. The tours 
   y: -3,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '1st-ave-s-x-14-y-3-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

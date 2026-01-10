@@ -13,6 +13,8 @@ A bus shelter offers minimal protection from elements that don't care about shel
   y: -2,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '3rd-ave-s-x7-y-2-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

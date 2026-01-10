@@ -11,6 +11,8 @@ WALTER PIERCE MEMORIAL PLAZA reads a bronze plaque set into the pavers. Walter P
   y: -3,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '2nd-ave-s-x0-y-3-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

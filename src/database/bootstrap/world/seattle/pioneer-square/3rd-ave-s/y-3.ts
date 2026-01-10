@@ -13,6 +13,8 @@ The avenue continues south toward Jackson Street, where the district's heart bea
   y: -3,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '3rd-ave-s-x7-y-3-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

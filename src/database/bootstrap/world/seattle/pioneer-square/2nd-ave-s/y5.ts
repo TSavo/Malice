@@ -10,6 +10,8 @@ On the western side of the avenue, buildings stand open and abandoned, their int
   x: 0,
   y: 5,
   z: 0,
+
+  imageOnDisk: '2nd-ave-s-x0-y5-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

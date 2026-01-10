@@ -10,6 +10,8 @@ The street surface here is stained with something that leached from the east sid
   x: 0,
   y: -7,
   z: 0,
+
+  imageOnDisk: '2nd-ave-s-x0-y-7-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

@@ -11,6 +11,8 @@ Below the galleries, a coffee shop called Zeitgeist pitched itself to the art cr
   y: 1,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '1st-ave-s-x-14-y1-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

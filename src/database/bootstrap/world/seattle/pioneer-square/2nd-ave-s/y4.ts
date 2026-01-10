@@ -10,6 +10,8 @@ Water stains mark the asphalt where something leaked from above. The source isn'
   x: 0,
   y: 4,
   z: 0,
+
+  imageOnDisk: '2nd-ave-s-x0-y4-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

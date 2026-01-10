@@ -11,6 +11,8 @@ Orange plastic fencing stretches across the northern part of the street, zip-tie
   y: 10,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '2nd-ave-s-x0-y10-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 10, // Wind against tower
   lighting: 100, // Daylight (outdoor)

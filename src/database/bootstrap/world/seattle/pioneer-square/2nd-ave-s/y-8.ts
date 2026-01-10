@@ -10,6 +10,8 @@ Across the street, a row of storefronts shows the archaeology of commercial fail
   x: 0,
   y: -8,
   z: 0,
+
+  imageOnDisk: '2nd-ave-s-x0-y-8-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,
