@@ -1,0 +1,19 @@
+🖼️  Room Image Generator (Midjourney)
+=====================================
+✅ Midjourney API connected
+
+🔍 Scanning world rooms...
+🔍 Scanning building rooms...
+🔍 Scanning underground JSON rooms...
+
+📋 Found 2703 rooms without images
+
+🎨 Will generate 2703 images
+
+⏱️  Delay between images: 5s - 180s (random)
+
+[1/2703] 1st Ave S
+    File: src/database/bootstrap/world/seattle/pioneer-square/1st-ave-s/y-2.ts
+    Coords: (-14, -2, 0)
+    MOO ID: #480
+    ⏳ Generating image via Midjourney...
