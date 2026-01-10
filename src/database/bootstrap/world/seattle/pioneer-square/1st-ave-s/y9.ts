@@ -11,6 +11,8 @@ To the west, City Services occupies what was once a bank building—the kind of 
   y: 9,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '1st-ave-s-x-14-y9-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,
