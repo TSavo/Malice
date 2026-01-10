@@ -48,12 +48,14 @@ services:
       - FORCE_BOOTSTRAP=${FORCE_BOOTSTRAP:-false}
       - EMAIL_API_KEY=${EMAIL_API_KEY:-}
       - GOOGLE_AI_API_KEY=${GOOGLE_AI_API_KEY:-}
-      - LAOZHANG_API_KEY=${LAOZHANG_API_KEY:-}
+      - MIDJOURNEY_API_URL=http://midjourney-api:3000
     volumes:
       - claude_sessions:/home/bun/.claude
       - ./assets/images:/app/assets/images
     depends_on:
       mongodb:
+        condition: service_healthy
+      midjourney-api:
         condition: service_healthy
     networks:
       malice-network:
@@ -69,6 +71,37 @@ services:
   # Caddy - Reverse proxy with automatic HTTPS
   # Routes all domains to correct game ports
   # ============================================================
+
+  # ============================================================
+  # Midjourney API - Image generation via Discord MJ bot
+  # ============================================================
+  midjourney-api:
+    build:
+      context: ./midjourney-api
+      dockerfile: Dockerfile
+    container_name: malice-midjourney
+    restart: unless-stopped
+    # Not exposed to host - only accessible within Docker network
+    # Game server connects via http://midjourney-api:3000
+    environment:
+      - PORT=3000
+      - DEBUG=${MIDJOURNEY_DEBUG:-false}
+      - SERVER_ID=${MIDJOURNEY_SERVER_ID}
+      - CHANNEL_ID=${MIDJOURNEY_CHANNEL_ID}
+      - SALAI_TOKEN=${MIDJOURNEY_SALAI_TOKEN}
+      - HUGGINGFACE_TOKEN=${HUGGINGFACE_TOKEN:-}
+      - OUTPUT_DIR=/app/outputs
+    volumes:
+      - midjourney_outputs:/app/outputs
+    networks:
+      malice-network:
+        ipv4_address: 172.20.0.20
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   caddy:
     image: caddy:2-alpine
@@ -96,6 +129,8 @@ volumes:
   caddy_data:
     driver: local
   caddy_config:
+    driver: local
+  midjourney_outputs:
     driver: local
 
 networks:

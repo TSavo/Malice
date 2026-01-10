@@ -20,3 +20,9 @@ configs/
 
 # Auto Claude data directory
 .auto-claude/
+
+# Midjourney API secrets and outputs
+midjourney-api/.env
+midjourney-api/outputs/
+midjourney-api/node_modules/
+midjourney-api/libs/
