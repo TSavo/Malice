@@ -683,6 +683,11 @@ export class DescribableBuilder implements Builder {
        *  Walks inheritance chain to find imagePrompt, imageNegativePrompt, and style options.
        *  Substitutes \${variable} placeholders with object properties.
        *
+       *  @param context - Optional context object for type-specific customization
+       *    For rooms: { timeOfDay: 'day'|'night'|'dusk'|'dawn'|'overcast', weather: 'clear'|'rain'|'fog'|'storm' }
+       *    For items: { condition: 'pristine'|'worn'|'damaged'|'ruined' }
+       *    Subclasses can override getImagePrompt to use context values.
+       *
        *  Available variables:
        *    \${name} - object name
        *    \${description} - object description

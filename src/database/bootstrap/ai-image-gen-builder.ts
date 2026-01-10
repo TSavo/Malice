@@ -122,7 +122,7 @@ export class AiImageGenBuilder implements Builder {
       if (options.tile) mjOptions.tile = options.tile;
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 min timeout for MJ
+      const timeoutId = setTimeout(() => controller.abort(), 600000); // 10 min timeout for MJ (generation can take 2-4min + queue time)
 
       try {
         // Call Midjourney API /generate endpoint (full pipeline)
@@ -153,8 +153,15 @@ export class AiImageGenBuilder implements Builder {
           return { success: false, error: 'No image URI in response', data };
         }
 
-        // Fetch the image from Discord CDN
-        const imageResp = await fetch(data.uri);
+        // Fetch the image from Discord CDN with timeout
+        const cdnController = new AbortController();
+        const cdnTimeoutId = setTimeout(() => cdnController.abort(), 60000); // 1 min timeout for CDN
+        let imageResp;
+        try {
+          imageResp = await fetch(data.uri, { signal: cdnController.signal });
+        } finally {
+          clearTimeout(cdnTimeoutId);
+        }
         if (!imageResp.ok) {
           return { success: false, error: 'Failed to fetch image from CDN: ' + imageResp.status };
         }
@@ -313,8 +320,15 @@ export class AiImageGenBuilder implements Builder {
           return { success: false, error: 'No image URI in response', data };
         }
 
-        // Fetch the image from Discord CDN
-        const imageResp = await fetch(data.uri);
+        // Fetch the image from Discord CDN with timeout
+        const cdnController = new AbortController();
+        const cdnTimeoutId = setTimeout(() => cdnController.abort(), 60000); // 1 min timeout for CDN
+        let imageResp;
+        try {
+          imageResp = await fetch(data.uri, { signal: cdnController.signal });
+        } finally {
+          clearTimeout(cdnTimeoutId);
+        }
         if (!imageResp.ok) {
           return { success: false, error: 'Failed to fetch image from CDN: ' + imageResp.status };
         }

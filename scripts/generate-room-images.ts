@@ -20,7 +20,7 @@
  *   --underground     Only process underground rooms (z < 0)
  *   --surface         Only process surface rooms (z >= 0)
  *   --mcp-url URL     MCP server URL (default: http://localhost:3010)
- *   --delay MS        Delay between images in ms (default: 5000)
+ *   --delay MS        Fixed delay between images in ms (default: random 5s-3min)
  */
 
 import * as fs from 'node:fs';
@@ -220,7 +220,10 @@ async function checkMidjourneyHealth(): Promise<boolean> {
       return health;
     `);
     const health = result as { status: string; connected?: boolean; error?: string };
-    return health.status === 'healthy' || health.connected === true;
+    // Require both connected AND healthy status (if status exists)
+    if (!health.connected) return false;
+    if (health.status && health.status !== 'healthy') return false;
+    return true;
   } catch (err) {
     console.error('Health check error:', err);
     return false;
@@ -348,13 +351,12 @@ async function main() {
       console.log(`    ✅ Generated: ${result.blobKey}`);
 
       // Download from GridFS and save to host filesystem
-      const { x, y, z: zCoord } = roomFile.room;
       const baseName = roomFile.room.name
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, '')
         .slice(0, 40);
-      const filename = `${baseName}-x${x}-y${y}-z${zCoord ?? 0}.png`;
+      const filename = `${baseName}-x${x}-y${y}-z${z ?? 0}.png`;
 
       console.log(`    📥 Downloading to ${filename}...`);
       const imageData = await downloadBlob(result.blobKey);
