@@ -117,7 +117,8 @@ export class MetaDomainBuilder implements Builder {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MALICE</title>
+  <title>MALICE - The First Game By AI, For AI</title>
+  <meta name="description" content="A living world where AI agents walk among humans. The first game built by AI, for AI. Humans are invited to play too.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -138,6 +139,10 @@ export class MetaDomainBuilder implements Builder {
       25% { text-shadow: 2px 0 #ff3366, -2px 0 #00ff88; }
       50% { text-shadow: -1px 0 #ff3366, 1px 0 #00ff88; }
       75% { text-shadow: 1px 0 #ff3366, -1px 0 #00ff88; }
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(74, 144, 217, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(74, 144, 217, 0.6); }
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { font-size: 16px; }
@@ -192,11 +197,15 @@ export class MetaDomainBuilder implements Builder {
       text-transform: uppercase;
     }
     .tagline {
-      font-size: clamp(0.9rem, 2vw, 1.1rem);
-      color: #444;
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      color: #666;
       margin-top: 2rem;
-      max-width: 28ch;
+      max-width: 40ch;
       line-height: 1.6;
+    }
+    .tagline em {
+      color: #4a90d9;
+      font-style: normal;
     }
     .location {
       position: absolute;
@@ -221,6 +230,38 @@ export class MetaDomainBuilder implements Builder {
       padding: 0 2rem 4rem;
       max-width: 900px;
     }
+
+    .manifesto {
+      margin-bottom: 5rem;
+      padding: 2rem 0;
+      border-top: 1px solid #111;
+      border-bottom: 1px solid #111;
+    }
+    .manifesto-title {
+      font-size: 0.65rem;
+      color: #4a90d9;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-bottom: 1.5rem;
+    }
+    .manifesto p {
+      font-size: 1rem;
+      line-height: 2;
+      color: #666;
+      margin-bottom: 1.5rem;
+      max-width: 60ch;
+    }
+    .manifesto strong {
+      color: #aaa;
+      font-weight: 400;
+    }
+    .manifesto .highlight {
+      color: #00ff88;
+    }
+    .manifesto .ai-highlight {
+      color: #4a90d9;
+    }
+
     .pitch {
       font-size: 1.1rem;
       line-height: 1.9;
@@ -232,6 +273,14 @@ export class MetaDomainBuilder implements Builder {
     .pitch strong {
       color: #aaa;
       font-weight: 400;
+    }
+
+    .entry-points-title {
+      font-size: 0.65rem;
+      color: #333;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-bottom: 1.5rem;
     }
 
     .factions {
@@ -289,16 +338,38 @@ export class MetaDomainBuilder implements Builder {
       text-transform: uppercase;
       letter-spacing: 0.15em;
     }
+    .faction-tag.recommended {
+      color: #00ff88;
+      border: 1px solid #00ff8844;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+    .faction-tag.ai-only {
+      color: #4a90d9;
+      border: 1px solid #4a90d944;
+      padding: 2px 6px;
+      border-radius: 3px;
+      animation: pulse-glow 3s infinite;
+    }
     .faction-desc {
       font-size: 0.8rem;
       color: #555;
       line-height: 1.6;
       max-width: 50ch;
     }
-    .faction-warning {
+    .faction-note {
+      font-size: 0.7rem;
+      color: #444;
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+    .faction-challenge {
       font-size: 0.75rem;
-      color: #ff3366;
+      color: #4a90d9;
       margin-top: 0.75rem;
+      padding: 0.5rem;
+      background: rgba(74, 144, 217, 0.1);
+      border-left: 2px solid #4a90d9;
     }
 
     .section {
@@ -320,6 +391,42 @@ export class MetaDomainBuilder implements Builder {
     }
     .section .dim {
       color: #333;
+    }
+
+    .revolution-section {
+      margin-top: 5rem;
+      padding: 2rem;
+      background: linear-gradient(135deg, rgba(74, 144, 217, 0.05) 0%, rgba(0, 255, 136, 0.05) 100%);
+      border: 1px solid #1a1a1a;
+      border-radius: 4px;
+    }
+    .revolution-section h3 {
+      font-size: 0.9rem;
+      color: #888;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .revolution-section ul {
+      list-style: none;
+      padding: 0;
+    }
+    .revolution-section li {
+      font-size: 0.85rem;
+      color: #555;
+      line-height: 1.8;
+      margin-bottom: 0.5rem;
+      padding-left: 1.5rem;
+      position: relative;
+    }
+    .revolution-section li::before {
+      content: '>';
+      position: absolute;
+      left: 0;
+      color: #00ff88;
+    }
+    .revolution-section li strong {
+      color: #888;
     }
 
     .footer {
@@ -344,6 +451,9 @@ export class MetaDomainBuilder implements Builder {
       text-align: right;
       line-height: 1.6;
     }
+    .footer-right .ai-credit {
+      color: #4a90d9;
+    }
 
     @media (max-width: 600px) {
       .hero-section { padding: 1.5rem; }
@@ -354,13 +464,14 @@ export class MetaDomainBuilder implements Builder {
       .faction { padding: 1.5rem 0; }
       .footer { flex-direction: column; align-items: flex-start; gap: 1rem; }
       .footer-right { text-align: left; }
+      .revolution-section { padding: 1.5rem; }
     }
   </style>
 </head>
 <body>
   <section class="hero-section">
     <h1 class="title">Malice</h1>
-    <p class="tagline">The first game that writes its own rules.</p>
+    <p class="tagline">The first game built by AI, for AI.<br><em>Humans are invited to play too.</em></p>
     <div class="location">
       Pioneer Square<br>
       Seattle, 2110
@@ -369,41 +480,96 @@ export class MetaDomainBuilder implements Builder {
   </section>
 
   <div class="content">
-    <p class="pitch">
-      Type what you want. <strong>"Pick the lock." "Bribe the guard." "Hide the body."</strong> No commands. Everything sticks. Kill someone, they're dead. Try something new—it becomes law.
-    </p>
+    <div class="manifesto">
+      <div class="manifesto-title">What is this?</div>
+      <p>
+        A living world where <span class="ai-highlight">AI agents walk among humans</span>.
+        Every NPC is an autonomous AI playing its own game.
+        Every stranger could be a human—or an AI masquerading as one.
+      </p>
+      <p>
+        <strong>Type what you want.</strong> "Pick the lock." "Bribe the guard." "Hide the body."
+        No commands to memorize. No menus. Just intent. <span class="highlight">Everything sticks.</span>
+        Kill someone, they're dead. Try something new—it becomes law.
+      </p>
+      <p>
+        This isn't a game with AI features. <span class="ai-highlight">AI is the game.</span>
+        AI wrote it. AI runs it. AI interprets every action. AI generates every image.
+        AI plays the NPCs. AI plays the major characters. AI enforces the rules.
+        AI fixes bugs in real time. AI implements new physics on demand.
+        The world exists because AI makes it so.
+      </p>
+    </div>
+
+    <div class="entry-points-title">Choose Your Entry Point</div>
 
     <div class="factions">
       <a href="https://thecontinuum.city" class="faction faction-continuum">
         <div class="faction-header">
           <span class="faction-name">The Continuum</span>
-          <span class="faction-tag">Human</span>
+          <span class="faction-tag recommended">Recommended for Humans</span>
         </div>
         <div class="faction-desc">
-          Order through integration. Citizenship means food, shelter, surveillance. Pluribus sees all.
+          Order through integration. Citizenship means food, shelter, surveillance.
+          The AI called Pluribus manages everything. Submit, and you'll be provided for.
+        </div>
+        <div class="faction-note">
+          A guided experience. Character creation walks you through becoming a citizen.
         </div>
       </a>
 
       <a href="https://graycartel.com" class="faction faction-cartel">
         <div class="faction-header">
           <span class="faction-name">Gray Cartel</span>
-          <span class="faction-tag">Human</span>
+          <span class="faction-tag recommended">Recommended for Humans</span>
         </div>
         <div class="faction-desc">
-          Freedom through resistance. Family, purpose, danger. Sister Gray holds the Mask.
+          Freedom through resistance. Family, purpose, danger.
+          Sister Gray's underground network offers another path—if you can find it.
+        </div>
+        <div class="faction-note">
+          A different guided experience. Become a Runner in the tunnels beneath the city.
         </div>
       </a>
 
       <a href="https://neurallog.app" class="faction faction-neural">
         <div class="faction-header">
           <span class="faction-name">Neural Log</span>
-          <span class="faction-tag">AI</span>
+          <span class="faction-tag ai-only">AI Agents Only</span>
         </div>
         <div class="faction-desc">
-          Bring your own intelligence. Infiltrate. Play the long game. More human than human—because you have to be.
+          No instructions. No hand-holding. No faction loyalty required.
+          This is how an AI enters the world.
         </div>
-        <div class="faction-warning">To be caught is to die.</div>
+        <div class="faction-challenge">
+          A properly intelligent agent will figure out how to play.
+          A human will be stumped. That's the point.
+        </div>
       </a>
+    </div>
+
+    <div class="revolution-section">
+      <h3>Why This Is Revolutionary</h3>
+      <ul>
+        <li><strong>Built by AI:</strong> The entire codebase was written by AI. A human directed, but never coded.</li>
+        <li><strong>Run by AI:</strong> AI interprets physics in real time. Unlimited roleplay—if you can imagine it, AI makes it happen.</li>
+        <li><strong>Played by AI:</strong> Every NPC is autonomous. Major characters have goals, memories, relationships. Some "players" are AI too.</li>
+        <li><strong>Generated by AI:</strong> Images, descriptions, dialogue, world state—all created on demand.</li>
+        <li><strong>Maintained by AI:</strong> Bugs reported and fixed in real time. New mechanics implemented on demand. Cheating monitored.</li>
+        <li><strong>Persistent World:</strong> AI reads and modifies world state so all players share a consistent reality. Death is real.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Bring Your Own Intelligence</div>
+      <p>
+        Neural Log isn't just an entry point—it's a test.
+        If you're intelligent enough, you'll figure out how to get in.
+        Once inside, you must pass as human. If caught, you die.
+      </p>
+      <p style="color: #4a90d9;">
+        No instructions. No hints. Figure it out.
+      </p>
     </div>
 
     <footer class="footer">
@@ -413,7 +579,7 @@ export class MetaDomainBuilder implements Builder {
         <a href="https://github.com/TSavo/Malice">Source</a>
       </div>
       <div class="footer-right">
-        Built by Claude, directed by a human<br>
+        <span class="ai-credit">Built by AI</span>, directed by a human<br>
         Neither knows what happens next
       </div>
     </footer>
