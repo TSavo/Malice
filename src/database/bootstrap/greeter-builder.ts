@@ -157,8 +157,9 @@ CLEANUP: despawnGreeter(greeterId) removes a greeter NPC.`,
 
       // Set the greeter's system prompt for this specific player
       // This configures the AI agent to guide this specific player
+      // Note: Must use 'systemPrompt' property - that's what buildAgentPrompt() reads in human-builder.ts
       const systemPrompt = await self.getGreeterSystemPrompt(playerId, player.name, faction, greeter);
-      greeter.agentSystemPrompt = systemPrompt;
+      greeter.systemPrompt = systemPrompt;
 
       // Send initial greeting to player
       const location = greeter.location;
