@@ -40,7 +40,7 @@ const blobKey = await map.image();
 
 For generating images directly (used internally by `$describable.image()`).
 
-Uses Nano Banana via [laozhang.ai](https://api.laozhang.ai) - 79% cheaper than Google direct at $0.05/image.
+Uses Midjourney via Discord bot proxy. Requires an active Midjourney subscription.
 
 ### generate(prompt, options?)
 
@@ -53,7 +53,7 @@ const result = await $aiImageGen.generate('A cyberpunk banana with neon lights')
 //   blobKey: '507f1f77bcf86cd799439011',
 //   contentType: 'image/png',
 //   prompt: 'A cyberpunk banana with neon lights',
-//   aspectRatio: '16:9'
+//   uri: 'https://cdn.midjourney.com/...'
 // }
 
 // Get URL for display
@@ -63,9 +63,14 @@ const url = $blob.url(result.blobKey, 'thecontinuum.city');
 ### Options
 
 ```javascript
-await $aiImageGen.generate('A glowing orb', {
-  model: 'gemini-3-pro-image-preview',   // Nano Banana Pro (4K support)
-  aspectRatio: 'portrait',               // 'landscape', 'portrait', 'square'
+await $aiImageGen.generate('A glowing orb in a dark forest', {
+  version: '7',                          // Midjourney version: '5', '6', '6.1', '7', 'niji6', etc.
+  aspectRatio: 'portrait',               // 'landscape', 'portrait', 'square', or '16:9', '9:16', '1:1'
+  stylize: 750,                          // 0-1000, artistic influence (default: 100)
+  chaos: 25,                             // 0-100, variation/randomness (default: 0)
+  no: 'people, text',                    // Elements to exclude from image
+  style: 'raw',                          // 'raw' or 'scenic'
+  upscaleIndex: 2,                       // 1-4, which image from grid to use (default: 1)
   metadata: { createdBy: player.id },    // Stored with blob
   filename: 'orb.png'                    // Optional filename
 });
@@ -75,9 +80,21 @@ await $aiImageGen.generate('A glowing orb', {
 
 | Name | Ratio | Use Case |
 |------|-------|----------|
-| `'landscape'`, `'wide'` | 16:9 | Rooms, scenes, wide shots |
-| `'portrait'`, `'tall'` | 9:16 | People, tall objects |
-| `'square'` | 1:1 | Icons, items |
+| `'landscape'`, `'wide'`, `'16:9'` | 16:9 | Rooms, scenes, wide shots |
+| `'portrait'`, `'tall'`, `'9:16'` | 9:16 | People, tall objects |
+| `'square'`, `'1:1'` | 1:1 | Icons, items |
+
+### Midjourney-Specific Options
+
+- **`stylize`** (0-1000, default: 100) - Higher values = more artistic interpretation
+- **`chaos`** (0-100, default: 0) - Higher values = more varied/unpredictable results
+- **`no`** (string) - Comma-separated list of elements to exclude (e.g., 'people, text, watermarks')
+- **`style`** - 'raw' (less opinionated) or 'scenic' (more artistic)
+- **`upscaleIndex`** (1-4, default: 1) - Which image from the 2x2 grid to upscale
+- **`seed`** - Deterministic seed for reproducible results
+- **`quality`** - Image quality setting
+- **`weird`** - Weirdness factor for experimental results
+- **`tile`** - Enable seamless tiling
 
 ### generateRaw(prompt, options?)
 
@@ -85,7 +102,7 @@ Return base64 directly without storing:
 
 ```javascript
 const result = await $aiImageGen.generateRaw('An icon');
-// { success: true, data: 'base64...', contentType: 'image/png' }
+// { success: true, data: 'base64...', contentType: 'image/png', uri: '...' }
 ```
 
 ### Available Models
@@ -93,14 +110,30 @@ const result = await $aiImageGen.generateRaw('An icon');
 ```javascript
 const models = $aiImageGen.listModels();
 // [
-//   { id: 'gemini-2.5-flash-image', name: 'Nano Banana (stable)', tier: 'budget', pricePerImage: 0.05 },
-//   { id: 'gemini-3-pro-image-preview', name: 'Nano Banana Pro (4K support)', tier: 'quality', pricePerImage: 0.05 }
+//   { id: '7', name: 'Midjourney v7 (latest)', tier: 'quality', default: true },
+//   { id: '6.1', name: 'Midjourney v6.1', tier: 'quality' },
+//   { id: 'niji6', name: 'Niji 6 (anime)', tier: 'specialty' },
+//   ...
 // ]
 
-$aiImageGen.setDefaultModel('gemini-3-pro-image-preview');  // Use Pro model
+$aiImageGen.setDefaultModel('6.1');  // Use v6.1 instead of v7
 ```
 
-**Environment:** Requires `LAOZHANG_API_KEY` environment variable.
+### Health Check
+
+```javascript
+const health = await $aiImageGen.health();
+// { success: true, connected: true, status: '...' }
+```
+
+### Get Options Documentation
+
+```javascript
+const options = await $aiImageGen.getOptions();
+// Returns full documentation of available Midjourney options
+```
+
+**Environment:** Requires Midjourney API server running (see CLAUDE.md "Midjourney API Server" section).
 
 ---
 
@@ -116,6 +149,12 @@ const blobKey = await item.image();
 const blobKey = await room.image({ aspectRatio: 'landscape' });
 const blobKey = await npc.image({ aspectRatio: 'portrait' });
 
+// Context-aware image generation (for time/weather variations)
+const blobKey = await room.image({
+  context: { timeOfDay: 'night', weather: 'rain' }
+});
+// Generates prompt with context, caches as '16:9:night:rain'
+
 // Force regeneration (ignore cache)
 const blobKey = await item.image({ force: true });
 
@@ -127,14 +166,21 @@ const blobKey = await room.image({
 
 ### Caching
 
-Images are cached by aspect ratio on `self.images`:
+Images are cached by aspect ratio on `self.images`. When context is provided, cache keys include context values:
 
 ```javascript
 // After calling image() with different ratios:
 item.images = {
-  '16:9': 'abc123...',  // landscape
-  '9:16': 'def456...',  // portrait
-  '1:1': 'ghi789...'    // square
+  '16:9': 'abc123...',  // landscape, no context
+  '9:16': 'def456...',  // portrait, no context
+  '1:1': 'ghi789...'    // square, no context
+}
+
+// After calling with context:
+room.images = {
+  '16:9': 'abc123...',             // landscape, day
+  '16:9:night': 'def456...',       // landscape, night
+  '16:9:night:rain': 'ghi789...'   // landscape, night + rain
 }
 
 // Check existing images

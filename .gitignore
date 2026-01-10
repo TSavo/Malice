@@ -6,6 +6,7 @@ node_modules
 checkpoints
 .credentials
 npm-debug.log*
+*.log
 shippable
 test-results.xml
 .idea

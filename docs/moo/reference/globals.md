@@ -562,40 +562,56 @@ const result = await $cash.transfer(fromPlayer, toPlayer, 100);
 
 ### $aiImageGen - AI Image Generation
 
-Generate images using Nano Banana via [laozhang.ai](https://api.laozhang.ai) and store in `$blob`. 79% cheaper than Google direct.
+Generate images using Midjourney via Discord bot proxy and store in `$blob`. Requires an active Midjourney subscription.
 
 ```javascript
 // Generate image and store in blob
 const result = await $aiImageGen.generate('A cyberpunk banana');
-// { success: true, blobKey: '...', contentType: 'image/png', prompt: '...' }
+// { success: true, blobKey: '...', contentType: 'image/png', prompt: '...', uri: 'https://...' }
 
 // Get URL for the image
 const url = $blob.url(result.blobKey, 'thecontinuum.city');
 
-// Generate with options
-const result = await $aiImageGen.generate('A glowing orb', {
-  model: 'gemini-3-pro-image-preview',  // Nano Banana Pro
-  aspectRatio: 'portrait',
+// Generate with Midjourney options
+const result = await $aiImageGen.generate('A glowing orb in a dark forest', {
+  version: '7',              // '5', '6', '6.1', '7', 'niji6', etc.
+  aspectRatio: 'portrait',   // 'landscape', 'portrait', 'square'
+  stylize: 750,              // 0-1000, artistic influence (default: 100)
+  chaos: 25,                 // 0-100, variation/randomness (default: 0)
+  no: 'people, text',        // Elements to exclude
+  style: 'raw',              // 'raw' or 'scenic'
+  upscaleIndex: 2,           // 1-4, which grid image to use
   metadata: { createdBy: player.id },
   filename: 'orb.png'
 });
 
 // Generate without storing (returns base64)
 const raw = await $aiImageGen.generateRaw('An icon');
-// { success: true, data: 'base64...', contentType: 'image/png' }
+// { success: true, data: 'base64...', contentType: 'image/png', uri: '...' }
 
-// List available models
+// List available Midjourney versions
 const models = $aiImageGen.listModels();
+// [{ id: '7', name: 'Midjourney v7 (latest)', tier: 'quality', default: true }, ...]
 
-// Change default model
-$aiImageGen.setDefaultModel('gemini-3-pro-image-preview');
+// Change default version
+$aiImageGen.setDefaultModel('6.1');
+
+// Check API health
+const health = await $aiImageGen.health();
+
+// Get options documentation
+const options = await $aiImageGen.getOptions();
 ```
 
-**Environment:** Requires `LAOZHANG_API_KEY` environment variable.
+**Environment:** Requires Midjourney API server running (see CLAUDE.md "Midjourney API Server" section).
 
-**Models:**
-- `gemini-2.5-flash-image` - Nano Banana (default, $0.05/image)
-- `gemini-3-pro-image-preview` - Nano Banana Pro with 4K support ($0.05/image)
+**Midjourney Versions:**
+- `7` - Midjourney v7 (latest, default)
+- `6.1` - Midjourney v6.1
+- `6` - Midjourney v6
+- `5.2` - Midjourney v5.2
+- `niji6` - Niji 6 (anime style)
+- `niji5` - Niji 5 (anime style)
 
 ### $describable.image() - Object Image Generation
 
@@ -610,6 +626,12 @@ const blobKey = await room.image({ aspectRatio: 'landscape' });  // 16:9
 const blobKey = await npc.image({ aspectRatio: 'portrait' });    // 9:16
 const blobKey = await icon.image({ aspectRatio: 'square' });     // 1:1
 
+// Context-aware image generation (for time/weather variations)
+const blobKey = await room.image({
+  context: { timeOfDay: 'night', weather: 'rain' }
+});
+// Generates prompt with context, caches as '16:9:night:rain'
+
 // Force regeneration
 const blobKey = await item.image({ force: true });
 
@@ -622,10 +644,17 @@ const blobKey = await room.image({
 const url = $blob.url(blobKey, 'thecontinuum.city');
 ```
 
-**Caching:** Images are cached by aspect ratio in `self.images`:
+**Caching:** Images are cached by aspect ratio in `self.images`. When context is provided, cache keys include context values:
 ```javascript
 // After calling image() with different ratios:
 item.images = { '16:9': 'abc123', '9:16': 'def456' }
+
+// With context:
+room.images = {
+  '16:9': 'abc123',              // landscape, day
+  '16:9:night': 'def456',        // landscape, night
+  '16:9:night:rain': 'ghi789'    // landscape, night + rain
+}
 ```
 
 **Showing to Players:**
@@ -677,7 +706,7 @@ Quick access to prototype objects for inheritance:
 | `$http` | HTTP client for external requests |
 | `$blob` | Binary storage (MongoDB GridFS) |
 | `$email` | Email sending (Resend) |
-| `$aiImageGen` | AI image generation (Nano Banana via laozhang.ai) |
+| `$aiImageGen` | AI image generation (Midjourney via Discord bot) |
 
 ## Special Properties on $
 
