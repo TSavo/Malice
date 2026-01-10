@@ -659,9 +659,12 @@ CRITICAL RULES:
       `
       /** Get a ready greeter from the pool.
        *  @param faction - 'continuum' or 'cartel'
+       *  @param maxRetries - Max retries for invalid greeters (default: 5)
        *  @returns greeter RuntimeObject or null if pool empty
        */
       const faction = args[0];
+      const maxRetries = args[1] ?? 5;
+
       if (!faction || !['continuum', 'cartel'].includes(faction)) {
         throw new Error('faction must be "continuum" or "cartel"');
       }
@@ -682,14 +685,20 @@ CRITICAL RULES:
       const greeter = await $load(greeterId);
       if (!greeter) {
         console.log('[Greeter] Pooled greeter #' + greeterId + ' not found, trying next');
-        // Recursively try next in pool
-        return await self.acquireFromPool(faction);
+        // Retry with decremented counter to prevent infinite loops
+        if (maxRetries > 0) {
+          return await self.acquireFromPool(faction, maxRetries - 1);
+        }
+        console.log('[Greeter] Max retries reached for ' + faction + ' pool');
+        return null;
       }
 
       console.log('[Greeter] Acquired greeter #' + greeterId + ' (' + greeter.name + ') from ' + faction + ' pool');
 
       // Trigger background replenishment (don't await)
-      self.replenishPool(faction).catch(err => {
+      self.replenishPool(faction).then(() => {
+        console.log('[Greeter] Pool replenishment completed for ' + faction);
+      }).catch(err => {
         console.error('[Greeter] Background replenish error:', err);
       });
 
@@ -849,6 +858,8 @@ CRITICAL RULES:
       'initializePools',
       `
       /** Initialize pools for all factions. Called at startup or manually.
+       *  Spawns at least one greeter per faction synchronously to ensure pools are ready,
+       *  then continues replenishment in background.
        */
       console.log('[Greeter] Initializing greeter pools...');
 
@@ -858,15 +869,53 @@ CRITICAL RULES:
       if (!pool.cartel) pool.cartel = [];
       self.greeterPool = pool;
 
-      // Replenish both pools (don't await - let it run in background)
-      self.replenishPool('continuum').catch(err => {
+      // Spawn first greeter for each faction synchronously to ensure at least one is ready
+      // This prevents the race condition where players complete chargen before pools are ready
+      const results = { continuum: null, cartel: null };
+
+      // Spawn first continuum greeter if pool is empty
+      if (pool.continuum.length === 0) {
+        try {
+          const greeter = await self.spawnPooledGreeter('continuum');
+          if (greeter) {
+            pool.continuum.push(greeter.id);
+            self.greeterPool = pool;
+            results.continuum = greeter.id;
+            console.log('[Greeter] Initial continuum greeter spawned: #' + greeter.id);
+          }
+        } catch (err) {
+          console.error('[Greeter] Failed to spawn initial continuum greeter:', err);
+        }
+      }
+
+      // Spawn first cartel greeter if pool is empty
+      if (pool.cartel.length === 0) {
+        try {
+          const greeter = await self.spawnPooledGreeter('cartel');
+          if (greeter) {
+            pool.cartel.push(greeter.id);
+            self.greeterPool = pool;
+            results.cartel = greeter.id;
+            console.log('[Greeter] Initial cartel greeter spawned: #' + greeter.id);
+          }
+        } catch (err) {
+          console.error('[Greeter] Failed to spawn initial cartel greeter:', err);
+        }
+      }
+
+      // Continue replenishing both pools in background to reach target size
+      self.replenishPool('continuum').then(() => {
+        console.log('[Greeter] Continuum pool replenishment completed');
+      }).catch(err => {
         console.error('[Greeter] Continuum pool init error:', err);
       });
-      self.replenishPool('cartel').catch(err => {
+      self.replenishPool('cartel').then(() => {
+        console.log('[Greeter] Cartel pool replenishment completed');
+      }).catch(err => {
         console.error('[Greeter] Cartel pool init error:', err);
       });
 
-      return { success: true, message: 'Pool initialization started' };
+      return { success: true, message: 'Pool initialization completed', initial: results };
     `,
     );
   }
