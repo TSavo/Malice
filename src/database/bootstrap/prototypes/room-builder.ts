@@ -72,14 +72,12 @@ export class RoomBuilder implements Builder {
 
           // Image generation prompt template for rooms
           // Uses ${variable} substitution - see getImagePrompt()
-          // Setting: Seattle 2110, after "The Event" - mass disappearance, infrastructure decay
-          imagePrompt: `Photorealistic wide-angle photograph, 16:9 cinematic composition, high detail.
-Seattle 2110, near-future post-apocalyptic, after mass disappearance event.
-Abandoned for decades, nature reclaiming urban spaces, overgrown with moss and vines.
-Weathered, decayed, urban ruins, desolate, hauntingly empty.
-Pacific Northwest atmosphere, perpetual overcast, muted colors.
+          // Room-specific details FIRST (more weight in Midjourney), then generic setting
+          imagePrompt: `\${name}: \${description}
 
-\${name}: \${description}`,
+Photorealistic wide-angle photograph, 16:9 cinematic composition, high detail.
+Seattle 2110, near-future post-apocalyptic, after mass disappearance event.
+Pacific Northwest atmosphere, perpetual overcast, muted colors.`,
 
           // Negative prompt for Midjourney --no parameter
           // Things to exclude from generated room images
@@ -979,25 +977,23 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       // Get base prompt config from parent (walks inheritance)
       const baseConfig = await pass();
 
-      // Use Midjourney prompt weighting syntax (::weight)
-      // Context gets weight 0.5, room-specific description gets weight 2
-      // This makes the room's unique details more prominent than generic setting
+      // Put room-specific description FIRST (more prominent in Midjourney)
+      // Then add generic context SECOND (less influence)
       if (baseConfig && typeof baseConfig === 'object') {
         // Parent returns { prompt, no?, stylize?, style? }
-        // Use :: to separate context (low weight) from room details (high weight)
         const roomPrompt = baseConfig.prompt || '';
         return {
           ...baseConfig,
-          prompt: context + '::0.5 ' + roomPrompt + '::2',
+          prompt: roomPrompt + ' ' + context,
         };
       } else if (baseConfig && typeof baseConfig === 'string') {
         // Legacy fallback if parent returns string
-        return { prompt: context + '::0.5 ' + baseConfig + '::2' };
+        return { prompt: baseConfig + ' ' + context };
       }
 
       // Fallback if no imagePrompt defined anywhere
       const fallbackPrompt = self.name + ': ' + (self.description || '');
-      return { prompt: context + '::0.5 ' + fallbackPrompt + '::2' };
+      return { prompt: fallbackPrompt + ' ' + context };
     `,
     );
 

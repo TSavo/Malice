@@ -10,6 +10,8 @@ The streetscape shows evidence of the last days—barriers that were erected and
   x: 0,
   y: -1,
   z: 0,
+
+  imageOnDisk: '2nd-ave-s-x0-y-1-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,
