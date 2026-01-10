@@ -12,7 +12,7 @@ export const building = {
       name: 'Basement Door Lock',
       description:
         'A heavy-duty deadbolt securing the basement access.',
-      difficulty: 4,
+      difficulty: 4
     },
     '%BASEMENT_DOOR': {
       prototype: 'door',
@@ -21,7 +21,7 @@ export const building = {
         'A steel fire door leading to the basement stairs, marked "AUTHORIZED PERSONNEL ONLY."',
       locked: true,
       open: false,
-      locks: ['%BASEMENT_LOCK'],
+      locks: ['%BASEMENT_LOCK']
     },
 
     '%ROASTER_LOCK': {
@@ -29,7 +29,7 @@ export const building = {
       name: 'Roaster Room Lock',
       description:
         'A secure lock on the roasting facility door, protecting expensive equipment.',
-      difficulty: 5,
+      difficulty: 5
     },
     '%ROASTER_DOOR': {
       prototype: 'door',
@@ -38,7 +38,7 @@ export const building = {
         'A heavy door with a small window, marked "ROASTING FACILITY - AUTHORIZED ONLY."',
       locked: true,
       open: false,
-      locks: ['%ROASTER_LOCK'],
+      locks: ['%ROASTER_LOCK']
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -63,7 +63,7 @@ A bare bulb flickers at the bottom of the stairs, casting shadows that jump with
       exits: {
         up: { to: 'z0.ts#%BACK', door: '%BASEMENT_DOOR', locks: ['%BASEMENT_LOCK'] },
         north: '%STORAGE',
-        east: { room: '%ROASTER', door: '%ROASTER_DOOR', locks: ['%ROASTER_LOCK'] },
+        east: { room: '%ROASTER', door: '%ROASTER_DOOR', locks: ['%ROASTER_LOCK'] }
       },
       objects: [
         {
@@ -71,9 +71,9 @@ A bare bulb flickers at the bottom of the stairs, casting shadows that jump with
           name: 'photo wall',
           aliases: ['photos', 'pictures', 'photographs'],
           description:
-            'Framed photographs line the stairwell—the history of Zeitgeist Coffee in images. Opening night, 2008. First anniversary party. The barista championship they hosted. Local bands playing to packed crowds. The faces are young, hopeful, unaware of how the story ends.',
+            'Framed photographs line the stairwell—the history of Zeitgeist Coffee in images. Opening night, 2008. First anniversary party. The barista championship they hosted. Local bands playing to packed crowds. The faces are young, hopeful, unaware of how the story ends.'
         },
-      ],
+      ]
     },
 
     '%STORAGE': {
@@ -93,7 +93,7 @@ A small desk holds cupping notes and roast profiles, the handwriting of master r
       outdoor: false,
       exits: {
         south: '%BASEMENT_STAIRS',
-        east: '%ROASTER',
+        east: '%ROASTER'
       },
       sittables: [
         {
@@ -101,7 +101,7 @@ A small desk holds cupping notes and roast profiles, the handwriting of master r
           capacity: 1,
           emptyMsg:
             'A simple office chair sits at the cupping desk, positioned for evaluating beans.',
-          occupiedMsg: '%s seated at the cupping desk',
+          occupiedMsg: '%s seated at the cupping desk'
         },
       ],
       objects: [
@@ -110,23 +110,23 @@ A small desk holds cupping notes and roast profiles, the handwriting of master r
           name: 'coffee sacks',
           aliases: ['sacks', 'burlap', 'beans'],
           description:
-            'Burlap sacks of green coffee beans, stamped with exotic origins: Ethiopia Yirgacheffe, Guatemala Huehuetenango, Kenya AA. The beans inside have gone stale, their potential unfulfilled, but the sacks remain organized by the obsessive taxonomy of specialty coffee.',
+            'Burlap sacks of green coffee beans, stamped with exotic origins: Ethiopia Yirgacheffe, Guatemala Huehuetenango, Kenya AA. The beans inside have gone stale, their potential unfulfilled, but the sacks remain organized by the obsessive taxonomy of specialty coffee.'
         },
         {
           prototype: 'desk',
           name: 'cupping desk',
           aliases: ['desk', 'tasting desk'],
           description:
-            'A desk covered in cupping notes—flavor wheels, roast profiles, tasting scores. The handwriting varies: multiple roasters contributing their observations. "Ethiopian Natural: blueberry, wine, floral finish." "Guatemala Washed: chocolate, citrus, clean." The observations are precise. The beans they describe are gone.',
+            'A desk covered in cupping notes—flavor wheels, roast profiles, tasting scores. The handwriting varies: multiple roasters contributing their observations. "Ethiopian Natural: blueberry, wine, floral finish." "Guatemala Washed: chocolate, citrus, clean." The observations are precise. The beans they describe are gone.'
         },
         {
           prototype: 'cabinet',
           name: 'sample jars',
           aliases: ['jars', 'samples'],
           description:
-            'Glass jars line a shelf, each containing a sample of beans from different origins and roast dates. Labels in careful handwriting identify contents and dates. The oldest samples are years old now, their purpose—quality reference—obsolete.',
+            'Glass jars line a shelf, each containing a sample of beans from different origins and roast dates. Labels in careful handwriting identify contents and dates. The oldest samples are years old now, their purpose—quality reference—obsolete.'
         },
-      ],
+      ]
     },
 
     '%ROASTER': {
@@ -149,7 +149,7 @@ Industrial ventilation ductwork snakes across the ceiling, designed to carry awa
       exits: {
         west: { room: '%BASEMENT_STAIRS', door: '%ROASTER_DOOR', locks: ['%ROASTER_LOCK'] },
         north: '%STORAGE',
-        down: '%OLD_BASEMENT',
+        down: '%OLD_BASEMENT'
       },
       objects: [
         {
@@ -157,30 +157,30 @@ Industrial ventilation ductwork snakes across the ceiling, designed to carry awa
           name: 'Probat roaster',
           aliases: ['roaster', 'drum roaster', 'probat'],
           description:
-            'A vintage Probat drum roaster—German engineering from the 1970s, worth more than the shop\'s first year\'s revenue. The brass fittings are dull with neglect, the sight glass dark, the burners cold. But the craftsmanship is undeniable. This was a serious machine for serious coffee.',
+            'A vintage Probat drum roaster—German engineering from the 1970s, worth more than the shop\'s first year\'s revenue. The brass fittings are dull with neglect, the sight glass dark, the burners cold. But the craftsmanship is undeniable. This was a serious machine for serious coffee.'
         },
         {
           prototype: 'describable',
           name: 'cooling tray',
           aliases: ['tray', 'cooling'],
           description:
-            'A circular cooling tray beside the roaster, designed to rapidly cool beans after roasting. A few scattered beans remain—dark and oily, the last batch never collected. The stirring arms are frozen mid-rotation.',
+            'A circular cooling tray beside the roaster, designed to rapidly cool beans after roasting. A few scattered beans remain—dark and oily, the last batch never collected. The stirring arms are frozen mid-rotation.'
         },
         {
           prototype: 'describable',
           name: 'roast logbook',
           aliases: ['logbook', 'log', 'records'],
           description:
-            'A logbook tracking every batch roasted: date, origin, weight, roast time, final temperature. The handwriting is meticulous, the data comprehensive. The last entry reads: "Ethiopian Sidamo, 12kg, 14:32 roast, 218°C drop." The date was months ago.',
+            'A logbook tracking every batch roasted: date, origin, weight, roast time, final temperature. The handwriting is meticulous, the data comprehensive. The last entry reads: "Ethiopian Sidamo, 12kg, 14:32 roast, 218°C drop." The date was months ago.'
         },
         {
           prototype: 'describable',
           name: 'floor hatch',
           aliases: ['hatch', 'trapdoor'],
           description:
-            'A heavy hatch in the floor, secured with industrial bolts. The hatch predates the coffee shop—original construction, probably, leading to an older basement level. Someone bolted it shut for a reason.',
+            'A heavy hatch in the floor, secured with industrial bolts. The hatch predates the coffee shop—original construction, probably, leading to an older basement level. Someone bolted it shut for a reason.'
         },
-      ],
+      ]
     },
 
     '%OLD_BASEMENT': {
@@ -201,35 +201,30 @@ Wooden crates are stacked in the corners, their contents removed, their purpose 
       waterLevel: 0,
       outdoor: false,
       exits: {
-        up: '%ROASTER',
-        south: {
-          to: 'underground/upper-tunnels/x-15-y0.ts',
-          description: 'A breach in the wall leads into the underground tunnels',
-        },
-      },
+        up: '%ROASTER'      },
       objects: [
         {
           prototype: 'describable',
           name: 'wall breach',
           aliases: ['breach', 'hole', 'opening'],
           description:
-            'A section of the south wall has been knocked through, bricks scattered on the floor, mortar dust still visible on the rubble. The breach opens into the underground passages—the buried streets of old Seattle. Someone made this connection deliberately, decades ago.',
+            'A section of the south wall has been knocked through, bricks scattered on the floor, mortar dust still visible on the rubble. The breach opens into the underground passages—the buried streets of old Seattle. Someone made this connection deliberately, decades ago.'
         },
         {
           prototype: 'crate',
           name: 'old crates',
           aliases: ['crates', 'boxes', 'wooden crates'],
           description:
-            'Wooden crates stacked in the corners, their stenciled labels faded to illegibility. Whatever they contained has been removed. The wood is soft with age, the iron bands rusted. They\'ve been here longer than the coffee shop above.',
+            'Wooden crates stacked in the corners, their stenciled labels faded to illegibility. Whatever they contained has been removed. The wood is soft with age, the iron bands rusted. They\'ve been here longer than the coffee shop above.'
         },
         {
           prototype: 'describable',
           name: 'rusted bicycle',
           aliases: ['bicycle', 'bike', 'frame'],
           description:
-            'A bicycle frame without wheels or handlebars, rusted to a uniform orange-brown. The frame is old—balloon tires era, maybe 1940s—abandoned here when someone traded up or gave up. It leans against the wall, waiting for repairs that will never come.',
+            'A bicycle frame without wheels or handlebars, rusted to a uniform orange-brown. The frame is old—balloon tires era, maybe 1940s—abandoned here when someone traded up or gave up. It leans against the wall, waiting for repairs that will never come.'
         },
-      ],
-    },
-  },
+      ]
+    }
+  }
 };

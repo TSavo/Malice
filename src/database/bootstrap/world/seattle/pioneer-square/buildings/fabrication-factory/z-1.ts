@@ -16,10 +16,10 @@ export const building = {
         {
           type: 'retinal',
           part: 'eye',
-          message: 'Level 3 clearance required.',
+          message: 'Level 3 clearance required.'
         },
       ],
-      authorizedUsers: {},
+      authorizedUsers: {}
     },
     '%BASEMENT_DOOR': {
       prototype: 'door',
@@ -30,7 +30,7 @@ export const building = {
       open: false,
       locks: ['%BASEMENT_LOCK'],
       material: 'metal',
-      durability: 95,
+      durability: 95
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -57,9 +57,9 @@ The noise is a constant roar, muffled only slightly by acoustic baffling. The ai
           to: 'z0.ts#%PUBLIC_SERVICES',
           description: 'A freight elevator leads up to public services',
           door: '%BASEMENT_DOOR',
-          locks: ['%BASEMENT_LOCK'],
+          locks: ['%BASEMENT_LOCK']
         },
-        east: '%FOUNDRY',
+        east: '%FOUNDRY'
       },
       objects: [
         {
@@ -67,16 +67,16 @@ The noise is a constant roar, muffled only slightly by acoustic baffling. The ai
           name: 'industrial shredders',
           aliases: ['shredders', 'recycling'],
           description:
-            'Massive industrial shredders capable of reducing scrap metal, plastic, and composite materials to uniform feedstock. The machines run continuously, their teeth grinding down the waste products of the old world to build the infrastructure of the new. The noise is overwhelming. The efficiency is absolute.',
+            'Massive industrial shredders capable of reducing scrap metal, plastic, and composite materials to uniform feedstock. The machines run continuously, their teeth grinding down the waste products of the old world to build the infrastructure of the new. The noise is overwhelming. The efficiency is absolute.'
         },
         {
           prototype: 'describable',
           name: 'smelting furnaces',
           aliases: ['furnaces', 'smelters'],
           description:
-            'Industrial furnaces for metal smelting, their exteriors glowing with contained heat. The furnaces process everything from aluminum cans to steel beams, reducing them to molten raw material ready for reforming. The heat radiates outward even through heavy insulation. Standing too close is uncomfortable for humans. The machines don\'t notice.',
+            'Industrial furnaces for metal smelting, their exteriors glowing with contained heat. The furnaces process everything from aluminum cans to steel beams, reducing them to molten raw material ready for reforming. The heat radiates outward even through heavy insulation. Standing too close is uncomfortable for humans. The machines don\'t notice.'
         },
-      ],
+      ]
     },
 
     '%FOUNDRY': {
@@ -96,29 +96,23 @@ A breach in the southern wall opens to the underground tunnels, the edges worn s
       outdoor: false,
       exits: {
         west: '%PROCESSING',
-        east: '%GENERATOR',
-        south: {
-          to: 'underground/upper-tunnels/x-19-y10.ts',
-          description:
-            'A breach in the wall leads to the underground tunnels',
-        },
-      },
+        east: '%GENERATOR'      },
       objects: [
         {
           prototype: 'describable',
           name: 'casting molds',
           aliases: ['molds', 'casts', 'forms'],
           description:
-            'Ceramic molds shaped for specialized components—valve bodies, pump housings, structural fittings that require the precision of casting. The molds are heat-resistant, reusable, precision-machined to tolerances the AI calculated. Each one represents a part the city needs, rendered in negative space.',
+            'Ceramic molds shaped for specialized components—valve bodies, pump housings, structural fittings that require the precision of casting. The molds are heat-resistant, reusable, precision-machined to tolerances the AI calculated. Each one represents a part the city needs, rendered in negative space.'
         },
         {
           prototype: 'describable',
           name: 'molten crucibles',
           aliases: ['crucibles', 'metal'],
           description:
-            'Industrial crucibles of molten metal, their contents glowing orange-white. The alloys are precisely mixed—aluminum, steel, bronze, whatever the specifications require. Robotic arms dip ladles into the crucibles, pouring measured amounts into waiting molds. The heat is overwhelming. The precision is inhuman.',
+            'Industrial crucibles of molten metal, their contents glowing orange-white. The alloys are precisely mixed—aluminum, steel, bronze, whatever the specifications require. Robotic arms dip ladles into the crucibles, pouring measured amounts into waiting molds. The heat is overwhelming. The precision is inhuman.'
         },
-      ],
+      ]
     },
 
     '%GENERATOR': {
@@ -137,7 +131,7 @@ The room smells of diesel and ozone, the particular atmosphere of power waiting 
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: '%FOUNDRY',
+        west: '%FOUNDRY'
       },
       objects: [
         {
@@ -145,16 +139,16 @@ The room smells of diesel and ozone, the particular atmosphere of power waiting 
           name: 'diesel generators',
           aliases: ['generators', 'diesel'],
           description:
-            'Industrial diesel generators capable of powering the entire factory independent of the grid. The engines are cold but maintained, their fuel tanks full, their control systems ready for automatic startup. The AI runs them monthly to ensure readiness. The factory cannot stop for something as mundane as a power outage.',
+            'Industrial diesel generators capable of powering the entire factory independent of the grid. The engines are cold but maintained, their fuel tanks full, their control systems ready for automatic startup. The AI runs them monthly to ensure readiness. The factory cannot stop for something as mundane as a power outage.'
         },
         {
           prototype: 'describable',
           name: 'battery banks',
           aliases: ['batteries', 'power storage'],
           description:
-            'Rows of industrial batteries providing power smoothing and emergency reserve. The banks store enough energy to maintain critical systems during generator startup, or to ride out brief grid fluctuations. The charge indicators show full capacity. The AI doesn\'t believe in letting reserves deplete.',
+            'Rows of industrial batteries providing power smoothing and emergency reserve. The banks store enough energy to maintain critical systems during generator startup, or to ride out brief grid fluctuations. The charge indicators show full capacity. The AI doesn\'t believe in letting reserves deplete.'
         },
-      ],
-    },
-  },
+      ]
+    }
+  }
 };

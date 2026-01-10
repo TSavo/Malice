@@ -35,13 +35,13 @@ The passage below runs straight south, a remarkable feature in an underground wh
           to: 'buildings/yesler-underground/z-2.ts',
           room: '%SECOND_YESLER',
           description: 'A concealed shaft rises toward the Yesler underground',
-          hidden: true,
+          hidden: true
         },
-        south: '%ARTERY_N2',
+        south: '%ARTERY_N2'
       },
       objects: [
         { prototype: 'sign', name: 'a chalk arrow', description: 'A simple chalk arrow points south, the mark fresh. Someone maintains this waypoint.', boltedDown: true },
-      ],
+      ]
     },
 
     '%ARTERY_N2': {
@@ -59,8 +59,8 @@ The air moves steadily, drawn south by ventilation that creates a constant draft
       outdoor: false,
       exits: {
         north: '%ARTERY_N1',
-        south: '%ARTERY_N3',
-      },
+        south: '%ARTERY_N3'
+      }
     },
 
     '%ARTERY_N3': {
@@ -76,8 +76,8 @@ The air moves steadily, drawn south by ventilation that creates a constant draft
       outdoor: false,
       exits: {
         north: '%ARTERY_N2',
-        south: '%ARTERY_N4',
-      },
+        south: '%ARTERY_N4'
+      }
     },
 
     '%ARTERY_N4': {
@@ -99,16 +99,11 @@ The cross-passage leads east and west, connecting the arterial to the transition
         east: {
           to: 'buildings/underground-east/z-3.ts',
           room: '%CABLE_VAULT',
-          description: 'A rough passage leads east toward the cable vault',
-        },
-        west: {
-          to: 'underground/transitional/junction-shaft.ts',
-          description: 'A passage leads west toward the Junction Shaft',
-        },
-      },
+          description: 'A rough passage leads east toward the cable vault'
+        }      },
       objects: [
         { prototype: 'sign', name: 'directional markers', description: 'Chalk marks indicate: "↑YESLER ↓KING ←JUNCTION →CABLES". Someone has added a skull next to the western arrow.', boltedDown: true },
-      ],
+      ]
     },
 
     '%ARTERY_N5': {
@@ -124,8 +119,8 @@ The cross-passage leads east and west, connecting the arterial to the transition
       outdoor: false,
       exits: {
         north: '%ARTERY_N4',
-        south: '%ARTERY_CENTER_N',
-      },
+        south: '%ARTERY_CENTER_N'
+      }
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -147,12 +142,7 @@ Sound carries strangely—footsteps from the networks above filter down as dista
       outdoor: false,
       exits: {
         north: '%ARTERY_N5',
-        south: '%ARTERY_CENTER_N2',
-        west: {
-          to: 'underground/transitional/park-shaft.ts',
-          description: 'A passage leads west toward the park access',
-        },
-      },
+        south: '%ARTERY_CENTER_N2'      }
     },
 
     '%ARTERY_CENTER_N2': {
@@ -168,8 +158,8 @@ Sound carries strangely—footsteps from the networks above filter down as dista
       outdoor: false,
       exits: {
         north: '%ARTERY_CENTER_N',
-        south: '%ARTERY_CENTER_N3',
-      },
+        south: '%ARTERY_CENTER_N3'
+      }
     },
 
     '%ARTERY_CENTER_N3': {
@@ -185,8 +175,8 @@ Sound carries strangely—footsteps from the networks above filter down as dista
       outdoor: false,
       exits: {
         north: '%ARTERY_CENTER_N2',
-        south: '%ARTERY_HUB',
-      },
+        south: '%ARTERY_HUB'
+      }
     },
 
     '%ARTERY_HUB': {
@@ -210,25 +200,25 @@ A ventilation shaft rises toward the surface, its grating hidden somewhere in Oc
         east: {
           to: 'buildings/underground-east/z-3.ts',
           room: '%SLUICE_CHANNEL',
-          description: 'A passage leads east toward the sluice channel',
+          description: 'A passage leads east toward the sluice channel'
         },
         west: {
           to: 'buildings/transit-corridor/z-3.ts',
           room: '%TRANSIT_CENTER',
-          description: 'A passage leads west along the transit corridor',
+          description: 'A passage leads west along the transit corridor'
         },
         up: {
           to: 'buildings/occidental-square/z0.ts',
           room: '%GALLERY',
           description: 'A narrow shaft rises toward the surface',
-          hidden: true,
-        },
+          hidden: true
+        }
       },
       objects: [
         { prototype: 'bench', name: 'a stone bench', description: 'A rough stone bench carved from the wall, worn smooth by countless travelers resting here.', boltedDown: true },
         { prototype: 'sign', name: 'a route map', description: 'A detailed map is scratched into the wall, showing the arterial and its connections. Regular updates have created layers of information.', boltedDown: true },
         { prototype: 'sign', name: 'territorial markers', description: 'Carefully balanced symbols mark this as neutral ground. Cartel grey, Continuum blue, and independent marks all appear in equal measure.', boltedDown: true },
-      ],
+      ]
     },
 
     '%ARTERY_CENTER_S1': {
@@ -250,9 +240,9 @@ An iron ladder descends through a shaft in the floor, leading to the cistern net
         down: {
           to: 'buildings/deep-connector/z-4.ts',
           room: '%CISTERN_SHAFT',
-          description: 'An iron ladder descends to the cistern network',
-        },
-      },
+          description: 'An iron ladder descends to the cistern network'
+        }
+      }
     },
 
     '%ARTERY_CENTER_S2': {
@@ -274,9 +264,9 @@ A rough shaft descends through the damaged section, leading to the cistern north
         down: {
           to: 'buildings/deep-connector/z-4.ts',
           room: '%CISTERN_N_PASSAGE',
-          description: 'A rough shaft descends to the cistern passages',
-        },
-      },
+          description: 'A rough shaft descends to the cistern passages'
+        }
+      }
     },
 
     '%ARTERY_CENTER_S3': {
@@ -292,8 +282,8 @@ A rough shaft descends through the damaged section, leading to the cistern north
       outdoor: false,
       exits: {
         north: '%ARTERY_CENTER_S2',
-        south: '%ARTERY_CENTER_S4',
-      },
+        south: '%ARTERY_CENTER_S4'
+      }
     },
 
     '%ARTERY_CENTER_S4': {
@@ -315,18 +305,18 @@ A natural shaft descends through a crack in the floor, leading to caverns below.
         east: {
           to: 'buildings/chinatown-underground/z-2.ts',
           room: '%DEEP_PASSAGE',
-          description: 'A passage leads east toward the Chinatown deep passage',
+          description: 'A passage leads east toward the Chinatown deep passage'
         },
         down: {
           to: 'buildings/deep-connector/z-4.ts',
           room: '%DEEP_CAVERN_N',
           description: 'A natural shaft descends into caverns',
-          hidden: true,
-        },
+          hidden: true
+        }
       },
       objects: [
         { prototype: 'sign', name: 'direction markers', description: 'Chalk marks indicate routes: "↑HUB ↓KING →CHINATOWN". The Chinatown arrow has been reinforced with red paint.', boltedDown: true },
-      ],
+      ]
     },
 
     '%ARTERY_CENTER_S5': {
@@ -342,8 +332,8 @@ A natural shaft descends through a crack in the floor, leading to caverns below.
       outdoor: false,
       exits: {
         north: '%ARTERY_CENTER_S4',
-        south: '%ARTERY_S1',
-      },
+        south: '%ARTERY_S1'
+      }
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -368,9 +358,9 @@ A natural shaft descends through a crack in the floor, leading to caverns below.
           to: 'buildings/underground-complex/z-4.ts',
           room: '%KV',
           description: 'A secured passage leads west toward the vault',
-          hidden: true,
-        },
-      },
+          hidden: true
+        }
+      }
     },
 
     '%ARTERY_S2': {
@@ -386,8 +376,8 @@ A natural shaft descends through a crack in the floor, leading to caverns below.
       outdoor: false,
       exits: {
         north: '%ARTERY_S1',
-        south: '%ARTERY_S3',
-      },
+        south: '%ARTERY_S3'
+      }
     },
 
     '%ARTERY_S3': {
@@ -403,8 +393,8 @@ A natural shaft descends through a crack in the floor, leading to caverns below.
       outdoor: false,
       exits: {
         north: '%ARTERY_S2',
-        south: '%ARTERY_S4',
-      },
+        south: '%ARTERY_S4'
+      }
     },
 
     '%ARTERY_S4': {
@@ -426,17 +416,17 @@ Routes branch east toward the deep rail access and west toward the freight infra
         east: {
           to: 'buildings/king-street-underground/z-2.ts',
           room: '%DEEP_KING_MID',
-          description: 'A passage leads east toward the deep King Street corridor',
+          description: 'A passage leads east toward the deep King Street corridor'
         },
         west: {
           to: 'buildings/king-street-underground/z-2.ts',
           room: '%DEEP_FREIGHT_MAIN',
-          description: 'A passage leads west toward the freight infrastructure',
-        },
+          description: 'A passage leads west toward the freight infrastructure'
+        }
       },
       objects: [
         { prototype: 'sign', name: 'a railway warning', description: 'A painted sign reads: "CAUTION - RAIL OPERATIONS OVERHEAD - EXPECT VIBRATION". The paint is industrial yellow, official.', boltedDown: true },
-      ],
+      ]
     },
 
     '%ARTERY_S5': {
@@ -452,8 +442,8 @@ Routes branch east toward the deep rail access and west toward the freight infra
       outdoor: false,
       exits: {
         north: '%ARTERY_S4',
-        south: '%ARTERY_TERMINUS',
-      },
+        south: '%ARTERY_TERMINUS'
+      }
     },
 
     '%ARTERY_TERMINUS': {
@@ -476,14 +466,14 @@ Water seeps through the unfinished walls more heavily here, the incomplete const
         up: {
           to: 'buildings/king-street-underground/z-2.ts',
           room: '%SECOND_AVE_SOUTH',
-          description: 'A shaft rises toward the King Street underground',
-        },
+          description: 'A shaft rises toward the King Street underground'
+        }
       },
       objects: [
         { prototype: 'sign', name: 'abandoned tools', description: 'Rusted picks and shovels lean against the wall, left where workers dropped them decades ago.', boltedDown: true },
         { prototype: 'furniture', name: 'a sump pump', description: 'An electric pump hums steadily, drawing water from a collection basin and pushing it into drainage pipes.', boltedDown: true },
         { prototype: 'sign', name: 'a construction date', description: 'Carved into the wall: "WPA 1937 - SUSPENDED". The Works Progress Administration built this. The Depression ended it.', boltedDown: true },
-      ],
-    },
-  },
+      ]
+    }
+  }
 };

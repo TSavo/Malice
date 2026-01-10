@@ -37,8 +37,9 @@ services:
       # Docker socket for running containerized jobs
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - runner-network
+      - malice-network
 
 networks:
-  runner-network:
-    driver: bridge
+  malice-network:
+    external: true
+    name: malice_malice-network

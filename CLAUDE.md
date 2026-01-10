@@ -843,7 +843,6 @@ The game features an extensive underground tunnel network beneath Pioneer Square
 - **Corp Construction** (+0 to +6, +1 to +4, z=0) - Continuum research facility with elevator access to levels -1 through -3
 
 **Building basement connections:**
-- Colman Building basement (-12, -2, -1) → east to underground via access shaft
 - Doc Maynard's cellar (-15, 2, -1) → east to underground
 - Fabrication Factory foundry (-19, 10, -1) → south to underground
 - Gargoyle Building coal cellar (-18, 12, -1) → east to underground
@@ -1167,12 +1166,12 @@ player.avatarBlobKey = blobKey;
 
 ### $aiImageGen - AI Image Generation Object
 
-Generate images using Nano Banana via [laozhang.ai](https://api.laozhang.ai) with automatic fallback to Google AI Studio and store them in `$blob`:
+Generate images using Nano Banana via [laozhang.ai](https://api.laozhang.ai) (79% cheaper than Google direct) and store them in `$blob`:
 
 ```typescript
 // Generate image and store in $blob
 const result = await $aiImageGen.generate('A cyberpunk banana with neon lights');
-// { success: true, blobKey: '...', contentType: 'image/png', prompt: '...', provider: 'laozhang' }
+// { success: true, blobKey: '...', contentType: 'image/png', prompt: '...' }
 
 // Get URL for the generated image
 const url = $blob.url(result.blobKey, 'thecontinuum.city');
@@ -1187,14 +1186,7 @@ const result = await $aiImageGen.generate('A glowing orb', {
 
 // Generate without storing (returns base64 directly)
 const raw = await $aiImageGen.generateRaw('A simple icon');
-// { success: true, data: 'base64...', contentType: 'image/png', provider: 'laozhang' }
-
-// Check usage and quota (for Google fallback tracking)
-const usage = await $aiImageGen.getUsage();
-// { today: 42, limit: 499, remaining: 457 }
-
-const remaining = await $aiImageGen.getRemainingQuota();
-// 457
+// { success: true, data: 'base64...', contentType: 'image/png' }
 
 // List available models
 const models = $aiImageGen.listModels();
@@ -1204,32 +1196,10 @@ const models = $aiImageGen.listModels();
 $aiImageGen.setDefaultModel('gemini-3-pro-image-preview');
 ```
 
-**Environment:**
-- **Primary:** `LAOZHANG_API_KEY` - laozhang.ai API key ($0.05/image)
-  - Get key from [api.laozhang.ai](https://api.laozhang.ai)
-- **Fallback:** `GOOGLE_AI_API_KEY` - Google AI Studio API key (free tier: 499 images/day)
-  - Get key from [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
-  - Used when LAOZHANG_API_KEY not set
-
-**How it works:**
-- Uses laozhang.ai by default ($0.05/image)
-- Falls back to Google AI Studio free tier if laozhang key not set (499/day limit tracked in MongoDB `aiImageGenUsage` collection)
-- Returns `provider: 'laozhang'` or `provider: 'google'` in response
+**Environment:** Requires `LAOZHANG_API_KEY` environment variable.
 
 **Available models:**
-- `gemini-2.5-flash-image` - Nano Banana (default)
-- `gemini-3-pro-image-preview` - Nano Banana Pro with 4K support
-
-**Batch generation script:**
-```bash
-# Generate images for all rooms without imageOnDisk
-bun scripts/generate-room-images.ts
-
-# Options:
-bun scripts/generate-room-images.ts --dry-run         # Preview without generating
-bun scripts/generate-room-images.ts --buildings-only  # Only building rooms
-bun scripts/generate-room-images.ts --world-only      # Only world rooms
-bun scripts/generate-room-images.ts --limit 50        # Override daily limit
-```
+- `gemini-2.5-flash-image` - Nano Banana (default, $0.05/image)
+- `gemini-3-pro-image-preview` - Nano Banana Pro with 4K support ($0.05/image)
 
 All transports require authentication. Players must first register via `POST /register` on the faction's HTTP server, then connect via WebSocket or Session MCP with their credentials. Connections are tagged with `factionId` for routing to the correct character generation flow.

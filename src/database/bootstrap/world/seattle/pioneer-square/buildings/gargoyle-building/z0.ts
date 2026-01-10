@@ -19,7 +19,7 @@ export const building = {
       name: 'Pioneer Mutual Front Lock',
       description:
         'A massive brass lock mechanism set into the heavy wooden doors. Victorian engineering—intricate but well-maintained despite its age.',
-      difficulty: 5,
+      difficulty: 5
     },
     '%FRONT_DOOR': {
       prototype: 'door',
@@ -30,14 +30,14 @@ export const building = {
       open: true,
       locks: ['%FRONT_LOCK'],
       material: 'wood',
-      durability: 85,
+      durability: 85
     },
     '%SHOP_LOCK': {
       prototype: 'lock',
       name: 'Shop Alley Lock',
       description:
         'A simple deadbolt on the shop\'s alley entrance. The kind of lock meant to deter casual theft, not determined entry.',
-      difficulty: 4,
+      difficulty: 4
     },
     '%SHOP_DOOR': {
       prototype: 'door',
@@ -48,7 +48,7 @@ export const building = {
       open: false,
       locks: ['%SHOP_LOCK'],
       material: 'glass',
-      durability: 25,
+      durability: 25
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -74,37 +74,37 @@ A brass mailbox bank lines one wall, each box labeled with suite numbers and nam
         east: {
           to: 'yesler-way/x-17.ts',
           description: 'Heavy wooden doors lead back to Yesler Way',
-          door: '%FRONT_DOOR',
+          door: '%FRONT_DOOR'
         },
         west: '%BACK_HALL',
-        up: '%STAIRWELL',
+        up: '%STAIRWELL'
       },
       objects: [
         {
           prototype: 'describable',
           name: 'terrazzo floor',
           aliases: ['floor', 'mosaic'],
-          description: `The terrazzo floor is a work of art in itself—chips of marble in black and white creating a checkerboard pattern, with the building's name set in brass letters in the center: PIONEER MUTUAL BUILDING, 1892. The floor is cracked in places, the brass letters tarnished, but the craftsmanship persists. Someone took pride in this floor once. The pride shows through the neglect.`,
+          description: `The terrazzo floor is a work of art in itself—chips of marble in black and white creating a checkerboard pattern, with the building's name set in brass letters in the center: PIONEER MUTUAL BUILDING, 1892. The floor is cracked in places, the brass letters tarnished, but the craftsmanship persists. Someone took pride in this floor once. The pride shows through the neglect.`
         },
         {
           prototype: 'cabinet',
           name: 'brass mailboxes',
           aliases: ['mailboxes', 'mail', 'mailbox bank'],
-          description: `A bank of brass mailboxes, each one labeled with a suite number and a name on a paper insert: "Suite 201 - Hendricks & Associates," "Suite 304 - Pacific Maritime Insurance," "Suite 412 - J. R. Peterson, CPA." Some boxes hang open, rifled through. Others remain locked, their contents visible through the mesh: catalogues, bills, letters from people who didn't know the recipients would never read them.`,
+          description: `A bank of brass mailboxes, each one labeled with a suite number and a name on a paper insert: "Suite 201 - Hendricks & Associates," "Suite 304 - Pacific Maritime Insurance," "Suite 412 - J. R. Peterson, CPA." Some boxes hang open, rifled through. Others remain locked, their contents visible through the mesh: catalogues, bills, letters from people who didn't know the recipients would never read them.`
         },
         {
           prototype: 'describable',
           name: 'cast iron staircase',
           aliases: ['staircase', 'stairs', 'stair'],
-          description: `A cast iron staircase rises against the eastern wall, its ornate balusters shaped like twisted vines, its newel post capped with a brass acorn. The stairs are worn at the center of each tread, the iron showing through where paint has been worn away by generations of feet. The staircase spirals upward into shadow, promising access to floors above.`,
+          description: `A cast iron staircase rises against the eastern wall, its ornate balusters shaped like twisted vines, its newel post capped with a brass acorn. The stairs are worn at the center of each tread, the iron showing through where paint has been worn away by generations of feet. The staircase spirals upward into shadow, promising access to floors above.`
         },
         {
           prototype: 'describable',
           name: 'pressed tin ceiling',
           aliases: ['ceiling', 'tin panels'],
-          description: `The ceiling is a grid of pressed tin panels, each one stamped with an intricate pattern of flowers and scrollwork. Paint has flaked in places, revealing the tin beneath—silver-grey where it's protected, oxidized brown where moisture has reached it. A chandelier hangs from the center, its crystals dusty, its bulbs long since burned out. The craftsmanship remains impressive. The maintenance ended.`,
+          description: `The ceiling is a grid of pressed tin panels, each one stamped with an intricate pattern of flowers and scrollwork. Paint has flaked in places, revealing the tin beneath—silver-grey where it's protected, oxidized brown where moisture has reached it. A chandelier hangs from the center, its crystals dusty, its bulbs long since burned out. The craftsmanship remains impressive. The maintenance ended.`
         },
-      ],
+      ]
     },
 
     '%BACK_HALL': {
@@ -125,28 +125,28 @@ A service staircase, narrower than the ornate one in the lobby, descends into da
       exits: {
         east: '%LOBBY',
         south: '%SHOP',
-        down: '%BASEMENT',
+        down: '%BASEMENT'
       },
       objects: [
         {
           prototype: 'describable',
           name: 'elevator',
           aliases: ['lift', 'brass doors'],
-          description: `An old elevator with brass doors, the kind with an accordion gate that operators once pulled closed by hand. The doors are sealed now, and the position indicator above them—a brass semicircle with floor numbers—shows the car frozen between 2 and 3. An OUT OF ORDER sign is taped to the doors, its paper yellowed, its message redundant. Nothing in this building is "in order" anymore.`,
+          description: `An old elevator with brass doors, the kind with an accordion gate that operators once pulled closed by hand. The doors are sealed now, and the position indicator above them—a brass semicircle with floor numbers—shows the car frozen between 2 and 3. An OUT OF ORDER sign is taped to the doors, its paper yellowed, its message redundant. Nothing in this building is "in order" anymore.`
         },
         {
           prototype: 'cabinet',
           name: 'janitor closet',
           aliases: ['closet', 'janitor'],
-          description: `A closet door stands ajar, revealing the tools of building maintenance: mops and brooms, buckets stacked inside each other, bottles of cleaning solution in brands that stopped being manufactured decades ago. A grey jumpsuit hangs on a hook—someone's work uniform, waiting for a shift that will never start. The smell of industrial cleanser lingers, faint but persistent.`,
+          description: `A closet door stands ajar, revealing the tools of building maintenance: mops and brooms, buckets stacked inside each other, bottles of cleaning solution in brands that stopped being manufactured decades ago. A grey jumpsuit hangs on a hook—someone's work uniform, waiting for a shift that will never start. The smell of industrial cleanser lingers, faint but persistent.`
         },
         {
           prototype: 'describable',
           name: 'service staircase',
           aliases: ['stairs', 'basement stairs'],
-          description: `A narrow staircase descends into darkness, its steps concrete, its handrail steel pipe. This is the servants' stair, built for maintenance workers and delivery personnel, not for the tenants who used the ornate lobby stairs. The basement waits below—boiler room, mechanical systems, the building's hidden infrastructure.`,
+          description: `A narrow staircase descends into darkness, its steps concrete, its handrail steel pipe. This is the servants' stair, built for maintenance workers and delivery personnel, not for the tenants who used the ornate lobby stairs. The basement waits below—boiler room, mechanical systems, the building's hidden infrastructure.`
         },
-      ],
+      ]
     },
 
     '%SHOP': {
@@ -169,8 +169,8 @@ A separate entrance opens onto the alley to the south, its door locked but its g
         south: {
           to: null, // Alley exit not implemented
           description: 'A cracked glass door leads to the alley',
-          door: '%SHOP_DOOR',
-        },
+          door: '%SHOP_DOOR'
+        }
       },
       objects: [
         {
@@ -178,27 +178,27 @@ A separate entrance opens onto the alley to the south, its door locked but its g
           name: 'three-way mirror',
           aliases: ['mirror', 'mirrors'],
           description: `A three-way mirror, the kind that lets you see yourself from all angles when trying on clothes. The glass is dusty but unbroken, its brass frame tarnished. The reflections show the empty shop from multiple angles, multiplying the abandonment. In better days, customers stood here and watched themselves transformed by tailored clothing.`,
-          boltedDown: true,
+          boltedDown: true
         },
         {
           prototype: 'desk',
           name: 'tailor worktable',
           aliases: ['worktable', 'table', 'cutting table'],
-          description: `A large worktable designed for cutting fabric and making alterations, its surface a patchwork of pin marks, chalk lines, and cutting guides worn into the wood. A pair of fabric shears lies on the table, their blades rusted shut. Pins are scattered in the corners, their heads forming tiny constellations. The tailor's tools remain. The tailor's hands are gone.`,
+          description: `A large worktable designed for cutting fabric and making alterations, its surface a patchwork of pin marks, chalk lines, and cutting guides worn into the wood. A pair of fabric shears lies on the table, their blades rusted shut. Pins are scattered in the corners, their heads forming tiny constellations. The tailor's tools remain. The tailor's hands are gone.`
         },
         {
           prototype: 'furniture',
           name: 'dress form',
           aliases: ['mannequin', 'form', 'dummy'],
-          description: `A headless, armless dress form stands in the corner, its adjustable sections set for someone's measurements. Measuring tape hangs across its torso like a sash, the inches and centimeters still legible. A half-finished alteration—pinned but never sewn—clings to the form: a jacket waiting to have its sleeves shortened. The customer never came back for it.`,
+          description: `A headless, armless dress form stands in the corner, its adjustable sections set for someone's measurements. Measuring tape hangs across its torso like a sash, the inches and centimeters still legible. A half-finished alteration—pinned but never sewn—clings to the form: a jacket waiting to have its sleeves shortened. The customer never came back for it.`
         },
         {
           prototype: 'describable',
           name: 'thread spools',
           aliases: ['thread', 'spools'],
-          description: `Spools of thread line a wall-mounted rack, organized by color in a rainbow that runs from white through every shade to black. The labels are faded—Coats & Clark, Gutermann, brands that served the garment industry for generations. The thread is still good, still usable. If anyone needed to sew anything, the materials are here. No one needs to sew anything.`,
+          description: `Spools of thread line a wall-mounted rack, organized by color in a rainbow that runs from white through every shade to black. The labels are faded—Coats & Clark, Gutermann, brands that served the garment industry for generations. The thread is still good, still usable. If anyone needed to sew anything, the materials are here. No one needs to sew anything.`
         },
-      ],
+      ]
     },
 
     '%BASEMENT': {
@@ -220,34 +220,34 @@ A section of the eastern wall has been knocked through, revealing a narrow passa
       outdoor: false,
       exits: {
         up: '%BACK_HALL',
-        east: '%COAL_CELLAR',
+        east: '%COAL_CELLAR'
       },
       objects: [
         {
           prototype: 'describable',
           name: 'boiler',
           aliases: ['furnace', 'heater'],
-          description: `The boiler is a massive cast iron cylinder, perhaps ten feet tall, its surface covered in gauges and valves and warning plates in languages both English and pictographic. The coal doors have been welded shut—the conversion to natural gas happened decades ago—but the original infrastructure remains, a monument to the industrial age. The pilot light is out. The basement is cold.`,
+          description: `The boiler is a massive cast iron cylinder, perhaps ten feet tall, its surface covered in gauges and valves and warning plates in languages both English and pictographic. The coal doors have been welded shut—the conversion to natural gas happened decades ago—but the original infrastructure remains, a monument to the industrial age. The pilot light is out. The basement is cold.`
         },
         {
           prototype: 'describable',
           name: 'pipe network',
           aliases: ['pipes', 'ductwork'],
-          description: `Cast iron pipes radiate from the boiler like the tentacles of some mechanical octopus, wrapped in asbestos insulation that no one dares remove. The pipes carried steam heat to radiators on every floor, a system that worked for a century. Some pipes are labeled in faded stencil: SUPPLY, RETURN, CONDENSATE. The labels remain legible. The steam no longer flows.`,
+          description: `Cast iron pipes radiate from the boiler like the tentacles of some mechanical octopus, wrapped in asbestos insulation that no one dares remove. The pipes carried steam heat to radiators on every floor, a system that worked for a century. Some pipes are labeled in faded stencil: SUPPLY, RETURN, CONDENSATE. The labels remain legible. The steam no longer flows.`
         },
         {
           prototype: 'desk',
           name: 'engineer workbench',
           aliases: ['workbench', 'bench', 'tools'],
-          description: `A metal workbench against the wall, its surface organized with the precision of someone who spent decades maintaining this building. Wrenches hang on a pegboard, arranged by size. Pressure gauges are labeled and calibrated. A clipboard holds maintenance logs dating back years, each entry noting dates and readings and small repairs. The last entry is months old. The log ends mid-page.`,
+          description: `A metal workbench against the wall, its surface organized with the precision of someone who spent decades maintaining this building. Wrenches hang on a pegboard, arranged by size. Pressure gauges are labeled and calibrated. A clipboard holds maintenance logs dating back years, each entry noting dates and readings and small repairs. The last entry is months old. The log ends mid-page.`
         },
         {
           prototype: 'describable',
           name: 'wall breach',
           aliases: ['breach', 'passage', 'opening'],
-          description: `A section of the eastern wall has been knocked through, bricks piled on either side of the opening. The breach leads into a narrow passage—not part of the original construction, but added later by someone who needed access to the spaces beyond. Coal dust stains the passage floor.`,
+          description: `A section of the eastern wall has been knocked through, bricks piled on either side of the opening. The breach leads into a narrow passage—not part of the original construction, but added later by someone who needed access to the spaces beyond. Coal dust stains the passage floor.`
         },
-      ],
+      ]
     },
 
     '%COAL_CELLAR': {
@@ -268,28 +268,28 @@ A narrow passage descends toward the underground tunnels—a connection that pre
       exits: {
         west: '%BASEMENT',
         down: '%TUNNEL_ACCESS',
-        south: '%STORAGE_VAULT',
+        south: '%STORAGE_VAULT'
       },
       objects: [
         {
           prototype: 'describable',
           name: 'coal bin',
           aliases: ['bin', 'coal'],
-          description: `An empty coal bin occupies one corner, a relic from before the conversion to gas. The wooden walls are stained black with coal dust that will never wash away. The bin is empty now—has been empty for decades—but the staining persists, a permanent record of the fuel that once heated the building.`,
+          description: `An empty coal bin occupies one corner, a relic from before the conversion to gas. The wooden walls are stained black with coal dust that will never wash away. The bin is empty now—has been empty for decades—but the staining persists, a permanent record of the fuel that once heated the building.`
         },
         {
           prototype: 'describable',
           name: 'coal chute',
           aliases: ['chute', 'delivery chute'],
-          description: `A coal chute rises to the street level above, its iron door welded shut from both ends. In the old days, coal wagons would stop here and shovel their load down the chute. The wagons are gone. The chute is sealed. The building heats with gas now, or would if anyone lived here to need heat.`,
+          description: `A coal chute rises to the street level above, its iron door welded shut from both ends. In the old days, coal wagons would stop here and shovel their load down the chute. The wagons are gone. The chute is sealed. The building heats with gas now, or would if anyone lived here to need heat.`
         },
         {
           prototype: 'describable',
           name: 'coal shovel',
           aliases: ['shovel'],
-          description: `A coal shovel leans against the wall, its blade worn thin from use that ended generations ago. The wooden handle is blackened with coal dust and the oils of many hands. The shovel is still functional—coal shovels are simple tools—but there's no coal to shovel.`,
+          description: `A coal shovel leans against the wall, its blade worn thin from use that ended generations ago. The wooden handle is blackened with coal dust and the oils of many hands. The shovel is still functional—coal shovels are simple tools—but there's no coal to shovel.`
         },
-      ],
+      ]
     },
 
     '%STORAGE_VAULT': {
@@ -308,28 +308,28 @@ A large safe sits in one corner, its door slightly ajar, its contents removed by
       waterLevel: 0,
       outdoor: false,
       exits: {
-        north: '%COAL_CELLAR',
+        north: '%COAL_CELLAR'
       },
       objects: [
         {
           prototype: 'cabinet',
           name: 'insurance files',
           aliases: ['files', 'filing cabinets', 'cabinets'],
-          description: `Metal filing cabinets line the walls, each drawer labeled with policy types: HULL INSURANCE, CARGO COVERAGE, MARITIME LIABILITY. The papers inside are yellowed and foxed, policies written for ships that have long since completed their voyages—or not completed them, which is why there was insurance.`,
+          description: `Metal filing cabinets line the walls, each drawer labeled with policy types: HULL INSURANCE, CARGO COVERAGE, MARITIME LIABILITY. The papers inside are yellowed and foxed, policies written for ships that have long since completed their voyages—or not completed them, which is why there was insurance.`
         },
         {
           prototype: 'safe',
           name: 'vault safe',
           aliases: ['safe'],
-          description: `A large floor safe, perhaps three feet tall, its heavy door slightly ajar. Whatever was inside has been removed—cash, bonds, something worth securing behind this much steel. The combination dial is worn smooth from use. Someone knew the numbers. That someone took what was inside.`,
+          description: `A large floor safe, perhaps three feet tall, its heavy door slightly ajar. Whatever was inside has been removed—cash, bonds, something worth securing behind this much steel. The combination dial is worn smooth from use. Someone knew the numbers. That someone took what was inside.`
         },
         {
           prototype: 'desk',
           name: 'document table',
           aliases: ['table', 'desk'],
-          description: `A heavy wooden table for reviewing documents, its surface covered in ring stains from coffee cups that the insurance adjusters drank decades ago. A magnifying glass sits on the table, the tool of someone who needed to read fine print. The fine print is still there. The reader is gone.`,
+          description: `A heavy wooden table for reviewing documents, its surface covered in ring stains from coffee cups that the insurance adjusters drank decades ago. A magnifying glass sits on the table, the tool of someone who needed to read fine print. The fine print is still there. The reader is gone.`
         },
-      ],
+      ]
     },
 
     '%TUNNEL_ACCESS': {
@@ -348,12 +348,8 @@ The passage opens into the larger tunnel network to the east, the buried streets
       waterLevel: 0,
       outdoor: false,
       exits: {
-        up: '%COAL_CELLAR',
-        east: {
-          to: 'underground/upper-tunnels/x-16-y12.ts',
-          description: 'The passage opens into the underground tunnel network',
-        },
-      },
+        up: '%COAL_CELLAR'
+      }
     },
 
     '%STAIRWELL': {
@@ -373,28 +369,28 @@ Doors on each landing lead to the upper floors—offices once, apartments perhap
       outdoor: false,
       exits: {
         down: '%LOBBY',
-        up: 'z1.ts#HALL_1',
+        up: 'z1.ts#HALL_1'
       },
       objects: [
         {
           prototype: 'describable',
           name: 'skylight',
           aliases: ['light', 'glass'],
-          description: `A skylight four stories above lets in grey, filtered light—enough to navigate by, not enough to read by. The glass is grimy with decades of accumulated dirt, bird droppings, and the detritus of a city that no longer cleans. The light that does penetrate is diffuse and shadowless, giving the stairwell an underwater quality.`,
+          description: `A skylight four stories above lets in grey, filtered light—enough to navigate by, not enough to read by. The glass is grimy with decades of accumulated dirt, bird droppings, and the detritus of a city that no longer cleans. The light that does penetrate is diffuse and shadowless, giving the stairwell an underwater quality.`
         },
         {
           prototype: 'describable',
           name: 'office doors',
           aliases: ['doors', 'offices'],
-          description: `Doors on each landing lead to what were once offices or apartments. The doors are solid wood with frosted glass transoms, each one labeled with a suite number. Some doors stand ajar—202, 305, 411—revealing empty rooms, abandoned desks, windows looking out on the street below. Other doors remain closed and locked, their contents unknown, their tenants departed.`,
+          description: `Doors on each landing lead to what were once offices or apartments. The doors are solid wood with frosted glass transoms, each one labeled with a suite number. Some doors stand ajar—202, 305, 411—revealing empty rooms, abandoned desks, windows looking out on the street below. Other doors remain closed and locked, their contents unknown, their tenants departed.`
         },
         {
           prototype: 'describable',
           name: 'iron balusters',
           aliases: ['balusters', 'railings', 'banister'],
-          description: `The cast iron balusters are works of art—each one individually cast, depicting twisted vines, acanthus leaves, and occasional faces hidden in the foliage. The style is Victorian, ornate, completely impractical, absolutely beautiful. The iron is cold to the touch, the metalwork smooth from a century of hands gripping it on the climb.`,
+          description: `The cast iron balusters are works of art—each one individually cast, depicting twisted vines, acanthus leaves, and occasional faces hidden in the foliage. The style is Victorian, ornate, completely impractical, absolutely beautiful. The iron is cold to the touch, the metalwork smooth from a century of hands gripping it on the climb.`
         },
-      ],
-    },
-  },
+      ]
+    }
+  }
 };
