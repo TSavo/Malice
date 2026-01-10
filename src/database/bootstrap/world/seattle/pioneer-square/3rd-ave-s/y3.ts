@@ -13,6 +13,8 @@ A hot dog cart sits at the curb, its umbrella faded, its condiment bottles empty
   y: 3,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '3rd-ave-s-x7-y3-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

@@ -10,6 +10,8 @@ A fire hydrant stands at the corner, its red paint faded to pink, its cap rusted
   x: 14,
   y: -8,
   z: 0,
+
+  imageOnDisk: '4th-ave-s-x14-y-8-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

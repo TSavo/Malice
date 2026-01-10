@@ -10,6 +10,8 @@ A dragon lamp post stands at the corner, one of a series installed in the 1970s 
   x: 14,
   y: -4,
   z: 0,
+
+  imageOnDisk: '4th-ave-s-x14-y-4-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

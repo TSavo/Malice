@@ -12,6 +12,8 @@ The smell of old fire lingers in the debris, decades of rain unable to wash away
   x: 7,
   y: 9,
   z: 0,
+
+  imageOnDisk: '3rd-ave-s-x7-y9-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

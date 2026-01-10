@@ -10,6 +10,8 @@ The alley continues north, narrowing between the buildings. Light filters down f
   x: -17,
   y: 7,
   z: 0,
+
+  imageOnDisk: 'alley-x-17-y7-z0.png',
   population: 0,
   ambientNoise: 15,
   lighting: 60,

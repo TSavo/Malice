@@ -10,6 +10,8 @@ The ground is littered with the usual alley debris: broken glass, sodden cardboa
   x: -17,
   y: 8,
   z: 0,
+
+  imageOnDisk: 'alley-x-17-y8-z0.png',
   population: 0,
   ambientNoise: 20,
   lighting: 50,

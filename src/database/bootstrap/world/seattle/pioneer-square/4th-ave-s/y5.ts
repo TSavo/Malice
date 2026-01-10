@@ -10,6 +10,8 @@ The avenue itself shows signs that someone has tried to maintain it—debris pus
   x: 14,
   y: 5,
   z: 0,
+
+  imageOnDisk: '4th-ave-s-x14-y5-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

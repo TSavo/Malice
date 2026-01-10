@@ -10,6 +10,8 @@ Fourth Avenue ends here in any practical sense. The city continues beyond, but n
   x: 14,
   y: 11,
   z: 0,
+
+  imageOnDisk: '4th-ave-s-x14-y11-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

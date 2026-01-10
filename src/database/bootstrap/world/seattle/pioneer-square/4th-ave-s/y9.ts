@@ -13,6 +13,8 @@ The smell of old cooking oil drifts from somewhere. Maybe the restaurant to the 
   y: 9,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '4th-ave-s-x14-y9-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

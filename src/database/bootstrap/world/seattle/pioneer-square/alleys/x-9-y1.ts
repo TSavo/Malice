@@ -16,6 +16,8 @@ First Avenue continues north toward S. Washington and south toward S. Main.`,
   y: 1,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '1st-ave-s-x-14-y1-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 5, // Quiet, muffled
   lighting: 45, // Shadowed (buildings block some light)

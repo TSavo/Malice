@@ -10,6 +10,8 @@ Buildings on the west side show Victorian brick and warehouse architecture. The 
   x: 14,
   y: -1,
   z: 0,
+
+  imageOnDisk: '4th-ave-s-x14-y-1-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,
