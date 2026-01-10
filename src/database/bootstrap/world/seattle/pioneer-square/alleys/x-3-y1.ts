@@ -17,7 +17,7 @@ The avenue continues north toward S. Washington and south toward S. Main.`,
   z: 0,
   // Environmental properties
 
-  imageOnDisk: 'occidental-ave-s-x-7-y1-z0.png',
+  imageOnDisk: 'occidental-ave-s-x--7-y1-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 8, // Some ambient noise from nearby park
   lighting: 50, // Better lit (closer to park's open space)

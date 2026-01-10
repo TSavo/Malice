@@ -11,7 +11,7 @@ The Fabrication Factory's loading bay is visible through a gap in the fence to t
   y: 11,
   z: 0,
 
-  imageOnDisk: 'alley-x-17-y11-z0.png',
+  imageOnDisk: 'alley-x--17-y11-z0.png',
   population: 0,
   ambientNoise: 30,
   lighting: 70,
