@@ -1,8 +1,9 @@
 # GitHub Actions Self-Hosted Runner
-#
+name: github-runners
+
 # Usage:
 #   docker compose -f docker-compose.runner.yml up -d
-#   docker compose -f docker-compose.runner.yml up -d --scale github-runner=3
+#   docker compose -f docker-compose.runner.yml up -d --scale github-runner=10
 #
 # Prerequisites:
 #   1. Create a GitHub Personal Access Token (PAT) with 'repo' scope
@@ -37,9 +38,8 @@ services:
       # Docker socket for running containerized jobs
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - malice-network
+      - runner-network
 
 networks:
-  malice-network:
-    external: true
-    name: malice_malice-network
+  runner-network:
+    driver: bridge
