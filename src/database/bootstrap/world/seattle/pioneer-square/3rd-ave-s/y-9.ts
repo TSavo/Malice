@@ -10,6 +10,8 @@ A chain-link fence surrounds an empty lot where a building once stood. The demol
   x: 7,
   y: -9,
   z: 0,
+
+  imageOnDisk: '3rd-ave-s-x7-y-9-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

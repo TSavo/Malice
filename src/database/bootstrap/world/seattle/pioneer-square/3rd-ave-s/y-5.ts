@@ -13,6 +13,8 @@ The pagoda gates of Jackson Street are visible to the south, marking the ceremon
   y: -5,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '3rd-ave-s-x7-y-5-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

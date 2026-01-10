@@ -10,6 +10,8 @@ Graffiti covers the lower stories of buildings on both sides—tags and murals l
   x: 7,
   y: -4,
   z: 0,
+
+  imageOnDisk: '3rd-ave-s-x7-y-4-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,
