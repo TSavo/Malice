@@ -90,7 +90,9 @@ export class AiImageGenBuilder implements Builder {
       if (options.stylize !== undefined) mjOptions.stylize = options.stylize;
       if (options.chaos !== undefined) mjOptions.chaos = options.chaos;
       if (options.no) mjOptions.no = options.no;
-      if (options.version) mjOptions.version = options.version;
+      // Use explicit version, or fall back to defaultVersion if set
+      const version = options.version || self.defaultVersion;
+      if (version) mjOptions.version = version;
       if (options.style) mjOptions.style = options.style;
       if (options.seed !== undefined) mjOptions.seed = options.seed;
       if (options.quality !== undefined) mjOptions.quality = options.quality;
@@ -215,7 +217,9 @@ export class AiImageGenBuilder implements Builder {
       if (options.stylize !== undefined) mjOptions.stylize = options.stylize;
       if (options.chaos !== undefined) mjOptions.chaos = options.chaos;
       if (options.no) mjOptions.no = options.no;
-      if (options.version) mjOptions.version = options.version;
+      // Use explicit version, or fall back to defaultVersion if set
+      const version = options.version || self.defaultVersion;
+      if (version) mjOptions.version = version;
       if (options.style) mjOptions.style = options.style;
       if (options.seed !== undefined) mjOptions.seed = options.seed;
       if (options.quality !== undefined) mjOptions.quality = options.quality;

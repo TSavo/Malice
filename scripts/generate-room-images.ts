@@ -52,6 +52,11 @@ interface RoomFile {
   jsonRoomId?: string; // For JSON rooms, the room's 'id' field (e.g., 'r1')
 }
 
+interface ImageGenerationResult {
+  blobKey: string;
+  filename: string | null;
+}
+
 // Parse command line args
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
@@ -184,13 +189,13 @@ async function getRoomIdByCoords(x: number, y: number, z: number): Promise<numbe
  * Generate image for a room via MCP
  * Returns the result from room.image({ saveToDisk: true })
  */
-async function generateRoomImage(roomId: number): Promise<{ blobKey: string; filename: string | null }> {
+async function generateRoomImage(roomId: number): Promise<ImageGenerationResult> {
   const result = await executeMooCode(`
     const room = await $load(${roomId});
     if (!room) throw new Error('Room not found: ${roomId}');
     return await room.image({ saveToDisk: true, force: true });
   `, 600000); // 10 minute timeout for Midjourney generation
-  return result as { blobKey: string; filename: string | null };
+  return result as ImageGenerationResult;
 }
 
 /**
@@ -436,9 +441,12 @@ async function addImageOnDiskToFile(filePath: string, imageFilename: string, roo
 
   // Check if it's a building file (has 'building' export with rooms)
   if (content.includes('export const building')) {
-    // For buildings, we need to add imageOnDisk to each room definition
-    // This is more complex - skip for now and just log
-    console.log(`    ⚠️  Building file - manual edit needed`);
+    // TODO: Implement building file updates
+    // Building files have structure: export const building = { rooms: { '%0': {...}, '%1': {...} } }
+    // This requires parsing the room key, finding the correct room object, and adding imageOnDisk.
+    // For now, building room images are stored in GridFS but not added to source files.
+    // This means the imageOnDisk property must be added manually or via a separate tool.
+    console.log(`    ⚠️  Building file - manual edit needed (automatic update not implemented)`);
     return;
   }
 
