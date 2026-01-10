@@ -441,11 +441,11 @@ describe('generate-room-images script', () => {
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, '-')
           .replace(/^-+|-+$/g, '');
-        return `${sanitized}-x-${x}-y${y}-z${z}.png`;
+        return `${sanitized}-x${x}-y${y}-z${z}.png`;
       }
 
       const filename = generateFilename('1st Ave S', 14, 1, 0);
-      expect(filename).toBe('1st-ave-s-x-14-y1-z0.png');
+      expect(filename).toBe('1st-ave-s-x14-y1-z0.png');
     });
 
     it('should handle special characters in room names', () => {
@@ -454,11 +454,11 @@ describe('generate-room-images script', () => {
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, '-')
           .replace(/^-+|-+$/g, '');
-        return `${sanitized}-x-${x}-y${y}-z${z}.png`;
+        return `${sanitized}-x${x}-y${y}-z${z}.png`;
       }
 
       const filename = generateFilename("Merchant's Café & Bar", -5, 10, -2);
-      expect(filename).toBe('merchant-s-caf-bar-x--5-y10-z-2.png');
+      expect(filename).toBe('merchant-s-caf-bar-x-5-y10-z-2.png');
     });
 
     it('should handle negative coordinates', () => {
@@ -467,11 +467,11 @@ describe('generate-room-images script', () => {
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, '-')
           .replace(/^-+|-+$/g, '');
-        return `${sanitized}-x-${x}-y${y}-z${z}.png`;
+        return `${sanitized}-x${x}-y${y}-z${z}.png`;
       }
 
       const filename = generateFilename('Underground Tunnel', -10, -5, -3);
-      expect(filename).toBe('underground-tunnel-x--10-y-5-z-3.png');
+      expect(filename).toBe('underground-tunnel-x-10-y-5-z-3.png');
     });
   });
 

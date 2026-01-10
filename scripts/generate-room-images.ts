@@ -174,9 +174,9 @@ async function executeMooCode(code: string, timeoutMs: number = 600000): Promise
  */
 async function getRoomIdByCoords(x: number, y: number, z: number): Promise<number | null> {
   const result = await executeMooCode(`
-    const rooms = await $query().parent($room).prop('x').equals(${x}).all();
+    const rooms = await $query().parent($room).prop('x').equals(${JSON.stringify(x)}).all();
     for (const room of rooms) {
-      if (room.y === ${y} && room.z === ${z}) {
+      if (room.y === ${JSON.stringify(y)} && room.z === ${JSON.stringify(z)}) {
         return room.id;
       }
     }
@@ -191,8 +191,8 @@ async function getRoomIdByCoords(x: number, y: number, z: number): Promise<numbe
  */
 async function generateRoomImage(roomId: number): Promise<ImageGenerationResult> {
   const result = await executeMooCode(`
-    const room = await $load(${roomId});
-    if (!room) throw new Error('Room not found: ${roomId}');
+    const room = await $load(${JSON.stringify(roomId)});
+    if (!room) throw new Error('Room not found: ${JSON.stringify(roomId)}');
     // Don't use saveToDisk - that saves inside Docker container
     // We'll download from GridFS to host filesystem separately
     return await room.image({ force: true });
@@ -205,7 +205,7 @@ async function generateRoomImage(roomId: number): Promise<ImageGenerationResult>
  */
 async function downloadBlob(blobKey: string): Promise<string> {
   const result = await executeMooCode(`
-    return await $blob.read('${blobKey}');
+    return await $blob.read(${JSON.stringify(blobKey)});
   `);
   return result as string;
 }
