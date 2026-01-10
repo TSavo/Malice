@@ -26,7 +26,8 @@ while true; do
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>"
 
-        # Push
+        # Push (pull --rebase first in case of force push)
+        git pull --rebase 2>/dev/null || true
         git push
 
         echo "$(date): Committed and pushed $NEW_COUNT changes"
