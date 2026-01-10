@@ -246,6 +246,44 @@ Each faction gets its own isolated network infrastructure. Ports are calculated 
 
 Factions are created dynamically via `$factionManager.create()` - see Faction System below.
 
+**AI Services:**
+- **3000** (internal) - Midjourney API server (Discord bot proxy)
+
+### Midjourney API Server
+
+The Midjourney API server (`midjourney-api` service) runs as a Docker container and provides a REST API for generating images via Discord's Midjourney bot. It requires a Discord account with an active Midjourney subscription.
+
+**Setup:**
+1. Get Discord credentials:
+   - `SALAI_TOKEN` - Your Discord token (DevTools > Application > Local Storage > token)
+   - `SERVER_ID` - Discord server ID where Midjourney bot is present
+   - `CHANNEL_ID` - Channel ID for sending Midjourney commands
+2. Add to `.env`:
+   ```bash
+   MIDJOURNEY_SERVER_ID=your_discord_server_id
+   MIDJOURNEY_CHANNEL_ID=your_discord_channel_id
+   MIDJOURNEY_SALAI_TOKEN=your_discord_token
+   MIDJOURNEY_DEBUG=false
+   HUGGINGFACE_TOKEN=hf_xxxxxxxxxx  # Optional: for human verification
+   ```
+3. Start with Docker Compose:
+   ```bash
+   docker compose up midjourney-api
+   ```
+
+**API Endpoints:**
+- `POST /generate` - Full pipeline: imagine → wait → upscale → return image
+  - Body: `{ prompt, options?, upscaleIndex?, download? }`
+  - Returns: `{ id, hash, uri, width, height, flags, content }`
+- `GET /health` - Health check
+  - Returns: `{ connected, status }`
+- `GET /options` - Get available Midjourney options documentation
+
+**Integration:**
+The `$aiImageGen` MOO object uses this service internally. You don't need to call the API directly - just use `$aiImageGen.generate()` from MOO code.
+
+See `midjourney-api/API.md` for full API documentation.
+
 ## Multiplexed Transport
 
 The WebSocket server supports a **multiplexed channel protocol** for rich web clients. Connect to `/mux` path for channel support.
@@ -1169,40 +1207,82 @@ player.avatarBlobKey = blobKey;
 
 ### $aiImageGen - AI Image Generation Object
 
-Generate images using Nano Banana via [laozhang.ai](https://api.laozhang.ai) (79% cheaper than Google direct) and store them in `$blob`:
+Generate images using Midjourney and store them in `$blob`:
 
 ```typescript
 // Generate image and store in $blob
 const result = await $aiImageGen.generate('A cyberpunk banana with neon lights');
-// { success: true, blobKey: '...', contentType: 'image/png', prompt: '...' }
+// { success: true, blobKey: '...', contentType: 'image/png', prompt: '...', uri: 'https://...' }
 
 // Get URL for the generated image
 const url = $blob.url(result.blobKey, 'thecontinuum.city');
 
-// Generate with options
-const result = await $aiImageGen.generate('A glowing orb', {
-  model: 'gemini-3-pro-image-preview',  // Nano Banana Pro (4K support)
-  aspectRatio: 'portrait',               // 'landscape', 'portrait', 'square'
+// Generate with Midjourney-specific options
+const result = await $aiImageGen.generate('A glowing orb in a dark forest', {
+  aspectRatio: 'portrait',               // 'landscape', 'portrait', 'square', or '16:9', '9:16', '1:1'
+  stylize: 750,                          // 0-1000, artistic influence (default: 100)
+  chaos: 25,                             // 0-100, variation/randomness (default: 0)
+  no: 'people, text',                    // Elements to exclude from image
+  version: '7',                          // '5', '6', '6.1', '7', 'niji6', etc. (default: 7)
+  style: 'raw',                          // 'raw' or 'scenic'
+  upscaleIndex: 2,                       // 1-4, which image from grid to use (default: 1)
   metadata: { createdBy: player.id },
   filename: 'orb.png'
 });
 
 // Generate without storing (returns base64 directly)
 const raw = await $aiImageGen.generateRaw('A simple icon');
-// { success: true, data: 'base64...', contentType: 'image/png' }
+// { success: true, data: 'base64...', contentType: 'image/png', uri: '...' }
 
-// List available models
+// List available Midjourney versions
 const models = $aiImageGen.listModels();
-// [{ id: 'gemini-2.5-flash-image', name: 'Nano Banana (stable)', tier: 'budget' }, ...]
+// [
+//   { id: '7', name: 'Midjourney v7 (latest)', tier: 'quality', default: true },
+//   { id: '6.1', name: 'Midjourney v6.1', tier: 'quality' },
+//   { id: 'niji6', name: 'Niji 6 (anime)', tier: 'specialty' },
+//   ...
+// ]
 
-// Change default model
-$aiImageGen.setDefaultModel('gemini-3-pro-image-preview');
+// Change default version
+$aiImageGen.setDefaultModel('6.1');
+
+// Check API health
+const health = await $aiImageGen.health();
+// { success: true, connected: true, status: '...' }
+
+// Get available options documentation
+const options = await $aiImageGen.getOptions();
 ```
 
-**Environment:** Requires `LAOZHANG_API_KEY` environment variable.
+**Environment:** Requires Midjourney API server (see "Midjourney API Server" section below).
 
-**Available models:**
-- `gemini-2.5-flash-image` - Nano Banana (default, $0.05/image)
-- `gemini-3-pro-image-preview` - Nano Banana Pro with 4K support ($0.05/image)
+**Environment variables:**
+- `MIDJOURNEY_SERVER_ID` - Discord server ID
+- `MIDJOURNEY_CHANNEL_ID` - Discord channel ID
+- `MIDJOURNEY_SALAI_TOKEN` - Discord authentication token
+- `MIDJOURNEY_DEBUG` - Enable debug logging (optional)
+- `HUGGINGFACE_TOKEN` - For human verification (optional)
+- `MIDJOURNEY_API_URL` - API server URL (default: `http://midjourney-api:3000`)
+
+**Available Midjourney versions:**
+- `7` - Midjourney v7 (latest, default)
+- `6.1` - Midjourney v6.1
+- `6` - Midjourney v6
+- `5.2` - Midjourney v5.2
+- `niji6` - Niji 6 (anime style)
+- `niji5` - Niji 5 (anime style)
+
+**Midjourney options:**
+- `aspectRatio` - Image dimensions: 'landscape' (16:9), 'portrait' (9:16), 'square' (1:1), or custom ratio
+- `stylize` - Artistic influence (0-1000, default: 100). Higher = more artistic interpretation
+- `chaos` - Variation/randomness (0-100, default: 0). Higher = more varied results
+- `no` - Comma-separated list of elements to exclude (e.g., 'people, text, watermarks')
+- `version` - Midjourney version to use
+- `style` - 'raw' (less opinionated) or 'scenic' (more artistic)
+- `seed` - Deterministic seed for reproducible results
+- `quality` - Image quality setting
+- `weird` - Weirdness factor for experimental results
+- `tile` - Enable seamless tiling
+- `upscaleIndex` - Which image from 2x2 grid to upscale (1-4, default: 1)
 
 All transports require authentication. Players must first register via `POST /register` on the faction's HTTP server, then connect via WebSocket or Session MCP with their credentials. Connections are tagged with `factionId` for routing to the correct character generation flow.
