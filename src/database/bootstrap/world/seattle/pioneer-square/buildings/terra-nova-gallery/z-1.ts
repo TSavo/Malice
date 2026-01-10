@@ -12,7 +12,7 @@ export const building = {
       name: 'Basement Padlock',
       description:
         'A heavy-duty padlock, the kind that resists bolt cutters.',
-      difficulty: 4,
+      difficulty: 4
     },
     '%BASEMENT_DOOR': {
       prototype: 'door',
@@ -23,7 +23,7 @@ export const building = {
       open: false,
       locks: ['%BASEMENT_LOCK'],
       material: 'wood',
-      durability: 50,
+      durability: 50
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -50,9 +50,9 @@ A trapdoor in the ceiling leads up to the gallery office. The basement ceiling i
           to: 'z0.ts#%OFFICE',
           description: 'A trapdoor leads up to the gallery office',
           door: '%BASEMENT_DOOR',
-          locks: ['%BASEMENT_LOCK'],
+          locks: ['%BASEMENT_LOCK']
         },
-        north: '%VAULT',
+        north: '%VAULT'
       },
       objects: [
         {
@@ -60,16 +60,16 @@ A trapdoor in the ceiling leads up to the gallery office. The basement ceiling i
           name: 'worktable',
           aliases: ['table', 'workbench'],
           description:
-            'A massive worktable built for framing, its surface a palimpsest of cuts and scratches. The table has seen hundreds of pieces pass through—measured, matted, framed, transformed from raw canvas to gallery-ready commodity. The tools around it are organized with the precision of someone who respected their craft.',
+            'A massive worktable built for framing, its surface a palimpsest of cuts and scratches. The table has seen hundreds of pieces pass through—measured, matted, framed, transformed from raw canvas to gallery-ready commodity. The tools around it are organized with the precision of someone who respected their craft.'
         },
         {
           prototype: 'describable',
           name: 'framing equipment',
           aliases: ['equipment', 'tools', 'cutters'],
           description:
-            'The tools of the framing trade: mat cutters with parallel rulers, glass cutters with carbide wheels, corner clamps in various sizes, a miter saw for cutting molding. The equipment is dusty but maintained—cleaned and oiled before being left, perhaps in hope of return. The molding racks hold dozens of options, from minimalist metal to ornate gilded wood.',
+            'The tools of the framing trade: mat cutters with parallel rulers, glass cutters with carbide wheels, corner clamps in various sizes, a miter saw for cutting molding. The equipment is dusty but maintained—cleaned and oiled before being left, perhaps in hope of return. The molding racks hold dozens of options, from minimalist metal to ornate gilded wood.'
         },
-      ],
+      ]
     },
 
     '%VAULT': {
@@ -88,12 +88,7 @@ A breach in the northern wall opens to the underground, the edges worn smooth by
       waterLevel: 0,
       outdoor: false,
       exits: {
-        south: '%WORKSHOP',
-        north: {
-          to: 'underground/upper-tunnels/x-15-y-5.ts',
-          description:
-            'A breach in the wall leads to the underground tunnels',
-        },
+        south: '%WORKSHOP'
       },
       objects: [
         {
@@ -101,23 +96,23 @@ A breach in the northern wall opens to the underground, the edges worn smooth by
           name: 'art racks',
           aliases: ['racks', 'storage', 'canvases'],
           description:
-            'Vertical storage racks designed for paintings, each slot padded with archival foam. The works are wrapped in acid-free paper, their corners protected by cardboard. Numbers are visible on each wrapping—inventory codes that correspond to records in the office above. The art inside could be valuable or worthless. The wrapping treats all of it the same.',
+            'Vertical storage racks designed for paintings, each slot padded with archival foam. The works are wrapped in acid-free paper, their corners protected by cardboard. Numbers are visible on each wrapping—inventory codes that correspond to records in the office above. The art inside could be valuable or worthless. The wrapping treats all of it the same.'
         },
         {
           prototype: 'describable',
           name: 'climate control unit',
           aliases: ['hvac', 'climate control', 'cooling'],
           description:
-            'A specialized climate control unit built into the wall, its display showing temperature and humidity readings. The system maintains gallery-standard conditions: 70°F, 50% relative humidity. The unit hums quietly, drawing power from somewhere to protect art that may never be displayed again. The dedication is touching, or absurd, depending on perspective.',
+            'A specialized climate control unit built into the wall, its display showing temperature and humidity readings. The system maintains gallery-standard conditions: 70°F, 50% relative humidity. The unit hums quietly, drawing power from somewhere to protect art that may never be displayed again. The dedication is touching, or absurd, depending on perspective.'
         },
         {
           prototype: 'describable',
           name: 'wall breach',
           aliases: ['breach', 'opening', 'hole'],
           description:
-            'A section of wall where bricks have been removed, creating a passage into the underground beyond. The edges are worn smooth, the bricks around it darkened by the touch of hands over time. The breach was made intentionally, maintained intentionally, used regularly. Art and underground commerce have always been adjacent.',
+            'A section of wall where bricks have been removed, creating a passage into the underground beyond. The edges are worn smooth, the bricks around it darkened by the touch of hands over time. The breach was made intentionally, maintained intentionally, used regularly. Art and underground commerce have always been adjacent.'
         },
-      ],
-    },
-  },
+      ]
+    }
+  }
 };

@@ -127,8 +127,6 @@ The smell of old books mingles with the smell of old earth—paper and stone, kn
       exits: {
         east: '%ARCHIVE',
         south: {
-          to: 'buildings/yesler-underground/z-2.ts',
-          room: '%YESLER_WEST',
           description: 'An excavated passage leads into the underground',
           hidden: true,
         },

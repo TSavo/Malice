@@ -1,0 +1,36 @@
+# Ollama service for local LLM inference
+# Used for generating room descriptions from roomgen exports
+#
+# Usage:
+#   docker compose -f docker-compose.ollama.yml up -d
+#   docker exec ollama ollama pull mistral-nemo:12b-instruct-2407-q4_K_M
+#   npx tsx scripts/generate-room-descriptions.ts underground-world.json
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    environment:
+      - OLLAMA_NUM_PARALLEL=1
+      - OLLAMA_MAX_LOADED_MODELS=1
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:11434/api/tags || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  ollama_data:
+    driver: local

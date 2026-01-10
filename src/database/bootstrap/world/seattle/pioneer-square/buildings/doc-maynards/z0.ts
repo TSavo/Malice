@@ -20,7 +20,7 @@ export const building = {
       name: 'Pub Lock',
       description:
         'A heavy brass deadbolt, the mechanism old but well-maintained.',
-      difficulty: 3,
+      difficulty: 3
     },
     '%FRONT_DOOR': {
       prototype: 'door',
@@ -31,14 +31,14 @@ export const building = {
       open: false,
       locks: ['%FRONT_LOCK'],
       material: 'wood',
-      durability: 70,
+      durability: 70
     },
     '%CELLAR_LOCK': {
       prototype: 'lock',
       name: 'Cellar Lock',
       description:
         'A padlock securing the cellar hatch, the mechanism corroded but functional.',
-      difficulty: 4,
+      difficulty: 4
     },
     '%CELLAR_HATCH': {
       prototype: 'door',
@@ -49,7 +49,7 @@ export const building = {
       open: false,
       locks: ['%CELLAR_LOCK'],
       material: 'wood',
-      durability: 65,
+      durability: 65
     },
     '%BACK_DOOR': {
       prototype: 'door',
@@ -60,7 +60,7 @@ export const building = {
       open: false,
       locks: [],
       material: 'metal',
-      durability: 75,
+      durability: 75
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -86,15 +86,15 @@ Old photographs cover the walls: Seattle in the 1890s, the waterfront before the
         east: {
           to: '1st-ave-s/y2.ts',
           description: 'The heavy wooden door leads to 1st Ave S',
-          door: '%FRONT_DOOR',
+          door: '%FRONT_DOOR'
         },
         north: '%TOUR_ROOM',
         west: '%BACK_ROOM',
         down: {
           description: 'A hatch behind the bar leads down to the cellar',
           door: '%CELLAR_HATCH',
-          to: '%CELLAR',
-        },
+          to: '%CELLAR'
+        }
       },
       sittables: [
         {
@@ -102,7 +102,7 @@ Old photographs cover the walls: Seattle in the 1890s, the waterfront before the
           capacity: 10,
           emptyMsg:
             'Wooden bar stools line the mahogany bar, their seats worn smooth by decades of drinkers.',
-          occupiedMsg: '%s sitting at the bar',
+          occupiedMsg: '%s sitting at the bar'
         },
       ],
       objects: [
@@ -111,27 +111,27 @@ Old photographs cover the walls: Seattle in the 1890s, the waterfront before the
           name: 'mahogany bar',
           aliases: ['bar', 'counter'],
           description: `A massive mahogany bar, the centerpiece of the establishment. The wood is dark with age, polished to a shine in places, scarred by cigarette burns and glass rings in others. Brass rails run along the base and edge, worn smooth by feet and hands. This bar has served drinks through Prohibition (quietly), the Depression (grimly), and every decade since (steadily). It will probably outlast everything else in the building.`,
-          boltedDown: true,
+          boltedDown: true
         },
         {
           prototype: 'cabinet',
           name: 'back bar',
           aliases: ['bottles', 'liquor', 'spirits'],
-          description: `The back bar is a Victorian showpiece—carved mahogany shelves, mirrors that multiply the bottles into infinite recession, brass fixtures that were impressive in 1890 and are impressive now. The bottles are dusty but full: whiskey, bourbon, gin, vodka, the staples of drinking arranged by type and price. The expensive stuff is on the top shelf, out of easy reach. The cheap stuff is at elbow height, for quick pours.`,
+          description: `The back bar is a Victorian showpiece—carved mahogany shelves, mirrors that multiply the bottles into infinite recession, brass fixtures that were impressive in 1890 and are impressive now. The bottles are dusty but full: whiskey, bourbon, gin, vodka, the staples of drinking arranged by type and price. The expensive stuff is on the top shelf, out of easy reach. The cheap stuff is at elbow height, for quick pours.`
         },
         {
           prototype: 'describable',
           name: 'historic photographs',
           aliases: ['photographs', 'photos', 'pictures'],
-          description: `Framed photographs cover every available wall space, documenting Seattle's transformation from mudflat to metropolis. The oldest show the waterfront before the seawall, ships tied to piers that no longer exist. Others show the Great Fire of 1889, the regrading that buried the original streets, the construction of the buildings that stand today. Each photograph is a window into a city that was demolished to build the present.`,
+          description: `Framed photographs cover every available wall space, documenting Seattle's transformation from mudflat to metropolis. The oldest show the waterfront before the seawall, ships tied to piers that no longer exist. Others show the Great Fire of 1889, the regrading that buried the original streets, the construction of the buildings that stand today. Each photograph is a window into a city that was demolished to build the present.`
         },
         {
           prototype: 'describable',
           name: 'Doc Maynard portrait',
           aliases: ['portrait', 'Maynard', 'Doc'],
-          description: `A portrait of David "Doc" Maynard hangs above the bar—the founder of Pioneer Square, Seattle's first physician, and by most accounts an amiable drunk who gave away more than he sold. The portrait shows a bearded man in 19th-century dress, his expression suggesting someone who found the whole thing amusing. He died broke and beloved. The bar named for him outlived him by a century and a half.`,
+          description: `A portrait of David "Doc" Maynard hangs above the bar—the founder of Pioneer Square, Seattle's first physician, and by most accounts an amiable drunk who gave away more than he sold. The portrait shows a bearded man in 19th-century dress, his expression suggesting someone who found the whole thing amusing. He died broke and beloved. The bar named for him outlived him by a century and a half.`
         },
-      ],
+      ]
     },
 
     '%TOUR_ROOM': {
@@ -151,7 +151,7 @@ A heavy steel door at the back is padlocked shut, a chain looped through the han
       outdoor: false,
       exits: {
         south: '%BAR',
-        west: '%BACK_ROOM',
+        west: '%BACK_ROOM'
       },
       sittables: [
         {
@@ -159,7 +159,7 @@ A heavy steel door at the back is padlocked shut, a chain looped through the han
           capacity: 20,
           emptyMsg:
             'Wooden benches line the walls, seating for tour groups that no longer gather.',
-          occupiedMsg: '%s sitting on the tour benches',
+          occupiedMsg: '%s sitting on the tour benches'
         },
       ],
       objects: [
@@ -167,21 +167,21 @@ A heavy steel door at the back is padlocked shut, a chain looped through the han
           prototype: 'cabinet',
           name: 'artifact displays',
           aliases: ['display', 'cases', 'artifacts'],
-          description: `Glass display cases hold artifacts recovered from the Underground: medicine bottles, clay pipes, shards of china with partial patterns, the everyday objects of businesses that operated at street level before the fire. Small placards identify each item: RECOVERED FROM BENEATH 1ST AVE, CIRCA 1890. The objects are mundane—that's the point. Ordinary life, buried and preserved.`,
+          description: `Glass display cases hold artifacts recovered from the Underground: medicine bottles, clay pipes, shards of china with partial patterns, the everyday objects of businesses that operated at street level before the fire. Small placards identify each item: RECOVERED FROM BENEATH 1ST AVE, CIRCA 1890. The objects are mundane—that's the point. Ordinary life, buried and preserved.`
         },
         {
           prototype: 'describable',
           name: 'Pioneer Square model',
           aliases: ['model', 'diorama'],
-          description: `A scale model of Pioneer Square before the Great Fire of 1889, built with painstaking detail under a glass case. Tiny wooden buildings crowd tiny muddy streets. The waterfront is visible, ships at anchor. Everything in this model is about to burn, or be buried, or both. The model captures a moment before catastrophe, preserved under glass like a warning.`,
+          description: `A scale model of Pioneer Square before the Great Fire of 1889, built with painstaking detail under a glass case. Tiny wooden buildings crowd tiny muddy streets. The waterfront is visible, ships at anchor. Everything in this model is about to burn, or be buried, or both. The model captures a moment before catastrophe, preserved under glass like a warning.`
         },
         {
           prototype: 'describable',
           name: 'tour podium',
           aliases: ['podium', 'lectern'],
-          description: `A wooden podium where tour guides delivered their introductory presentations—the history of the fire, the burial of the streets, the safety rules for descending into darkness. Notes are still taped to the podium's surface, bullet points for a speech given thousands of times: "WAIT FOR EVERYONE TO GATHER." "WATCH YOUR HEAD." "NO FLASH PHOTOGRAPHY." The notes are yellowed. The tours are over.`,
+          description: `A wooden podium where tour guides delivered their introductory presentations—the history of the fire, the burial of the streets, the safety rules for descending into darkness. Notes are still taped to the podium's surface, bullet points for a speech given thousands of times: "WAIT FOR EVERYONE TO GATHER." "WATCH YOUR HEAD." "NO FLASH PHOTOGRAPHY." The notes are yellowed. The tours are over.`
         },
-      ],
+      ]
     },
 
     '%BACK_ROOM': {
@@ -204,8 +204,8 @@ A narrow stairway leads up to the second floor, where the building's original ho
         north: '%TOUR_ROOM',
         up: {
           description: 'A narrow stairway leads up',
-          to: '%STORAGE',
-        },
+          to: '%STORAGE'
+        }
       },
       objects: [
         {
@@ -213,21 +213,21 @@ A narrow stairway leads up to the second floor, where the building's original ho
           name: 'stacked kegs',
           aliases: ['kegs', 'barrels'],
           description: `Stainless steel kegs stacked three high in the corner—the inventory of a bar that expected to reopen. The kegs are probably still pressurized, their contents preserved by the same technology that keeps beer drinkable for months. Whether that beer is still drinkable after years is a question someone might eventually answer.`,
-          boltedDown: true,
+          boltedDown: true
         },
         {
           prototype: 'desk',
           name: 'office desk',
           aliases: ['desk'],
-          description: `A metal desk shoved against one wall, its surface covered in bar paperwork: invoices, inventory lists, schedules marked with shift changes. A calculator sits beside a stack of receipts, its display showing a number that was important once. The desk lamp is the adjustable kind, bent toward the paperwork, dark now.`,
+          description: `A metal desk shoved against one wall, its surface covered in bar paperwork: invoices, inventory lists, schedules marked with shift changes. A calculator sits beside a stack of receipts, its display showing a number that was important once. The desk lamp is the adjustable kind, bent toward the paperwork, dark now.`
         },
         {
           prototype: 'describable',
           name: 'stored furniture',
           aliases: ['chairs', 'tables', 'furniture'],
-          description: `Chairs and tables stacked upside-down against one wall, the configuration of a room being rearranged. The furniture is mismatched—different eras, different styles, the accumulated seating of a bar that replaced what broke and kept what worked. The reorganization was never completed. The furniture waits, inverted, for a purpose it won't receive.`,
+          description: `Chairs and tables stacked upside-down against one wall, the configuration of a room being rearranged. The furniture is mismatched—different eras, different styles, the accumulated seating of a bar that replaced what broke and kept what worked. The reorganization was never completed. The furniture waits, inverted, for a purpose it won't receive.`
         },
-      ],
+      ]
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -240,7 +240,7 @@ A narrow stairway leads up to the second floor, where the building's original ho
 
 Kegs and cases line the walls, the bar's reserve inventory dusty but intact. An ancient refrigeration unit hums in one corner, somehow still keeping things cold, its compressor rattling with the effort of decades. The unit probably shouldn't work. It does.
 
-The cinderblock seal that once closed the old tour entrance has been broken through—someone removed enough blocks to create a passage. The Underground Tour descended here for sixty years before the tours stopped. Now the passage is open again, leading east into the buried streets of old Seattle.`,
+The cinderblock seal that once closed the old tour entrance remains intact, though someone has scratched at the mortar with crowbars, testing its strength. The Underground Tour descended through here for sixty years before the tours stopped. The passage is sealed now, the buried streets beyond inaccessible from this location.`,
       x: -15,
       y: 2,
       z: -1,
@@ -252,34 +252,33 @@ The cinderblock seal that once closed the old tour entrance has been broken thro
       exits: {
         up: {
           description: 'A ladder leads up to the bar',
-          to: '%BAR',
-        },
-        east: {
-          to: 'underground/upper-tunnels/x-14-y2.ts',
-          description: 'A breach in the cinderblock wall leads into the Underground',
-        },
+          to: '%BAR'
+        }
+        // Note: The "down to underground" exit is created by underground-json-builder
+        // when it finds this room at (-15, 2, -1) via spatial.getRoomDataAt() while
+        // processing the underground room at (-15, 2, -2)
       },
       objects: [
         {
           prototype: 'cabinet',
           name: 'beer storage',
           aliases: ['kegs', 'cases', 'inventory'],
-          description: `Cases of bottled beer stacked against the brick walls, their cardboard packaging damp but intact. The brands are familiar—local microbrews, national distributors, the variety of a bar that served diverse tastes. Some bottles have burst from freezing and thawing cycles. Others remain sealed, their contents potentially still drinkable. The dust suggests no one has tested that theory.`,
+          description: `Cases of bottled beer stacked against the brick walls, their cardboard packaging damp but intact. The brands are familiar—local microbrews, national distributors, the variety of a bar that served diverse tastes. Some bottles have burst from freezing and thawing cycles. Others remain sealed, their contents potentially still drinkable. The dust suggests no one has tested that theory.`
         },
         {
           prototype: 'describable',
-          name: 'breached passage',
-          aliases: ['passage', 'tunnel', 'underground', 'breach'],
-          description: `A rough-cut passage in the east wall where the cinderblock seal was broken through. The blocks lie scattered on the floor, removed with crowbars rather than demolished. Tour groups descended through here for sixty years before the tours stopped. Someone reopened the route. The Underground breathes through the gap, cold air carrying the smell of old brick and older secrets.`,
+          name: 'sealed passage',
+          aliases: ['passage', 'seal', 'underground', 'entrance'],
+          description: `The old tour entrance is sealed with cinderblocks, their mortar still holding despite decades of settling. Fresh scratches around the edges show where someone tried prying at the blocks with crowbars, testing whether the seal could be broken. Tour groups descended through here for sixty years before the tours stopped. The passage remains sealed, the Underground inaccessible from this location. The air is still, no draft from the buried streets beyond.`
         },
         {
           prototype: 'furniture',
           name: 'ancient refrigerator',
           aliases: ['fridge', 'refrigerator', 'cooler'],
           description: `An ancient refrigeration unit, probably older than anyone who worked here, still humming in the corner. The compressor rattles. The seals are cracked. The temperature gauge reads 40°F, which is close enough to food-safe. The unit runs on the same mysterious power that keeps certain systems functioning when they shouldn't. Nobody questions it. The beer stays cold.`,
-          boltedDown: true,
+          boltedDown: true
         },
-      ],
+      ]
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -306,23 +305,23 @@ A narrow stairway continues up to the roof access, its steps worn concave by a c
         north: '%OFFICE',
         up: {
           description: 'A stairway continues up to the roof',
-          to: '%ROOF_SE',
-        },
+          to: '%ROOF_SE'
+        }
       },
       objects: [
         {
           prototype: 'cabinet',
           name: 'storage boxes',
           aliases: ['boxes', 'crates', 'merchandise'],
-          description: `Cardboard boxes stacked floor to ceiling, their contents labeled in marker: TOUR SHIRTS L, SHOT GLASSES, PROMO MATERIALS 2015. The merchandise of a business that expected to continue operating. Some boxes have been opened, their contents rummaged. Others remain sealed, inventory for a gift shop that will never reopen.`,
+          description: `Cardboard boxes stacked floor to ceiling, their contents labeled in marker: TOUR SHIRTS L, SHOT GLASSES, PROMO MATERIALS 2015. The merchandise of a business that expected to continue operating. Some boxes have been opened, their contents rummaged. Others remain sealed, inventory for a gift shop that will never reopen.`
         },
         {
           prototype: 'describable',
           name: 'old wallpaper',
           aliases: ['wallpaper', 'walls'],
-          description: `The original hotel wallpaper is visible in patches—floral patterns in colors that were fashionable a century ago, faded now to suggestions of their original hues. The wallpaper peels where moisture has worked its way in, curling back to reveal older layers beneath. The building's history is readable in its walls, each layer a chapter.`,
+          description: `The original hotel wallpaper is visible in patches—floral patterns in colors that were fashionable a century ago, faded now to suggestions of their original hues. The wallpaper peels where moisture has worked its way in, curling back to reveal older layers beneath. The building's history is readable in its walls, each layer a chapter.`
         },
-      ],
+      ]
     },
 
     '%OFFICE': {
@@ -341,28 +340,28 @@ A small safe sits in the corner, door ajar, contents gone. Someone knew it was h
       waterLevel: 0,
       outdoor: false,
       exits: {
-        south: '%STORAGE',
+        south: '%STORAGE'
       },
       objects: [
         {
           prototype: 'desk',
           name: 'manager desk',
           aliases: ['desk'],
-          description: `A wooden desk cluttered with bar paperwork: liquor licenses in frames, health inspection certificates, employee schedules, the administrative overhead of running an establishment. A nameplate reads MANAGER, generic and interchangeable. A family photo shows someone's kids, ages uncertain, faces smiling.`,
+          description: `A wooden desk cluttered with bar paperwork: liquor licenses in frames, health inspection certificates, employee schedules, the administrative overhead of running an establishment. A nameplate reads MANAGER, generic and interchangeable. A family photo shows someone's kids, ages uncertain, faces smiling.`
         },
         {
           prototype: 'describable',
           name: 'awards wall',
           aliases: ['awards', 'certificates'],
-          description: `Framed awards and certificates document the bar's recognition over decades: best bar awards, preservation honors, neighborhood association certificates. BEST CRAFT COCKTAILS 2018. PIONEER SQUARE BUSINESS OF THE YEAR 2007. Each frame is a moment of pride, now dusty and irrelevant.`,
+          description: `Framed awards and certificates document the bar's recognition over decades: best bar awards, preservation honors, neighborhood association certificates. BEST CRAFT COCKTAILS 2018. PIONEER SQUARE BUSINESS OF THE YEAR 2007. Each frame is a moment of pride, now dusty and irrelevant.`
         },
         {
           prototype: 'cabinet',
           name: 'empty safe',
           aliases: ['safe'],
-          description: `A floor safe in the corner, its door hanging open, interior empty. The safe is old—1950s construction, the kind with a combination dial and heavy steel walls. Whatever it held—cash, probably, maybe documents—is gone. The safe remains, too heavy to move, too obsolete to repurpose.`,
+          description: `A floor safe in the corner, its door hanging open, interior empty. The safe is old—1950s construction, the kind with a combination dial and heavy steel walls. Whatever it held—cash, probably, maybe documents—is gone. The safe remains, too heavy to move, too obsolete to repurpose.`
         },
-      ],
+      ]
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -387,7 +386,7 @@ A weathered wooden deck suggests someone used this space for breaks or parties�
       exits: {
         down: '%STORAGE',
         north: '%ROOF_NE',
-        west: '%ROOF_SW',
+        west: '%ROOF_SW'
       },
       sittables: [
         {
@@ -395,7 +394,7 @@ A weathered wooden deck suggests someone used this space for breaks or parties�
           capacity: 2,
           emptyMsg:
             'Rusted lawn chairs sit on the weathered deck, left out for seasons beyond counting.',
-          occupiedMsg: '%s sitting in the rusted chairs',
+          occupiedMsg: '%s sitting in the rusted chairs'
         },
       ],
       objects: [
@@ -404,16 +403,16 @@ A weathered wooden deck suggests someone used this space for breaks or parties�
           name: 'rooftop deck',
           aliases: ['deck', 'boards'],
           description: `A wooden deck covering part of the roof, its boards weathered grey and stained with the residue of spilled drinks and old parties. The deck was someone's project—an attempt to make the rooftop usable, a space for staff breaks or private gatherings. The attempt succeeded, for a while.`,
-          boltedDown: true,
+          boltedDown: true
         },
         {
           prototype: 'furniture',
           name: 'HVAC equipment',
           aliases: ['hvac', 'units'],
           description: `Commercial HVAC units squat on concrete pads, their housings weathered, their fans frozen. The equipment cooled the bar below, maintaining the comfortable temperature that drinking establishments require. The cooling has stopped. The bar below is whatever temperature the building achieves on its own.`,
-          boltedDown: true,
+          boltedDown: true
         },
-      ],
+      ]
     },
 
     '%ROOF_NE': {
@@ -433,16 +432,16 @@ From here you can see north toward the blocks where Pioneer Square gives way to 
       outdoor: true,
       exits: {
         south: '%ROOF_SE',
-        west: '%ROOF_NW',
+        west: '%ROOF_NW'
       },
       objects: [
         {
           prototype: 'describable',
           name: 'old neon sign',
           aliases: ['sign', 'neon'],
-          description: `A broken neon sign leaning against the parapet, its tubes cracked, its transformer box missing. The sign reads PUBLIC HOUSE in flowing script, the letters sized for visibility from the street. The sign was removed during some renovation and never reinstalled—too large to move, too damaged to repair, it became rooftop furniture.`,
+          description: `A broken neon sign leaning against the parapet, its tubes cracked, its transformer box missing. The sign reads PUBLIC HOUSE in flowing script, the letters sized for visibility from the street. The sign was removed during some renovation and never reinstalled—too large to move, too damaged to repair, it became rooftop furniture.`
         },
-      ],
+      ]
     },
 
     '%ROOF_SW': {
@@ -462,22 +461,22 @@ Graffiti covers the parapet wall, tags accumulated over years of unauthorized ro
       outdoor: true,
       exits: {
         east: '%ROOF_SE',
-        north: '%ROOF_NW',
+        north: '%ROOF_NW'
       },
       objects: [
         {
           prototype: 'describable',
           name: 'fire escape',
           aliases: ['escape', 'stairs'],
-          description: `An iron fire escape descending the building's west face, switchbacking down to the alley below. The ironwork is old but sturdy—the kind of construction that outlasts the people who built it. The final ladder is the drop-down type, latched in the raised position, requiring release from above.`,
+          description: `An iron fire escape descending the building's west face, switchbacking down to the alley below. The ironwork is old but sturdy—the kind of construction that outlasts the people who built it. The final ladder is the drop-down type, latched in the raised position, requiring release from above.`
         },
         {
           prototype: 'describable',
           name: 'ghost graffiti',
           aliases: ['graffiti', 'mural', 'art'],
-          description: `A graffiti mural covers part of the parapet—a spectral figure emerging from stylized underground passages, arms raised, face blank. The caption reads THE DEAD RISE in dripping letters. The piece is skilled, probably the work of someone who knew the Underground Tour history. The dead beneath Pioneer Square aren't rising, but they're not gone either.`,
+          description: `A graffiti mural covers part of the parapet—a spectral figure emerging from stylized underground passages, arms raised, face blank. The caption reads THE DEAD RISE in dripping letters. The piece is skilled, probably the work of someone who knew the Underground Tour history. The dead beneath Pioneer Square aren't rising, but they're not gone either.`
         },
-      ],
+      ]
     },
 
     '%ROOF_NW': {
@@ -497,7 +496,7 @@ A weathered bench sits near the parapet edge, positioned for sunset views that a
       outdoor: true,
       exits: {
         south: '%ROOF_SW',
-        east: '%ROOF_NE',
+        east: '%ROOF_NE'
       },
       sittables: [
         {
@@ -505,7 +504,7 @@ A weathered bench sits near the parapet edge, positioned for sunset views that a
           capacity: 3,
           emptyMsg:
             'A weathered wooden bench faces west, positioned for sunsets that Seattle rarely delivers.',
-          occupiedMsg: '%s sitting on the weathered bench',
+          occupiedMsg: '%s sitting on the weathered bench'
         },
       ],
       objects: [
@@ -513,9 +512,9 @@ A weathered bench sits near the parapet edge, positioned for sunset views that a
           prototype: 'describable',
           name: 'water tank mounts',
           aliases: ['mounts', 'brackets', 'tank'],
-          description: `Iron mounting brackets bolted to a concrete pad, the remains of a water tank that was removed or collapsed. The brackets are rusted but sturdy, still capable of supporting significant weight. The tank they held is gone—salvaged for metal, probably, or simply rotted away. The infrastructure remains, waiting for a tank that won't be installed.`,
+          description: `Iron mounting brackets bolted to a concrete pad, the remains of a water tank that was removed or collapsed. The brackets are rusted but sturdy, still capable of supporting significant weight. The tank they held is gone—salvaged for metal, probably, or simply rotted away. The infrastructure remains, waiting for a tank that won't be installed.`
         },
-      ],
-    },
-  },
+      ]
+    }
+  }
 };

@@ -71,8 +71,6 @@ Somewhere ahead, the tunnel connects to the forgotten passages beneath Pioneer S
       exits: {
         east: '%DC_UTILITY',
         southwest: {
-          to: 'buildings/yesler-underground/z-2.ts',
-          room: '%PROHIBITION_HALL',
           description: 'The tunnel continues southwest into the Seattle Underground',
         },
       },

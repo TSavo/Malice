@@ -61,7 +61,7 @@ interface DeferredWorldExit {
 }
 
 export class BuildingBuilder implements Builder {
-  static provides: string[] = []; // Creates individual building room aliases, not a single alias
+  static provides: string[] = ['buildings', 'basements']; // Provides building rooms including basements at z=-1
   // All prototypes used in building definitions must be loaded before building
   static depends = [
     'room',
@@ -299,15 +299,6 @@ export class BuildingBuilder implements Builder {
       sharedPlaceholders.set(placeholder, room);
       // Register globally for cross-building/world exit resolution
       this.allPlaceholders.set(placeholder, room);
-
-      // Load pre-generated images from disk (if specified)
-      if (def.imageOnDisk) {
-        await this.loadImagesOnDisk(
-          room,
-          def.imageOnDisk,
-          `${buildingName}/${floorName}/${placeholder}`,
-        );
-      }
 
       // Register alias if specified (e.g., alias: 'immigrationServices' -> $immigrationServices)
       if (def.alias && objectManager) {
@@ -1055,86 +1046,6 @@ export class BuildingBuilder implements Builder {
     }
 
     return null;
-  }
-
-  /**
-   * Load pre-generated images from disk and attach to object
-   */
-  private async loadImagesOnDisk(
-    target: RuntimeObject,
-    imageSpec: string | { file: string; aspectRatio?: string } | Array<{ file: string; aspectRatio?: string }>,
-    debugKey: string,
-  ): Promise<void> {
-    const $ = this.manager as any;
-    const blob = $.blob;
-
-    if (!blob) {
-      console.warn(`    Warning: $blob not available, skipping images for ${debugKey}`);
-      return;
-    }
-
-    // Normalize to array
-    let specs: Array<{ file: string; aspectRatio?: string }>;
-    if (typeof imageSpec === 'string') {
-      specs = [{ file: imageSpec, aspectRatio: '16:9' }];
-    } else if (Array.isArray(imageSpec)) {
-      specs = imageSpec;
-    } else {
-      specs = [imageSpec];
-    }
-
-    const assetsDir = path.join(process.cwd(), 'assets/images');
-    const existingImages = (target.get('images') as Record<string, string>) || {};
-    const images: Record<string, string> = { ...existingImages };
-
-    for (const spec of specs) {
-      const aspectRatio = spec.aspectRatio || '16:9';
-
-      // Skip if already have image for this aspect ratio
-      if (images[aspectRatio]) {
-        continue;
-      }
-
-      const imagePath = path.join(assetsDir, spec.file);
-
-      if (!fs.existsSync(imagePath)) {
-        console.warn(`    Warning: Image not found: ${spec.file} for ${debugKey}`);
-        continue;
-      }
-
-      try {
-        // Read image and convert to base64
-        const imageBuffer = fs.readFileSync(imagePath);
-        const base64Data = imageBuffer.toString('base64');
-
-        // Determine content type from extension
-        const ext = spec.file.split('.').pop()?.toLowerCase() || 'png';
-        const contentTypeMap: Record<string, string> = {
-          png: 'image/png',
-          jpg: 'image/jpeg',
-          jpeg: 'image/jpeg',
-          webp: 'image/webp',
-        };
-        const contentType = contentTypeMap[ext] || 'image/png';
-
-        // Upload to GridFS via $blob
-        const blobKey = await blob.call('write', base64Data, {
-          contentType,
-          filename: spec.file.split('/').pop(),
-          source: 'bootstrap',
-          aspectRatio,
-        });
-
-        images[aspectRatio] = blobKey;
-      } catch (err) {
-        console.warn(`    Warning: Failed to load image ${spec.file}: ${err}`);
-      }
-    }
-
-    // Update object's images property if we loaded any
-    if (Object.keys(images).length > 0) {
-      target.set('images', images);
-    }
   }
 
   /**

@@ -12,7 +12,7 @@ export const building = {
       name: 'Basement Lock',
       description:
         'A heavy-duty padlock, the kind used to secure valuable inventory.',
-      difficulty: 4,
+      difficulty: 4
     },
     '%BASEMENT_DOOR': {
       prototype: 'door',
@@ -23,7 +23,7 @@ export const building = {
       open: false,
       locks: ['%BASEMENT_LOCK'],
       material: 'metal',
-      durability: 70,
+      durability: 70
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -50,10 +50,10 @@ The climate control system hums steadily—dehumidifiers and temperature regulat
           to: 'z0.ts#%STORAGE',
           description: 'A trapdoor leads up to ground-floor storage',
           door: '%BASEMENT_DOOR',
-          locks: ['%BASEMENT_LOCK'],
+          locks: ['%BASEMENT_LOCK']
         },
         north: '%MECHANICAL',
-        west: '%OLD_FOUNDATION',
+        west: '%OLD_FOUNDATION'
       },
       objects: [
         {
@@ -61,16 +61,16 @@ The climate control system hums steadily—dehumidifiers and temperature regulat
           name: 'art racks',
           aliases: ['racks', 'storage', 'canvases'],
           description:
-            'Vertical art storage racks, their slots padded with archival materials. Canvases slide in and out, each numbered with a brass tag. The system is analog, efficient, and entirely dependent on someone remembering where everything is. That someone is gone.',
+            'Vertical art storage racks, their slots padded with archival materials. Canvases slide in and out, each numbered with a brass tag. The system is analog, efficient, and entirely dependent on someone remembering where everything is. That someone is gone.'
         },
         {
           prototype: 'describable',
           name: 'shrouded sculptures',
           aliases: ['sculptures', 'statues', 'art'],
           description:
-            'Sculptures stand on pedestals, covered in white cloth that turns them into abstract shapes. The cloth protects from dust and light damage. The shapes beneath could be anything—figurative, abstract, political, personal. The mystery is part of the preservation.',
+            'Sculptures stand on pedestals, covered in white cloth that turns them into abstract shapes. The cloth protects from dust and light damage. The shapes beneath could be anything—figurative, abstract, political, personal. The mystery is part of the preservation.'
         },
-      ],
+      ]
     },
 
     '%MECHANICAL': {
@@ -89,7 +89,7 @@ A small workspace in the corner has maintenance logs, the last entries from mont
       waterLevel: 0,
       outdoor: false,
       exits: {
-        south: '%ART_STORAGE',
+        south: '%ART_STORAGE'
       },
       objects: [
         {
@@ -97,16 +97,16 @@ A small workspace in the corner has maintenance logs, the last entries from mont
           name: 'HVAC unit',
           aliases: ['hvac', 'air conditioning', 'climate control'],
           description:
-            'A commercial HVAC unit, its compressor humming steadily. The unit is modern—installed within the last two decades—and still functions perfectly. It maintains the climate that protects the art stored below. The power comes from somewhere. The maintenance has stopped. The machine continues.',
+            'A commercial HVAC unit, its compressor humming steadily. The unit is modern—installed within the last two decades—and still functions perfectly. It maintains the climate that protects the art stored below. The power comes from somewhere. The maintenance has stopped. The machine continues.'
         },
         {
           prototype: 'describable',
           name: 'electrical panels',
           aliases: ['panels', 'breakers', 'electrical'],
           description:
-            'Electrical panels with breakers for each floor and zone. The labels are printed, professional: GALLERY LIGHTING, COFFEE BAR, CLIMATE CONTROL. Some breakers are tripped. Others remain on. The pattern suggests intentional conservation of power.',
+            'Electrical panels with breakers for each floor and zone. The labels are printed, professional: GALLERY LIGHTING, COFFEE BAR, CLIMATE CONTROL. Some breakers are tripped. Others remain on. The pattern suggests intentional conservation of power.'
         },
-      ],
+      ]
     },
 
     '%OLD_FOUNDATION': {
@@ -125,11 +125,7 @@ A breach in the western wall opens into darkness—the underground passage netwo
       waterLevel: 5,
       outdoor: false,
       exits: {
-        east: '%ART_STORAGE',
-        west: {
-          to: 'underground/upper-tunnels/x-14-y1.ts',
-          description: 'A breach in the foundation leads to the underground',
-        },
+        east: '%ART_STORAGE'
       },
       objects: [
         {
@@ -137,16 +133,16 @@ A breach in the western wall opens into darkness—the underground passage netwo
           name: 'stone foundation',
           aliases: ['stones', 'walls', 'foundation'],
           description:
-            'The original foundation stones, massive blocks fitted together with skill that predates modern construction. The stones are weathered, their surfaces marked by over a century of moisture seepage. Mineral deposits trace the water\'s path in white and orange lines. The foundation holds. It has held for 130 years.',
+            'The original foundation stones, massive blocks fitted together with skill that predates modern construction. The stones are weathered, their surfaces marked by over a century of moisture seepage. Mineral deposits trace the water\'s path in white and orange lines. The foundation holds. It has held for 130 years.'
         },
         {
           prototype: 'describable',
           name: 'wall breach',
           aliases: ['breach', 'opening', 'passage'],
           description:
-            'A section of wall where stones have been removed, creating a passage into the underground beyond. The breach is old—the edges worn smooth, the surrounding stones showing decades of contact. Someone uses this passage regularly. The footprints lead both ways.',
+            'A section of wall where stones have been removed, creating a passage into the underground beyond. The breach is old—the edges worn smooth, the surrounding stones showing decades of contact. Someone uses this passage regularly. The footprints lead both ways.'
         },
-      ],
-    },
-  },
+      ]
+    }
+  }
 };

@@ -1,8 +1,9 @@
 # GitHub Actions Self-Hosted Runner
-#
+name: github-runners
+
 # Usage:
 #   docker compose -f docker-compose.runner.yml up -d
-#   docker compose -f docker-compose.runner.yml up -d --scale github-runner=3
+#   docker compose -f docker-compose.runner.yml up -d --scale github-runner=10
 #
 # Prerequisites:
 #   1. Create a GitHub Personal Access Token (PAT) with 'repo' scope
@@ -24,6 +25,8 @@ services:
     build:
       context: ./docker/github-runner
       dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: ${RUNNER_BASE_IMAGE:-tsavo/malice-runner-base:latest}
     restart: unless-stopped
     environment:
       # Required: GitHub authentication

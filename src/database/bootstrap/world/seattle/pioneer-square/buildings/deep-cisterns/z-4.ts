@@ -30,8 +30,6 @@ The chamber was rediscovered by those who dug the Chinatown tunnels. They found 
       outdoor: false,
       exits: {
         up: {
-          to: 'buildings/chinatown-underground/z-2.ts',
-          room: '%ANCIENT_TUNNEL',
           description: 'A shaft rises toward the ancient tunnels',
         },
         south: '%CENTRAL_CISTERN',
@@ -57,8 +55,6 @@ The water is dark, tainted with the residue of a century of industrial use.`,
       outdoor: false,
       exits: {
         up: {
-          to: 'buildings/industrial-underground/z-2.ts',
-          room: '%PUMP_STATION',
           description: 'A flooded shaft rises toward the pump station',
         },
         west: '%INDUSTRIAL_RESERVOIR',
@@ -82,8 +78,6 @@ The water is dark, tainted with the residue of a century of industrial use.`,
       outdoor: false,
       exits: {
         up: {
-          to: 'buildings/industrial-underground/z-2.ts',
-          room: '%SEWER_JUNCTION',
           description: 'A shaft rises toward the sewer junction',
         },
         west: '%INDUSTRIAL_RESERVOIR',

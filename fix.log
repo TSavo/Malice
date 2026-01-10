@@ -1,0 +1,443 @@
+=== Room Description Fixer ===
+Input: underground-world-fresh-described.json
+Output: underground-world-fresh-described-fixed.json
+Model: mistral:7b
+
+Loaded 644 rooms
+Quick scan: 531 rooms look clean, 113 need AI review
+
+[1/113] r6 (modern) - FIXED
+  Before: COLD FLOOR, recent evidence of an unwelcome intruder. Beyond...
+  After:  COLD FLOOR, recent evidence of an unwelcome intruder. Beyond...
+  ETA: 162s remaining
+
+[2/113] r14 (modern) - OK (AI confirmed clean)
+  ETA: 90s remaining
+
+[3/113] r15 (victorian) - OK (AI confirmed clean)
+  ETA: 65s remaining
+
+[4/113] r20 (modern) - FIXED
+  Before: COLD concrete walls encased in weathered steel echoes of the...
+  After:  COLD concrete walls encased in weathered steel echoes of the...
+  ETA: 106s remaining
+
+[5/113] r27 (victorian) - OK (AI confirmed clean)
+  ETA: 87s remaining
+
+[6/113] r30 (modern) - OK (AI confirmed clean)
+  ETA: 75s remaining
+
+[7/113] r31 (victorian) - OK (AI confirmed clean)
+  ETA: 66s remaining
+
+[8/113] r33 (victorian) - FIXED
+  Before: COLD STONE SURFACES
+
+Exits: South - a railway station cloake...
+  After:  COLD STONE SURFACES
+
+Exits: South - a railway station cloake...
+  ETA: 67s remaining
+
+[9/113] r53 (depression) - OK (AI confirmed clean)
+  ETA: 61s remaining
+
+[10/113] r89 (modern) - FIXED
+  Before: COLD METALLIC WALLS, dim LED light reflecting off cool concr...
+  After:  COLD METALLIC WALLS, dim LED light reflecting off cool concr...
+  ETA: 76s remaining
+
+[11/113] r90 (modern) - OK (AI confirmed clean)
+  ETA: 70s remaining
+
+[12/113] r93 (victorian) - OK (AI confirmed clean)
+  ETA: 65s remaining
+
+[13/113] r94 (victorian) - OK (AI confirmed clean)
+  ETA: 60s remaining
+
+[14/113] r95 (victorian) - FIXED
+  Before: The hub room stands as an echo of 1889, a testament to its b...
+  After:  The hub room stands as an echo of 1889, a testament to its b...
+  ETA: 91s remaining
+
+[15/113] r103 (victorian) - OK (AI confirmed clean)
+  ETA: 85s remaining
+
+[16/113] r108 (victorian) - OK (AI confirmed clean)
+  ETA: 80s remaining
+
+[17/113] r122 (victorian) - OK (AI confirmed clean)
+  ETA: 75s remaining
+
+[18/113] r124 (victorian) - FIXED
+  Before: COLD STONE, rough beneath your feet, as you stand amidst rem...
+  After:  COLD STONE, rough beneath your feet, as you stand amidst rem...
+  ETA: 78s remaining
+
+[19/113] r145 (industrial) - OK (AI confirmed clean)
+  ETA: 74s remaining
+
+[20/113] r146 (industrial) - FIXED
+  Before: Concrete corridors stretch out like veins beneath Seattle's ...
+  After:  Concrete corridors stretch out like veins beneath Seattle's ...
+  ETA: 81s remaining
+
+[21/113] r147 (industrial) - FIXED
+  Before: The corridor's concrete expanse stretches out like veins ben...
+  After:  The corridor's concrete expanse stretches out like veins ben...
+  ETA: 88s remaining
+
+[22/113] r149 (deep) - OK (AI confirmed clean)
+  ETA: 84s remaining
+
+[23/113] r150 (industrial) - OK (AI confirmed clean)
+  ETA: 80s remaining
+
+[24/113] r151 (victorian) - FIXED
+  Before: Brick arches loom ominously, crumbling mortar whispering tal...
+  After:  Brick arches loom ominously, crumbling mortar whispering tal...
+  ETA: 85s remaining
+
+[25/113] r155 (victorian) - OK (AI confirmed clean)
+  ETA: 82s remaining
+
+[26/113] r158 (depression) - OK (AI confirmed clean)
+  ETA: 78s remaining
+
+[27/113] r162 (victorian) - FIXED
+  Before: COLD stone floor reverberates with echoes of trains long gon...
+  After:  COLD stone floor reverberates with echoes of trains long gon...
+  ETA: 79s remaining
+
+[28/113] r167 (victorian) - OK (AI confirmed clean)
+  ETA: 76s remaining
+
+[29/113] r172 (deep) - OK (AI confirmed clean)
+  ETA: 73s remaining
+
+[30/113] r177 (victorian) - OK (AI confirmed clean)
+  ETA: 70s remaining
+
+[31/113] r181 (victorian) - OK (AI confirmed clean)
+  ETA: 68s remaining
+
+[32/113] r184 (victorian) - OK (AI confirmed clean)
+  ETA: 65s remaining
+
+[33/113] r204 (victorian) - FIXED
+  Before: Brick arches, time-weathered yet resilient, loom high above ...
+  After:  Brick arches, time-weathered yet resilient, loom high above ...
+  ETA: 67s remaining
+
+[34/113] r206 (victorian) - OK (AI confirmed clean)
+  ETA: 65s remaining
+
+[35/113] r208 (victorian) - FIXED
+  Before: Creaks as time wears away at rusted hinges. White brickwork ...
+  After:  Creaks as time wears away at rusted hinges. White brickwork ...
+  ETA: 66s remaining
+
+[36/113] r218 (deep) - OK (AI confirmed clean)
+  ETA: 64s remaining
+
+[37/113] r222 (victorian) - FIXED
+  Before: Brick arches loom high above. Iron supports hold them steady...
+  After:  Brick arches loom high above. Iron supports hold them steady...
+  ETA: 64s remaining
+
+[38/113] r229 (depression) - OK (AI confirmed clean)
+  ETA: 62s remaining
+
+[39/113] r237 (victorian) - OK (AI confirmed clean)
+  ETA: 59s remaining
+
+[40/113] r242 (deep) - OK (AI confirmed clean)
+  ETA: 58s remaining
+
+[41/113] r257 (depression) - FIXED
+  Before: COLD, dampness clings to weather-worn concrete stairs. A rus...
+  After:  COLD, dampness clings to weather-worn concrete stairs. A rus...
+  ETA: 57s remaining
+
+[42/113] r259 (depression) - OK (AI confirmed clean)
+  ETA: 55s remaining
+
+[43/113] r260 (depression) - OK (AI confirmed clean)
+  ETA: 54s remaining
+
+[44/113] r265 (industrial) - OK (AI confirmed clean)
+  ETA: 52s remaining
+
+[45/113] r273 (victorian) - OK (AI confirmed clean)
+  ETA: 50s remaining
+
+[46/113] r278 (victorian) - OK (AI confirmed clean)
+  ETA: 49s remaining
+
+[47/113] r287 (victorian) - FIXED
+  Before: Cobweb-veiled brick archways tower, etched with lines from a...
+  After:  Cobweb-veiled brick archways tower, etched with lines from a...
+  ETA: 48s remaining
+
+[48/113] r301 (depression) - OK (AI confirmed clean)
+  ETA: 47s remaining
+
+[49/113] r302 (depression) - FIXED
+  Before: Cistern echoes off damp brick arches and rust-stained steel ...
+  After:  Cistern echoes off damp brick arches and rust-stained steel ...
+  ETA: 47s remaining
+
+[50/113] r303 (industrial) - OK (AI confirmed clean)
+  ETA: 46s remaining
+
+[51/113] r304 (industrial) - FIXED
+  Before: Cistern below concealed by an expansive iron grate above.
+A ...
+  After:  Cistern below concealed by an expansive iron grate above.
+A ...
+  ETA: 46s remaining
+
+[52/113] r306 (deep) - OK (AI confirmed clean)
+  ETA: 45s remaining
+
+[53/113] r307 (deep) - OK (AI confirmed clean)
+  ETA: 44s remaining
+
+[54/113] r308 (deep) - OK (AI confirmed clean)
+  ETA: 42s remaining
+
+[55/113] r313 (industrial) - OK (AI confirmed clean)
+  ETA: 41s remaining
+
+[56/113] r314 (industrial) - FIXED
+  Before: A dry scent fills the air around aging expansion joints and ...
+  After:  A dry scent fills the air around aging expansion joints and ...
+  ETA: 41s remaining
+
+[57/113] r323 (ancient) - OK (AI confirmed clean)
+  ETA: 40s remaining
+
+[58/113] r340 (victorian) - FIXED
+  Before: Creaks as hinges yield to the weight of time.
+White efflores...
+  After:  Creaks as hinges yield to the weight of time.
+White efflores...
+  ETA: 43s remaining
+
+[59/113] r346 (victorian) - OK (AI confirmed clean)
+  ETA: 41s remaining
+
+[60/113] r351 (victorian) - OK (AI confirmed clean)
+  ETA: 40s remaining
+
+[61/113] r363 (victorian) - OK (AI confirmed clean)
+  ETA: 39s remaining
+
+[62/113] r369 (depression) - FIXED
+  Before: The room is a flooded hub, harkening back to the Depression ...
+  After:  The room is a flooded hub, harkening back to the Depression ...
+  ETA: 40s remaining
+
+[63/113] r371 (industrial) - FIXED
+  Before: COLD AND UNYIELDING INDUSTRIAL HUB, concrete passages are et...
+  After:  COLD AND UNYIELDING INDUSTRIAL HUB, concrete passages are et...
+  ETA: 40s remaining
+
+[64/113] r372 (industrial) - OK (AI confirmed clean)
+  ETA: 39s remaining
+
+[65/113] r373 (industrial) - OK (AI confirmed clean)
+  ETA: 40s remaining
+
+[66/113] r374 (deep) - OK (AI confirmed clean)
+  ETA: 38s remaining
+
+[67/113] r383 (deep) - OK (AI confirmed clean)
+  ETA: 37s remaining
+
+[68/113] r388 (modern) - OK (AI confirmed clean)
+  ETA: 36s remaining
+
+[69/113] r391 (modern) - OK (AI confirmed clean)
+  ETA: 35s remaining
+
+[70/113] r395 (depression) - OK (AI confirmed clean)
+  ETA: 33s remaining
+
+[71/113] r397 (victorian) - FIXED
+  Before: Creaks as hinges yield to weight.
+White efflorescence marrin...
+  After:  Creaks as hinges yield to weight.
+White efflorescence marrin...
+  ETA: 33s remaining
+
+[72/113] r408 (depression) - OK (AI confirmed clean)
+  ETA: 32s remaining
+
+[73/113] r418 (victorian) - FIXED
+  Before: Crawlspaces among iron girders, crisscrossing above and corr...
+  After:  Crawlspaces among iron girders, crisscrossing above and corr...
+  ETA: 32s remaining
+
+[74/113] r421 (industrial) - OK (AI confirmed clean)
+  ETA: 30s remaining
+
+[75/113] r422 (deep) - OK (AI confirmed clean)
+  ETA: 29s remaining
+
+[76/113] r423 (depression) - FIXED
+  Before: Cisterns rust, their edges frayed like tattered remnants of ...
+  After:  Cisterns rust, their edges frayed like tattered remnants of ...
+  ETA: 29s remaining
+
+[77/113] r427 (deep) - FIXED
+  Before: COLD AIR BITES AT BARE SKIN, SEEPING INTO EVERY PORE, CARRYI...
+  After:  COLD AIR BITES AT BARE SKIN, SEEPING INTO EVERY PORE, CARRYI...
+  ETA: 29s remaining
+
+[78/113] r435 (depression) - FIXED
+  Before: Water laps at feet, filling this passage with a sense of for...
+  After:  Water laps at feet, filling this passage with a sense of for...
+  ETA: 28s remaining
+
+[79/113] r440 (victorian) - OK (AI confirmed clean)
+  ETA: 27s remaining
+
+[80/113] r445 (victorian) - OK (AI confirmed clean)
+  ETA: 26s remaining
+
+[81/113] r449 (depression) - OK (AI confirmed clean)
+  ETA: 25s remaining
+
+[82/113] r454 (depression) - FIXED
+  Before: The room is a damp labyrinth of concrete form marks, its wal...
+  After:  The room is a damp labyrinth of concrete form marks, its wal...
+  ETA: 25s remaining
+
+[83/113] r455 (depression) - FIXED
+  Before: COLD STEAM RADIATOR LIES ABANDONED IN THE EASTERN CORNER, IT...
+  After:  COLD STEAM RADIATOR LIES ABANDONED IN THE EASTERN CORNER, IT...
+  ETA: 25s remaining
+
+[84/113] r456 (depression) - OK (AI confirmed clean)
+  ETA: 24s remaining
+
+[85/113] r465 (victorian) - OK (AI confirmed clean)
+  ETA: 23s remaining
+
+[86/113] r466 (depression) - OK (AI confirmed clean)
+  ETA: 22s remaining
+
+[87/113] r469 (depression) - FIXED
+  Before: Cement arches tower, marked with grime from decades past. Ru...
+  After:  Cement arches tower, marked with grime from decades past. Ru...
+  ETA: 21s remaining
+
+[88/113] r485 (victorian) - FIXED
+  Before: Cement arches loom ominously, edges crumbling inward against...
+  After:  Cement arches loom ominously, edges crumbling inward against...
+  ETA: 21s remaining
+
+[89/113] r488 (victorian) - FIXED
+  Before: Creaking iron hinges bear witness to bygone eras, their rust...
+  After:  Creaking iron hinges bear witness to bygone eras, their rust...
+  ETA: 21s remaining
+
+[90/113] r493 (victorian) - OK (AI confirmed clean)
+  ETA: 20s remaining
+
+[91/113] r495 (depression) - FIXED
+  Before: The corridor stretches ahead, its concrete surface weathered...
+  After:  The corridor stretches ahead, its concrete surface weathered...
+  ETA: 19s remaining
+
+[92/113] r498 (depression) - OK (AI confirmed clean)
+  ETA: 18s remaining
+
+[93/113] r504 (victorian) - OK (AI confirmed clean)
+  ETA: 17s remaining
+
+[94/113] r519 (deep) - OK (AI confirmed clean)
+  ETA: 16s remaining
+
+[95/113] r520 (industrial) - FIXED
+  Before: LED lights cast eerie shadows along the worn floor, their fa...
+  After:  LED lights cast eerie shadows along the worn floor, their fa...
+  ETA: 16s remaining
+
+[96/113] r523 (victorian) - OK (AI confirmed clean)
+  ETA: 15s remaining
+
+[97/113] r524 (victorian) - OK (AI confirmed clean)
+  ETA: 14s remaining
+
+[98/113] r527 (depression) - OK (AI confirmed clean)
+  ETA: 13s remaining
+
+[99/113] r539 (depression) - OK (AI confirmed clean)
+  ETA: 12s remaining
+
+[100/113] r551 (depression) - FIXED
+  Before: Cistern
+Murky waters lap against crumbling brick walls, leav...
+  After:  Cistern
+Murky waters lap against crumbling brick walls, leav...
+  ETA: 11s remaining
+
+[101/113] r558 (victorian) - FIXED
+  Before: Creaking mournfully as they prop up the decaying structure, ...
+  After:  Creaking mournfully as they prop up the decaying structure, ...
+  ETA: 11s remaining
+
+[102/113] r561 (victorian) - OK (AI confirmed clean)
+  ETA: 10s remaining
+
+[103/113] r565 (modern) - OK (AI confirmed clean)
+  ETA: 9s remaining
+
+[104/113] r575 (victorian) - OK (AI confirmed clean)
+  ETA: 8s remaining
+
+[105/113] r576 (victorian) - FIXED
+  Before: Cavernous hub encased in brick and iron wears the patina of ...
+  After:  Cavernous hub encased in brick and iron wears the patina of ...
+  ETA: 7s remaining
+
+[106/113] r579 (industrial) - OK (AI confirmed clean)
+  ETA: 6s remaining
+
+[107/113] r582 (depression) - OK (AI confirmed clean)
+  ETA: 5s remaining
+
+[108/113] r583 (victorian) - OK (AI confirmed clean)
+  ETA: 4s remaining
+
+[109/113] r588 (depression) - FIXED
+  Before: COLD
+Three levels beneath the ruined streets of Seattle, a c...
+  After:  COLD
+Three levels beneath the ruined streets of Seattle, a c...
+  ETA: 4s remaining
+
+[110/113] r590 (victorian) - OK (AI confirmed clean)
+  ETA: 3s remaining
+
+[111/113] r618 (depression) - OK (AI confirmed clean)
+  ETA: 2s remaining
+
+[112/113] r627 (deep) - FIXED
+  Before: COLD TOUCH OF STONE AND METAL FILLS THE SENSES AS REMNANTS O...
+  After:  COLD TOUCH OF STONE AND METAL FILLS THE SENSES AS REMNANTS O...
+  ETA: 1s remaining
+
+[113/113] r632 (ancient) - OK (AI confirmed clean)
+  ETA: 0s remaining
+
+=== Complete ===
+Processed: 113
+Fixed: 38
+Unchanged: 75
+Skipped (clean): 531
+Saved to: underground-world-fresh-described-fixed.json

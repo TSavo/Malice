@@ -12,7 +12,7 @@ export const building = {
       name: 'Cellar Lock',
       description:
         'An ancient padlock, its brass mechanism green with age but still functional.',
-      difficulty: 3,
+      difficulty: 3
     },
     '%CELLAR_DOOR': {
       prototype: 'door',
@@ -23,7 +23,7 @@ export const building = {
       open: false,
       locks: ['%CELLAR_LOCK'],
       material: 'wood',
-      durability: 65,
+      durability: 65
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -50,10 +50,10 @@ The air is cool and damp, smelling of earth and old wood and something faintly y
           to: 'z0.ts#%BAR',
           description: 'A trapdoor leads up to the bar',
           door: '%CELLAR_DOOR',
-          locks: ['%CELLAR_LOCK'],
+          locks: ['%CELLAR_LOCK']
         },
         north: '%BOOTLEGGER_ROOM',
-        west: '%OLD_FOUNDATION',
+        west: '%OLD_FOUNDATION'
       },
       objects: [
         {
@@ -61,16 +61,16 @@ The air is cool and damp, smelling of earth and old wood and something faintly y
           name: 'wooden keg racks',
           aliases: ['racks', 'shelves', 'storage'],
           description:
-            'Hand-built wooden racks line the walls, their joints fitted without nails, their construction meant to last. The racks held kegs once—dozens of them, the inventory of a bar that served drinks through Prohibition and beyond. Now they hold dust and memory and the occasional forgotten crate.',
+            'Hand-built wooden racks line the walls, their joints fitted without nails, their construction meant to last. The racks held kegs once—dozens of them, the inventory of a bar that served drinks through Prohibition and beyond. Now they hold dust and memory and the occasional forgotten crate.'
         },
         {
           prototype: 'crate',
           name: 'old crates',
           aliases: ['crates', 'boxes'],
           description:
-            'A few wooden crates remain on the racks, their labels rotted, their contents a mystery. The wood is dry and grey, the nails rusted. Whatever was stored here was forgotten long ago. The forgetting continues.',
+            'A few wooden crates remain on the racks, their labels rotted, their contents a mystery. The wood is dry and grey, the nails rusted. Whatever was stored here was forgotten long ago. The forgetting continues.'
         },
-      ],
+      ]
     },
 
     '%BOOTLEGGER_ROOM': {
@@ -89,11 +89,7 @@ A heavy door in the north wall leads to a passage beyond—the tunnels the bootl
       waterLevel: 0,
       outdoor: false,
       exits: {
-        south: '%CELLAR',
-        north: {
-          to: 'underground/upper-tunnels/x-14-y4.ts',
-          description: 'A bootlegger passage leads into the underground',
-        },
+        south: '%CELLAR'
       },
       objects: [
         {
@@ -101,23 +97,23 @@ A heavy door in the north wall leads to a passage beyond—the tunnels the bootl
           name: 'bootlegger shelves',
           aliases: ['shelves', 'storage'],
           description:
-            'Wooden shelving built to hold contraband whiskey, the rings from hundreds of bottles still visible in the dust. The shelves are deeper than normal, designed for cases stacked two or three deep. The construction is solid but fast—built by people who needed storage quickly and discreetly.',
+            'Wooden shelving built to hold contraband whiskey, the rings from hundreds of bottles still visible in the dust. The shelves are deeper than normal, designed for cases stacked two or three deep. The construction is solid but fast—built by people who needed storage quickly and discreetly.'
         },
         {
           prototype: 'furniture',
           name: 'workbench',
           aliases: ['bench', 'table'],
           description:
-            'A heavy wooden workbench, its surface scarred by decades of use. Bottle caps are embedded in the wood, hammered flat by repeated impacts. Scratches trace paths where cases were dragged. The bench was the center of operations—where bottles were labeled, cases packed, contraband prepared for distribution.',
+            'A heavy wooden workbench, its surface scarred by decades of use. Bottle caps are embedded in the wood, hammered flat by repeated impacts. Scratches trace paths where cases were dragged. The bench was the center of operations—where bottles were labeled, cases packed, contraband prepared for distribution.'
         },
         {
           prototype: 'describable',
           name: 'tunnel entrance',
           aliases: ['passage', 'tunnel', 'door'],
           description:
-            'A heavy wooden door in the north wall, reinforced with iron bands. Beyond it, darkness—the bootlegger tunnels that connected Pioneer Square during Prohibition, repurposing older passages that had existed since the street was raised. The door is unlocked now. Nobody cares about contraband anymore.',
+            'A heavy wooden door in the north wall, reinforced with iron bands. Beyond it, darkness—the bootlegger tunnels that connected Pioneer Square during Prohibition, repurposing older passages that had existed since the street was raised. The door is unlocked now. Nobody cares about contraband anymore.'
         },
-      ],
+      ]
     },
 
     '%OLD_FOUNDATION': {
@@ -136,7 +132,7 @@ Old pipes run along the ceiling—gas lines from before electricity, water lines
       waterLevel: 5,
       outdoor: false,
       exits: {
-        east: '%CELLAR',
+        east: '%CELLAR'
       },
       objects: [
         {
@@ -144,16 +140,16 @@ Old pipes run along the ceiling—gas lines from before electricity, water lines
           name: 'stone walls',
           aliases: ['walls', 'stones', 'foundation'],
           description:
-            'The original foundation walls, built from local stone before the Great Fire, before modern construction methods arrived. The stones are fitted together with skill that predates Portland cement—lime mortar, hand-cut blocks, the craftsmanship of an earlier era. Water seeps through in places, leaving mineral deposits that trace its path.',
+            'The original foundation walls, built from local stone before the Great Fire, before modern construction methods arrived. The stones are fitted together with skill that predates Portland cement—lime mortar, hand-cut blocks, the craftsmanship of an earlier era. Water seeps through in places, leaving mineral deposits that trace its path.'
         },
         {
           prototype: 'describable',
           name: 'old pipes',
           aliases: ['pipes', 'gas lines', 'plumbing'],
           description:
-            'Ancient pipes run along the ceiling—gas lines from before electricity, water lines from before modern plumbing. The pipes are corroded, their joints crusted with mineral deposits, their contents long since drained or disconnected. They remain because removing them would cost more than leaving them.',
+            'Ancient pipes run along the ceiling—gas lines from before electricity, water lines from before modern plumbing. The pipes are corroded, their joints crusted with mineral deposits, their contents long since drained or disconnected. They remain because removing them would cost more than leaving them.'
         },
-      ],
-    },
-  },
+      ]
+    }
+  }
 };

@@ -127,8 +127,6 @@ Debris around the excavation suggests the work was done recently, with modern to
       exits: {
         east: '%CELLAR',
         south: {
-          to: 'buildings/underground-tour/z-2.ts',
-          room: '%TOUR_START',
           description: 'An excavated passage leads into the underground',
           hidden: true,
         },
