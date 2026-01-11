@@ -10,6 +10,8 @@ The intersection feels like a crossroads in the older sense—a place where path
   x: -14,
   y: 6,
   z: 0,
+
+  imageOnDisk: 's-washington-st-1st-ave-s-x-14-y6-z0.png',
   intersection: ['1st Ave S', 'S. Washington St'],
   population: 0,
   ambientNoise: 0,
