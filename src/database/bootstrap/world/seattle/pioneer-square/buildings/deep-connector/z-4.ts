@@ -55,6 +55,7 @@ The construction is different from the tunnels above. The dimensions are smaller
       x: -6,
       y: -4,
       z: -4,
+      imageOnDisk: 'ancient-passage-x-6-y-4-z-4.png',
       population: 0,
       ambientNoise: 8,
       lighting: 8,
