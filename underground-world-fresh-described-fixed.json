@@ -35,7 +35,8 @@
         "railway",
         "room"
       ],
-      "description": "In this room, brick arches soar above, their edges softened by time and weather. Iron supports groan under the weight of decay, rusted beams sagging dangerously close to crumbling stone. Wooden crate fragments litter the ground, worn smooth from years of neglect. The original foundation, rough-cut stones, peak through in places, a testament to its Victorian origins. A dry, dusty wind whispers softly, echoing through the empty space. The air carries the scent of decay and damp earth, mingling with the faint metallic tang of rusted iron. Above, a dim light filters through gaps in the ceiling, illuminating the room in a ghostly glow."
+      "description": "In this room, brick arches soar above, their edges softened by time and weather. Iron supports groan under the weight of decay, rusted beams sagging dangerously close to crumbling stone. Wooden crate fragments litter the ground, worn smooth from years of neglect. The original foundation, rough-cut stones, peak through in places, a testament to its Victorian origins. A dry, dusty wind whispers softly, echoing through the empty space. The air carries the scent of decay and damp earth, mingling with the faint metallic tang of rusted iron. Above, a dim light filters through gaps in the ceiling, illuminating the room in a ghostly glow.",
+      "imageOnDisk": "r1-x-16-y8-z-2.png"
     },
     {
       "id": "r3",
@@ -72,7 +73,8 @@
         "room",
         "railway"
       ],
-      "description": "In this vast expanse, brick arches intertwine with iron girders, a testament to Seattle's buried 1889 streets. Bricks and mortar crumble subtly underfoot, while rusted gas pipes hiss like ghosts of the past. The ceiling yawns open at one corner, debris scattered below like remnants from a bygone era. A layer of ash mingles with dampness in the air, creating an eerie veil that clings to every surface.\n\nThe atmosphere is damp and heavy, echoing whispers reverberating through long-forgotten tunnels. The scent of decay seeps into the chilly air, intertwining with the faint metallic tang lingering from decades past. A wooden door looms ahead, its rotted frame a stark contrast against the Victorian architecture. Beyond it lies only darkness and the promise of more secrets buried deep within the heart of this city."
+      "description": "In this vast expanse, brick arches intertwine with iron girders, a testament to Seattle's buried 1889 streets. Bricks and mortar crumble subtly underfoot, while rusted gas pipes hiss like ghosts of the past. The ceiling yawns open at one corner, debris scattered below like remnants from a bygone era. A layer of ash mingles with dampness in the air, creating an eerie veil that clings to every surface.\n\nThe atmosphere is damp and heavy, echoing whispers reverberating through long-forgotten tunnels. The scent of decay seeps into the chilly air, intertwining with the faint metallic tang lingering from decades past. A wooden door looms ahead, its rotted frame a stark contrast against the Victorian architecture. Beyond it lies only darkness and the promise of more secrets buried deep within the heart of this city.",
+      "imageOnDisk": "r3-x6-y4-z-2.png"
     },
     {
       "id": "r5",
@@ -107,7 +109,8 @@
         "entrance",
         "railway"
       ],
-      "description": "In this room, the brick walls bear scars from time's relentless passage, their surfaces flaked and pitted like aged skin. Iron hinges rusted shut groan softly in the dry, dust-laden air as a wooden crate lies collapsed nearby, its timbers splintered and warped. Gas pipes hiss mournfully underfoot, their patina of verdigris staining the stone floor beneath. The heavy scent of decay clings to the musty atmosphere, mingled with the distant faintest hint of something once sweet now long lost. A faint echo of footsteps reverberates through the shadows cast by tall, iron-framed gas lamps that flicker dimly in the gloom."
+      "description": "In this room, the brick walls bear scars from time's relentless passage, their surfaces flaked and pitted like aged skin. Iron hinges rusted shut groan softly in the dry, dust-laden air as a wooden crate lies collapsed nearby, its timbers splintered and warped. Gas pipes hiss mournfully underfoot, their patina of verdigris staining the stone floor beneath. The heavy scent of decay clings to the musty atmosphere, mingled with the distant faintest hint of something once sweet now long lost. A faint echo of footsteps reverberates through the shadows cast by tall, iron-framed gas lamps that flicker dimly in the gloom.",
+      "imageOnDisk": "r5-x9-y3-z-2.png"
     },
     {
       "id": "r7",
@@ -146,7 +149,8 @@
         "railway",
         "room"
       ],
-      "description": "Ancient cobblestones carpet the floor, their surface worn smooth by time. Iron beams crisscross overhead, supporting brick arches that arch over the remnants of a stone foundation. A flicker of daylight filters through narrow windows, illuminating decaying plaster walls adorned with 1890s graffiti. The air smells damp and musty, carrying whispers of the past on a cool breeze. In the distance, the echoes of distant footsteps reverberate off the brick walls, muffled by the weight of centuries."
+      "description": "Ancient cobblestones carpet the floor, their surface worn smooth by time. Iron beams crisscross overhead, supporting brick arches that arch over the remnants of a stone foundation. A flicker of daylight filters through narrow windows, illuminating decaying plaster walls adorned with 1890s graffiti. The air smells damp and musty, carrying whispers of the past on a cool breeze. In the distance, the echoes of distant footsteps reverberate off the brick walls, muffled by the weight of centuries.",
+      "imageOnDisk": "r7-x-20-y8-z-2.png"
     },
     {
       "id": "r9",
@@ -182,7 +186,8 @@
         "room",
         "railway"
       ],
-      "description": "Iron beams arch above, adorned with layers of corrosion that glimmer in the dim light cast by gas lamps flickering along the brick walls. Brick arches support the weight of the ceiling, their edges worn smooth from centuries of wear. Gas pipes run like veins through the iron girders, valves encased in thick ice that reflects the ghostly illumination below. Rat droppings scatter the floor in a testament to the desolation, the stale air heavy with the scent of decay and the faint whispers of steam escaping from pipes long past use. The ground trembles beneath footfalls, echoing the distant rumble of forgotten trains deep within the earth."
+      "description": "Iron beams arch above, adorned with layers of corrosion that glimmer in the dim light cast by gas lamps flickering along the brick walls. Brick arches support the weight of the ceiling, their edges worn smooth from centuries of wear. Gas pipes run like veins through the iron girders, valves encased in thick ice that reflects the ghostly illumination below. Rat droppings scatter the floor in a testament to the desolation, the stale air heavy with the scent of decay and the faint whispers of steam escaping from pipes long past use. The ground trembles beneath footfalls, echoing the distant rumble of forgotten trains deep within the earth.",
+      "imageOnDisk": "r9-x-14-y1-z-2.png"
     },
     {
       "id": "r11",
@@ -219,7 +224,8 @@
         "room",
         "railway"
       ],
-      "description": "A vast expanse of brick walls, chipped and weather-worn, stretches out. Iron support beams, their paint long flaked off, jut at odd angles from the wreckage of a collapsed ceiling section. Wooden debris, rotted soft, clatters beneath feet. The scent of damp earth permeates the air, mingling with the pungent aroma of decaying wood and rust-stained iron. A hushed stillness hangs over the space, broken only by the distant drip of water echoing off stone and brick. A cold breeze whispers through cracks in the walls, carrying the faintest hint of a long-forgotten street above. The floor beneath feels rough, uneven, cobblestones buried under debris. Exits lie scattered around, a call to adventure amidst the ruins."
+      "description": "A vast expanse of brick walls, chipped and weather-worn, stretches out. Iron support beams, their paint long flaked off, jut at odd angles from the wreckage of a collapsed ceiling section. Wooden debris, rotted soft, clatters beneath feet. The scent of damp earth permeates the air, mingling with the pungent aroma of decaying wood and rust-stained iron. A hushed stillness hangs over the space, broken only by the distant drip of water echoing off stone and brick. A cold breeze whispers through cracks in the walls, carrying the faintest hint of a long-forgotten street above. The floor beneath feels rough, uneven, cobblestones buried under debris. Exits lie scattered around, a call to adventure amidst the ruins.",
+      "imageOnDisk": "r11-x-16-y10-z-2.png"
     },
     {
       "id": "r13",
@@ -256,7 +262,8 @@
         "room",
         "railway"
       ],
-      "description": "Brick arches loom overhead, their darkened edges etched with intricate patterns of worn mortar. Iron grates rust from disuse, trapping wisps of smoke in a dance of ghostly shadows. Gas lamps cast an amber glow across the room, flickering and casting eerie reflections on aged wooden doors, their rotten wood creaking slightly under the weight of time. The air is thick with the aroma of soot and old leather, punctuated by whispers of distant voices echoing from the abandoned city above."
+      "description": "Brick arches loom overhead, their darkened edges etched with intricate patterns of worn mortar. Iron grates rust from disuse, trapping wisps of smoke in a dance of ghostly shadows. Gas lamps cast an amber glow across the room, flickering and casting eerie reflections on aged wooden doors, their rotten wood creaking slightly under the weight of time. The air is thick with the aroma of soot and old leather, punctuated by whispers of distant voices echoing from the abandoned city above.",
+      "imageOnDisk": "r13-x11-y-6-z-2.png"
     },
     {
       "id": "r15",
@@ -293,7 +300,8 @@
         "railway",
         "room"
       ],
-      "description": "Brick arches, intricate and weathered, tower above, remnants of an era where craftsmanship reigned supreme. Iron beams, rotten wood supporting their weight, groan under the strain. Dusty footprints mar the floor, fresh imprints amidst the decay.\n\nThe air carries a musty scent, dampness seeping from the walls. An eerie silence prevails, broken only by distant drips or faint mechanical hums. The atmosphere is heavy with the weight of time and neglect.\n\nNorth, south, east, west - worn passageways beckon, each offering an opportunity for exploration or peril. Above lies a modern entrance (-15,4,-1), its bright lights casting eerie shadows on steel girders and exposed cables. Below stretch the railway tracks of another era (-16,4,-2) to the west, (-14,4,-2) to the east, and (-15,3,-2) to the south. A journey into the depths (-15,5,-2) awaits further north, each step taking you deeper into Seattle's forgotten past."
+      "description": "Brick arches, intricate and weathered, tower above, remnants of an era where craftsmanship reigned supreme. Iron beams, rotten wood supporting their weight, groan under the strain. Dusty footprints mar the floor, fresh imprints amidst the decay.\n\nThe air carries a musty scent, dampness seeping from the walls. An eerie silence prevails, broken only by distant drips or faint mechanical hums. The atmosphere is heavy with the weight of time and neglect.\n\nNorth, south, east, west - worn passageways beckon, each offering an opportunity for exploration or peril. Above lies a modern entrance (-15,4,-1), its bright lights casting eerie shadows on steel girders and exposed cables. Below stretch the railway tracks of another era (-16,4,-2) to the west, (-14,4,-2) to the east, and (-15,3,-2) to the south. A journey into the depths (-15,5,-2) awaits further north, each step taking you deeper into Seattle's forgotten past.",
+      "imageOnDisk": "r15-x-15-y4-z-2.png"
     },
     {
       "id": "r17",
@@ -329,7 +337,8 @@
         "railway",
         "room"
       ],
-      "description": "In this hub, remnants of 1889's brick and iron architecture persist amidst damage. Worn-away cobblestones peek from the floor, their edges jagged like broken promises. A charred chimney base looms in silence, its once grandeur now a memory veiled by time. The air carries an oppressive staleness, heavy with the scent of damp earth and decaying mortar. Echoes of distant whispers reverberate off worn walls, while the occasional clank resonates from the surrounding railways like phantom trains in the depths below street level."
+      "description": "In this hub, remnants of 1889's brick and iron architecture persist amidst damage. Worn-away cobblestones peek from the floor, their edges jagged like broken promises. A charred chimney base looms in silence, its once grandeur now a memory veiled by time. The air carries an oppressive staleness, heavy with the scent of damp earth and decaying mortar. Echoes of distant whispers reverberate off worn walls, while the occasional clank resonates from the surrounding railways like phantom trains in the depths below street level.",
+      "imageOnDisk": "r17-x-12-y-3-z-2.png"
     },
     {
       "id": "r19",
@@ -365,7 +374,8 @@
         "railway",
         "room"
       ],
-      "description": "The plaster ceiling hangs precariously, peeling layers revealing worn brick beneath. Decaying wooden support beams groan softly under pressure, their iron reinforcements corroded and weak. Dust dances in the dry air, casting a haze over the crumbling remains of this once grand hub. The rotted wood feels cold and unyielding underfoot, as unforgiving as time itself. Echoes reverberate through the hollow chambers, whispering tales of Victorian grandeur long lost. A musty smell fills the air, a blend of damp stone and decaying iron."
+      "description": "The plaster ceiling hangs precariously, peeling layers revealing worn brick beneath. Decaying wooden support beams groan softly under pressure, their iron reinforcements corroded and weak. Dust dances in the dry air, casting a haze over the crumbling remains of this once grand hub. The rotted wood feels cold and unyielding underfoot, as unforgiving as time itself. Echoes reverberate through the hollow chambers, whispering tales of Victorian grandeur long lost. A musty smell fills the air, a blend of damp stone and decaying iron.",
+      "imageOnDisk": "r19-x-15-y-3-z-2.png"
     },
     {
       "id": "r21",
@@ -401,7 +411,8 @@
         "railway",
         "room"
       ],
-      "description": "Dust-laden brick walls tower, their once vibrant red faded to a dull grey. Wrought iron hinges creak underfoot, the echo lingering in the damaged hub. Recent bootprints mark the ground, adding an eerie sense of presence. A musty smell fills the air, a reminder of the past that still clings tightly. The scent of rusted iron mingles with the damp earth beneath."
+      "description": "Dust-laden brick walls tower, their once vibrant red faded to a dull grey. Wrought iron hinges creak underfoot, the echo lingering in the damaged hub. Recent bootprints mark the ground, adding an eerie sense of presence. A musty smell fills the air, a reminder of the past that still clings tightly. The scent of rusted iron mingles with the damp earth beneath.",
+      "imageOnDisk": "r21-x-14-y7-z-2.png"
     },
     {
       "id": "r23",
@@ -439,7 +450,8 @@
         "entrance",
         "room"
       ],
-      "description": "Cobblestone pathways wind beneath arches of rusted iron, their surface worn smooth by time. Brick walls, effloresced with white crystals, tower overhead. A cast-iron support column, ornate but aged, stands tall in the centre, its base dusty from footprints recent to this ancient space. The scent of damp earth fills the air, mingling with a faint metallic undertone that lingers on the tongue. Above, original cobblestones remain exposed where the floor has worn away, their rough surface echoing softly underfoot. A musty silence hangs heavy in the room, broken only by distant drips from leaky gas pipes overhead. Exits lie open to the north, south, east, and west, each a passage into another level of this subterranean city."
+      "description": "Cobblestone pathways wind beneath arches of rusted iron, their surface worn smooth by time. Brick walls, effloresced with white crystals, tower overhead. A cast-iron support column, ornate but aged, stands tall in the centre, its base dusty from footprints recent to this ancient space. The scent of damp earth fills the air, mingling with a faint metallic undertone that lingers on the tongue. Above, original cobblestones remain exposed where the floor has worn away, their rough surface echoing softly underfoot. A musty silence hangs heavy in the room, broken only by distant drips from leaky gas pipes overhead. Exits lie open to the north, south, east, and west, each a passage into another level of this subterranean city.",
+      "imageOnDisk": "r23-x-8-y0-z-2.png"
     },
     {
       "id": "r25",
@@ -478,7 +490,8 @@
         "room",
         "railway"
       ],
-      "description": "In this railway hub, brick arches soar beneath an iron canopy that sighs in the cavernous silence. Rust-stained hinges groan at the touch, while barrel hoops line the floor like relics from another age. The scent of aged parchment drifts through air thick with dust and decay, carried by a faint echo that seems to reverberate off the walls. A section of ceiling lies collapsed, debris scattered below in a muddle of broken bricks and twisted iron. A storefront window, long since bricked up, leaves its outline etched on stone, the ghostly remnants of commerce past. Above, shadows dance eerily across worn cobblestones under the dim glow of gas lamps that flicker with an unsteady light."
+      "description": "In this railway hub, brick arches soar beneath an iron canopy that sighs in the cavernous silence. Rust-stained hinges groan at the touch, while barrel hoops line the floor like relics from another age. The scent of aged parchment drifts through air thick with dust and decay, carried by a faint echo that seems to reverberate off the walls. A section of ceiling lies collapsed, debris scattered below in a muddle of broken bricks and twisted iron. A storefront window, long since bricked up, leaves its outline etched on stone, the ghostly remnants of commerce past. Above, shadows dance eerily across worn cobblestones under the dim glow of gas lamps that flicker with an unsteady light.",
+      "imageOnDisk": "r25-x-16-y-1-z-2.png"
     },
     {
       "id": "r27",
@@ -515,7 +528,8 @@
         "railway",
         "room"
       ],
-      "description": "Brick archways stretch high above, their once vibrant hues now faded to dull reds and browns by time's merciless touch. Iron railings corrode, spiraling downwards in twisted knots that groan under the weight of years. Gas pipes hiss softly, casting eerie shadows across the worn wood floorboards. A musty scent fills the air, mingling with the faint metallic tang from the nearby gas lamps. The bricks beneath plaster walls crumble slightly, revealing patches of rough stone that seem to whisper tales of the past.\n\nSouthward lies a maze of iron tracks leading towards another brick chamber, while west takes you deeper into the labyrinth of abandoned railways. An upward exit lurks shrouded in darkness, promising unseen dangers or mysteries hidden beneath. A staircase spirals downwards below, disappearing into gloom and silence - a silent testament to days long past when this city thrived above ground."
+      "description": "Brick archways stretch high above, their once vibrant hues now faded to dull reds and browns by time's merciless touch. Iron railings corrode, spiraling downwards in twisted knots that groan under the weight of years. Gas pipes hiss softly, casting eerie shadows across the worn wood floorboards. A musty scent fills the air, mingling with the faint metallic tang from the nearby gas lamps. The bricks beneath plaster walls crumble slightly, revealing patches of rough stone that seem to whisper tales of the past.\n\nSouthward lies a maze of iron tracks leading towards another brick chamber, while west takes you deeper into the labyrinth of abandoned railways. An upward exit lurks shrouded in darkness, promising unseen dangers or mysteries hidden beneath. A staircase spirals downwards below, disappearing into gloom and silence - a silent testament to days long past when this city thrived above ground.",
+      "imageOnDisk": "r27-x-15-y12-z-2.png"
     },
     {
       "id": "r29",
@@ -551,7 +565,8 @@
         "railway",
         "room"
       ],
-      "description": "Brick arches, weathered by time, tower above, their edges draped in rust-streaked iron. Wooden support beams, softened by rot, barely hold the weight, reinforced later with timber shoring to prevent collapse. Gas pipes hiss softly beneath worn cobblestone floors, their aroma mingling with damp earth and musty brick. The air is warm and heavy, carrying whispers of a forgotten era above ground. A distant echo of distant train rumbling permeates the space."
+      "description": "Brick arches, weathered by time, tower above, their edges draped in rust-streaked iron. Wooden support beams, softened by rot, barely hold the weight, reinforced later with timber shoring to prevent collapse. Gas pipes hiss softly beneath worn cobblestone floors, their aroma mingling with damp earth and musty brick. The air is warm and heavy, carrying whispers of a forgotten era above ground. A distant echo of distant train rumbling permeates the space.",
+      "imageOnDisk": "r29-x-16-y7-z-2.png"
     },
     {
       "id": "r31",
@@ -589,7 +604,8 @@
         "room",
         "railway"
       ],
-      "description": "In this preserved railway hub, brick and iron architecture harkens back to Seattle's Victorian era buried streets. Rusted barrel hoops stand sentinel, patinated bricks and mortar darker than their surroundings. Brick wall efflorescence speckles the walls in white, while floor joists are exposed beneath a layer of grime. A sealed doorway, bricked up with mortar, looms ominously amidst the gloom. The air here is damp, carrying the scent of moss and moisture that clings to every surface. Echoes reverberate off hard surfaces, creating an unsettling symphony of distant drips and faint mechanical hums.\n\nA northward passage leads deeper into the labyrinth, while south, east, and west offer different directions for exploration or peril. Above lies a modern entrance, its bright lights casting eerie shadows on steel girders and exposed cables. Below stretch tracks of another era, leading to various chambers. A descent awaits further north, each step taking you deeper into Seattle's forgotten past."
+      "description": "In this preserved railway hub, brick and iron architecture harkens back to Seattle's Victorian era buried streets. Rusted barrel hoops stand sentinel, patinated bricks and mortar darker than their surroundings. Brick wall efflorescence speckles the walls in white, while floor joists are exposed beneath a layer of grime. A sealed doorway, bricked up with mortar, looms ominously amidst the gloom. The air here is damp, carrying the scent of moss and moisture that clings to every surface. Echoes reverberate off hard surfaces, creating an unsettling symphony of distant drips and faint mechanical hums.\n\nA northward passage leads deeper into the labyrinth, while south, east, and west offer different directions for exploration or peril. Above lies a modern entrance, its bright lights casting eerie shadows on steel girders and exposed cables. Below stretch tracks of another era, leading to various chambers. A descent awaits further north, each step taking you deeper into Seattle's forgotten past.",
+      "imageOnDisk": "r31-x-16-y4-z-2.png"
     },
     {
       "id": "r33",
