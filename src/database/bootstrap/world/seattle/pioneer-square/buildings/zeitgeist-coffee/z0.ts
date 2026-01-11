@@ -140,6 +140,7 @@ The employee schedule still hangs on a corkboard, shifts assigned to people who 
       x: -16,
       y: 0,
       z: 0,
+      imageOnDisk: 's-main-st-x-16-y0-z0.png',
       population: 0,
       ambientNoise: 8,
       lighting: 40,

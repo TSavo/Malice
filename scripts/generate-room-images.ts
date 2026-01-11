@@ -385,6 +385,20 @@ async function main() {
 
       // Detect token-related errors (TypeError with undefined blobKey means API returned error)
       if (errStr.includes('ERR_INVALID_ARG_TYPE') || errStr.includes('Received an instance of Object')) {
+        // Check if it's a rate limit (429) by checking recent docker logs
+        try {
+          const { execSync } = await import('child_process');
+          const logs = execSync('docker compose logs midjourney-api --tail 5 2>&1', { encoding: 'utf-8' });
+          if (logs.includes('429') || logs.includes('rate limit')) {
+            console.error(`    ⏳ Rate limited - waiting 60s before retry...`);
+            await sleep(60000);
+            consecutiveErrors = 0; // Reset - rate limit is not a token error
+            continue; // Retry this room
+          }
+        } catch {
+          // Ignore log check errors
+        }
+
         consecutiveErrors++;
         console.error(`    ⚠️  Consecutive errors: ${consecutiveErrors}`);
 
@@ -489,13 +503,26 @@ async function addImageOnDiskToFile(filePath: string, imageFilename: string, roo
   let content = fs.readFileSync(filePath, 'utf-8');
 
   // Check if it's a building file (has 'building' export with rooms)
-  if (content.includes('export const building')) {
-    // TODO: Implement building file updates
-    // Building files have structure: export const building = { rooms: { '%0': {...}, '%1': {...} } }
-    // This requires parsing the room key, finding the correct room object, and adding imageOnDisk.
-    // For now, building room images are stored in GridFS but not added to source files.
-    // This means the imageOnDisk property must be added manually or via a separate tool.
-    console.log(`    ⚠️  Building file - manual edit needed (automatic update not implemented)`);
+  if (content.includes('export const building') && roomFile?.relativePath.includes(':')) {
+    // Extract placeholder key from relativePath (e.g., "path/to/file.ts:%ARTERY_N1")
+    const placeholder = roomFile.relativePath.split(':').pop();
+    if (!placeholder) {
+      console.log(`    ⚠️  Could not extract room placeholder from path`);
+      return;
+    }
+
+    // Find the room object by its placeholder key and add imageOnDisk after z coordinate
+    // Pattern: 'placeholder': { ... z: N, ... }
+    const roomKeyPattern = new RegExp(`('${placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}':\\s*\\{[^}]*?)(z:\\s*-?\\d+,?)`, 's');
+    const match = content.match(roomKeyPattern);
+
+    if (match) {
+      const replacement = `${match[1]}${match[2]}\n      imageOnDisk: '${imageFilename}',`;
+      content = content.replace(roomKeyPattern, replacement);
+      fs.writeFileSync(filePath, content);
+    } else {
+      console.log(`    ⚠️  Could not find room ${placeholder} z coordinate in building file`);
+    }
     return;
   }
 

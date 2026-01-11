@@ -83,6 +83,7 @@ The gallery was artist-run, the placard on the wall explains. Twenty members sha
       x: -8,
       y: 0,
       z: 0,
+      imageOnDisk: 's-main-st-x-8-y0-z0.png',
       population: 0,
       ambientNoise: 2,
       lighting: 30,

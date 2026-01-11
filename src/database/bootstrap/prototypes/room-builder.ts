@@ -978,7 +978,15 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       const baseConfig = await pass();
 
       // Sanitize prompt to remove --, em-dashes, en-dashes which Midjourney interprets as parameters
-      const sanitize = (p) => p.replace(/--/g, '-').replace(/—/g, '-').replace(/–/g, '-').replace(/\\n/g, ' ').replace(/\\s+/g, ' ');
+      // Also replace " -N" (space-dash-number) patterns like "Level -3" with "Level minus 3"
+      // Note: Use [0-9] instead of \\d because this code is stored as a string
+      const sanitize = (p) => p
+        .replace(/--/g, '-')
+        .replace(/—/g, '-')
+        .replace(/–/g, '-')
+        .replace(/ -([0-9])/g, ' minus $1')
+        .replace(/\\n/g, ' ')
+        .replace(/\\s+/g, ' ');
 
       // Put room-specific description FIRST (more prominent in Midjourney)
       // Then add generic context SECOND (less influence)
