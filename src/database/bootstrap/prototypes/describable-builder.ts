@@ -45,9 +45,11 @@ export class DescribableBuilder implements Builder {
           // Every digital device in 2110 is conscious (legacy of AI solving software in 2026)
           systemPrompt: null, // string - AI personality/role prompt
           interactionSession: null, // string - session ID for conversation continuity
-          // TTS voice for speech synthesis
-          voiceId: null, // string - TTS voice ID (alloy, ash, ballad, coral, echo, fable, onyx, nova, sage, shimmer, verse, marin, cedar)
-          // TTS voice style for steerability (gpt-4o-mini-tts) - e.g., "speak slowly and menacingly"
+          // TTS voice for speech synthesis (VibeVoice server)
+          // Built-in: alloy, echo, fable, onyx, nova, shimmer
+          // Custom: any voice added via $tts.addVoice() from audio samples
+          voiceId: null, // string - TTS voice ID
+          // TTS voice style for steerability - e.g., "speak slowly and menacingly"
           voiceStyle: null, // string - natural language instruction for how to speak
           // Image generation prompt template with ${variable} substitution
           imagePrompt: null, // string - template for AI image generation
@@ -1045,12 +1047,14 @@ export class DescribableBuilder implements Builder {
       `
       /** Get this object's TTS voice ID. Deterministic based on object ID.
        *  Same object always gets same voice across sessions.
-       *  @returns voice ID string (alloy, ash, ballad, coral, echo, fable, onyx, nova, sage, shimmer, verse, marin, cedar)
+       *  Built-in voices: alloy, echo, fable, onyx, nova, shimmer
+       *  Custom voices can be added via $tts.addVoice() from audio samples.
+       *  @returns voice ID string
        */
       if (self.voiceId) return self.voiceId;
 
-      // Deterministic assignment from object ID - 13 OpenAI TTS voices
-      const VOICES = ['alloy', 'ash', 'ballad', 'coral', 'echo', 'fable', 'onyx', 'nova', 'sage', 'shimmer', 'verse', 'marin', 'cedar'];
+      // Deterministic assignment from object ID - 6 built-in VibeVoice voices
+      const VOICES = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
       self.voiceId = VOICES[self.id % VOICES.length];
       return self.voiceId;
     `,
@@ -1138,11 +1142,11 @@ export class DescribableBuilder implements Builder {
     );
     obj.setPropertyDescription(
       'voiceId',
-      'TTS voice ID for speech synthesis (alloy, ash, ballad, coral, echo, fable, onyx, nova, sage, shimmer, verse, marin, cedar)',
+      'TTS voice ID for VibeVoice. Built-in: alloy, echo, fable, onyx, nova, shimmer. Custom voices can be added via $tts.addVoice().',
     );
     obj.setPropertyDescription(
       'voiceStyle',
-      'Natural language instruction for how to speak, e.g., "speak slowly and menacingly" or "cheerful and energetic" (requires gpt-4o-mini-tts)',
+      'Natural language instruction for how to speak, e.g., "speak slowly and menacingly" or "cheerful and energetic"',
     );
     obj.setPropertyDescription(
       'imagePrompt',

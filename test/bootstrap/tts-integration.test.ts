@@ -46,7 +46,7 @@ describe('TTS Integration', () => {
       expect(typeof voice1).toBe('string');
     });
 
-    it('should assign one of the thirteen valid OpenAI voices', async () => {
+    it('should assign one of the six valid VibeVoice voices', async () => {
       const obj = await $.recycler.create(
         {
           parent: $.describable,
@@ -56,7 +56,7 @@ describe('TTS Integration', () => {
       );
 
       const voice = await obj.call('getVoiceId');
-      const validVoices = ['alloy', 'ash', 'ballad', 'coral', 'echo', 'fable', 'onyx', 'nova', 'sage', 'shimmer', 'verse', 'marin', 'cedar'];
+      const validVoices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
 
       expect(validVoices).toContain(voice);
     });
@@ -98,11 +98,11 @@ describe('TTS Integration', () => {
       const voice2 = await obj2.call('getVoiceId');
 
       // Both should be valid voices
-      const validVoices = ['alloy', 'ash', 'ballad', 'coral', 'echo', 'fable', 'onyx', 'nova', 'sage', 'shimmer', 'verse', 'marin', 'cedar'];
+      const validVoices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
       expect(validVoices).toContain(voice1);
       expect(validVoices).toContain(voice2);
 
-      // With 13 voices, different IDs are likely to get different voices
+      // With 6 voices, different IDs are likely to get different voices
       // (not guaranteed but statistically likely with sequential IDs)
     });
 
