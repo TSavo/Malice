@@ -10,6 +10,8 @@ A streetlight leans at fifteen degrees from vertical, bent by some impact—a ve
   x: -14,
   y: 0,
   z: 0,
+
+  imageOnDisk: '1st-ave-s-s-main-st-x-14-y0-z0.png',
   intersection: ['1st Ave S', 'S. Main St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
