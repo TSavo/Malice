@@ -11,6 +11,8 @@ Third Avenue and the Pioneer Square light rail station are visible ahead. The st
   y: 12,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'yesler-way-x4-y12-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

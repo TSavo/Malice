@@ -10,6 +10,8 @@ The street surface buckles and heaves where it approaches the crater's edge, the
   x: 6,
   y: 12,
   z: 0,
+
+  imageOnDisk: 'yesler-way-x6-y12-z0.png',
   population: 0,
   ambientNoise: 5,
   lighting: 100,
