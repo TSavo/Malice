@@ -244,6 +244,7 @@ The cinderblock seal that once closed the old tour entrance remains intact, thou
       x: -15,
       y: 2,
       z: -1,
+      imageOnDisk: 'doc-maynard-s-cellar-x-15-y2-z-1.png',
       population: 0,
       ambientNoise: 8,
       lighting: 10,
