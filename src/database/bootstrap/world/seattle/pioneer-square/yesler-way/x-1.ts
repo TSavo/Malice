@@ -10,6 +10,8 @@ The Pioneer Building rises to the east, its Romanesque bulk anchoring the inters
   x: -1,
   y: 12,
   z: 0,
+
+  imageOnDisk: 'yesler-way-x-1-y12-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

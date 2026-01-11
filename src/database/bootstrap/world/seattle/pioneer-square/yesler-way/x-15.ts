@@ -10,6 +10,8 @@ The debris pile that blocks passage to downtown is visible ahead, the collapsed 
   x: -15,
   y: 12,
   z: 0,
+
+  imageOnDisk: 'yesler-way-x-15-y12-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

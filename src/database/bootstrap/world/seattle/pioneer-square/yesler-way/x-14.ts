@@ -11,6 +11,8 @@ Yesler Way and 1st Avenue intersect here at a point that represents Seattle's ge
   x: -14,
   y: 12,
   z: 0,
+
+  imageOnDisk: '1st-ave-s-yesler-way-x-14-y12-z0.png',
   intersection: ['1st Ave S', 'Yesler Way'],
   // Environmental properties
   population: 0, // Empty (post-Event)
