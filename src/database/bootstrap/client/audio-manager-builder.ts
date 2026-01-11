@@ -211,13 +211,13 @@ export class AudioManager {
 
     // Check if muted
     if (this.globalMuted) {
-      this.playNext();
+      setTimeout(() => this.playNext(), 0);
       return;
     }
 
     const speakerSettings = this.objectVolumes.get(segment.speaker);
     if (speakerSettings?.muted) {
-      this.playNext();
+      setTimeout(() => this.playNext(), 0);
       return;
     }
 
