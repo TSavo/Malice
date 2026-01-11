@@ -57,6 +57,12 @@ jobs:
           fetch-depth: 0
           ref: ${{ steps.pr-number.outputs.branch }}
 
+      - name: Wait for other reviewers to finish
+        run: |
+          echo "⏳ Waiting 3 minutes for other review bots to complete..."
+          sleep 180
+          echo "✅ Proceeding with review"
+
       - name: Check iteration count
         id: check-iterations
         env:
@@ -91,18 +97,42 @@ jobs:
 
             You are the REVIEWER agent in a two-agent feedback loop. Your job is to review code and provide actionable feedback.
 
+            ## CRITICAL: Read ALL Existing Comments and Reviews First
+
+            Before doing your own review, you MUST read all existing comments and code reviews on this PR:
+
+            ```bash
+            # Get ALL PR comments (from bots and humans)
+            gh pr view ${{ steps.pr-number.outputs.number }} --json comments,reviews \
+              --jq '.comments[].body, .reviews[].body'
+
+            # Get ALL inline code review comments (line-specific feedback)
+            gh api repos/${{ github.repository }}/pulls/${{ steps.pr-number.outputs.number }}/comments \
+              --jq '.[] | {author: .user.login, path: .path, line: .line, body: .body}'
+            ```
+
             ## Your Task
-            1. Review the PR diff thoroughly
-            2. Check for: bugs, security issues, performance problems, code quality, test coverage
-            3. Use CLAUDE.md for project conventions
-            4. For world/building files (src/database/bootstrap/world/**), verify:
+
+            1. **Read ALL existing comments and reviews** using the commands above
+            2. Review the PR diff yourself for anything others missed
+            3. Check for: bugs, security issues, performance problems, code quality, test coverage
+            4. Use CLAUDE.md for project conventions
+            5. For world/building files (src/database/bootstrap/world/**), verify:
                - Room coordinates (x, y, z) fall within declared building footprint
                - Building footprint formula: x ∈ [x - width + 1, x], y ∈ [y - height + 1, y]
                - Exit bi-directionality: if room A exits north to room B, room B must exit south to room A
                - Stair exits: stairs going up (z+1) must have corresponding stairs down (z-1)
                - Street exits: rooms at z=0 with street exits must connect to valid street coordinates
 
+            ## Verdict Logic
+
+            Your verdict MUST consider ALL existing feedback:
+            - If ANY reviewer (human or bot) found critical/blocking issues → "Changes Requested"
+            - Evaluate whether reported issues are valid and still outstanding
+            - Your job is to synthesize all feedback into a final verdict
+
             ## Response Format
+
             You MUST respond with a structured review comment using `gh pr comment`.
 
             CRITICAL: Your comment body MUST begin with exactly these 29 characters (no escaping, no backslashes, copy verbatim):
@@ -112,16 +142,23 @@ jobs:
 
             After the marker, include a verdict heading: "## ✅ LGTM" or "## 🔧 Changes Requested"
 
+            Structure your review:
+            1. **Existing Review Findings** - Summarize issues found by other reviewers and whether you agree
+            2. **Additional Issues** - Any issues you found that others missed
+            3. **Verdict** - Your final decision considering ALL findings
+
             If changes requested, list SPECIFIC issues with file paths, line numbers, and exact fixes needed.
             If everything looks good, just say the code looks good.
 
             ## Important
+
             - Be specific with file paths and line numbers
             - Only flag real issues, not style preferences
             - If this is iteration 2+, focus only on NEW issues (previous ones should be fixed)
             - The fixer agent will read your comment and implement changes automatically
+            - DO NOT ignore critical issues found by other reviewers
 
             Use `gh pr comment ${{ steps.pr-number.outputs.number }} --body "YOUR_REVIEW"` to post.
 
-          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'
+          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(gh api:*)"'
 
