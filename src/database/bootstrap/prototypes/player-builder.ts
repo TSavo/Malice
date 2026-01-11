@@ -618,6 +618,86 @@ export class PlayerBuilder implements Builder {
       return self.state('location', roomState);
     `,
     );
+
+    // Show a window to the player with object or HTML content
+    obj.setMethod(
+      'show',
+      `
+      /** Show a window to the player.
+       *  @param name - Window identifier (e.g., 'lock', 'item', 'note')
+       *  @param content - RuntimeObject (shows image/name/desc) or string (HTML content)
+       *  @param options - { persist?: boolean, title?: string }
+       *    persist: if true, adds to start menu so player can reopen
+       *    title: override the window title (defaults to object name or 'View')
+       */
+      const name = args[0];
+      const content = args[1];
+      const options = args[2] || {};
+
+      if (!name) return false;
+
+      const data = {
+        window: name,
+        persist: options.persist || false,
+        title: options.title || null
+      };
+
+      // Detect content type
+      if (content && typeof content === 'object' && content.id !== undefined) {
+        // It's a RuntimeObject - extract image and info
+        data.type = 'object';
+        data.id = content.id;
+        data.name = content.name || 'Unknown';
+        data.description = content.description || '';
+        data.title = data.title || content.name || 'View';
+
+        // Get image URL
+        const images = content.images || {};
+        const blobKey = images['9:16'] || images['portrait'] || images['1:1'] || images['square'] || Object.values(images)[0];
+        if (blobKey) {
+          data.imageUrl = '/blob/' + blobKey;
+        }
+      } else if (typeof content === 'string') {
+        // It's HTML content
+        data.type = 'html';
+        data.html = content;
+        data.title = data.title || 'View';
+      } else {
+        return false;
+      }
+
+      return self.state('show', data);
+    `,
+    );
+
+    // Close a window (removes from screen, optionally keeps in start menu if persist was set)
+    obj.setMethod(
+      'close',
+      `
+      /** Close a shown window.
+       *  @param name - Window identifier to close
+       *  If the window was opened with persist:true, it stays in the start menu.
+       */
+      const name = args[0];
+      if (!name) return false;
+
+      return self.state('close', { window: name });
+    `,
+    );
+
+    // Hide a window (removes from screen AND start menu)
+    obj.setMethod(
+      'hide',
+      `
+      /** Hide a shown window completely (removes from start menu too).
+       *  @param name - Window identifier to hide
+       */
+      const name = args[0];
+      if (!name) return false;
+
+      return self.state('hide', { window: name });
+    `,
+    );
   }
 
   private addInputMethods(obj: RuntimeObject): void {

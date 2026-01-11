@@ -914,6 +914,30 @@ export class ContinuumDomainBuilder implements Builder {
       return { status: 404, contentType: 'text/plain', body: 'Module not found' };
     `,
     );
+
+    // /js/show-window.js - ShowWindow class for player.show() API
+    const showWindowJsRoute = await this.createRoute(webRoute, jsRoute, {
+      name: 'ShowWindow JS Route',
+      segment: 'show-window.js',
+      methods: ['GET'],
+      contentType: 'application/javascript',
+    });
+    showWindowJsRoute.setMethod(
+      'handleRequest',
+      `
+      const mod = $.showWindowJs;
+      if (mod && mod.getScript) {
+        const script = await mod.getScript();
+        return {
+          status: 200,
+          contentType: 'application/javascript',
+          body: script,
+          headers: { 'Cache-Control': 'public, max-age=3600' }
+        };
+      }
+      return { status: 404, contentType: 'text/plain', body: 'Module not found' };
+    `,
+    );
   }
 
   async registerAliases(): Promise<void> {

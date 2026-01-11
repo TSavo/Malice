@@ -226,6 +226,21 @@ export class MaliceClient {
       this._handleLocationState(msg.data);
     }
 
+    // Handle show - open/update a show window
+    if (msg.type === 'show' && msg.data && this.wm) {
+      this._handleShowState(msg.data);
+    }
+
+    // Handle close - close a show window
+    if (msg.type === 'close' && msg.data && this.wm) {
+      this._handleCloseState(msg.data);
+    }
+
+    // Handle hide - close and remove from start menu
+    if (msg.type === 'hide' && msg.data && this.wm) {
+      this._handleHideState(msg.data);
+    }
+
     // Emit event for UI components
     document.dispatchEvent(new CustomEvent('moo-state', { detail: msg }));
 
@@ -352,6 +367,110 @@ export class MaliceClient {
         minimizable: true
       }
     });
+  }
+
+  async _handleShowState(data) {
+    const windowId = 'show:' + data.window;
+
+    // Track show windows for state management
+    if (!this.showWindows) {
+      this.showWindows = new Map();  // windowName -> data
+    }
+    this.showWindows.set(data.window, data);
+
+    // If persist flag, register with taskbar
+    if (data.persist) {
+      const client = this;
+      this.wm?.taskbar?.registerAvailableWindow(windowId, {
+        icon: '👁',
+        label: data.title || data.window,
+        windowType: 'show',
+        stateType: 'show:' + data.window,
+        openFn: () => client._openShowWindow(data.window)
+      });
+    }
+
+    // Check if window already exists
+    let win = this.wm.getWindow(windowId);
+
+    if (!win) {
+      await this._openShowWindow(data.window, data);
+      win = this.wm.getWindow(windowId);
+    }
+
+    // Update the window with content
+    if (win && win.setContent) {
+      win.setContent(data);
+    }
+
+    // Update title if provided
+    if (win && data.title) {
+      win.setTitle(data.title);
+    }
+  }
+
+  _handleCloseState(data) {
+    const windowId = 'show:' + data.window;
+    const win = this.wm?.getWindow(windowId);
+
+    if (win) {
+      this.wm.closeWindow(windowId);
+    }
+  }
+
+  _handleHideState(data) {
+    const windowId = 'show:' + data.window;
+
+    // Close the window
+    const win = this.wm?.getWindow(windowId);
+    if (win) {
+      this.wm.closeWindow(windowId);
+    }
+
+    // Remove from taskbar
+    this.wm?.taskbar?.unregisterAvailableWindow(windowId);
+
+    // Clean up stored data
+    if (this.showWindows) {
+      this.showWindows.delete(data.window);
+    }
+  }
+
+  async _openShowWindow(windowName, data) {
+    const windowId = 'show:' + windowName;
+    const area = this.wm.getWindowArea();
+    const winWidth = 320;
+    const winHeight = 420;
+
+    // Cascade position for multiple show windows
+    const existingShowWindows = Array.from(this.wm.windows.keys()).filter(id => id.startsWith('show:'));
+    const offset = (existingShowWindows.length * 30) % 150;
+
+    await this.wm.openWindow({
+      windowId: windowId,
+      windowType: 'show',
+      title: data?.title || windowName,
+      channel: 'win:' + windowId,
+      config: {
+        x: 100 + offset,
+        y: 100 + offset,
+        width: winWidth,
+        height: winHeight,
+        minimized: false,
+        maximized: false,
+        resizable: true,
+        closable: true,
+        minimizable: true
+      }
+    });
+
+    // Set content if data provided
+    if (data) {
+      const win = this.wm.getWindow(windowId);
+      if (win && win.setContent) {
+        win.setContent(data);
+      }
+    }
   }
 
   onWmMessage(msg) {

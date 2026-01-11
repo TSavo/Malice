@@ -185,6 +185,7 @@ export class CartelDomainBuilder implements Builder {
       { segment: 'audio-manager.js', alias: 'audioManagerJs' },
       { segment: 'location-window.js', alias: 'locationWindowJs' },
       { segment: 'speaker-window.js', alias: 'speakerWindowJs' },
+      { segment: 'show-window.js', alias: 'showWindowJs' },
     ];
 
     for (const mod of modules) {

@@ -48,6 +48,7 @@ import { HtmlWindow } from '/js/html-window';
 import { IframeWindow } from '/js/iframe-window';
 import { LocationWindow } from '/js/location-window';
 import { SpeakerWindow } from '/js/speaker-window';
+import { ShowWindow } from '/js/show-window';
 import { Taskbar } from '/js/taskbar';
 
 /**
@@ -444,6 +445,9 @@ export class WindowManager {
       case 'speaker':
         win = new SpeakerWindow(this, config);
         break;
+      case 'show':
+        win = new ShowWindow(this, config);
+        break;
       default:
         win = new Window(this, config);
     }
@@ -497,6 +501,7 @@ export class WindowManager {
       case 'map': return '🗺';
       case 'location': return '📍';
       case 'speaker': return '🔊';
+      case 'show': return '👁';
       default: return '□';
     }
   }
