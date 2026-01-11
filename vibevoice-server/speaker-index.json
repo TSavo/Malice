@@ -9265,8 +9265,127 @@
         "chapter_id": "291718",
         "id": "6965_291718_000007_000000"
       }
+    },
+    {
+      "id": "3945",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/73097/audio/audio.wav?Expires=1768147127&Signature=da6R-73JYww0CC3nvh4zmMYxm2YC5lVqgc552YbQ9m-QOwIRWYyKt~ywLdcafsSk7VEnfuIG7a0hIeeXAFfu-ln94EOWQZ0irEGczreDI-LDwfxalo0VCZN9XVcwURMrvmGy6O1ALt901D1cI8lJWz4-n7WhkjqUUemxSt68zgWynGFUao0XKN2hHQsm9iWqCP2Bs7~ercOoRZ9ji5a6g7-ymYBLDy8kmr85b3F93vVOP~X8zSkwZ~BbNTNEefEIltIMwiCt9ruPOpKBUxQwM95UL2C7ir3CquYo91GAE8uXb~~kymTmIN6vtz5cLzJR2VnBdBgvG18AzA8DWjatJA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "The train was swinging along at a rapid rate, jarring from side to side; the step was a long one between the cars and there was no protecting grating.",
+        "text_original": "The train was swinging along at a rapid rate, jarring from side to side; the step was a long one between the cars and there was no protecting grating.",
+        "speaker_id": "3945",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/3945/29110/3945_29110_000010_000001.wav",
+        "chapter_id": "29110",
+        "id": "3945_29110_000010_000001"
+      }
+    },
+    {
+      "id": "1343",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/73244/audio/audio.wav?Expires=1768147136&Signature=NjbGY~00dejXBD~FwX1t4ed6hg2EKbTmE8fdLdu7t3gVfGAtdnHAzFWTwnGYounzeqd8a7dFpoWEZsvwHZPB3RZipreSgeG5LT4R5IU1S2ZYdWbLif4t2pVSc4qs0HsCfPMI8xMKr~Ai9R48rJIzMYF32juj1AIDDM3RgL4dEjHU3vGZOs6KhJ6Loj32pCBFI4tQISQR-I4X0XN~aw9BWg8e8TufYS57ZMcn6HaZhUVDELb1ZSxnbLl1yberL5Mq7JrffQRryPlM5LsgvM25-ZONywSQBOEA4MblDV-Ut1Fg-chlSZ7SXt1T05vaE5~Y1wE8K3j3YKvd4WuB8pcGyQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "This brother, and this Norwegian King, joining their forces against England, with Duke William's help, won a fight in which the English were commanded by two nobles; and then besieged York. Harold, who was waiting for the Normans on the coast at Hastings, with his army, marched to Stamford Bridge upon the river Derwent to give them instant battle.",
+        "text_original": "This brother, and this Norwegian King, joining their forces against England, with Duke William's help, won a fight in which the English were commanded by two nobles; and then besieged York. Harold, who was waiting for the Normans on the coast at Hastings, with his army, marched to Stamford Bridge upon the river Derwent to give them instant battle.",
+        "speaker_id": "1343",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/1343/139681/1343_139681_000002_000001.wav",
+        "chapter_id": "139681",
+        "id": "1343_139681_000002_000001"
+      }
+    },
+    {
+      "id": "1271",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/73333/audio/audio.wav?Expires=1768147142&Signature=pp1JfyRU2xvXMtLYPllujBeCwC0ElK8AHfLHoFKOZYRFxM7wVNJ~ICZJXLMwzpuQbEWs96ok3RR-MveDqbNXHCxFRa3PPAZ8CUWhg557pLCqXsHgr1yELSzPK6cETSAdJQ4imDzq5Y1HJi-VJ2w71-4Asz1kp-X7~9G3JoEjHIL3cv7nFg8xrrvXSScHF6RxH1K5jvvyseHLVHmh8a96vrZQ-HrWK2tTWrRvRBR2u7WT37QwnuWfQfFAu4c45Bzpfw4inGVeTIAcojKDmZvc-RKrg6PfAnSDSRs1PgdHfUIfUN06iWJ4unpVwPI3KZU7PHrM8EBdDac-SmzqX28XWQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "If any one could point out an intermediate and yet a tenable position between the complete independence and the entire subjection of the public expression of opinion, I should perhaps be inclined to adopt it; but the difficulty is to discover this position.",
+        "text_original": "If any one could point out an intermediate and yet a tenable position between the complete independence and the entire subjection of the public expression of opinion, I should perhaps be inclined to adopt it; but the difficulty is to discover this position.",
+        "speaker_id": "1271",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/1271/133279/1271_133279_000000_000000.wav",
+        "chapter_id": "133279",
+        "id": "1271_133279_000000_000000"
+      }
+    },
+    {
+      "id": "4054",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/73486/audio/audio.wav?Expires=1768147148&Signature=L5gnd0tYJTX35gx3el9J6H-IBk3HemlgfCOsV3lpoCcyNTDG4mOIyrGxDbWIUlAy6z6qUEfO~poo7MtT91GLcVh1CJ3gCiIapMyOLQ7NeQfmXatsaHRyBgitHVdR4ysoZqGleKlR8ZaPC4KKc4jXjgvbll4J3WkKKs-V0J1N6oe3w1o~4PVyg7zoe9Zl02yhYtJoDzTT2qF6vck5Haf2g6ZLNiZSg2rx7IRErcU0d2xPcyHAqlBbA-JN8oJUdy1s43nxQsTkp1djQSCGbSqiHMaZUXhKXtErXW4rXZVTiSGGpojQu4m6zb2uzTPssbfuMImQ260ADZxJMOfp48~lEA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "It is a curious fact, and makes life very interesting, that, generally speaking, none of us have any expectation that things are going to happen till the very moment when they do happen.",
+        "text_original": "It is a curious fact, and makes life very interesting, that, generally speaking, none of us have any expectation that things are going to happen till the very moment when they do happen.",
+        "speaker_id": "4054",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/4054/11077/4054_11077_000004_000000.wav",
+        "chapter_id": "11077",
+        "id": "4054_11077_000004_000000"
+      }
+    },
+    {
+      "id": "1607",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/73632/audio/audio.wav?Expires=1768147158&Signature=Ma7J82LhirF0IzxIjnoOoDqMtTMrODhdQGWi-eYAaj78rHFkwXlLEqph85Gz9mGcUNFz0lIb0WOm94ozeovoinfWMGGa65WbgGmONS8cSo2hBUskFzMvIV5rsfafh-wNJB8Q~RAxo~JeFnDuOyGWrQ-VV70DC9B7SkylInKM0ZHrgcdHpCKBKjOgN0cuxntrjsakh2Rb08DxmldGkyCAeLMpSQdDbodnTEcTyoeW1QjrQGqJfvzPgWA7U8NOHlK208KgN02MKf1n91N9BV0ZR~6fZHud75NBQIDQnr7ODkuYLzswsElGqFv~QgwZ-koHuNpXRSLB~xgTKC69brKWgw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "The indulgence of Constantine admitted them, at a very tender age, to share the administration of the empire; and they studied the art of reigning, at the expense of the people intrusted to their care.",
+        "text_original": "The indulgence of Constantine admitted them, at a very tender age, to share the administration of the empire; and they studied the art of reigning, at the expense of the people intrusted to their care.",
+        "speaker_id": "1607",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/1607/134636/1607_134636_000004_000008.wav",
+        "chapter_id": "134636",
+        "id": "1607_134636_000004_000008"
+      }
+    },
+    {
+      "id": "5909",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/73642/audio/audio.wav?Expires=1768147158&Signature=Z-v-F2Ffr~z5LXCVmDbbca3V2csIzF2rNsRQHQYlcUlKw6XPtsA~wD6jphDAWM5RPKmv7xORJMRB5BG2ZwlMPzsh~k2nqfpGgPxOM7934gWBNK9wxMzit9KiYRStpqMwvKDfUWJdF3tsfoM7rXOn8ifWhemG-6JXQAWW7WjMHTrvTEiwDMHdLrolQ06JOxzDWiT5MYTWqe-1BoukL4zTo5yhdianCfkdoZciSBMZnybSE5IUi0xc1Dwphu9yE7PV78~m1fE0wHYMnOW0gEA7GsNL26U8a3DSpJyoa5L7F4seaVZo9fj5RWpSJL~JWAQ5fjnHq9RabCat3kQJkqzsDg__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "When they did finally tumble in and pull the blankets over them they were unable to sleep, between the howling of the coyotes and their laughter over Stacy Brown's new found talent.",
+        "text_original": "When they did finally tumble in and pull the blankets over them they were unable to sleep, between the howling of the coyotes and their laughter over Stacy Brown's new-found talent.",
+        "speaker_id": "5909",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/5909/111961/5909_111961_000006_000001.wav",
+        "chapter_id": "111961",
+        "id": "5909_111961_000006_000001"
+      }
+    },
+    {
+      "id": "8545",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/73961/audio/audio.wav?Expires=1768147172&Signature=sWspdO0hc91oG8A4OcdNoBjFZRm5b-a8645IzZzTFgKc1skfVIy~SrJXzgksmftpzhvgVDmW8VSfj1fir~srP6~RE5y9S8Rd6lTBX5plPUpj99lGsVjSdg8OJqaCM-kaOtJUyHS7VC7-njAj2AvxEumHRkXOkhk9vBm5sWBKCzWRQD~CssJOrYeqrWJYybIHYoBOJQyjjkorJDY4q7h05zae1ChtVQM0zXndWgDH9EqZuk3oY1fPwnGn~vSBhOD~wQ8UbWwk~y7SZLR-At4giWub0lE7yq4oD0OMd9M7L5lIjX6uAntK~IAnfSgFJ8PwWyasf0BxnpwDkmy1alUzzA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "The store keeper quickly made known her condition at the Anti slavery Office, and in double quick time j m",
+        "text_original": "The store-keeper quickly made known her condition at the Anti-slavery Office, and in double-quick time J.M.",
+        "speaker_id": "8545",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/8545/287671/8545_287671_000016_000005.wav",
+        "chapter_id": "287671",
+        "id": "8545_287671_000016_000005"
+      }
     }
   ],
-  "scannedRows": 73000,
+  "scannedRows": 74000,
   "totalRows": 116500
 }
