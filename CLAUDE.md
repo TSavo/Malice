@@ -375,34 +375,43 @@ npc.say("Hello there!");
 player.say("Hi!");
 vendingMachine.say("Please insert coins.");
 
-// Get object's TTS voice ID (deterministic based on object ID)
+// Get object's TTS voice ID (gender-aware, deterministic based on object ID)
 const voice = obj.getVoiceId();
-// Returns: 'alloy', 'echo', 'fable', 'onyx', 'nova', or 'shimmer'
+// Returns: 'speaker_123' (from 789 LibriTTS voices) or 'alloy' (fallback)
+
+// Reroll to a different voice (increments voiceSeed)
+const newVoice = await obj.rerollVoice();
+// Optional gender override: await obj.rerollVoice('female') or rerollVoice('male')
+
+// Manually set a specific voice
+obj.setVoice('speaker_42');
+
+// Set voice style for steerability (optional)
+obj.voiceStyle = "speak slowly and menacingly";
 ```
 
 **Location Broadcast:**
 ```typescript
 // Broadcast audio segments to all players in location
 room.broadcastAudio([
-  { speaker: '42', speakerName: 'Bot', voiceId: 'alloy', text: 'Hello' },
-  { speaker: '99', speakerName: 'Alice', voiceId: 'nova', text: 'Hi there!' }
+  { speaker: '42', speakerName: 'Bot', voiceId: 'speaker_123', text: 'Hello' },
+  { speaker: '99', speakerName: 'Alice', voiceId: 'speaker_456', text: 'Hi there!', voiceStyle: 'cheerful' }
 ]);
 ```
 
 **How it works:**
 1. Any object calls `say(message)` - broadcasts text via `location.announce()` and audio via `location.broadcastAudio()`
-2. Voice is deterministic: same object always gets same voice (based on `objectId % 6`)
-3. Audio segments sent to all players in location via `audio` channel
-4. Client requests TTS audio from server and plays it
+2. Voice is **gender-aware**: objects with `sex` property get appropriate voices (374 female, 415 male)
+3. Voice is **deterministic**: same object + voiceSeed always gets same voice
+4. Audio segments sent to all players in location via `audio` channel
+5. Client requests TTS audio from VibeVoice server and plays it
 
 **Voice assignment:**
-Objects are assigned one of 6 OpenAI TTS voices based on their ID:
-- `alloy` - Neutral, balanced
-- `echo` - Clear, expressive
-- `fable` - Warm, storytelling
-- `onyx` - Deep, authoritative
-- `nova` - Bright, energetic
-- `shimmer` - Soft, gentle
+- Objects with `sex='female'` or `'F'` get female voices
+- Objects with `sex='male'` or `'M'` get male voices
+- Objects without `sex` get voices from all available voices
+- 789 LibriTTS voices available (speaker_0 through speaker_788)
+- Fallback to 6 built-in voices if TTS server unavailable: alloy, echo, fable, onyx, nova, shimmer
 
 ### WebSocket Protocol
 
@@ -660,7 +669,7 @@ return {roomId: room.id, torchId: torch.id};
 - `$query()` - Fluent query builder for finding objects
 - `$aiQuery(system, prompt, session?)` - Query Claude AI with MCP tools
 - `$recycler` - Create/destroy objects via recycler pattern
-- All `$aliases` - `$room`, `$player`, `$exit`, `$ai`, `$plot`, `$spatial`, `$faction`, `$factionManager`, `$transports`, `$continuum`, `$cartel`, `$greeter`, furniture prototypes (`$bed`, `$table`, `$chair`, `$cabinet`, `$trunk`, `$crate`, `$locker`, `$bench`, `$couch`, `$safe`, `$furniture`), security (`$door`, `$lock`, `$biometricLock`, `$guardedExit`), utilities (`$http`, `$email`, `$blob`, `$aiImageGen`), etc.
+- All `$aliases` - `$room`, `$player`, `$exit`, `$ai`, `$plot`, `$spatial`, `$faction`, `$factionManager`, `$transports`, `$continuum`, `$cartel`, `$greeter`, furniture prototypes (`$bed`, `$table`, `$chair`, `$cabinet`, `$trunk`, `$crate`, `$locker`, `$bench`, `$couch`, `$safe`, `$furniture`), security (`$door`, `$lock`, `$biometricLock`, `$guardedExit`), utilities (`$http`, `$email`, `$blob`, `$tts`, `$aiImageGen`), etc.
 - `player` - Your authenticated player object (if HTTP Basic Auth provided)
 - Full JavaScript - loops, conditionals, async/await, etc.
 
@@ -1204,9 +1213,9 @@ $continuum.discordWebhook = 'https://discord.com/api/webhooks/...';
 $cartel.discordWebhook = 'https://discord.com/api/webhooks/...';
 ```
 
-## Email, HTTP, Blob, and AI Image Objects
+## Email, HTTP, Blob, TTS, and AI Image Objects
 
-MOO objects for external communication, blob storage, and AI image generation. These are proper MOO objects (not injected TypeScript classes) - their methods use native `fetch`, `await import('resend')`, and `await import('mongodb')` for GridFS.
+MOO objects for external communication, blob storage, text-to-speech, and AI image generation. These are proper MOO objects (not injected TypeScript classes) - their methods use native `fetch`, `await import('resend')`, and `await import('mongodb')` for GridFS.
 
 ### $email - Email Object
 
@@ -1304,6 +1313,59 @@ player.avatarBlobKey = blobKey;
 
 // Player can view at: https://faction.domain/blob/{blobKey}
 ```
+
+### $tts - Text-to-Speech Voice Manager
+
+Manages TTS voices using VibeVoice (self-hosted voice cloning server). Provides 789 LibriTTS voices (374 female, 415 male) plus 6 built-in voices.
+
+```typescript
+// List all available voices
+const voices = await $tts.listVoices();
+// [{ voice_id: 'speaker_0', name: 'speaker_0' }, ...]
+
+// Get voice stats
+const stats = await $tts.getVoiceStats();
+// { female: 374, male: 415, total: 789, builtin: 6 }
+
+// Get gender-specific voices
+const femaleVoices = await $tts.getFemaleVoices();
+// ['speaker_0', 'speaker_2', ...]
+const maleVoices = await $tts.getMaleVoices();
+// ['speaker_1', 'speaker_3', ...]
+
+// Get voice for gender (deterministic based on object ID + seed)
+const voice = await $tts.getVoiceForGender('female', objectId, seed);
+// Returns: 'speaker_42'
+
+// Add a custom voice from audio sample
+const result = await $tts.addVoice('villain', audioBase64, 'wav');
+// { success: true, voice_id: 'villain' }
+
+// Generate speech audio
+const audio = await $tts.speak('Hello world', 'speaker_42', { speed: 1.0 });
+// { success: true, audio: 'base64...', contentType: 'audio/wav' }
+
+// Check voice exists
+const exists = await $tts.hasVoice('speaker_42');
+
+// Get voice info
+const info = await $tts.getVoice('speaker_42');
+// { voice_id: 'speaker_42', name: 'speaker_42' }
+
+// Check TTS server health
+const health = await $tts.health();
+// { healthy: true, model: '...', gpu_available: true, ... }
+```
+
+**Key features:**
+- **Gender-aware selection**: Automatically matches voices to character gender
+- **Deterministic assignment**: Same objectId + seed = same voice
+- **Voice cloning**: Add custom voices from audio samples
+- **Built-in fallback**: 6 voices (alloy, echo, fable, onyx, nova, shimmer) if server unavailable
+- **30-min cache**: Gender data cached for performance
+
+**Environment:**
+- `VIBEVOICE_URL` - VibeVoice server URL (default: `http://vibevoice-server:8880`)
 
 ### $aiImageGen - AI Image Generation Object
 
