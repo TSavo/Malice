@@ -54,7 +54,33 @@ export class Taskbar {
     this.buttons = new Map();  // windowId -> button element
     this.menuOpen = false;
 
+    // Dynamic menu entries - registered by client when state is received
+    // Map of windowId -> { icon, label, windowType, stateType, data }
+    this.availableWindows = new Map();
+
     this.render();
+  }
+
+  /**
+   * Register an available window type for the start menu.
+   * Called by MaliceClient when relevant state is received.
+   */
+  registerAvailableWindow(windowId, config) {
+    this.availableWindows.set(windowId, {
+      icon: config.icon || '📄',
+      label: config.label || windowId,
+      windowType: config.windowType || 'html',
+      stateType: config.stateType || null,
+      data: config.data || null,
+      openFn: config.openFn || null
+    });
+  }
+
+  /**
+   * Unregister an available window type.
+   */
+  unregisterAvailableWindow(windowId) {
+    this.availableWindows.delete(windowId);
   }
 
   render() {
@@ -315,11 +341,35 @@ export class Taskbar {
   }
 
   _buildMenu() {
+    // Clear existing menu items
+    this.menu.innerHTML = '';
+
+    // Build items list dynamically
     const items = [
-      { icon: '🖥', label: 'Terminal', action: () => this.wm?.openTerminal() },
-      { type: 'separator' },
-      { icon: '🔌', label: 'Disconnect', action: () => this.wm?.disconnect(), danger: true }
+      { icon: '>', label: 'Terminal', action: () => this.wm?.openTerminal() },
     ];
+
+    // Add dynamic window entries from availableWindows
+    for (const [windowId, config] of this.availableWindows) {
+      const isOpen = this.wm?.windows?.has(windowId);
+      items.push({
+        icon: config.icon,
+        label: config.label + (isOpen ? ' ✓' : ''),
+        action: () => {
+          if (isOpen) {
+            // Focus existing window
+            this.wm?.focusWindow(windowId);
+          } else if (config.openFn) {
+            // Use custom open function
+            config.openFn();
+          }
+        }
+      });
+    }
+
+    // Add separator and disconnect
+    items.push({ type: 'separator' });
+    items.push({ icon: '🔌', label: 'Disconnect', action: () => this.wm?.disconnect(), danger: true });
 
     for (const item of items) {
       if (item.type === 'separator') {
@@ -372,6 +422,8 @@ export class Taskbar {
   }
 
   openMenu() {
+    // Rebuild menu each time to reflect current state
+    this._buildMenu();
     this.menu.style.display = 'block';
     this.menuOpen = true;
     this.startBtn.style.background = '#252525';

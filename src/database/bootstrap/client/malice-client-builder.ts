@@ -225,38 +225,59 @@ export class MaliceClient {
   async _handleLocationState(locationData) {
     const windowId = 'location';
 
+    // Register this window type with the taskbar for the start menu
+    // Use arrow function that references this.state.location for latest data
+    const client = this;
+    this.wm?.taskbar?.registerAvailableWindow(windowId, {
+      icon: '📍',
+      label: 'Location',
+      windowType: 'location',
+      stateType: 'location',
+      openFn: () => client._openLocationWindow()
+    });
+
     // Check if location window already exists
     let win = this.wm.getWindow(windowId);
 
     if (!win) {
-      // Create location window (positioned to the right of screen, not maximized)
-      const area = this.wm.getWindowArea();
-      const winWidth = 320;
-      const winHeight = 400;
-
-      await this.wm.openWindow({
-        windowId: windowId,
-        windowType: 'location',
-        title: 'Location',
-        channel: 'win:location',
-        config: {
-          x: area.width - winWidth - 20,
-          y: 20,
-          width: winWidth,
-          height: winHeight,
-          minimized: false,
-          maximized: false,
-          resizable: true,
-          closable: true,
-          minimizable: true
-        }
-      });
-
+      await this._openLocationWindow();
       win = this.wm.getWindow(windowId);
     }
 
     // Update the location window with new data
     if (win && win.setLocation) {
+      win.setLocation(locationData);
+    }
+  }
+
+  async _openLocationWindow() {
+    const windowId = 'location';
+    const area = this.wm.getWindowArea();
+    const winWidth = 320;
+    const winHeight = 400;
+
+    await this.wm.openWindow({
+      windowId: windowId,
+      windowType: 'location',
+      title: 'Location',
+      channel: 'win:location',
+      config: {
+        x: area.width - winWidth - 20,
+        y: 20,
+        width: winWidth,
+        height: winHeight,
+        minimized: false,
+        maximized: false,
+        resizable: true,
+        closable: true,
+        minimizable: true
+      }
+    });
+
+    // Use latest location data from state
+    const win = this.wm.getWindow(windowId);
+    const locationData = this.state.location;
+    if (win && win.setLocation && locationData) {
       win.setLocation(locationData);
     }
   }
