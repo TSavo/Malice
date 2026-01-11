@@ -13,6 +13,8 @@ The waterfront continues north and south. The bay continues forever, or at least
   y: 1,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'alaskan-way-x-21-y1-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

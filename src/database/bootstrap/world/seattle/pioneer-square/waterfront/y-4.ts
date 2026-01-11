@@ -12,6 +12,8 @@ The wind off the bay is constant here, salt spray carried on air that never quit
   x: -21,
   y: -4,
   z: 0,
+
+  imageOnDisk: 'waterfront-x-21-y-4-z0.png',
   population: 0,
   ambientNoise: 20,
   lighting: 100,

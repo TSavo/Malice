@@ -13,6 +13,8 @@ The port stretches south. The city huddles to the east. The bay waits to the wes
   y: -10,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'alaskan-way-x-21-y-10-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

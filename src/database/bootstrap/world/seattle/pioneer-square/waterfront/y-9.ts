@@ -10,6 +10,8 @@ Gulls circle overhead, the only consistent life along this stretch. They've adap
   x: -21,
   y: -9,
   z: 0,
+
+  imageOnDisk: 'waterfront-x-21-y-9-z0.png',
   population: 0,
   ambientNoise: 15,
   lighting: 100,

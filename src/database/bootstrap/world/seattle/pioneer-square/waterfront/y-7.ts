@@ -10,6 +10,8 @@ The smell of the bay is strong here—salt and seaweed and something organic dec
   x: -21,
   y: -7,
   z: 0,
+
+  imageOnDisk: 'waterfront-x-21-y-7-z0.png',
   population: 0,
   ambientNoise: 15,
   lighting: 100,
