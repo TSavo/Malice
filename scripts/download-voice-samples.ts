@@ -58,8 +58,8 @@ const LIST_ONLY = values.list as boolean;
 // Hugging Face datasets API
 const HF_API = 'https://datasets-server.huggingface.co';
 const DATASET = 'mythicinfinity/libritts';
-const CONFIG = 'dev';
-const SPLIT = 'dev.clean'; // Clean subset with diverse speakers
+const CONFIG = 'clean';
+const SPLIT = 'train.clean.100'; // 251 speakers, ~28k samples
 
 interface AudioSource {
   src: string;
@@ -83,13 +83,28 @@ interface HFResponse {
   num_rows_per_page: number;
 }
 
-async function fetchRows(offset: number, length: number): Promise<HFResponse> {
+async function fetchRows(offset: number, length: number, retries = 3): Promise<HFResponse> {
   const url = `${HF_API}/rows?dataset=${DATASET}&config=${CONFIG}&split=${SPLIT}&offset=${offset}&length=${length}`;
-  const resp = await fetch(url);
-  if (!resp.ok) {
+
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    const resp = await fetch(url);
+
+    if (resp.ok) {
+      return resp.json();
+    }
+
+    if (resp.status === 429 && attempt < retries) {
+      // Rate limited - wait and retry
+      const waitTime = attempt * 5000; // 5s, 10s, 15s
+      console.log(`\n  ⏳ Rate limited, waiting ${waitTime / 1000}s...`);
+      await new Promise((r) => setTimeout(r, waitTime));
+      continue;
+    }
+
     throw new Error(`HF API error: ${resp.status} ${resp.statusText}`);
   }
-  return resp.json();
+
+  throw new Error('Max retries exceeded');
 }
 
 async function downloadAudio(url: string): Promise<Buffer> {
@@ -158,8 +173,8 @@ async function main() {
       `\r  Scanned ${scanned.toLocaleString()} samples, found ${speakerSamples.size} unique speakers`
     );
 
-    // Don't hammer the API
-    await new Promise((r) => setTimeout(r, 100));
+    // Don't hammer the API - increased delay to avoid rate limits
+    await new Promise((r) => setTimeout(r, 500));
   }
 
   console.log('\n');
