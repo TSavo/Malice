@@ -386,19 +386,21 @@ export class TtsBuilder implements Builder {
     `,
     );
 
-    // Get voice for gender (deterministic based on object ID)
+    // Get voice for gender (deterministic based on object ID + seed)
     this.tts.setMethod(
       'getVoiceForGender',
       `
-      /** Get a deterministic voice ID based on gender and object ID.
-       *  Same object always gets the same voice.
+      /** Get a deterministic voice ID based on gender, object ID, and optional seed.
+       *  Same object+seed always gets the same voice. Change seed to reroll.
        *  Fetches voice data from server with 30-min cache.
        *  @param gender - 'female', 'male', or null/undefined for neutral
        *  @param objectId - Numeric object ID for deterministic selection
+       *  @param seed - Optional seed offset for rerolling (default: 0)
        *  @returns Voice ID (e.g., 'speaker_123' or 'alloy' for fallback)
        */
       const gender = args[0];
       const objectId = args[1] || 0;
+      const seed = args[2] || 0;
 
       // Normalize gender
       const normalizedGender = (gender || '').toLowerCase();
@@ -419,11 +421,11 @@ export class TtsBuilder implements Builder {
       // Fallback to built-in voices if no custom voices available
       if (voicePool.length === 0) {
         const builtins = self.builtinVoices || ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
-        return builtins[objectId % builtins.length];
+        return builtins[(objectId + seed) % builtins.length];
       }
 
-      // Deterministic selection based on object ID
-      return voicePool[objectId % voicePool.length];
+      // Deterministic selection based on object ID + seed
+      return voicePool[(objectId + seed) % voicePool.length];
     `,
     );
 

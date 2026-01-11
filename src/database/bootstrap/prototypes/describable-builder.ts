@@ -1045,23 +1045,77 @@ export class DescribableBuilder implements Builder {
     obj.setMethod(
       'getVoiceId',
       `
-      /** Get this object's TTS voice ID. Deterministic based on object ID.
-       *  Same object always gets same voice across sessions.
-       *  Uses $tts.getVoiceForGender() to match voice gender to object's sex property.
+      /** Get this object's TTS voice ID.
+       *  If voiceId is set, returns it (manual override).
+       *  Otherwise calculates from sex + objectId + voiceSeed.
        *  @returns voice ID string (e.g., 'speaker_123' or 'alloy' for fallback)
        */
       if (self.voiceId) return self.voiceId;
 
       // Use $tts for gender-aware voice assignment
       // self.sex can be 'female', 'male', 'F', 'M', or null/undefined
+      // self.voiceSeed offsets the selection (for rerolling)
       if ($tts && $tts.getVoiceForGender) {
-        self.voiceId = await $tts.getVoiceForGender(self.sex, self.id);
+        const seed = self.voiceSeed || 0;
+        self.voiceId = await $tts.getVoiceForGender(self.sex, self.id, seed);
         return self.voiceId;
       }
 
       // Fallback to built-in voices if $tts not available
       const VOICES = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
-      self.voiceId = VOICES[self.id % VOICES.length];
+      const seed = self.voiceSeed || 0;
+      self.voiceId = VOICES[(self.id + seed) % VOICES.length];
+      return self.voiceId;
+    `,
+    );
+
+    // rerollVoice() - Get a new random voice
+    obj.setMethod(
+      'rerollVoice',
+      `
+      /** Reroll to a different voice. Increments voiceSeed and clears cached voiceId.
+       *  @param gender - Optional: override gender for this reroll ('female', 'male', or null)
+       *  @returns The new voice ID
+       */
+      const genderOverride = args[0];
+
+      // Increment seed
+      self.voiceSeed = (self.voiceSeed || 0) + 1;
+
+      // Clear cached voice
+      self.voiceId = null;
+
+      // If gender override provided, temporarily set it
+      const originalSex = self.sex;
+      if (genderOverride !== undefined) {
+        self.sex = genderOverride;
+      }
+
+      // Get new voice
+      const newVoice = await self.getVoiceId();
+
+      // Restore original sex if we overrode it
+      if (genderOverride !== undefined) {
+        self.sex = originalSex;
+      }
+
+      return newVoice;
+    `,
+    );
+
+    // setVoice() - Manually set a specific voice
+    obj.setMethod(
+      'setVoice',
+      `
+      /** Manually set a specific voice ID, overriding automatic selection.
+       *  @param voiceId - The voice ID to use (e.g., 'speaker_123', 'alloy')
+       *  @returns The voice ID that was set
+       */
+      const voiceId = args[0];
+      if (!voiceId) {
+        throw new Error('voiceId is required');
+      }
+      self.voiceId = voiceId;
       return self.voiceId;
     `,
     );
