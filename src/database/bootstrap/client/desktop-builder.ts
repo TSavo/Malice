@@ -44,6 +44,7 @@ export class DesktopBuilder implements Builder {
       return \`
 import { WindowManager } from '/js/window-manager';
 import { MaliceClient } from '/js/malice-client';
+import { AudioManager } from '/js/audio-manager';
 
 /**
  * Show login form for pre-authentication
@@ -256,14 +257,21 @@ async function initDesktop(token) {
     wsUrl += '?' + params.join('&');
   }
 
-  // Create window manager first (without client reference)
-  const wm = new WindowManager(windowArea, taskbarContainer, null);
+  // Determine TTS server URL from current location
+  // VibeVoice server runs on port 8880 relative to current host
+  const ttsUrl = window.location.protocol + '//' + window.location.hostname + ':8880';
+
+  // Create AudioManager for TTS playback
+  const audio = new AudioManager(ttsUrl);
+
+  // Create window manager first (without client reference, but with audio)
+  const wm = new WindowManager(windowArea, taskbarContainer, null, audio);
 
   // Set terminal libraries
   wm.setTerminalLibs(Terminal, FitAddon, WebLinksAddon);
 
-  // Create client with window manager reference
-  const client = new MaliceClient(wsUrl, wm);
+  // Create client with window manager and audio manager references
+  const client = new MaliceClient(wsUrl, wm, audio);
 
   // Now set client on window manager
   wm.client = client;
@@ -304,7 +312,7 @@ async function initDesktop(token) {
   }
 
   // Expose for debugging
-  window.malice = { wm, client };
+  window.malice = { wm, client, audio };
 
   console.log('[Desktop] Initialized');
 }

@@ -44,12 +44,13 @@ export class TaskbarBuilder implements Builder {
       return \`
 /**
  * Taskbar - Windows 11-style taskbar
- * Shows start menu, buttons for each window, connection status.
+ * Shows start menu, buttons for each window, connection status, sound controls.
  */
 export class Taskbar {
-  constructor(container, wm) {
+  constructor(container, wm, audioManager) {
     this.container = container;
     this.wm = wm;
+    this.audio = audioManager;
     this.buttons = new Map();  // windowId -> button element
     this.menuOpen = false;
 
@@ -144,6 +145,39 @@ export class Taskbar {
     \\\`;
     this.container.appendChild(this.buttonsArea);
 
+    // Sound button (right, before clock)
+    this.soundBtn = document.createElement('button');
+    this.soundBtn.id = 'taskbar-sound-btn';
+    this.soundBtn.innerHTML = '🔊';
+    this.soundBtn.style.cssText = \\\`
+      width: 28px;
+      height: 28px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 4px;
+      color: #888;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 8px;
+    \\\`;
+    this.soundBtn.title = 'Sound Settings';
+    this.soundBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (this.audio) {
+        this.audio.toggleSettings();
+      }
+    });
+    this.soundBtn.addEventListener('mouseenter', () => {
+      this.soundBtn.style.background = '#252525';
+    });
+    this.soundBtn.addEventListener('mouseleave', () => {
+      this.soundBtn.style.background = '#1a1a1a';
+    });
+    this.container.appendChild(this.soundBtn);
+
     // Clock (right)
     this.clock = document.createElement('div');
     this.clock.style.cssText = \\\`
@@ -155,6 +189,14 @@ export class Taskbar {
     this.container.appendChild(this.clock);
     this._updateClock();
     setInterval(() => this._updateClock(), 1000);
+  }
+
+  /**
+   * Update sound button icon based on mute state
+   */
+  updateSoundIcon() {
+    if (!this.soundBtn || !this.audio) return;
+    this.soundBtn.innerHTML = this.audio.globalMuted ? '🔇' : '🔊';
   }
 
   _updateClock() {
