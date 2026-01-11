@@ -86,12 +86,19 @@ Inherits from: `$root`
 - `abilities` - Prose physics describing how the object behaves
 - `systemPrompt` - AI personality prompt (if set, object is conscious)
 - `interactionSession` - Session ID for AI conversation continuity
+- `voiceId` - TTS voice ID (cached, set via getVoiceId or setVoice)
+- `voiceSeed` - Seed offset for voice selection (increment to reroll)
+- `voiceStyle` - Voice style for steerability (e.g., "speak slowly and menacingly")
 
 **Methods:**
 - `describe()` - Returns name + description
 - `getLocation()` - Returns location RuntimeObject
 - `getContents()` - Returns contents as RuntimeObjects
 - `to(speaker, message)` - Address this object; responds via AI if conscious
+- `say(message)` - Speak out loud; broadcasts text and audio to all players in location
+- `getVoiceId()` - Get gender-aware TTS voice (deterministic based on ID + voiceSeed)
+- `rerollVoice(gender?)` - Increment voiceSeed and return new voice
+- `setVoice(voiceId)` - Manually set a specific TTS voice
 
 **Consciousness:**
 
