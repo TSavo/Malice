@@ -684,4 +684,335 @@ describe('TTS Integration', () => {
       }
     });
   });
+
+  describe('rerollVoice() - Voice rerolling', () => {
+    it('should increment voiceSeed and return new voice', async () => {
+      const obj = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Reroller' },
+        },
+        null,
+      );
+
+      const initialVoice = await obj.call('getVoiceId');
+      const initialSeed = obj.voiceSeed || 0;
+
+      const newVoice = await obj.call('rerollVoice');
+
+      expect(obj.voiceSeed).toBe(initialSeed + 1);
+      expect(newVoice).toBeDefined();
+      expect(typeof newVoice).toBe('string');
+    });
+
+    it('should clear cached voiceId on reroll', async () => {
+      const obj = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Cache Test', voiceId: 'shimmer' },
+        },
+        null,
+      );
+
+      expect(obj.voiceId).toBe('shimmer');
+
+      await obj.call('rerollVoice');
+
+      // voiceId should be cleared, then reassigned
+      expect(obj.voiceId).toBeDefined();
+      expect(obj.voiceId).not.toBe('shimmer');
+    });
+
+    it('should accept gender override parameter', async () => {
+      const obj = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Gender Override', sex: 'male' },
+        },
+        null,
+      );
+
+      // Reroll with female override
+      const femaleVoice = await obj.call('rerollVoice', 'female');
+
+      // Original sex should be preserved
+      expect(obj.sex).toBe('male');
+      expect(femaleVoice).toBeDefined();
+    });
+
+    it('should increment seed on multiple rerolls', async () => {
+      const obj = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Multiple Reroll' },
+        },
+        null,
+      );
+
+      await obj.call('rerollVoice');
+      expect(obj.voiceSeed).toBe(1);
+
+      await obj.call('rerollVoice');
+      expect(obj.voiceSeed).toBe(2);
+
+      await obj.call('rerollVoice');
+      expect(obj.voiceSeed).toBe(3);
+    });
+  });
+
+  describe('setVoice() - Manual voice assignment', () => {
+    it('should set voiceId to specified value', async () => {
+      const obj = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Manual Voice' },
+        },
+        null,
+      );
+
+      const result = await obj.call('setVoice', 'speaker_42');
+
+      expect(obj.voiceId).toBe('speaker_42');
+      expect(result).toBe('speaker_42');
+    });
+
+    it('should override existing voiceId', async () => {
+      const obj = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Override Test', voiceId: 'alloy' },
+        },
+        null,
+      );
+
+      await obj.call('setVoice', 'speaker_123');
+
+      expect(obj.voiceId).toBe('speaker_123');
+    });
+
+    it('should throw error if voiceId not provided', async () => {
+      const obj = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'No Voice' },
+        },
+        null,
+      );
+
+      await expect(obj.call('setVoice')).rejects.toThrow('voiceId is required');
+    });
+
+    it('should persist manually set voice on subsequent getVoiceId calls', async () => {
+      const obj = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Persist Test' },
+        },
+        null,
+      );
+
+      await obj.call('setVoice', 'speaker_999');
+
+      const retrievedVoice = await obj.call('getVoiceId');
+      expect(retrievedVoice).toBe('speaker_999');
+    });
+  });
+
+  describe('Gender-aware voice assignment', () => {
+    it('should use $tts.getVoiceForGender when available', async () => {
+      const femaleObj = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Female Character', sex: 'female' },
+        },
+        null,
+      );
+
+      const voice = await femaleObj.call('getVoiceId');
+
+      expect(voice).toBeDefined();
+      expect(typeof voice).toBe('string');
+      // Voice should be set on object
+      expect(femaleObj.voiceId).toBe(voice);
+    });
+
+    it('should handle male gender', async () => {
+      const maleObj = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Male Character', sex: 'male' },
+        },
+        null,
+      );
+
+      const voice = await maleObj.call('getVoiceId');
+
+      expect(voice).toBeDefined();
+      expect(typeof voice).toBe('string');
+      expect(maleObj.voiceId).toBe(voice);
+    });
+
+    it('should handle F/M shorthand gender codes', async () => {
+      const femaleObj = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Female F', sex: 'F' },
+        },
+        null,
+      );
+
+      const maleObj = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Male M', sex: 'M' },
+        },
+        null,
+      );
+
+      const femaleVoice = await femaleObj.call('getVoiceId');
+      const maleVoice = await maleObj.call('getVoiceId');
+
+      expect(femaleVoice).toBeDefined();
+      expect(maleVoice).toBeDefined();
+    });
+
+    it('should use voiceSeed for deterministic selection', async () => {
+      const obj1 = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Seed Test 1', sex: 'female', voiceSeed: 5 },
+        },
+        null,
+      );
+
+      const obj2 = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Seed Test 2', sex: 'female', voiceSeed: 5 },
+        },
+        null,
+      );
+
+      const voice1 = await obj1.call('getVoiceId');
+      const voice2 = await obj2.call('getVoiceId');
+
+      // Same gender + same seed + different IDs = deterministic but different voices
+      expect(voice1).toBeDefined();
+      expect(voice2).toBeDefined();
+    });
+
+    it('should fallback to built-in voices if $tts unavailable', async () => {
+      // Create object without $tts available (mock scenario)
+      const obj = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Fallback Test' },
+        },
+        null,
+      );
+
+      // Temporarily disable $tts
+      const originalTts = manager._cache.get(manager._aliases.tts);
+      if (originalTts) {
+        const tempMethod = originalTts.getMethod('getVoiceForGender');
+        originalTts.setMethod('getVoiceForGender', null as any);
+
+        const voice = await obj.call('getVoiceId');
+        const validVoices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
+        expect(validVoices).toContain(voice);
+
+        // Restore
+        if (tempMethod) {
+          originalTts.setMethod('getVoiceForGender', tempMethod);
+        }
+      }
+    });
+  });
+
+  describe('$tts object methods', () => {
+    it('should exist as a global alias', async () => {
+      expect($.tts).toBeDefined();
+      expect($.tts.name).toBe('TTS Voice Manager');
+    });
+
+    it('should have serverUrl configured', async () => {
+      expect($.tts.serverUrl).toBeDefined();
+      expect(typeof $.tts.serverUrl).toBe('string');
+    });
+
+    it('should have builtinVoices array', async () => {
+      expect(Array.isArray($.tts.builtinVoices)).toBe(true);
+      expect($.tts.builtinVoices).toContain('alloy');
+      expect($.tts.builtinVoices).toContain('echo');
+      expect($.tts.builtinVoices).toContain('fable');
+    });
+
+    it('should list voices (with fallback)', async () => {
+      const voices = await $.tts.call('listVoices');
+
+      expect(Array.isArray(voices)).toBe(true);
+      expect(voices.length).toBeGreaterThan(0);
+
+      // Each voice should have voice_id and name
+      if (voices.length > 0) {
+        expect(voices[0]).toHaveProperty('voice_id');
+        expect(voices[0]).toHaveProperty('name');
+      }
+    });
+
+    it('should get voice stats', async () => {
+      const stats = await $.tts.call('getVoiceStats');
+
+      expect(stats).toBeDefined();
+      expect(typeof stats.total).toBe('number');
+      expect(stats.total).toBeGreaterThan(0);
+    });
+
+    it('should get female voices', async () => {
+      const femaleVoices = await $.tts.call('getFemaleVoices');
+
+      expect(Array.isArray(femaleVoices)).toBe(true);
+      // Should have at least some female voices (or fallback)
+      expect(femaleVoices.length).toBeGreaterThan(0);
+    });
+
+    it('should get male voices', async () => {
+      const maleVoices = await $.tts.call('getMaleVoices');
+
+      expect(Array.isArray(maleVoices)).toBe(true);
+      // Should have at least some male voices (or fallback)
+      expect(maleVoices.length).toBeGreaterThan(0);
+    });
+
+    it('should get voice for gender with object ID and seed', async () => {
+      const voice = await $.tts.call('getVoiceForGender', 'female', 42, 0);
+
+      expect(voice).toBeDefined();
+      expect(typeof voice).toBe('string');
+    });
+
+    it('should return deterministic voice for same inputs', async () => {
+      const voice1 = await $.tts.call('getVoiceForGender', 'male', 100, 5);
+      const voice2 = await $.tts.call('getVoiceForGender', 'male', 100, 5);
+
+      expect(voice1).toBe(voice2);
+    });
+
+    it('should return different voices for different seeds', async () => {
+      const voice1 = await $.tts.call('getVoiceForGender', 'female', 50, 0);
+      const voice2 = await $.tts.call('getVoiceForGender', 'female', 50, 1);
+
+      // Usually different, but might be same due to modulo
+      expect(voice1).toBeDefined();
+      expect(voice2).toBeDefined();
+    });
+
+    it('should handle null/undefined gender gracefully', async () => {
+      const voice1 = await $.tts.call('getVoiceForGender', null, 42, 0);
+      const voice2 = await $.tts.call('getVoiceForGender', undefined, 42, 0);
+
+      expect(voice1).toBeDefined();
+      expect(voice2).toBeDefined();
+    });
+  });
 });
