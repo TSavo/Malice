@@ -317,6 +317,7 @@ async function main() {
 
   let generated = 0;
   let errors = 0;
+  let consecutiveErrors = 0;
 
   for (const roomFile of toGenerate) {
     console.log(`[${generated + 1}/${toGenerate.length}] ${roomFile.room.name}`);
@@ -369,6 +370,7 @@ async function main() {
       console.log(`    ✅ Updated source file\n`);
 
       generated++;
+      consecutiveErrors = 0; // Reset on success
 
       // Delay between images to avoid rate limiting
       if (generated < toGenerate.length) {
@@ -377,8 +379,30 @@ async function main() {
         await sleep(delay);
       }
     } catch (err) {
+      const errStr = String(err);
       console.error(`    ❌ Error: ${err}`);
       errors++;
+
+      // Detect token-related errors (TypeError with undefined blobKey means API returned error)
+      if (errStr.includes('ERR_INVALID_ARG_TYPE') || errStr.includes('Received an instance of Object')) {
+        consecutiveErrors++;
+        console.error(`    ⚠️  Consecutive errors: ${consecutiveErrors}`);
+
+        if (consecutiveErrors >= 3) {
+          console.error('\n🛑 Too many consecutive errors - likely invalid Midjourney token');
+          console.error('🔄 Stopping midjourney-api container...');
+          try {
+            const { execSync } = await import('child_process');
+            execSync('docker compose stop midjourney-api', { stdio: 'inherit' });
+            console.error('✅ Container stopped. Please update MIDJOURNEY_SALAI_TOKEN and restart.');
+          } catch (stopErr) {
+            console.error('❌ Failed to stop container:', stopErr);
+          }
+          process.exit(1);
+        }
+      } else {
+        consecutiveErrors = 0; // Reset on different error types
+      }
       console.log('');
     }
   }
