@@ -353,6 +353,10 @@ export class AudioManager {
    * Set master volume (0-1)
    */
   setMasterVolume(volume) {
+    if (typeof volume !== 'number' || !isFinite(volume)) {
+      console.warn('[AudioManager] Invalid volume value, ignoring:', volume);
+      return;
+    }
     this.masterVolume = Math.max(0, Math.min(1, volume));
     if (this.currentAudio && this.currentSpeakerId) {
       const speakerSettings = this.objectVolumes.get(this.currentSpeakerId);
@@ -388,6 +392,10 @@ export class AudioManager {
   setObjectVolume(objectId, volume) {
     const settings = this.objectVolumes.get(objectId);
     if (settings) {
+      if (typeof volume !== 'number' || !isFinite(volume)) {
+        console.warn('[AudioManager] Invalid volume value for object ' + objectId + ', ignoring:', volume);
+        return;
+      }
       settings.volume = Math.max(0, Math.min(1, volume));
       this.saveSettings();
     }
