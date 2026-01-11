@@ -646,8 +646,178 @@
         "chapter_id": "72927",
         "id": "1259_72927_000034_000004"
       }
+    },
+    {
+      "id": "8008",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/5017/audio/audio.wav?Expires=1768143523&Signature=o1oc66CIVTOB3EtcTQb2qy7gBeaH9H-uhX1UN9-LB3hVkav92Nk4vSSjrz2hE3j78kY4oT~7Qe8tHO7-0x~rBJL9tHPY25WhBz89mu8sznEugWzt8WR8O25kKaKwGBgTIfpil~MQjuWCihMXclc~EOV8hXgyO87LiT-iEq7FQBLIiawCYa05L8NmedyPT4HsEhZsFDj4wljnNUZX0eKOOEX2Hfndz3JEt6bJyhuC5wSXb1frWMPw2Uyu7NwWU-BHpk0AFFmrN4ffk4hDDmo2d8ug0obLHYVfby0pbOejq~8-byHyei-5ankprBKjYQHSj2P1A10NO04qzU0a-TBsRQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "\"Certainly!\" answered the Prince, and immediately sticking his head through the trapdoor, he asked a Clown who stood outside to fetch the basket.",
+        "text_original": "\"Certainly!\" answered the Prince, and immediately sticking his head through the trapdoor, he asked a Clown who stood outside to fetch the basket.",
+        "speaker_id": "8008",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/8008/271812/8008_271812_000012_000000.wav",
+        "chapter_id": "271812",
+        "id": "8008_271812_000012_000000"
+      }
+    },
+    {
+      "id": "5007",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/5140/audio/audio.wav?Expires=1768143526&Signature=vsObNwA1UIje9WGTA0aF4eJNhnR73NzDvMESurPyxjEbetT737GACsf6XgM865IlBmrCBJ6cj71zNmQB9Jl3HK8b6Iig7OYI0gJGYbP6bExRzytspy--f7NnitAe83UQskqy-Ru7UspII1iuYEeKqPaB4FDO821o2UBSjbRGCfnTxPkwQQq2t45lNWymQ9ELAKBEcOysZSr1xLc-mJ5gRPh40ab4ZT9zsv4z~pTo75w4C9SoyBIu6RQ2r8khj7sHQysUI8g-sv4uwG~AEDZOuTASSzoogvs9TBr3HTY90Y8rY4A6xK6x4J0k9rdtRX0LVeSKrB5AWRg-DArksWXvUQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "It was so sudden, so appalling, so tragic in its nature, that for the time being it quite overshadowed the havoc and misery wrought in a number of other California towns of lesser note.",
+        "text_original": "It was so sudden, so appalling, so tragic in its nature, that for the time being it quite overshadowed the havoc and misery wrought in a number of other California towns of lesser note.",
+        "speaker_id": "5007",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/5007/31609/5007_31609_000002_000001.wav",
+        "chapter_id": "31609",
+        "id": "5007_31609_000002_000001"
+      }
+    },
+    {
+      "id": "1974",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/5254/audio/audio.wav?Expires=1768143527&Signature=chNFSM0LLxeoAnaxtDDyj0VkuY0sH~voR1tgPcheaJ4z2BgVlcJTBXogyZdIOU-LQzBscsNeU49~k8TF3oOymKJKM6bCgu0t6ZnPpGhhSi-~AZVbjUjNGzgvYS6I9HroEvC7BqrL2z022r9za~i7tQXteWk67I3yut-6FjpVDS9--89Bc4h7FwMyKWl3x0A7esgkNFxrxIrnwHM1qrhfNVBSc092OvMmozuH5o9On8AcVypnyfjPzFdzlWOq8EccCaHRvntMVz3rjHLgV0YSuudFlp9tPB1vWYb7r92V5AtTZaBLcJcrun2wiC6dbfD1CBDEUxdwuujB70TT4ylF9A__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "\"I often thought that though I wasn't good enough for her, I should make her a kind husband, and perhaps know her value better than another; and in this way I reconciled it to myself, and came to think it might be possible that we should be married.",
+        "text_original": "\"I often thought that though I wasn't good enough for her, I should make her a kind husband, and perhaps know her value better than another; and in this way I reconciled it to myself, and came to think it might be possible that we should be married.",
+        "speaker_id": "1974",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/1974/139741/1974_139741_000003_000000.wav",
+        "chapter_id": "139741",
+        "id": "1974_139741_000003_000000"
+      }
+    },
+    {
+      "id": "1028",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/5337/audio/audio.wav?Expires=1768143529&Signature=tdhpbXP6eaveA~7iM351KvQKbUjJsy71vx3CvzPa2kH~Jq9EMqjapNsANxeWMpP7z9XQsI3ak-BGkzHTC-x7czd1N8Z8jMvC5IFLQb~Hw50wNk3FNoL-NVJ-FYxQo7mvoB5wAGoogPizO3YClDy4AGZh7tVM~2ZlY43WI5p7TXfnY1mChndnoj~iGqYxh6Hh2l2YccE5hgOKPiz0W2txxYAD8L5llLJ65egAmr~1eZ48tn-2uVWBp2mnshrdq27p~cO23xENy4EC-zoJFLicIBZReLzfrzqDkMC6TVQpMBu4NtZRz-SZcGPwMu9U2jq6IuF06CSr-0slH0fH8AV7MA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Baron Conrad and his men at arms sat foot in stirrup, the milk white horse that had been brought for Otto stood waiting for him beside his father's great charger.",
+        "text_original": "Baron Conrad and his men-at-arms sat foot in stirrup, the milk-white horse that had been brought for Otto stood waiting for him beside his father's great charger.",
+        "speaker_id": "1028",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/1028/133393/1028_133393_000002_000001.wav",
+        "chapter_id": "133393",
+        "id": "1028_133393_000002_000001"
+      }
+    },
+    {
+      "id": "3094",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/5450/audio/audio.wav?Expires=1768143531&Signature=aUUr-tHAzEmQ-MvtiQB1vntVw2AL2iCjRKIvdcamdTn69L2~5MTnAkRTowqMoaGdZEwY9gJRzug5JnKqejXjlzcIBICyHfCSbH7xUTTzJ2o2jH9dA7Y7DIH7sTq01aISEIarOYTCGK5AFRJD7z53~z21hPjeGExp17zIXqO91LLDwZKlAAyyK1YGwGl0TJjrmn8XN2ytrlOqICTm0MxMHzSiX0LgMZnKuY5QUKPGQaxmJ8M0A8TilN3NgyxPdrOeGwF9bnYxV6dBtLTp9o5wASybX-namz~SKY45qbG25sbD3L~lDtFqKK-7uKJ4Vwb1znYDTCZwcT2w7bn7wdcUVg__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Mr Jones during this interval attempted once or twice to speak, but was absolutely incapable, muttering only, or rather sighing out, some broken words; when Sophia at length, partly out of pity to him, and partly to turn the discourse from the subject which she knew well enough he was endeavouring to open, said-",
+        "text_original": "Mr Jones during this interval attempted once or twice to speak, but was absolutely incapable, muttering only, or rather sighing out, some broken words; when Sophia at length, partly out of pity to him, and partly to turn the discourse from the subject which she knew well enough he was endeavouring to open, said--",
+        "speaker_id": "3094",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/3094/136458/3094_136458_000008_000000.wav",
+        "chapter_id": "136458",
+        "id": "3094_136458_000008_000000"
+      }
+    },
+    {
+      "id": "7286",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/5494/audio/audio.wav?Expires=1768143531&Signature=jiqCJRo6KgI7vurIgT9iMCqFhvPz3kdp-j23Y-R9L2Y-bOthwEkHY4RcEU4q4Po71KBLytoJyWPyqJFe0DtZgty5hblrC6eH9RUZv7ucTajRRocEiGxrI8pmkL2ZyZwUVaHqWUzn-wuLm-LDeE5X28R~i9FfnDfjKaZg60LgR6lMWY6QEXF7jipl-kbICE~2hrvEi4k3AJe1LVVIyrmLMeQyeDoOoHgEv5N85V9ykQcxRjER0G122DGZ6CKhmmEYTRyZL9u8CHYZ4c~mmkrp28thsUVww7kUzqSkGgi0yRKU4INt-HoBLbFStb1aN30fngPFuuK~qufMz-sO946Lnw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "In the days of the American Revolution a young woman lived as a servant in carlisle pennsylvania, with the family of General Irving, a retired British officer, who had fought in the French and Indian War and had seen a great deal of service.",
+        "text_original": "In the days of the American Revolution a young woman lived as a servant in Carlisle, Pennsylvania, with the family of General Irving, a retired British officer, who had fought in the French and Indian War and had seen a great deal of service.",
+        "speaker_id": "7286",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/7286/92930/7286_92930_000002_000000.wav",
+        "chapter_id": "92930",
+        "id": "7286_92930_000002_000000"
+      }
+    },
+    {
+      "id": "7739",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/5610/audio/audio.wav?Expires=1768143535&Signature=qe26AY~X9u~DblP2zR7MP85nJALsCyQCme6b-fOAkgQOoiS1HKVa3cTbeYdNJRa0v4iPZo8o57yi~ovRZFHi8ANSErxvphRhDSPTiacXGj-mLQRRczvnTwH4MGD7~l-vETbBrT2oz6GCyqGLSNTnP3EQNWo6d7NsKzAJPz8cEbGDbJsP3WT1Ghvm1h02gEPM87i2ktGgJkPHNviVcMkHzGbDNWtd8yBDi9IKZCfvPN2GxlmjkGcXApFn6HnTCTjTaZutR-aoBMs4vxpJCcgnZGB3EMt4IFZO7xMylDp5PWP6QbPuaBwmCMX09TN7FkIgXn8AOtaxvPyNUIzyY5QNfQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "There was little need for the swart gipsies to explain, as they stood knee deep in the snow round the bailiff of the Abbey Farm, what it was that had sent them.",
+        "text_original": "There was little need for the swart gipsies to explain, as they stood knee-deep in the snow round the bailiff of the Abbey Farm, what it was that had sent them.",
+        "speaker_id": "7739",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/7739/8592/7739_8592_000002_000000.wav",
+        "chapter_id": "8592",
+        "id": "7739_8592_000002_000000"
+      }
+    },
+    {
+      "id": "2364",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/5868/audio/audio.wav?Expires=1768143539&Signature=S5ffWO3CTqa0KQPPFeWLZp-VIH04jNbvg-UkPq-k99aJhgze99sLrTm39y6yVIfPF39G1fZ0yDStZGxR0NBBFQQEKuU~zhk0pPDWIyB356rOddFCKM6fc9Mg5-ddHQgh2TYqhxfkpBakC1qEGtzEbS3oCtLJB3Ls7DFvp0mSLnWcxso97M-LmYEBskkG8AbdaQ4uDqnZ5QNYjKnVW68LSdNsKLycZbVJC86Tvb2D8lSSydKD20VJDl54CHC4K~AThjE0up2lmRpRWzCyxBedWFv-y9SZ-lggItkxjZs1v3UOrmpiFDwu-irKM8eog8W3AynOcwYs2y3jWG0KX-FAPQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "In the early part of eighteen seventy three, and for some time afterward, the system invented by Joseph Stearns was the duplex in practical use.",
+        "text_original": "In the early part of 1873, and for some time afterward, the system invented by Joseph Stearns was the duplex in practical use.",
+        "speaker_id": "2364",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/2364/131735/2364_131735_000003_000000.wav",
+        "chapter_id": "131735",
+        "id": "2364_131735_000003_000000"
+      }
+    },
+    {
+      "id": "2499",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/5933/audio/audio.wav?Expires=1768143541&Signature=iC6hzScxQ75ldordZ7QYUz99k66-IXkvB1j~8sePbF4jiWC056uu-aJTqXbQJK2mV5bySq9G4TnkRBKlyTMyMVLVjB5aqBbls9ZRGc-chnUd64N6-el5x4FUTgFKkkmf2wYVBnaImmvfDkSAx29JLuE2wH9SgeWPHAdjPrY1553Bdc8Yaxt7Yd9DDxLUafR8T6h4DNkr~4yNUqPFHTR7bHjfA4Q6VX0-gR~qweIu03OHLYz~NE4uSuvwHU0NMlVwkxS6uz2VzGfg9u2H6IiM4qvOahY5KkKC4qOq7T1G2h9bDoLY~DAQGQZNfPZdGdiIptEz0OMsJ~4c4Z22iTC1EA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Rest from all bitter thoughts and things! How many a poor one's blessing went With thee beneath the low green tent Whose curtain never outward swings!",
+        "text_original": "Rest from all bitter thoughts and things! How many a poor one's blessing went With thee beneath the low green tent Whose curtain never outward swings!",
+        "speaker_id": "2499",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/2499/156155/2499_156155_000002_000000.wav",
+        "chapter_id": "156155",
+        "id": "2499_156155_000002_000000"
+      }
+    },
+    {
+      "id": "3977",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/5940/audio/audio.wav?Expires=1768143541&Signature=S-heAWo2-d2Qfgca~GLBmuHFgdDEt8Poa3VBCzIg~zw3cIYwVsI5u1R0UlPYrqLqNJl3tth1pj1pYwqfDkCeS1pl8m076bXSSDwLDB6je-5S3I-zy3fr9fypZcuiKcgnoX14VjpL-EHoxYBzjQf5dDWlM13EUysOZDQ0xXO~ha~nMkFwgj2Wgrb1lCBNPLopNlu0TovRHPA05iainVYGHI6G9SgMHsKCzdlyFVvhihsZdLRcP~P8SZ5R7fgOCGRrFVKlKFSp5dJDdp-TR~YfJO1~aeuQyoaPcUFw8EKS-tMMxFtaUFBpeLTKbWw9LvPHd-9L2RK659CKxJbe5RkyXQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Repeated experiments have proved that no brood can be raised in a hive, unless the bees are supplied with it.",
+        "text_original": "Repeated experiments have proved that no brood can be raised in a hive, unless the bees are supplied with it.",
+        "speaker_id": "3977",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/3977/185457/3977_185457_000006_000001.wav",
+        "chapter_id": "185457",
+        "id": "3977_185457_000006_000001"
+      }
     }
   ],
-  "scannedRows": 5000,
+  "scannedRows": 6000,
   "totalRows": 116500
 }
