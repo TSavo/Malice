@@ -11,6 +11,8 @@ The smell that used to define this corner—grilled meat and onions and the part
   y: 0,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-main-st-x10-y0-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
