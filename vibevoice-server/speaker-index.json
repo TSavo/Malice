@@ -1,0 +1,126 @@
+{
+  "split": "train.clean.360",
+  "speakers": [
+    {
+      "id": "2272",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/15/audio/audio.wav?Expires=1768143190&Signature=DYguM7fUUMKXUThRarC~3c5DdseDa73fcSHkXVgQMYb3KJwiRGf~Ug-1Pxam2mxS0NPLPPsKpZMuaOjKFQLkBvBl7CmkMOHfY6~LENdrNKaGLs-9o5X2QPsjU6JsG5U650QN4cNR5cQ~A3LlmR1is0jDk3lWm9gfKx4VaCrpj5-MWn7pJW2bWU8AcavCmd3eBLOBFPOinZKyyohrOk3Ink2BSaHJFjgLr7GiJ7xO16RNWR3xWI1dd461VE6CbSx~JTZi8abaRYgROG2CQIRqnsbBhrXhb4R-gYcdHhhEBCyWbcD6p3-1kn4vl9s07meWa1qctBMBW32hX~qLHn6bOA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Still, though both Angles and Saxons called themselves Christians, they were seldom at peace; and for more than two hundred years they frequently fought.",
+        "text_original": "Still, though both Angles and Saxons called themselves Christians, they were seldom at peace; and for more than two hundred years they frequently fought.",
+        "speaker_id": "2272",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/2272/152262/2272_152262_000020_000000.wav",
+        "chapter_id": "152262",
+        "id": "2272_152262_000020_000000"
+      }
+    },
+    {
+      "id": "1509",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/98/audio/audio.wav?Expires=1768143190&Signature=gxZGEVs826cRcboMr3sb~rOo-WBk0uV5tDPWYzCRsFRf6EuR4X8fiHplTZY8NiWMibDjvdCQ3A9pFNao8DVQaDbyMv7KXv8KS2gKATYCwUjSsA6rYvIk39oPK4xU7rXpl4LRyTN7JhmdOuBB5xMDBBRtL0xwyUsFRQwJSbF9bz9DA7o5LWsk4-TmftF4yzBt1OuuRDm6GI09NH5fAWasw2IwCHoFbB1bWqd1yDME1g2vCEEIFeULMiwnOOl3Htysm5ImCUZOmLHSH4e9tPHz4CUnXQsrfvWFPUGQ-1Hzbrf2XTpNP5eiBuRdEs7RXrp7-TZ8Nabb1fQL1nh6ehbraA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "'Well,' said Blockhead Hans, 'if I can't have a horse, I will take the goat which is mine; he can carry me!'",
+        "text_original": "'Well,' said Blockhead-Hans, 'if I can't have a horse, I will take the goat which is mine; he can carry me!'",
+        "speaker_id": "1509",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/1509/145742/1509_145742_000010_000000.wav",
+        "chapter_id": "145742",
+        "id": "1509_145742_000010_000000"
+      }
+    },
+    {
+      "id": "8193",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/288/audio/audio.wav?Expires=1768143193&Signature=aq159XTw511Xsm~itEaG8DNsmFgtlhm-06CfrTmdtjBxtyAjfCi1DY07iHAGjgvVvSg0ewrt~tjXS-a5H5gBPkoLvZtmodQabdNkhyvxPNmOIpg5n4ZwXHzufC~PHl41nJFa5T-Ulwy5NhNEPFfGsAp4r92YjeAasbE4HcJuYhpS~zUwXuCxpyF0gbHHxdAM2VjhmaV~8mC3QD7SUlddC7jnNBXdjGVOgnA3ON6j516XxUc0oXs8sUvbgwiNGrbazvEckrVUOtngAm1GhhvcS2duu1NYu8PAUgh6AxLeK0YYD8Ea6cXOr3Cyuj73wSrbe79Bm4iFYLlDn4r-mzLrQg__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "And Lynceus the quick eyed saw him coming, while he was still many a mile away, and cried: \"I see a hundred ships, like a flock of white swans, far in the east.\" And at that they rowed hard, like heroes; but the ships came nearer every hour.",
+        "text_original": "And Lynceus the quick eyed saw him coming, while he was still many a mile away, and cried: \"I see a hundred ships, like a flock of white swans, far in the east.\" And at that they rowed hard, like heroes; but the ships came nearer every hour.",
+        "speaker_id": "8193",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/8193/116804/8193_116804_000006_000001.wav",
+        "chapter_id": "116804",
+        "id": "8193_116804_000006_000001"
+      }
+    },
+    {
+      "id": "580",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/470/audio/audio.wav?Expires=1768143197&Signature=oBipFlbg295y65mzQgR5HqAKAfWRSYAxkpGX5LiSw1uoTFkaSgEeoNN7LiXypx9GZ8S0Z8yqL3GANE~DyF8O4giQQR5MxJlzzM2-xtYXWOgdX~IqxjRxIx-ZzNIiPpDY9LGXlinCbtgjPj8T62zTKKsqUcuU7mLoxOcd5M5jXt2U1OXnRAloHuKP0fb~ZOKqFqNDbFq7Bd4-GKFCPpXfzOBQW7Vx93o1XaGWq~gAeSQFwtl06WSoWKYcJ7k6ryXftx~d1yMKfLJ0uTHsFQ4t-rjsXookgHb8bwm6zTWsPzUWGmrDC8C5xkUMDukZ4OIq5~N48SwhKxYKuiFRD~st3g__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "But the siege of Potidaea put an end to her inaction; she had men inside it: besides, she feared for the place.",
+        "text_original": "But the siege of Potidaea put an end to her inaction; she had men inside it: besides, she feared for the place.",
+        "speaker_id": "580",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/580/126947/580_126947_000003_000000.wav",
+        "chapter_id": "126947",
+        "id": "580_126947_000003_000000"
+      }
+    },
+    {
+      "id": "2598",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/553/audio/audio.wav?Expires=1768143199&Signature=T130ZoatGrojTJC5tgRaaVh7C4BeGvzRJQbuLPvV-iI-gHhMJCYex8u9psbXqkH1PrnAUrWAkQRgUFuS-ebEwLp6ZBEp1cxpTrgfnMn7FGIUgqWdngmXnXnnC~qRDPR1RSU0crEmsv5G0CVtLpbuS9wSuRtv3jBoL8pw0rRfPLmymnWH4quD0lQOQvimlQ9mYBiuWamu0J9dwtRKOmBy3TZvLSv4lVx3qH35NWxkN1CpBp4DrELz8ahD~D7JoSJzrBmIeoSL-imO2RaYmAKVbfebnVyU9WfyAdu1TuZfdqNMEPATFg6C5J1em-3~RmwAdtMKq~~fn1mPyS7rQKJG~Q__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "\"A knight,\" said Miss Drew, who was struggling to inspire her class with enthusiasm for Tennyson's \"Idylls of the King,\" \"a knight was a person who spent his time going round succouring the oppressed.\"",
+        "text_original": "\"A knight,\" said Miss Drew, who was struggling to inspire her class with enthusiasm for Tennyson's \"Idylls of the King,\" \"a knight was a person who spent his time going round succouring the oppressed.\"",
+        "speaker_id": "2598",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/2598/4654/2598_4654_000001_000000.wav",
+        "chapter_id": "4654",
+        "id": "2598_4654_000001_000000"
+      }
+    },
+    {
+      "id": "1160",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/800/audio/audio.wav?Expires=1768143205&Signature=Nqi-fpUQit7YnEgLZpmF8OkRq-cPJNawyubMaRNKUOSEXBAgup4wLCqYpjl2FGlVEJMlHlExbGgesL5mGa1uM3Ln39Sb-tuu9SeSb-BnSJgoKQC3H8nnZXIaRru7NYGTp~QKTF~UmCOR47zPFXTa~1CrjqqWia29AYOofngzn~0a619CRCHHLY0JlqNrpXUs5VvWxZcWQsJFaMnuiXgZDyKPsTwiuyiBjfTNif9OYNth2fKAD7qVCzZxzSdMrIVC6l5cdGhUoFP6rspsZW7NG4waTjlcwl56wiQdNq0EhNcvbnP7KNEvoHrtTObaLlYqgJV9CPTGT8UcLYyTKJUHIA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Keimer and I liv'd on a pretty good familiar footing, and agreed tolerably well, for he suspected nothing of my setting up.",
+        "text_original": "Keimer and I liv'd on a pretty good familiar footing, and agreed tolerably well, for he suspected nothing of my setting up.",
+        "speaker_id": "1160",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/1160/139717/1160_139717_000003_000000.wav",
+        "chapter_id": "139717",
+        "id": "1160_139717_000003_000000"
+      }
+    },
+    {
+      "id": "2971",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/850/audio/audio.wav?Expires=1768143206&Signature=FAPqHNAPEp--MyTa0aWyFWUHZ9jsuRWfVu~yvD-brQs1uJSUZum8u85UG2q1o85EZKxtqhq6nm-7A7-WXMM~2Vt8xms~bXzgtHROPiII~JWdtYGqzEk6upeTBk6HdQbHlyqQqk02mi3dpGq12FldNpifPzY4GcJ5sEK8jzHVZt-w2BBXjG6ddX95LvErDbXpFmQEEBLHrr1YsUuF3wxiGIS1rq7F5qEz9HO1g5GY05GpMwe0sFtqjZXhX928DBnietf1EDVeXezmRTfvTjkv4LZuPXaSUi0~muKltVzbT~zzBC~btQKwrfCRttjSsMB-bDOYwuOQYkvrKDRNq2pDYg__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Every sort of tool or apparatus had, in consequence, to the full, that fantastic and distorted look which belongs to the miracles of science.",
+        "text_original": "Every sort of tool or apparatus had, in consequence, to the full, that fantastic and distorted look which belongs to the miracles of science.",
+        "speaker_id": "2971",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/2971/4275/2971_4275_000001_000003.wav",
+        "chapter_id": "4275",
+        "id": "2971_4275_000001_000003"
+      }
+    }
+  ],
+  "scannedRows": 1000,
+  "totalRows": 116500
+}

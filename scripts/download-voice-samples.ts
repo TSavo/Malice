@@ -13,9 +13,12 @@
  */
 
 import { parseArgs } from 'util';
-import { mkdir, writeFile, readdir } from 'fs/promises';
+import { mkdir, writeFile, readdir, readFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join } from 'path';
+
+// Cache file for speaker index (avoids re-scanning on restart)
+const CACHE_FILE = 'vibevoice-server/speaker-index.json';
 
 // Parse CLI args
 const { values } = parseArgs({
@@ -59,7 +62,7 @@ const LIST_ONLY = values.list as boolean;
 const HF_API = 'https://datasets-server.huggingface.co';
 const DATASET = 'mythicinfinity/libritts';
 const CONFIG = 'clean';
-const SPLIT = 'train.clean.100'; // 251 speakers, ~28k samples
+const SPLIT = 'train.clean.360'; // ~904 speakers, ~116k samples
 
 interface AudioSource {
   src: string;
@@ -116,6 +119,30 @@ async function downloadAudio(url: string): Promise<Buffer> {
   return Buffer.from(arrayBuffer);
 }
 
+interface SpeakerCache {
+  split: string;
+  speakers: Array<{ id: string; sample: LibriTTSRow }>;
+  scannedRows: number;
+  totalRows: number;
+}
+
+async function loadCache(): Promise<SpeakerCache | null> {
+  if (!existsSync(CACHE_FILE)) return null;
+  try {
+    const data = await readFile(CACHE_FILE, 'utf-8');
+    const cache = JSON.parse(data) as SpeakerCache;
+    // Invalidate cache if split changed
+    if (cache.split !== SPLIT) return null;
+    return cache;
+  } catch {
+    return null;
+  }
+}
+
+async function saveCache(cache: SpeakerCache): Promise<void> {
+  await writeFile(CACHE_FILE, JSON.stringify(cache, null, 2));
+}
+
 async function main() {
   console.log('🎤 LibriTTS Voice Sample Downloader');
   console.log('=====================================\n');
@@ -132,55 +159,100 @@ async function main() {
     console.log(`📁 Found ${existingVoices.size} existing voices in ${OUTPUT_DIR}`);
   }
 
-  // Fetch initial batch to understand the dataset
-  console.log('📡 Fetching dataset info from Hugging Face...');
-  const initial = await fetchRows(0, 100);
-  console.log(`📊 Dataset has ${initial.num_rows_total.toLocaleString()} total samples\n`);
+  // Try to load cached speaker index
+  let cache = await loadCache();
+  let speakerSamples = new Map<string, LibriTTSRow>();
 
-  // Collect unique speakers with their best sample
-  const speakerSamples = new Map<string, LibriTTSRow>();
-  let offset = 0;
-  const batchSize = 100;
-  let scanned = 0;
-
-  console.log('🔍 Scanning for unique speakers...');
-
-  // Scan through data to find diverse speakers
-  while (speakerSamples.size < COUNT && offset < initial.num_rows_total) {
-    const batch = await fetchRows(offset, batchSize);
-
-    for (const { row } of batch.rows) {
-      const speakerId = row.speaker_id;
-
-      // Skip if we already have this speaker
-      if (speakerSamples.has(speakerId)) continue;
-      if (existingVoices.has(`speaker_${speakerId}`)) continue;
-
-      // Skip samples with very short text (likely too short audio)
-      if (row.text_normalized.length < 100) continue;
-
-      speakerSamples.set(speakerId, row);
-
-      // Stop if we have enough
-      if (speakerSamples.size >= COUNT) break;
+  if (cache) {
+    console.log(`📋 Loaded speaker index from cache (${cache.speakers.length} speakers, ${cache.scannedRows.toLocaleString()}/${cache.totalRows.toLocaleString()} rows scanned)`);
+    for (const { id, sample } of cache.speakers) {
+      // Skip already downloaded
+      if (!existingVoices.has(`speaker_${id}`)) {
+        speakerSamples.set(id, sample);
+      }
     }
-
-    scanned += batch.rows.length;
-    offset += batchSize;
-
-    // Progress update
-    process.stdout.write(
-      `\r  Scanned ${scanned.toLocaleString()} samples, found ${speakerSamples.size} unique speakers`
-    );
-
-    // Don't hammer the API - increased delay to avoid rate limits
-    await new Promise((r) => setTimeout(r, 500));
+    console.log(`   ${speakerSamples.size} speakers still need downloading\n`);
   }
 
-  console.log('\n');
+  // If we need more speakers, scan the dataset
+  const needMore = speakerSamples.size < COUNT && (!cache || cache.scannedRows < cache.totalRows);
 
-  // Convert to array
-  const speakers = Array.from(speakerSamples.entries());
+  if (needMore) {
+    console.log('📡 Fetching dataset info from Hugging Face...');
+    const initial = await fetchRows(0, 100);
+    console.log(`📊 Dataset has ${initial.num_rows_total.toLocaleString()} total samples\n`);
+
+    // Start from where cache left off
+    let offset = cache?.scannedRows ?? 0;
+    const batchSize = 100;
+    let scanned = offset;
+
+    // Rebuild map from cache
+    if (cache) {
+      for (const { id, sample } of cache.speakers) {
+        speakerSamples.set(id, sample);
+      }
+    }
+
+    console.log(`🔍 Scanning for unique speakers (starting at row ${offset.toLocaleString()})...`);
+
+    // Scan through data to find diverse speakers
+    while (speakerSamples.size < COUNT && offset < initial.num_rows_total) {
+      const batch = await fetchRows(offset, batchSize);
+
+      for (const { row } of batch.rows) {
+        const speakerId = row.speaker_id;
+
+        // Skip if we already have this speaker
+        if (speakerSamples.has(speakerId)) continue;
+
+        // Skip samples with very short text (likely too short audio)
+        if (row.text_normalized.length < 100) continue;
+
+        speakerSamples.set(speakerId, row);
+
+        // Stop if we have enough
+        if (speakerSamples.size >= COUNT) break;
+      }
+
+      scanned += batch.rows.length;
+      offset += batchSize;
+
+      // Progress update
+      process.stdout.write(
+        `\r  Scanned ${scanned.toLocaleString()} samples, found ${speakerSamples.size} unique speakers`
+      );
+
+      // Save cache periodically (every 1000 rows)
+      if (scanned % 1000 === 0) {
+        await saveCache({
+          split: SPLIT,
+          speakers: Array.from(speakerSamples.entries()).map(([id, sample]) => ({ id, sample })),
+          scannedRows: scanned,
+          totalRows: initial.num_rows_total,
+        });
+      }
+
+      // Don't hammer the API - increased delay to avoid rate limits
+      await new Promise((r) => setTimeout(r, 500));
+    }
+
+    console.log('\n');
+
+    // Final cache save
+    await saveCache({
+      split: SPLIT,
+      speakers: Array.from(speakerSamples.entries()).map(([id, sample]) => ({ id, sample })),
+      scannedRows: scanned,
+      totalRows: initial.num_rows_total,
+    });
+    console.log(`💾 Saved speaker index to ${CACHE_FILE}\n`);
+  }
+
+  // Filter out already downloaded for the speakers list
+  const speakers = Array.from(speakerSamples.entries()).filter(
+    ([id]) => !existingVoices.has(`speaker_${id}`)
+  );
 
   if (LIST_ONLY) {
     console.log('📋 Available speakers:\n');
