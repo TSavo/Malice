@@ -12,6 +12,8 @@ This is as far east as you can go on Main Street.`,
   x: 14,
   y: 0,
   z: 0,
+
+  imageOnDisk: '4th-ave-s-s-main-st-x14-y0-z0.png',
   intersection: ['4th Ave S', 'S. Main St'],
   // Environmental properties
   population: 0, // Empty (post-Event)

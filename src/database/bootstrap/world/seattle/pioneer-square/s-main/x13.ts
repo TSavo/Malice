@@ -10,6 +10,8 @@ A former dim sum restaurant occupies the corner, its red awning faded to pink, i
   x: 13,
   y: 0,
   z: 0,
+
+  imageOnDisk: 's-main-st-x13-y0-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

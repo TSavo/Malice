@@ -11,6 +11,8 @@ A gap has been cut in the chain-link at waist height—wire snipped clean, the f
   y: 0,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-main-st-x3-y0-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
