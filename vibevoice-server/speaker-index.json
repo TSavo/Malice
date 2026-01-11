@@ -3111,8 +3111,926 @@
         "chapter_id": "101258",
         "id": "7540_101258_000006_000000"
       }
+    },
+    {
+      "id": "64",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/23062/audio/audio.wav?Expires=1768144516&Signature=o-8-TKZEJjVz9rq5sjmxG2kaP78cn2Ge1Ajqhf4IuGrvh8nLXdk3JujKiCVN3VI~a8Cs~WqaTvYA14BVK9~EwNo02geJw3zRzjWW8AySf-m-1V0BEeksupKK4IevrYSC6Q6p6sNDWZJzkgfvB2YiUVWQL0giFGgY0ASIPrR3SALbo-FusWTpnJowlzjE5MzjHq3EHh5711at9v7TFqYsbxb8oBfKw86uqI1R3dO50-3KXarjG6LAappm-LsF-qYrDhMOhHC8CH5vVQeVtuXq06tkkxGETD8hLX09e4cCFPMBlEShKEWIAsnTz14-EhsKqQ5gU3lHtAIQ~LMTIYO68A__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "The lads wore their regulation plainsman's clothes, but for this occasion coats had been put on and hair combed, each desiring to look his best, as they were to meet the young ladies of the ranch.",
+        "text_original": "The lads wore their regulation plainsman's clothes, but for this occasion coats had been put on and hair combed, each desiring to look his best, as they were to meet the young ladies of the ranch.",
+        "speaker_id": "64",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/64/76974/64_76974_000004_000000.wav",
+        "chapter_id": "76974",
+        "id": "64_76974_000004_000000"
+      }
+    },
+    {
+      "id": "7169",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/23378/audio/audio.wav?Expires=1768144530&Signature=qQJphA~~cefKt82Qsg3dhazMhdxJp5VHvBL6vpaS6Vsz4xdcPhIMQG2D1NMLdRHOk-imd4CGe~6XS1tCFrUht2lD78AzfdqSw2b~bq6wifnda2OGNQWs0RbCXB~qF7lL3tnp0hkZ3iYTeIg1zJQZMpwX0QEDrNzJQ~gIE7TimNfOupFk~E8pZWj8DtlyEQV5qnmnjV27eGeRFazhGB4eU9kZJSGnTZonxch7ictNn-qiFfkfo51p8DA-16Pyl3OodZyGLgN83EH4rfBhF1xHHxrElztou2VPDMM7852PBDieVXnL-VOKxWUJ9xr8pC9fm0HC0AVzsicfBx07UiFUxg__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "This last disposed of; Lanyard surrendered himself to new impressions-of which the first proved a bit disheartening.",
+        "text_original": "This last disposed of; Lanyard surrendered himself to new impressions--of which the first proved a bit disheartening.",
+        "speaker_id": "7169",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/7169/89735/7169_89735_000010_000000.wav",
+        "chapter_id": "89735",
+        "id": "7169_89735_000010_000000"
+      }
+    },
+    {
+      "id": "2113",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/23521/audio/audio.wav?Expires=1768144538&Signature=ITWt-xtAHhOHLqqyXNSg1UFMaio7cjUAftwBXjKCK6Ms0BD2dJfNAzu8UIgH2LFSpxIfEPJs0E4ghttrDQ7ie3-PWZtdMasb~XFq5MqlaiONHo1XeN55sRRcHK-t6FSmXxlZW-wZxbZC5EpCyiOlymNvqGIrhX64YOSXmGlc9x87IWf9KyJFTAoG6nCOlex5ZC3AkzdXB9tUelwiZWUFxROTPwcDp64KpJVJp3KtQDOPP4yO7z81SbEjMXeWV~qknHVp151MlzZxS6WhtOpJc1p345U4HHshDuMsmwDPLxtm-3o~VDF4Q9z63TiutXFHj9c43dv35e6psMVmj5ZMJA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Then he said that he would do his utmost to obtain an interview with you without my help. He assured me that his passion for you was a passing infatuation, now he has no feeling for you.",
+        "text_original": "Then he said that he would do his utmost to obtain an interview with you without my help. He assured me that his passion for you was a passing infatuation, now he has no feeling for you.",
+        "speaker_id": "2113",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/2113/132484/2113_132484_000017_000001.wav",
+        "chapter_id": "132484",
+        "id": "2113_132484_000017_000001"
+      }
+    },
+    {
+      "id": "8772",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/23693/audio/audio.wav?Expires=1768144544&Signature=Azrp-DFDRgw4dyL94wRwE6o2NHHIX9nppydxgOfqCXYNCpUTn8XqD8vOnvmXPvyhEOqj9XH4SnFn5ozzBLEmWSBI2gEyKRp-alTnoKVpYN6Kzp0Qv6CjBS4L5Sjv1iwDhs7tbewscfyB2MDnn0lNIez9-xj9sLZaJA~8QAUSBa4GBiyUED65ZBbp~~7g~21jBGoHSq8LPrIOyrqeX1WDkbwG1RVCQFs9TPAQBJO1scLiIHbK4SWsZ9xZvK8JHjZOJCpoBKal7o0voDf-bhjZvAG6qrDsQtrmx4xW~uTM2AclSbTM~TBLuZcMkZSpGxSQLG4j-2HWMzMEne2f-4uhMw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "The entire range of Henriot's experience, read, imagined, dreamed, then fainted into unreality before the sheer wonder of what he saw.",
+        "text_original": "The entire range of Henriot's experience, read, imagined, dreamed, then fainted into unreality before the sheer wonder of what he saw.",
+        "speaker_id": "8772",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/8772/295710/8772_295710_000001_000000.wav",
+        "chapter_id": "295710",
+        "id": "8772_295710_000001_000000"
+      }
+    },
+    {
+      "id": "2269",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/23853/audio/audio.wav?Expires=1768144554&Signature=rrx7ixAPxWjcgFOa61SOhzS1d1s4YGYDlBNVtx9FyuGdlAJLgCq~0IpkNoiJt6WJgisLOu6hHN5KpCRSdmdmZfm3FcHS4-FllPfYzPpz30NInZJa3SbGew15Vf7XPXxr1X-RVkT9vy1DacIBnZNseJOcdvXgFhiOSa5hywZgBHKlxRo9WV6GMlv63Dq9FCdcfEg4s-SgdnqJbDaSGOqGAmiNr1wFD52DpUzzsu40sDYI8WYUw6Al2pKsQGVa~J~9CcJmaKlhjR5HGeOJruEMlFA1XwCuW6FAfemxkQsSQ~83qfOvO9GLmT31XnugRDfwGRty5rHmzykS2kRMWoKJrA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "In my first stage the reader will perceive that I was a comparatively weak and harmless little slander, with merely that taint of original sin which was to be expected in one of such parentage.",
+        "text_original": "In my first stage the reader will perceive that I was a comparatively weak and harmless little slander, with merely that taint of original sin which was to be expected in one of such parentage.",
+        "speaker_id": "2269",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/2269/88761/2269_88761_000004_000000.wav",
+        "chapter_id": "88761",
+        "id": "2269_88761_000004_000000"
+      }
+    },
+    {
+      "id": "7011",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/23959/audio/audio.wav?Expires=1768144559&Signature=Pi19~Z5gkpSPgnP-AXg8WTbKtO-pz9YZ6OCQRKH-8qLi9nO1iuwouVBD-qYXhCimTqw~a0~q2A0g8qXlbDIo00t6delFcIR4M5FcJ~rhzS1awCtDUIoLd56vmSkwa6M2Wnt9I3Q~PGRMmX-cIpamJYa9uVipBbWVFgY9a5bUW66-uWdAT6b9aJ4wBkg3PPyFh4BRA6eCjV-KSqQ1Zg-qFSs9fjLN68Ry3ZIPK5Eomfv471994lreZZ0JPMWoSyxiiiy4QN1ap5eiw2STnHj7GI5u~9TgRGnrsRHuxoDHOvqVXinu~-52qYv5EuYH2OSAnODgGnvMVSkfN8HY3eDhig__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "The sky was clear of clouds and so bright was the light that objects on the farther side of the lake were plainly visible.",
+        "text_original": "The sky was clear of clouds and so bright was the light that objects on the farther side of the lake were plainly visible.",
+        "speaker_id": "7011",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/7011/66622/7011_66622_000003_000003.wav",
+        "chapter_id": "66622",
+        "id": "7011_66622_000003_000003"
+      }
+    },
+    {
+      "id": "1789",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/24078/audio/audio.wav?Expires=1768144565&Signature=E-Q3rDBlCZGawPGI1ADokIX-UaZcuMDQdUco6rkMMW9OY1G-Eu7k3XUqxYTseaEXRZ8MJtYfnebxZJXD3~o7IKgf-hiy4NbzdH5WZOxLvHGzYsQ5laW-HPGH4CeGHUSnKLnv~eVSOc5qU4oz~cNNden2Syx5uFKd7qtCRDMyPuPntpO4hdBvp9tEBtaJIdUY-ZYj5jYuAZS8xL6aKRE3zDEmPSOcOhB-O2M5LwCr2ir3t90G6PT5c1WHr2RF0d9auvDaZx9yhSDi3BuxaWvt2oTQJ6-adWbG25fIN9O6~-uSnZ7UJxSb1PomKsn11tbNRImfhiNmoMk4dAulI-9acQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "So the knight went his way unto King Mark, and brought him that rich horn, and said that Sir Lamorak sent it him, and thereto he told him the virtue of that horn.",
+        "text_original": "So the knight went his way unto King Mark, and brought him that rich horn, and said that Sir Lamorak sent it him, and thereto he told him the virtue of that horn.",
+        "speaker_id": "1789",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/1789/137618/1789_137618_000002_000003.wav",
+        "chapter_id": "137618",
+        "id": "1789_137618_000002_000003"
+      }
+    },
+    {
+      "id": "7833",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/24291/audio/audio.wav?Expires=1768144574&Signature=YPtomfM569RyG~IODu~NK1jMkgTXc4WiOPWu~KaLkWMFiJP-V9u67Nl7kbP-pzDW8k6QjEX3Lzyp~rPttHCcshBaiBysC93r3120TrWOdC63Kx3ihHnszNusqwA-RgXfgMYtCDrZSemWtyI4SUnJkDEkagMpM3BAPTPGdfGNJtzk5d6iQErPwb9IZ4BlLnLS~iRnUvd7h8fjEwyV8SYfhtOGk-2Mf2XyEJpVQX82wA8e~38F5KZPswfOIv6dPjwYrno9t6lMDPMuh0bXYM0g8IiKcc-kPZCnaL1n2KfP1auXG2PPPm7OSU4bXDUMyJNdFXe1I5JDKuc3eRi4nEYwaQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "mr Lincoln had made thus far very little money-nothing more, in fact, than a subsistence of the most modest character.",
+        "text_original": "Mr. Lincoln had made thus far very little money--nothing more, in fact, than a subsistence of the most modest character.",
+        "speaker_id": "7833",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/7833/102239/7833_102239_000002_000000.wav",
+        "chapter_id": "102239",
+        "id": "7833_102239_000002_000000"
+      }
+    },
+    {
+      "id": "1851",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/24451/audio/audio.wav?Expires=1768144584&Signature=TRaV9iT-~1bEa7-zk5y2Czxtvbo2oF7kV5OziGa3hxcZTYHtgkycHa0mW5QGv1DB1Tpb2Z61xxpC2IpwG6iagTGtWmcNJGgrr8uAeHTWU6bwSjtqWKqQtHjsi3Nanlxkq4vpWFH3nZVVviYX~EpljRA9qtk2HBoad~z1oCKN1re~SlsSdu9la5h~-7agu~RTBipmsusQiCXEuoHfDz9JtseLnSG59bB7pcw9cbrz5G~AQu~k6RhIgCcuqlQps3muKbz3PwPMpWf~EVgPnE-kyPvIKM5Ji0gSY24iMgNu2lT4BopE9S7YjG3M7elv9MMNfxR77ioF-BeHs7ucjvDP8A__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "The professor gave a great start at this almost reluctant suggestion, shrinking back with a look which fell not far short of being horrified. But then he rallied, forcing a laugh before speaking.",
+        "text_original": "The professor gave a great start at this almost reluctant suggestion, shrinking back with a look which fell not far short of being horrified. But then he rallied, forcing a laugh before speaking.",
+        "speaker_id": "1851",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/1851/151817/1851_151817_000004_000000.wav",
+        "chapter_id": "151817",
+        "id": "1851_151817_000004_000000"
+      }
+    },
+    {
+      "id": "815",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/24597/audio/audio.wav?Expires=1768144589&Signature=Mshc4W5JalPsxbAI-0LNF0ARxiaTZcIwo-JL3RgtQ94B3aZkvpsmQ14unYBUV70b3MQSnS~A5JkqbME~Psvli1DNs6itHwjip4sNLBJa~xT1EO4obNIixr1li52IjuMM~pyK5Xdm5W0IASApLyyFr10RB4oHJwFRq7pM5uH2idRuwpAUOfh4CvDLy0Edoghd-uKUXrxZ1KsTOVaHObwgfldDH-lyR7bnSofiBgxg0DsKmyukce4LJZhWLbk9j0VLfmzmYpcmWjpdgUJihejk7LSN35XDlD5~eLETRqtXJ8Yp-yftBT4ewvgkS9ZSMJN3I1uM1VhC-OEJySGguIkjoA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "\"The second maxim is this: You are the son of a Raja; whenever you go to bathe, do not bathe at the common bathing place, but at a place by yourself; give me my coin,\" and the Prince did so.",
+        "text_original": "\"The second maxim is this: You are the son of a Raja; whenever you go to bathe, do not bathe at the common bathing place, but at a place by yourself; give me my coin,\" and the Prince did so.",
+        "speaker_id": "815",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/815/130569/815_130569_000001_000011.wav",
+        "chapter_id": "130569",
+        "id": "815_130569_000001_000011"
+      }
+    },
+    {
+      "id": "6286",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/24621/audio/audio.wav?Expires=1768144594&Signature=mq-ZGWDerUW-n~9K5Gt2u7KmvmkXZbkYzT3xrs7zgV4noB-6SfNSaFuA-31NyuEC7toYaPATpKFqQO1LZ160AKba4v4GE0~d7rSep38F5UQbj4P4sl0hxGfAJVLHOfPxhP3gLP70a1nZjh4R7g0-5IMqL5z2lrDOPVTFjHchj7KVGXO4BnyoVve-zPXg7MQ5k-ANLhYaFmtZ4GgnLO6xkn2nek1qN8TQEeiUEdpqWMhkmY8W5-ftqL9bDQh9vB4IJcOZV5QRoXPZqY-FsSgOLAwe5IrW77c8XLo7t~sPC5fUhGiHbrYJpEIrl5P3VY0fFvCfiRtIpD89jSclD5LIKw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Then, she had no mind for bygone horrors, her own tragedy weighed too heavily upon her; but to night, as she gazed, fascinated, anxious to forget herself, anxious to indulge in any thought which would relieve her from dwelling on the question she must settle before she slept, she allowed her wonder and her revulsion to have free course.",
+        "text_original": "Then, she had no mind for bygone horrors, her own tragedy weighed too heavily upon her; but to-night, as she gazed, fascinated, anxious to forget herself, anxious to indulge in any thought which would relieve her from dwelling on the question she must settle before she slept, she allowed her wonder and her revulsion to have free course.",
+        "speaker_id": "6286",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/6286/69422/6286_69422_000006_000006.wav",
+        "chapter_id": "69422",
+        "id": "6286_69422_000006_000006"
+      }
+    },
+    {
+      "id": "5154",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/24735/audio/audio.wav?Expires=1768144600&Signature=z8mmJKT0yImPNt2kXAcRhE4R0yH8AMEZsCGew0F4Dh9CywGx1Ydm62le8JIHRSJc3pHnxbLisL2~Ejc5FSMNJIWR-b3oMFPLSwee~9iChTsa9ubp8LHMdpj7yhljStihwdxOPzigzJQf6CqDBjLcqZ2RTVHnfOzLLcj7IjA~V39IQFeHoysrZ4Fw7MM7G8hS2WRSovbpyhrenISwF9TTS2MocgELsLdsoL2EBPoNsQCJokKKysKJ2~QnPGV-m-D8OMWLkt178W7yvCDKmYt~0JfRZXFuqhjYVFAR7dATvQlK4Koanaae9HnZ0iPafvFJ5iKVFtJyKzD5a0F8TZl33g__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "When he took his half he gave the little old woman the bananas which grow at the bottom of the bunch and are small and wrinkled.",
+        "text_original": "When he took his half he gave the little old woman the bananas which grow at the bottom of the bunch and are small and wrinkled.",
+        "speaker_id": "5154",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/5154/26558/5154_26558_000001_000003.wav",
+        "chapter_id": "26558",
+        "id": "5154_26558_000001_000003"
+      }
+    },
+    {
+      "id": "2230",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/24835/audio/audio.wav?Expires=1768144605&Signature=QIEYjeCWeH3YNcP~Bxvt205zM3nSCO-YDKwI-c0rkzmvIrMnGGzmTTpVff6SeICbtKuGyutuq3F~gRUUiIzXcJAK~90iU~0bK8~0atQ-5LBvdb6QBtTbmORRLsh19B1mCYSV2sOJKAJ0jE3QkrtZtvcqCSFqvROeX4-IcJjdH9FUidXdmOqc7~L~2mmeLgMa30yo8ktBrJk1oufnHJDbJP3fvo8pUQfi0qRrJBZ0x7HSmk~gfzTMNvjSBZ4AxTAAWCgUpEK1A84qivVrIvRhi5YuYqTnU8tHhq8wHzX8yEEQulk-lLIWtnYKF~nnL28DgnV7vYVYzqlJY3ffisFv5A__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "While he sat there pondering, the first stroke of the town bell proclaiming the hour was borne upon his ear.",
+        "text_original": "While he sat there pondering, the first stroke of the town bell proclaiming the hour was borne upon his ear.",
+        "speaker_id": "2230",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/2230/124587/2230_124587_000001_000000.wav",
+        "chapter_id": "124587",
+        "id": "2230_124587_000001_000000"
+      }
+    },
+    {
+      "id": "5684",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/25037/audio/audio.wav?Expires=1768144615&Signature=ABEXwilwDGynTiuMb~5X-sO~AfGfklikPckf93qG1b2LdDt1pfqxTHRfa6VA3noDXPs1vXq71-ScKE9x396-9U9aOUHtso1-WkWDKX9kXAr~NMymANLMFj-qw9~yw0nXJ9xhGCVkQXxmg5xaNs8MqUv5412cCxllfd28xnx62-bMH~zXcOX0v6Y6OydmucSsr0hc1Dxin44CIvHfVgZMpft9c8901gBgYeTgitw5c7Xnxi6Um5Fepz~TcboXnnkVKwyf5IcSyoadxTnVfcqGT6KfTgn~lUa2omqt9bco~~5cno4~qgqk3wk11cAR0BXd5HMyZAT7vbAKfXEOKDsQBQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "In many cases where the sexes are separate, both are permanently attached to some support, and the one cannot search or struggle for the other.",
+        "text_original": "In many cases where the sexes are separate, both are permanently attached to some support, and the one cannot search or struggle for the other.",
+        "speaker_id": "5684",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/5684/46240/5684_46240_000003_000001.wav",
+        "chapter_id": "46240",
+        "id": "5684_46240_000003_000001"
+      }
+    },
+    {
+      "id": "7245",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/25134/audio/audio.wav?Expires=1768144620&Signature=KX18Hjr~-kFhO0KER3DEzwf3iM5oava68mJ39j8-XmkyNuL74YnHvZFDCr4u6UvYIbqIsjFJgXE~FEDiNsYM7FhAlyt3bNTAqQruqm5rVA~dHYENupTw8KZYL1O9Q~6-ugh4kObZpL4MJ4yaBkyEEv8NiQj8nHPWkHZ4g9Kiy33k8PV0y2ndQScMRDvy3D0QY~2DqHHuKS-3i-IoEaz7KL4jKNJBkuZmqaoDERu9DiR3HBd73qAfqbB4mJnN~zVMm09VUQjQF7UaZ2rB~NehFGpkiCtsbtvORygxUZrgPU4R1lFBdKAEZKhS16R2kRL8EGBu3qNiQBo7G2ut2ZoYmg__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Although there is nowhere a date, the handwriting makes it possible to arrange the poems with general chronologic accuracy.",
+        "text_original": "Although there is nowhere a date, the handwriting makes it possible to arrange the poems with general chronologic accuracy.",
+        "speaker_id": "7245",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/7245/104886/7245_104886_000016_000004.wav",
+        "chapter_id": "104886",
+        "id": "7245_104886_000016_000004"
+      }
+    },
+    {
+      "id": "3380",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/25346/audio/audio.wav?Expires=1768144630&Signature=Ih67VqB9x5s~IklRckWAPvEVnjPl3SpuZGtu9g36yGDv1jUM4xS9ERVW5OnPkZKQJaPssSsP8u1RMU0~Ta~LSwsgkbY0a4kI38ndu5W0A7ihYjQXaLpC0i1Y95f~YdP-WXlHXs7O19NqPmpZcXrZFOkQAG9iUP-a6PS58YUGiOT0c5vogs8QOEMZMlWZS6HO0SCtW5YBEIkuzVc~0A1lL9EXapQXZ2HF3atMraO8wiN5XYBbhlRxw3u0gXaRy37QnDwkGTE80QLmbCRSiZTp3YOn8sETD3FadtcNvPfH~mBwRuEFX89PkjRzN5eiDXqZOgwWihqRihZ-RP7eQKj~gQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "But it was better, she said to herself, that he should lie there untended, than be waited on by unloving hands.",
+        "text_original": "But it was better, she said to herself, that he should lie there untended, than be waited on by unloving hands.",
+        "speaker_id": "3380",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/3380/64298/3380_64298_000003_000001.wav",
+        "chapter_id": "64298",
+        "id": "3380_64298_000003_000001"
+      }
+    },
+    {
+      "id": "8097",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/25555/audio/audio.wav?Expires=1768144640&Signature=urC6QkuVN-gGjyNEiebpEUu9wNlxmnJh8uYowdr0BPIhDepEVqHyInMI7HiJr5Z9mR8s8X-hJ4a2GbZpKD2XG8R7x1KMQm96651yTgiRjqDa7ZmnDy5EIjwu~3Po4qNwcOpqSlZ5IqZKk7dOR5VhA4SqBlp3RBfjI-7YY1CekszLVzm~nPFn9SlURqUMZQGC4OBmkSRsL5ZRYkldXEAVj17Frnee~IQvAJywjQ-i5ZfPaThQak5fu2QiFRYgSbOWdSrlZYvFV1dJKQKbpTPKpLyUmJJMPNHeGGHP4-LKsbRpUQ8Hx1uTeAFgXQfoa4QNVlvsT-qTgcQFG2YB5I3T5w__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "On an evening of singular sunset, about the rich beginning of May, the little market town of Beethorpe was startled by the sound of a trumpet.",
+        "text_original": "On an evening of singular sunset, about the rich beginning of May, the little market-town of Beethorpe was startled by the sound of a trumpet.",
+        "speaker_id": "8097",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/8097/114971/8097_114971_000004_000000.wav",
+        "chapter_id": "114971",
+        "id": "8097_114971_000004_000000"
+      }
+    },
+    {
+      "id": "70",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/25632/audio/audio.wav?Expires=1768144646&Signature=KusNDEaamVhPidkY2ikzO5J20W9MmIVIOwg67hKIYZxPXgGXHSfaQXamCWgbOWp0xgjWEa5b3I9l7fPgwZ2E2fRHNB992~5w1II3N8nluhRRfv7putJSQhkfEGE9cSmscq7yUH6CKuwLNcOKSLkZYmynh4b9xTLlW4wjpg1PCV~Z3r6IEUwQtC82pDKN56Hzqo1yXz7kyO-LmhmQOk2gWf1xIoZ0mBNXB7JRP82KpEoRIgpaT-fyDTtpYrGobTX0fou8lPuLxY4BGRNzdHadcpv2LXNgt8jlP5qWET8rGkXG49aW8enuXvlEgFAxBC2lCgfxFUIpM1zX9Lv2PXdx2A__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "One division of La Force, in which the most dangerous and desperate prisoners are confined, is called the court of Saint Bernard.",
+        "text_original": "One division of La Force, in which the most dangerous and desperate prisoners are confined, is called the court of Saint-Bernard.",
+        "speaker_id": "70",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/70/121127/70_121127_000001_000000.wav",
+        "chapter_id": "121127",
+        "id": "70_121127_000001_000000"
+      }
+    },
+    {
+      "id": "922",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/25737/audio/audio.wav?Expires=1768144651&Signature=b-FzjgkVTau98XaxFDJ0osUp8IkyiJVKT3mGULNzjuGNrkyEqmhpz0ClTPU8qt5NtOipo137pjMv~qq2Sagp3-bv1292Q2XL7M7J0P7dF05GPULo5kdDRifmB0TJYnhMslSHtYv5~yAjJJwKVLtK~T1srsRTGcOFFpI7EgUOVz0P3ckcwUI75nplPj~Ah-aBlSMy7zDJMN9EpHs6Mr297RADX-3QNg8eVaB-RESLB3wHHfEOgicHS2txkfBGqXAx~qMVdsmo3dRBCzAPPme1k~zisfciCCX3HrL40vOtmW3h8qT47lMpsmLON0m7JyVb8FQXitsYFlGCM41EJUXvTA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "There were periods when fear clogged his throat and left him gasping with the need to scream and beat his cell walls.",
+        "text_original": "There were periods when fear clogged his throat and left him gasping with the need to scream and beat his cell walls.",
+        "speaker_id": "922",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/922/132299/922_132299_000003_000001.wav",
+        "chapter_id": "132299",
+        "id": "922_132299_000003_000001"
+      }
+    },
+    {
+      "id": "5186",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/26133/audio/audio.wav?Expires=1768144672&Signature=xySYVIkls42UR-V2eoH4s8w9vHbYkliyO8D6fMuhYHnRLb0f-tsS9XdnWMsBgFfvOiA6VDXgju5FbMiVsORElOXxRXE6RRh01asKOkNJBOfK29kZL-JZdRHQeYSUUqVRCHpF6jDmR8vjIuJPLQdI1M7gPoKRKhSiE1cn7eJqk~gyHn0Quskr5a8SLwSvQ2ww30kwHXSQZhoEXFHdTS1aFdqyzc4ZaPACiytAchulZjUZ7qe9UMyKvOFG2e3slYLDXGEKDbI8yctSqYYExNu5Q1i44kfO1jGWzDE3GXBBGvMDIxsv8Z8OsX0QF3LnNUn~dX7RSrIw~BFVOKOwsRebkA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "When I came, I found him unwilling to exert himself. I pressed him to write down his thoughts upon the subject.",
+        "text_original": "When I came, I found him unwilling to exert himself. I pressed him to write down his thoughts upon the subject.",
+        "speaker_id": "5186",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/5186/7793/5186_7793_000001_000001.wav",
+        "chapter_id": "7793",
+        "id": "5186_7793_000001_000001"
+      }
+    },
+    {
+      "id": "1046",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/26171/audio/audio.wav?Expires=1768144673&Signature=LCZf70TaYd02SIr4nwwr8gu1Szdpxhk8PxxNyT8uPlLfRjrJOqDnqIA2z05yDYDJl1DD8d8~IDiNpn3cFyrnjhGR94E5UBE52PSY61Q3gIQ1Gxc5~FfIlJ48Cr80CDb7nLi7kHGx8DwO~f8mmkpag92zuXZyJd3zK8wf0DqPkbbQm6uDCa94po-X30-caoPAchtN9R0UEIGeiRVDvg1Eg7c1WV6mI7jxU1sstAnYnpYXK8M7aELSrOpfv26lPI6pBtQYxexFd~xw~EDgCAO1TmkUbGw6waYxjKJ9ojOHqU5Vj9QX-0Mko4KMW3OQWGKyK6lHo7xjqBKg2UJJTtTC1A__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "This idea was first formulated by mr Henry George in eighteen seventy nine, and has grown steadily in favor.",
+        "text_original": "This idea was first formulated by Mr. Henry George in 1879, and has grown steadily in favor.",
+        "speaker_id": "1046",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/1046/133224/1046_133224_000001_000000.wav",
+        "chapter_id": "133224",
+        "id": "1046_133224_000001_000000"
+      }
+    },
+    {
+      "id": "209",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/26296/audio/audio.wav?Expires=1768144679&Signature=cz2BxZKEHKYwIlUAIcHVmPdOF1jhU5qMNQ0dlM5~oelFxyY~sHrby9rSkqdgKORGI7e~eBWc2oPEEhzd~b~FRkbFmSWUQJaUhBahBpv9-Hl8oQlqGEFczf~tw98bIPcAE8oH-jZcfMb21RK-qghF9zGj5hdo8V6DWuIkWEKCC6Mhpd~Zz9UOOsfS3~kw345y3pRfg3~WtLpBekpsI6n4d~mOaYCz6FEWmJ4GtOrk1f8ChA~J7omijMCRP3gzAKuWD2vddBVLcMixAJTU37OauvJJ41D8NfU9gTGu8KlEb9MDdbqS-ldYorfZYfaiHuqFOSYvEk8xx-6yZvRVcMPLMw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "She drew up plans of economy, she made exact calculations, and she did what nobody else thought of doing: she consulted Anne, who never seemed considered by the others as having any interest in the question.",
+        "text_original": "She drew up plans of economy, she made exact calculations, and she did what nobody else thought of doing: she consulted Anne, who never seemed considered by the others as having any interest in the question.",
+        "speaker_id": "209",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/209/157830/209_157830_000004_000002.wav",
+        "chapter_id": "157830",
+        "id": "209_157830_000004_000002"
+      }
+    },
+    {
+      "id": "1422",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/26464/audio/audio.wav?Expires=1768144689&Signature=qJWZ5EPitgGjyR1tb5Djwf~pIB-lvx~Yz1B8N3PsTEkh66bgQk-i2W-kQYSnLHYUxxyKMiaddKHXUaCUEUajRLRCCUYQ~LM7v2hL09ArxRyIi-bi27AhEu~LkMjwFl0Zxi0b38IrwEmiPxUYjwi-EuL9g-ezeRypQ6aeISEi3PVCQwSC3~yd9yABCAb9gussnSaUVHWrZP0RMcg7JcV72WdNxyGR-QQlDKE8xdfiMcOJICRAOt2eF5flXxSyVMhKzL9cA~rFvJ~lFNxLbuIVa-OszGccPpOqNGkXvuXGMdm13BDHo3tysDvs7RBxJswHnTpZAoZ96mJZ6ouURfXYRw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "The gift of hiding private emotion and keeping up appearances before strangers is not, as many suppose, entirely a product of our modern civilization.",
+        "text_original": "The gift of hiding private emotion and keeping up appearances before strangers is not, as many suppose, entirely a product of our modern civilization.",
+        "speaker_id": "1422",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/1422/146123/1422_146123_000001_000000.wav",
+        "chapter_id": "146123",
+        "id": "1422_146123_000001_000000"
+      }
+    },
+    {
+      "id": "1463",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/26688/audio/audio.wav?Expires=1768144699&Signature=TiMZQagJjO62nz7yFFzwjiPQFRc3A7Wci2FF9BdcQH8ssxpRacZk0wRp0cj~swDmzAe~vm9cP2omWzh2GHC5Q7MKOvGk-EUlukMqmafz5SQe3VRdlvRTtXSWFdc0JFbVWgWZHmYaqQUJdQY3KUMg7FACRJlVS4OV4VgLs0FupCOiOwSFjfmiU6lmPutllN9MnsHrwqdFmbYdZ7VveECAglzI31fBwBPV8uKcZ7X2EcJbiH90kdgf7tpvx007302Dt0LmwJjnoEwzrdMajaNdrUUk11O2rcscYwH8htCkWi4Y3QDXIPOOhNAl3aAcN9ok0t-c6pcKVIJJ~XbzQh2n3Q__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "It wasn't the first time I had tackled that kind of business, and I hadn't much to learn about steam cranes.",
+        "text_original": "It wasn't the first time I had tackled that kind of business, and I hadn't much to learn about steam cranes.",
+        "speaker_id": "1463",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/1463/134463/1463_134463_000003_000005.wav",
+        "chapter_id": "134463",
+        "id": "1463_134463_000003_000005"
+      }
+    },
+    {
+      "id": "8266",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/27024/audio/audio.wav?Expires=1768144715&Signature=vHAfyu-SJM4JnHD26SUi~9ZjZQhfInfDrxuFDVWmNcMcYYjasKOfT6XMI4Et6qY21S8POVk2cuFmk6-Ek8BtSChP3RhxpCWUqdVJkOKQWXKCbFvOBzZbgyMEugLe-VnUcAzEDIpE9TrSjYFv54vEx~0Vh6I3YSHNrL~c4aniQtWSHEeIMXb342RBxoPuO9jKqAwo7XY40-dPtVL4aZmC4F5E-3b4iJEeKnXc~rGAI16x6GQB9Y3yy~OynKc1xCHSwK6LnQ4rzpelYsGajTLRIsgpPg0hIm~HqINDidzfncMUSTPeU5kebwtKV~gRt9gtSea2yyCHZlTzTkqRaDwAMg__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Then he fared on into the valley.--And Shahrazad perceived the dawn of day and ceased saying her permitted say.",
+        "text_original": "Then he fared on into the valley.--And Shahrazad perceived the dawn of day and ceased saying her permitted say.",
+        "speaker_id": "8266",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/8266/258262/8266_258262_000005_000010.wav",
+        "chapter_id": "258262",
+        "id": "8266_258262_000005_000010"
+      }
+    },
+    {
+      "id": "3905",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/27187/audio/audio.wav?Expires=1768144721&Signature=aQYgjTuTpiMYMQaVhm4xHSD7aS4wulmXY4ZYxqaV21sKc9drRwdzFs8mvNAdjow~BZYhVh7aBstLi36X5XFtBej6IQGfmPslDX8KgHQL5lBi2yP8z8VFuEemxpe3bqu9M5JY0H~BAZAN1mXI7e2VFpScc1uUb~OHXmrkZk0TbUvJKy6952XuvsXHoxT4Jr1REWDmR3ePfQED4VMSoWni~FBy4eafL0WiwiBO6ABMOZfaajMelNqYx6qeB9P0G7MKrbOgxDaHpi4SCW1qquldbZLV8dD047nrDOfAkbIqI~BQa3zzbwWwFlJ0yhp8HWq-byFpQO97Y6AUAXjI-lshxw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "His queen set out in quest of him, but was taken ill on her journey, and died, leaving an infant son, whom, from the melancholy circumstances of his birth, she called Tristram.",
+        "text_original": "His queen set out in quest of him, but was taken ill on her journey, and died, leaving an infant son, whom, from the melancholy circumstances of his birth, she called Tristram.",
+        "speaker_id": "3905",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/3905/172165/3905_172165_000000_000003.wav",
+        "chapter_id": "172165",
+        "id": "3905_172165_000000_000003"
+      }
+    },
+    {
+      "id": "1903",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/27306/audio/audio.wav?Expires=1768144729&Signature=xy~NY1gqoFeC89f43GfDjY3sWllY0uKd-Zp5UxkSyna632VjeboDji3~f1t0mbo-kVQe-GM18yT~Dq0d0zZgSCVXUfPaIzg60unfFoyQf7hxLX3MrnaD2Z5PNEis~gf62khh0OYFpFxjvm9n2gTcUK6OkFiJS-0Lt-~DCk7SZSK7bGEL7PS7Uv-FmxVNh7o6ovpf22eI0W67PR5HLzGXr3LZkD5rZeNme-Dm0scNBjgNeVmuzkCkdCMT5wbk13k9tMGMc78MVusemgo846A8HWwYEnDbm4UoPGBiWX2Pz3srVxcn3ruzJIis4Kq6D3vh6vQx0zuSfIbh2~nld29Z5w__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "The same day, about seven o'clock in the evening, Raskolnikov was on his way to his mother's and sister's lodging-the lodging in Bakaleyev's house which Razumihin had found for them.",
+        "text_original": "The same day, about seven o'clock in the evening, Raskolnikov was on his way to his mother's and sister's lodging--the lodging in Bakaleyev's house which Razumihin had found for them.",
+        "speaker_id": "1903",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/1903/132499/1903_132499_000016_000000.wav",
+        "chapter_id": "132499",
+        "id": "1903_132499_000016_000000"
+      }
+    },
+    {
+      "id": "454",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/27519/audio/audio.wav?Expires=1768144739&Signature=vwQqRHoq3TlONhqn-n5lAwwXWRA6EPPIMb7yJUtIJIeBy0u5L7zREWYNJIq9xwOoNeIdknQuRleEMcVI68-aw0EAXZ1YHbDfntxCzjehWlXM7WGFU4wMaUIcm0uM9lfwzrioUT5XJKuMQBFzALvMab-jSlIfgPA7SHvyI4R5g67iGfC7hGNwyvHYbDI-JDFSahZatPIqI6IOQcmRYV1gxoiXTOQeeHTcPAVSZECrK7fKO6NvVLQ~sTVELAglXbpfDO1idnYKNkYwmfm-Flp34H6P1CLM5CFMoPyKgu9jMFlR~LAgB~VU4FWTHE~woHRGm1FyIwcVR6iU8qpeGQ02Nw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "To those who've fail'd, in aspiration vast, To unnam'd soldiers fallen in front on the lead, To calm, devoted engineers-to over ardent travelers-to pilots on their ships, To many a lofty song and picture without recognition-I'd rear laurel cover'd monument, High, high above the rest-To all cut off before their time, Possess'd by some strange spirit of fire, Quench'd by an early death.",
+        "text_original": "To those who've fail'd, in aspiration vast, To unnam'd soldiers fallen in front on the lead, To calm, devoted engineers--to over-ardent travelers--to pilots on their ships, To many a lofty song and picture without recognition--I'd rear laurel-cover'd monument, High, high above the rest--To all cut off before their time, Possess'd by some strange spirit of fire, Quench'd by an early death.",
+        "speaker_id": "454",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/454/134728/454_134728_000011_000000.wav",
+        "chapter_id": "134728",
+        "id": "454_134728_000011_000000"
+      }
+    },
+    {
+      "id": "3361",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/27592/audio/audio.wav?Expires=1768144740&Signature=vAbyFF4gCpRhus9z-K1iFXQCZaXU0bXKXLo2xcy61NUs-PeEunyPKvLtPKpQRP~FbSeA1tjfEqhgpG6i3cGomXWCZ5uOgCRwwFKEN-JjJMO5H~VYxENNENnri4DAKtQJxGyzb9j-KuAZbVOkYvh6BMyIzp5Z064T1jZLfQIkmPQ24Rf2rP5GWwKAeqLS5DAW0o4GhsNbjlf7naxHDQeZ2UL-oHksqYZgmBqZIq0gBaJ2aBauH100YntkSjt-h~usVOpph2K3UbDB5nKNr-uI~4U2TpGZlJQb3Fy2v2YSISLpoubZvNY76hkNhzr892pmi5aZat0MxLs18EMT5iExtw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "\"From ocean to ocean\"--so say the Americans; and these four words compose the general designation of the \"great trunk line\" which crosses the entire width of the United States.",
+        "text_original": "\"From ocean to ocean\"--so say the Americans; and these four words compose the general designation of the \"great trunk line\" which crosses the entire width of the United States.",
+        "speaker_id": "3361",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/3361/130131/3361_130131_000007_000000.wav",
+        "chapter_id": "130131",
+        "id": "3361_130131_000007_000000"
+      }
+    },
+    {
+      "id": "8725",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/27771/audio/audio.wav?Expires=1768144751&Signature=jIf61oPPazRtr2j4GG7sJSdk5ZPLnMg7QaDCX~42jLTXN4Z3-G8AGQrvPK9b54z6BONQRVjZDmYmt44IwuPY0H~6U1P~u8Ir~qzqjjPbwaIEBMy1fFS2-9zf1UiDNksHF5hJcNsLkUIi1AIjYfWes8wv5RrcRLlM23pXZfJeqBV99I1YLyT96HpFFO7Rm8L3o4jKqWLfF3EBysa8kloBiPdEqFudJdHGwAzh51QMY0Fwiwnn68xqkNCh5MJRYMDaVJB4M-aHqnYmKtmYTJotbmPmmocg55nBkrYA6v38LYq5bjfP~NgPvTb9y377qzkHofjClM25jbaLvwvgcUIDBA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "The word 'character' occurs only once in the New Testament, and that is in the passage in the prologue of the Epistle to the hebrews, where the original word is translated 'express image' in our version.",
+        "text_original": "The word 'character' occurs only once in the New Testament, and that is in the passage in the prologue of the Epistle to the Hebrews, where the original word is translated 'express image' in our version.",
+        "speaker_id": "8725",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/8725/294551/8725_294551_000013_000000.wav",
+        "chapter_id": "294551",
+        "id": "8725_294551_000013_000000"
+      }
+    },
+    {
+      "id": "8713",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/27919/audio/audio.wav?Expires=1768144760&Signature=eu2haf~ZqX-SqUrhV1sEaNJfiCMgyy5vJeUCIJLBxUCwLLu4mIgd2Bwjr5aFYNdEViFs7jNV4GffGKj8SVURA6L8h6VwexngljtSXYUCo75kBcscGJf~c6ibAeYDb~eQyojpoC08bnEZ6ADx0C0ZIecETWcvrX4fUV4ws6LfqjNfqD0YHVoAt28o4jo~XSO~8OonfElhonQuKPqVyRFA4P~TwVudM1rsvmafMbm~xBbSoFr7NqO6FOC0mjxuzHI7MEXmAmKVW-jNFhBszZYjV4hfxzezvzrwC4LxEx0yuI0oGQCSMbjwv-lJxNDzNaQCJQ9b8KWbVTYkxWeJldXcHQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "At the hospital the out patients were sitting in the dark, narrow little corridor waiting to be seen by the doctor.",
+        "text_original": "At the hospital the out-patients were sitting in the dark, narrow little corridor waiting to be seen by the doctor.",
+        "speaker_id": "8713",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/8713/300047/8713_300047_000002_000003.wav",
+        "chapter_id": "300047",
+        "id": "8713_300047_000002_000003"
+      }
+    },
+    {
+      "id": "6060",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/28063/audio/audio.wav?Expires=1768144767&Signature=d5TmM9r9y6GnZWIM4AnI4ZlSqJ8tB-deJYoKqvAD-lD0HtXmxw9pJCsJr03qg8q1LaVfBDgEtpOVmDAb5~OqYCgbTK5X9CUFbj5lMxiAFAvHJhoH~oMjsYaN8ill2fh-ZvUNOdeVp~U02-hX0rC6UphAT3ky5syoDIVlQa7-I1o1mt39cpQsuUgdN66UUXRCnsViCwKlLNUCQQiDxdR1NS9buO5ABpI33-IJIDd6ljxJq68334Voe7F0pahkc1DMhOmykipbPrt2hODJoGhxKwBBCh~TLywYXawAunx~e9pI9K8WnKP2f1~3BP~pJHIxkjv1LUgxiBQgbyEqodC76A__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "I often think of the good Gerson who doubts whether anything good should be [written and] published.",
+        "text_original": "I often think of the good Gerson who doubts whether anything good should be [written and] published.",
+        "speaker_id": "6060",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/6060/58090/6060_58090_000014_000004.wav",
+        "chapter_id": "58090",
+        "id": "6060_58090_000014_000004"
+      }
+    },
+    {
+      "id": "8138",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/28123/audio/audio.wav?Expires=1768144772&Signature=s1WNN6QnbgRATL7qdmU4NVz96N7y2v6hWWEggL7XmKYPI0DCmXUVKxyBAcJkBDCbjylYN250gUo0qO7~40Znuof8izuA0kAw8dQr6qSxXaAZGogZSmKYnzil2aR6yNUnE7AL~3gSmdsvHLZDZ~5yAE0ULNWefNdui8S0dtUlSb~R8VktiYX1Y5RZ1xhMOVBaewT9g-YOqnc2DrzQWUuE7FRvbW8GsB9brBvWqMClMunsMveecs8K8~~BduDlPrf-MmUWoLMfsOsh6QjIm8ORuk1KmgW7NliJWRI-yQI4-YEicLHfHE976073u~MWrW-xpfSZO-YZZS49YyHPgMbIoQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "peter had the facts, he knew the people; he had watched in the Goober case exactly how a \"frame up\" was made, and now he must make one for himself, and one that would pay.",
+        "text_original": "Peter had the facts, he knew the people; he had watched in the Goober case exactly how a \"frame-up\" was made, and now he must make one for himself, and one that would pay.",
+        "speaker_id": "8138",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/8138/293531/8138_293531_000024_000003.wav",
+        "chapter_id": "293531",
+        "id": "8138_293531_000024_000003"
+      }
+    },
+    {
+      "id": "6294",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/28252/audio/audio.wav?Expires=1768144778&Signature=ntq4x6bQC-VMySlTVNlgOdzfxnbohSCSXnShLgjCdIzF8AuQVZ~Ow4Ax1X4fqjBzv~nqwYCEJsNR35K~HI9Bpjy78ZrA3kZlwVYOkSAMvF~v0X~uwFpijQeYMaLDk9fMbdOSqSSiu5M1Fe4wPTAR1BOBZCBmWRaVMy1dX5NQUbKjGpM0Vbmtg-1Aetf3ksnpUwV~ecQJzRSN30qaQ4xTct1FLl03dC-PpZ-v-vMYH4GYzbDnRPf1xyotbcEYBVC~RQA5r-oh1qU4mwwlLVssJWU44av3QnczCGpESCVn9XBZR2jj32WsW08J23D7jJEhgs0Ulrm4rkwEWA4NrM9ZfQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Conall Yellowclaw was a sturdy tenant in Erin: he had three sons. There was at that time a king over every fifth of Erin.",
+        "text_original": "Conall Yellowclaw was a sturdy tenant in Erin: he had three sons. There was at that time a king over every fifth of Erin.",
+        "speaker_id": "6294",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/6294/86679/6294_86679_000001_000000.wav",
+        "chapter_id": "86679",
+        "id": "6294_86679_000001_000000"
+      }
+    },
+    {
+      "id": "205",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/28388/audio/audio.wav?Expires=1768144783&Signature=UftQlrB2Gk-0405nTc~gdyAyzHpN0ciYKxnRPTfR~hhFPD~pRMF7P21iyWf6jIPlxchXhEFBsEI~3mFjin31SBa53BoM4vY0xblNc-Y4bj5AhtHg34nPRviCJnklsqPKNqwEtXrlRZc2t1jL5u-6rszTAeHJnMidRLlLaunsqyfHvsoft2LcDyg51Y4MIOd84~EpjnrDk8yGYyanblyc4Jm2WKdeQZpbxs9f3WQ3wPdZa6IidZtoPW911o6TgQhVsuYFs1fVfE8o27PKe3OqsrgnmZJ-Q6BcyiZmdMNyUca1qEtMdkYNynOercc9FdLWK08AgwGeCsML01Ttefczyg__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "But, since such treatment gives a totally false idea of his achievement, this little sketch, drawn straight from original sources, tries to show him as he really was, a co-worker with the British fleet in a war based entirely on naval strategy and inseparably connected with international affairs of world-wide significance. The only simplification attempted here is that of arrangement and expression.",
+        "text_original": "But, since such treatment gives a totally false idea of his achievement, this little sketch, drawn straight from original sources, tries to show him as he really was, a co-worker with the British fleet in a war based entirely on naval strategy and inseparably connected with international affairs of world-wide significance. The only simplification attempted here is that of arrangement and expression.",
+        "speaker_id": "205",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/205/159056/205_159056_000012_000001.wav",
+        "chapter_id": "159056",
+        "id": "205_159056_000012_000001"
+      }
+    },
+    {
+      "id": "716",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/28514/audio/audio.wav?Expires=1768144793&Signature=NE96BpcaulE5lzZ2HiqzFYdKQEJ9tfictTRwoe~InjQPTdJR3R4v8MjETVHH0aLvLowohhzWQSKQlIg~oT5MgGPDFg-WR8NNbFKnp87C4H5VGn6-b3pWCCz5ba-GIjhBI1X4EAGs3SQAr7AjAadvai6N8~FZNZz2MhHPRuPtjdpV90EEKWdg2arFmHFADYDgR8nJfNa45taPqP2kNhQe7TFZWBaEAK7ha1xhi-mwzpRanHRzxeK-g1e3Lk6w678D3gBhcp0ZVcgBnVDs3Uu-uM~lkBOE5pO9rdYeabCtn85MYq0zp20EvErtZAz00r8U6V7WpE5Fn7JsOQamnLVb8A__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "I followed the llama up the beach, and was overtaken by Montgomery, who asked me not to enter the stone enclosure. I noticed then that the puma in its cage and the pile of packages had been placed outside the entrance to this quadrangle.",
+        "text_original": "I followed the llama up the beach, and was overtaken by Montgomery, who asked me not to enter the stone enclosure. I noticed then that the puma in its cage and the pile of packages had been placed outside the entrance to this quadrangle.",
+        "speaker_id": "716",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/716/129583/716_129583_000001_000001.wav",
+        "chapter_id": "129583",
+        "id": "716_129583_000001_000001"
+      }
+    },
+    {
+      "id": "8848",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/28642/audio/audio.wav?Expires=1768144798&Signature=eXfEqlfhQXtwuFvDwpoCzi0D98AFbqfQfHBHENxJGdqHHGTD~upga8TEBWQTfrn3n1-~CHIKwkYcmrGTyMAJriVrk5eHzEtuz60ZL~4bf6uNFa8yRSeMbtZE0PahVnOFXZp~bFSRsm766GWlpw5NumYqaT3FFDxtF36A30HquMURvsZ74moYXF422VsqdWNugfxdsymGKAeyVofF6anc7TIfz2kPBfPMN828N7H1AH7J7XZlTPR2BO~-9Xmk1bV0SAcnVp1SFjy7YwI36CagQuw-fg7j3V2Psr~mzysPvksLCzkn8U-9CKgKEIWZMqvFvG8sIvCSaOZpuMo9brDvZg__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "We have accepted him as Bernard, and when you come down you can question him either in that character or as Michael.",
+        "text_original": "We have accepted him as Bernard, and when you come down you can question him either in that character or as Michael.",
+        "speaker_id": "8848",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/8848/293957/8848_293957_000003_000002.wav",
+        "chapter_id": "293957",
+        "id": "8848_293957_000003_000002"
+      }
+    },
+    {
+      "id": "2673",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/29015/audio/audio.wav?Expires=1768144815&Signature=M6oWfV63fnllHT9GS~6w1wEUS4-Px79PKFQ79zq2SnjhWg0HWVTPd4SU6xuxfbx9YemHXN3IvE960fKbkZU2cgdZcEJdw10yKQmEBx6xNw97KMYhrxja6jSeaD~R7UYwiw65F39ekF-XEj5dVJfQyURz8LVkyHJjxzCczgFuuEax4YChsmn-yiq0~NTpf5uBzM~84YQCMl~sESk7xB2o7HUZ2qe~gPCDJkxjBIWfusYes~iAcDiUxhr2UNCP02DbBMX1A6V5K5XhWpTss4P38XqBOFJJfpsFVp3ryqtE6rdLNkRCuFloqTymXgIFrJ3swsibshehmpcB9J9xCZmFDw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "The right means, and the only entirely satisfactory means, of escape from it is through the undoing of the error which brought it about-that is, through the repeal of the Eighteenth Amendment.",
+        "text_original": "The right means, and the only entirely satisfactory means, of escape from it is through the undoing of the error which brought it about--that is, through the repeal of the Eighteenth Amendment.",
+        "speaker_id": "2673",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/2673/162130/2673_162130_000003_000001.wav",
+        "chapter_id": "162130",
+        "id": "2673_162130_000003_000001"
+      }
+    },
+    {
+      "id": "3003",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/29082/audio/audio.wav?Expires=1768144816&Signature=S-3C33bTFv6CXz3hbA~WyAKRlbWvs6NV3l0aJhle2cWgMrlHowHn0uchcTk15EBywWND6fYfYCy11~vgt8lVabm5ljvx5z6alA0UO7DnBPpRQRUh9RxYmBErL85bB27B40MRxSsaYIXmnXjMKYqlxwZ~pMq-tD61KxJLJe4oh0iG6aUQDpzL4omQ1-5elvM~9iPLdJ2MWpUJh88oiUSJ0tdQFBt~UrKfbNS3zJGrOuy-9UWG3HYKxCkpocD5Qcz02voN~uGtgyirLTcTZJHq50mHYhxdgY3laapr4H7Gl97GRyH6ZGl2gvq33bQ2x6UqzgcLUGBKe6OSKcaDVjt6tQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "In March of eighteen sixty five, Charles Wood of Olympia sent about three pecks of hop roots to Steilacoom for my father, Jacob r Meeker, who then lived on his claim in the Puyallup valley.",
+        "text_original": "In March of 1865, Charles Wood of Olympia sent about three pecks of hop roots to Steilacoom for my father, Jacob R. Meeker, who then lived on his claim in the Puyallup valley.",
+        "speaker_id": "3003",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/3003/12539/3003_12539_000006_000000.wav",
+        "chapter_id": "12539",
+        "id": "3003_12539_000006_000000"
+      }
+    },
+    {
+      "id": "2238",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/29345/audio/audio.wav?Expires=1768144832&Signature=BBU0bP-aaXVaTT6QCXoKeU~8K38wrk7vIohGttcimNSxlPBJaNP1FBAhHwEcec9ayzOVEvmQOiKORY0UWPbX6woPauSPF-R2qqgKohz2nF3JRPOuwmWk4bFSPNfSiaJjjWjIrTdPg2iEWCN~2U4zY-JJvwvcdr8JwKE6Td0wOwQTeRvcjiWl0~3kX~3sNxi3J1EbLvYho6mgwpoX0SknxYva3dZ7jHABaChzx8q3vm8Aeea-CIirlPGe74RfywAuJpG2PKb7ECC1PWMgOhKGPD81sMQm-~r~GDZ9S~AYJ6VR4EcKuGpeZ8puAEeSgbfGnhpETDoGarSUBZMKp2g80w__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "D'Artagnan would have preferred money in hand to all that fine talk, for he knew well that to Mazarin it was easy to promise and hard to perform. But, though he held the cardinal's promises as of little worth, he affected to be completely satisfied, for he was unwilling to discourage Porthos.",
+        "text_original": "D'Artagnan would have preferred money in hand to all that fine talk, for he knew well that to Mazarin it was easy to promise and hard to perform. But, though he held the cardinal's promises as of little worth, he affected to be completely satisfied, for he was unwilling to discourage Porthos.",
+        "speaker_id": "2238",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/2238/121415/2238_121415_000006_000000.wav",
+        "chapter_id": "121415",
+        "id": "2238_121415_000006_000000"
+      }
+    },
+    {
+      "id": "6553",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/29500/audio/audio.wav?Expires=1768144842&Signature=Ziv6UJxMQs3h0NYAKjPWRAnI1Y1Ds2kd4ihZTKWGak0pMsxzAzPNzTiEjQaTRJRNG5OLSyVHfyZrY-rzCCK5qMFXl7YiJIPyHw0PkWPXw2~8C5gMCvisG6vLGxPbs3TNljjRi-8yVVteOwE6fdGXNxEHu~6gOAe8Enh8lLyEwVWBtNGXY1z4j30Y6kvOB03dFgVzPhNWgBPCijECuAH7yAECoRqskatHQMVNdGL2NeKSO3Dy5CFCsgm976guHPJG2~K~vtuEYHor6c4~ZM7z7Gs5cXHDDOk5j64O4gnPkbkMlo2V9tacTwNmPeNQDJCtRtA2IN0nszo~bYoJ0EH8jw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "At that time, Moreover, the first storm was overblown, And the strong hand of outward violence Locked up in quiet.",
+        "text_original": "At that time, Moreover, the first storm was overblown, And the strong hand of outward violence Locked up in quiet.",
+        "speaker_id": "6553",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/6553/82558/6553_82558_000004_000002.wav",
+        "chapter_id": "82558",
+        "id": "6553_82558_000004_000002"
+      }
+    },
+    {
+      "id": "1093",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/29572/audio/audio.wav?Expires=1768144843&Signature=m1A0~KB09Yo-138T86yxIVOC-V4i4WKNoL68pBSz3ptjGch~qlR3egS4NA5HzmmAsmHrdf2EWZ3OXK9AOOmunjYg7I93RYBquF1g16d0O2nYgbub5utewKm5U~Uoj~ZHyzd3NJ-dSN0MAstbJG038AVUe86vxq7ZWyWYfE5YYceD9Icy5tM~9rbqcSHI5OlS1kOOE-ble4VpRPrP7pyBEIqyYrKw6Ahbxm64~28iOmtyplewU~0bZdQDKnf2gtNLwkxSn3vXLBxQPyPH5ZtMduZDO1gbqEL0jKVTMk1xUY8GskPRVazpveZwQvG5wDtYsmPBs5elUcJET7EuVTGCJg__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "It is gone, gone, gone with Thebes the Golden (Never say I didn't give you warning). In Seventeen Ninety four 'twas a famous dancing floor- But it's not in Philadelphia this morning.",
+        "text_original": "It is gone, gone, gone with Thebes the Golden (Never say I didn't give you warning). In Seventeen Ninety-four 'twas a famous dancing-floor-- But it's not in Philadelphia this morning.",
+        "speaker_id": "1093",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/1093/132891/1093_132891_000006_000000.wav",
+        "chapter_id": "132891",
+        "id": "1093_132891_000006_000000"
+      }
+    },
+    {
+      "id": "7981",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/29791/audio/audio.wav?Expires=1768144853&Signature=kQFxGraqC7i80WqTVd8DsSEsqeSY8VLcn8o8bfm~hgReL-~xBvIgXK9~-wjkSJPMlqOsg-LPThX5PTP7JcDe7fKFFUGUm3H18ePJ9OYdWtKRoaQkJVcx8~1ryblwiTlcANBY5pTErRdWQURQz-PKSjglkKu3WZIxq8mGwMjmslADpAfzaPBWf6-vJ2I5cRLl5V-uXfYcQanzb9n~veFBh-QCIa6TKqBlTcv6cDUjJSpUGvJrf5gmZNeMVG1I3C49S-LmkLGXDSXEGOZGrB-28YvztMgSo19tNMxQkc38eA7bdszS9-zh~w68dkHMJaV6nUGBPj9bTsveDei9-kNAZA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "So successful was his appeal that when he himself went a few hours later to see what could be done, he found the road thronged with people carrying food and necessaries.",
+        "text_original": "So successful was his appeal that when he himself went a few hours later to see what could be done, he found the road thronged with people carrying food and necessaries.",
+        "speaker_id": "7981",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/7981/112057/7981_112057_000012_000001.wav",
+        "chapter_id": "112057",
+        "id": "7981_112057_000012_000001"
+      }
+    },
+    {
+      "id": "3082",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/29953/audio/audio.wav?Expires=1768144863&Signature=E84kPRF8NoxJmY-ahCjwWDWFYyfAbRpnat~rjTmQFXOmruXWlv1hhYx5e-Q4xWWejhTJKMo1mAZ4RFp7lCkyJM9tc7HrpQcVvPDv~ll04YO-DQSJ2VGYQlCQe2tw94ck1aGJAUm6ugRlLDD0I5gzY6UV7WJmB2ck3xpqkIXSPEf7FGQvhYpXL2bW7AXQt3jQnlNnEZjOKNJkT6EmZrcnPb47Jrx5waq1~ndZlRaP0v5gsDslUkH~6p5w~Z0NYK1SZ8PtlZQaxPZu4NiS0m1EaveruN9aUmy-mcaPjowToXE1Msh7pL4cEhskVcry73z-gUhWjHLMQZvnixkmI0HIVQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "At the expiration of the above term, a pirate brigantine came in, on board which the king obliged them to enter, or travel by land to some other place, which they durst not do; and of two evils chose the least, that of going on board the pirate vessel, which was commanded by one William Read, who received them very civilly.",
+        "text_original": "At the expiration of the above term, a pirate brigantine came in, on board which the king obliged them to enter, or travel by land to some other place, which they durst not do; and of two evils chose the least, that of going on board the pirate vessel, which was commanded by one William Read, who received them very civilly.",
+        "speaker_id": "3082",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/3082/165428/3082_165428_000009_000000.wav",
+        "chapter_id": "165428",
+        "id": "3082_165428_000009_000000"
+      }
+    },
+    {
+      "id": "664",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/30025/audio/audio.wav?Expires=1768144868&Signature=eMIcs9CHSRl5DvmoB1tWmzk11FYx7HPtq1tv2DILo-KeRXmIxI5QGutv9uT~jwaGTRIWuOwyrUaHJ8mBLRlGoxFrJdGqSWmo7pLX68P58f53EPfgHVU84pY7NBciDMGKovjjQs8ddXoXl1NDalgXb29DBKea5o3eUXGt-ApzhTwZBTcSJ4WSXirAr45FOyzx5KtXI0In3JPjPKr5liOkCJ7IvFIpnFR4JXNNKiK0yNnKc4GD1csPf9VPvjNZN6Yu456XqdavQD2HaSni2BRhNoeimHjcBh6iP8sngdYAkYRNYwr6dujUXlhId6Qnvdd8-2JoZzu98JtgS5~jTI9nhQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "She was all respectful gratitude to mrs Sedley; delighted beyond measure at the Bazaars; and in a whirl of wonder at the theatre, whither the good-natured lady took her.",
+        "text_original": "She was all respectful gratitude to Mrs. Sedley; delighted beyond measure at the Bazaars; and in a whirl of wonder at the theatre, whither the good-natured lady took her.",
+        "speaker_id": "664",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/664/129011/664_129011_000004_000001.wav",
+        "chapter_id": "129011",
+        "id": "664_129011_000004_000001"
+      }
+    },
+    {
+      "id": "3118",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/30127/audio/audio.wav?Expires=1768144874&Signature=RRXxnUxIwxxXxsNttY7gV-T3~SsZr5O7fS1mKT90XCc2im6k3HswSOVMJt1FBJULsGL-gyOe62jc5tMRBeZ~mSPoSeo82tx2uo3yG-w-RHKWuEsl9X~iPxHVmtrkLPfB-bs9NJPB4N4an9SwhMpOPH3hR3p2DkcX64-a65ZR3Jy75XdAjOP-llAi0IXmOX0rQ~iPCH4KLlwPzlCIEetcnyFH7QxQPbaewPx56Hi0FQFtey20fBTxM9akrzhnaNKXUYumpa0rxJag9g5AHmXk1a8kTUTXL8flaXGWcXonSis04KkZMj2whVBWaFijaKqGVGMpD78qBlRcIZsf3RR7Sw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Principles taken upon trust, consequences lamely deduced from them, want of coherence in the parts, and of evidence in the whole, these are every where to be met with in the systems of the most eminent philosophers, and seem to have drawn disgrace upon philosophy itself.",
+        "text_original": "Principles taken upon trust, consequences lamely deduced from them, want of coherence in the parts, and of evidence in the whole, these are every where to be met with in the systems of the most eminent philosophers, and seem to have drawn disgrace upon philosophy itself.",
+        "speaker_id": "3118",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/3118/5911/3118_5911_000009_000003.wav",
+        "chapter_id": "5911",
+        "id": "3118_5911_000009_000003"
+      }
+    },
+    {
+      "id": "6378",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/30220/audio/audio.wav?Expires=1768144880&Signature=lLvTWd7UdsnCXtrKkIdezUYWMF49~ERlmMbFRItfMdX22W7D3i7C~gcDkYT~hHHFrhhSsNyMXw4RbgCi1kZF2xnvd6IATPwCqGCnZkox4AtPm9rPn5s~O4E35wgDWzQrBz~zsHqakZYidMbYGzBgUV4flU9Ulv5c5M0q1w41zFvP1CeANAwMuSwI5~3s1IO86Fx9ioQ5~5ThzIaWiCISUpER74HEcVOvAYU768kcXhCbcOsfCxRUkMpruZwHn-zA1zvB0VxrjAWO30B9iR7~btniZ7-k8eImBe3S44tvLo5nLQdhBSM4uPqOYtBr9QnjePvl~wI-WusoGS5VE~HDFQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "That was as clear to him, as if he had been a spectator at their passing. The stallion had been in the lead,--how far Zeb could not exactly tell; but certainly some distance beyond that of companionship.",
+        "text_original": "That was as clear to him, as if he had been a spectator at their passing. The stallion had been in the lead,--how far Zeb could not exactly tell; but certainly some distance beyond that of companionship.",
+        "speaker_id": "6378",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/6378/61780/6378_61780_000050_000001.wav",
+        "chapter_id": "61780",
+        "id": "6378_61780_000050_000001"
+      }
+    },
+    {
+      "id": "4854",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/30361/audio/audio.wav?Expires=1768144886&Signature=PTmqwsxRcFu1XfPWM7PNF1ZHQVdWbBsu5qklb9OcZjX8zWE-y3vwMpEk5Nehx5dXGYTyLRKkaz5O6n0DoakmiHA8pEhr1HKUbfQQSrBTSjg3krN07-CvnKSpq357k1KTCOp4IkDCydEDLhMC0Cs2jFff4ExqdngxOurFGy-pnh-JWKIH-G5BKkYFj4P75VSztiQREwgs4GcE-BPki-O~ie92GfmDlY4NmzRMxW7rYh9Uym9fsXCkLqE3A2Qa-Jftm~4L89rxuR5EAcpBEYSoreYma3UaCpFsLXqoFvqKHcX4ko7~LDfoAS0ksBBgvaVEvwJFTedVHgt3kRBqMmMcow__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Corollary two.--It also follows that God is a cause in himself, and not through an accident of his nature.",
+        "text_original": "Corollary II.--It also follows that God is a cause in himself, and not through an accident of his nature.",
+        "speaker_id": "4854",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/4854/24732/4854_24732_000003_000000.wav",
+        "chapter_id": "24732",
+        "id": "4854_24732_000003_000000"
+      }
+    },
+    {
+      "id": "227",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/30440/audio/audio.wav?Expires=1768144891&Signature=hY3OSiGXJLm-b2RT6PjeqVI1e~JLMs5oa~oakGv8dhWi06-IeStYPks7tkeFs7hJXc8vvRK~b1h~6YAKnGAu-w2EfQMLxBpOor9USuVX4iIM-Pa6~BzAS4T45MNkfwuFRhkYa~qLGp3DWZ5gUmsjI~Ig3aqc3neta~phbbmHroH-h35nNHU9KpqjEwwpHhjfWZ~CwNZudxmsq4ZixOw2ABmIAyQPJmdqwx8tGi27ZqtLewkUpwupjc1csNGpYAd760x9JkKmTOcdpH2GpyFpefBShn2zOMNLHYpbLwn2lEVCKQPBYLq0Sig~sUtPqcHKDul~fPduTKPSo59w0Rs2kw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "\"I have only to add, my dear Willoughby, that at Barton cottage you will always be welcome; for I will not press you to return here immediately, because you only can judge how far THAT might be pleasing to mrs Smith; and on this head I shall be no more disposed to question your judgment than to doubt your inclination.\"",
+        "text_original": "\"I have only to add, my dear Willoughby, that at Barton cottage you will always be welcome; for I will not press you to return here immediately, because you only can judge how far THAT might be pleasing to Mrs. Smith; and on this head I shall be no more disposed to question your judgment than to doubt your inclination.\"",
+        "speaker_id": "227",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/227/129974/227_129974_000016_000000.wav",
+        "chapter_id": "129974",
+        "id": "227_129974_000016_000000"
+      }
+    },
+    {
+      "id": "249",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/30557/audio/audio.wav?Expires=1768144896&Signature=WehS1VxDFDkDkb7grQMh-bZcqJnjhsjHjD3Yxh9ni8wJJNyD3vZxRIova69Czw8vdUW2is5ZMdTcbTOFiIKCYAVqUJ7JwQdiUqDDW0-nyAVkNWmTIWK6kPSJKhx5aFtyIs8sEMUsgl~eFNHhRSTVVwGzlnS5kPs1I3gpeS6lIHLSiKhE1RTAaqixJP5w4T5m8h3nal-YDlV9kn9AglqwVpRU4F7h5hxiGzKajVXcowIyF2bf2bdpWXYy-6F49UsGkhshPsAmQP9lW79YyWWhzZ8t~0E3I9TR1vYLD3N4FlGjDZv138SAjMjJkswpcMOd-9hLLkRxFBmZkmZb2hrLZg__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "\"Oh, clubs injurious to Princeton democracy; cost a lot; draw social lines, take time; the regular line you get sometimes from disappointed sophomores.",
+        "text_original": "\"Oh, clubs injurious to Princeton democracy; cost a lot; draw social lines, take time; the regular line you get sometimes from disappointed sophomores.",
+        "speaker_id": "249",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/249/121331/249_121331_000010_000000.wav",
+        "chapter_id": "121331",
+        "id": "249_121331_000010_000000"
+      }
+    },
+    {
+      "id": "1112",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/30708/audio/audio.wav?Expires=1768144905&Signature=TqBq4cLJyvV8vyKUIbLC4RBkyZQjHsMLryOd1vaxp28LEsJ~lsyJJH~8XL84mseNEw7dIp~OgwxGTaOHcXJB8biu4~Bka1Pvny3-dtH5icDtrLa27upx7oRUD2qR4hbUGGWfiej2dYUjG76pNyVx1BVmKh9m6c5HVlNzj4b52MDt0uWdew~f9aEVXi2QKsDjiMEhQmm4AadQVP4qZ10tvugFy0uRv6esN67~e7UrFYFt5VFP-A2W7orkaLEiDNikHRoWd32penNIO9ij~Z-JOQhtU3JoDWSGNYFEwLcpAmEbAjvnsp32VR65zSQyYgo8VRQnIA8nEdmZU8N4QkoX-g__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Without the slightest difficulty the door opened, revealing the blackness of the drying room beyond!",
+        "text_original": "Without the slightest difficulty the door opened, revealing the blackness of the drying-room beyond!",
+        "speaker_id": "1112",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/1112/1043/1112_1043_000041_000006.wav",
+        "chapter_id": "1043",
+        "id": "1112_1043_000041_000006"
+      }
+    },
+    {
+      "id": "122",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/30834/audio/audio.wav?Expires=1768144911&Signature=whBXG~R-Yk8sz3-2UmkQbel4GmMmMMh55RKMyaJvo~GAXy77O2wOQDsTzMvquLd-kAUYI5GDpnl9j-r196ZadX0VV1IhW62DYmv~zzRsR403IBYEdzTCgonFi8ETfcecMve2AgnZRou~ZCNdA1vqm0p9dJG17M2SLUym9oRUojn~0nL55Elp6tDB5yHNdlXJXVwLfkMOYeJbPSFR0Jgu9Ssr~vptci8VEwwXNf5F2CpwvWQLTwisnP4hbmuozlaIoK45IMNa4k2wf4QolgMBy6yJYE6vqmBn~bRVAp5PJtwLimZiHBKJKSjH-dPNyP7vXZ1pIfbsjB3f2JpBrZNWYg__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Add one cup of milk, one well beaten egg, three tablespoons of melted butter and a teaspoon of vanilla or lemon flavoring or a level teaspoon of mixed spices.",
+        "text_original": "Add one cup of milk, one well beaten egg, three tablespoons of melted butter and a teaspoon of vanilla or lemon flavoring or a level teaspoon of mixed spices.",
+        "speaker_id": "122",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/122/129752/122_129752_000015_000001.wav",
+        "chapter_id": "129752",
+        "id": "122_129752_000015_000001"
+      }
+    },
+    {
+      "id": "479",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/30857/audio/audio.wav?Expires=1768144911&Signature=QDy6t4hJgOW579VrQeY4mAa1dKVyB4~fNzgQoccTB6UbY5YY98Oor~XG~1sek9EqdNIgzH7~Rb746gPN37Uinx1vQsGaJEM3o17L3y4U21I8Gb1Sv3Lepdm8QTBjAxIebZyj34k45UkPzO3PmFHPPyeOXPggaoI6G-zsWHgXDgFNYU80D1MGb2BzMZCVjG0i0msMgDylUE2Y-sqzh2h24ONllXICEo4LcdVB-C60G9yldjVnvEY3lEMuDm9FV8ixiwQ8ULLtBxhZf3F0cyEdsgxbeDRL1ZBk0EpgxQdMkUXw7B7nXAFhiTiUOo-ORIZxWmxhb~s2SOmM9nkaAn0Ftw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "\"I am dreadfully afraid it WILL be mouse!\" said Duchess to herself-\"I really couldn't, COULDN'T eat mouse pie.",
+        "text_original": "\"I am dreadfully afraid it WILL be mouse!\" said Duchess to herself--\"I really couldn't, COULDN'T eat mouse pie.",
+        "speaker_id": "479",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/479/126480/479_126480_000007_000000.wav",
+        "chapter_id": "126480",
+        "id": "479_126480_000007_000000"
+      }
+    },
+    {
+      "id": "8855",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/30999/audio/audio.wav?Expires=1768144917&Signature=xVN7vk0P71ZK2sM7qMErf8OuLgVg7B-xhT2yYQ1ynNvoVgFkXjHtNwi521FExtXuPnXdrKVupDCBxyrfCVjfb54aVRwjBelVCIHMtVor5WUXtd9bezGc8aA7NGkpmiD0VGcmfGr0P9n6HveeBPmrMaHE58jbPdUx71tG9BuiIc3VLKdTSkUCjUMw6hkJWowKTdKZGy9wrVNgEjPrv92yX-3bYKPSZ6XqPJFzZ4rmFN1eOMDZvj1WTn91TMG35T2Xht9Z2RNHbo5bXgsxnTqwueArzwJCAtwza34hSL2v4rY3Ae8-v43hR0LYt5Fv9i7Lp3pmQBIZ4QNov4W4U8n9qQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "As I sat in my study, in the twilight of that same day, the door was hurriedly opened, and Judy entered.",
+        "text_original": "As I sat in my study, in the twilight of that same day, the door was hurriedly opened, and Judy entered.",
+        "speaker_id": "8855",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/8855/283242/8855_283242_000002_000000.wav",
+        "chapter_id": "283242",
+        "id": "8855_283242_000002_000000"
+      }
     }
   ],
-  "scannedRows": 23000,
+  "scannedRows": 31000,
   "totalRows": 116500
 }
