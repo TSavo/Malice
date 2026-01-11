@@ -890,6 +890,30 @@ export class ContinuumDomainBuilder implements Builder {
       return { status: 404, contentType: 'text/plain', body: 'Module not found' };
     `,
     );
+
+    // /js/speaker-window.js - SpeakerWindow class for TTS speaker images
+    const speakerWindowJsRoute = await this.createRoute(webRoute, jsRoute, {
+      name: 'SpeakerWindow JS Route',
+      segment: 'speaker-window.js',
+      methods: ['GET'],
+      contentType: 'application/javascript',
+    });
+    speakerWindowJsRoute.setMethod(
+      'handleRequest',
+      `
+      const mod = $.speakerWindowJs;
+      if (mod && mod.getScript) {
+        const script = await mod.getScript();
+        return {
+          status: 200,
+          contentType: 'application/javascript',
+          body: script,
+          headers: { 'Cache-Control': 'public, max-age=3600' }
+        };
+      }
+      return { status: 404, contentType: 'text/plain', body: 'Module not found' };
+    `,
+    );
   }
 
   async registerAliases(): Promise<void> {

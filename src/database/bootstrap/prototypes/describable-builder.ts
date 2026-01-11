@@ -1154,6 +1154,13 @@ export class DescribableBuilder implements Builder {
         if (self.voiceStyle) {
           segment.voiceStyle = self.voiceStyle;
         }
+        // Include image URL if speaker has a cached portrait image
+        const images = self.images || {};
+        // Prefer portrait (9:16) for speaker window, fallback to any cached image
+        const blobKey = images['9:16'] || images['portrait'] || images['1:1'] || images['square'] || Object.values(images)[0];
+        if (blobKey) {
+          segment.imageUrl = '/blob/' + blobKey;
+        }
         await location.broadcastAudio([segment]);
       }
     `,

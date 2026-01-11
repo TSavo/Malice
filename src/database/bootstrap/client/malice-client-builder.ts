@@ -70,6 +70,16 @@ export class MaliceClient {
     this.on('wm', (data) => this.onWmMessage(data));
     this.on('audio', (data) => this.onAudioMessage(data));
     this.on('error', (data) => this.onErrorMessage(data));
+
+    // Wire up audio manager callbacks for speaker window
+    if (this.audio) {
+      this.audio.onSpeakerStart = (speakerId, speakerName, segment) => {
+        this._handleSpeakerStart(speakerId, speakerName, segment);
+      };
+      this.audio.onSpeakerEnd = (speakerId) => {
+        this._handleSpeakerEnd(speakerId);
+      };
+    }
   }
 
   connect() {
@@ -280,6 +290,68 @@ export class MaliceClient {
     if (win && win.setLocation && locationData) {
       win.setLocation(locationData);
     }
+  }
+
+  async _handleSpeakerStart(speakerId, speakerName, segment) {
+    const windowId = 'speaker';
+
+    // Register this window type with the taskbar for the start menu
+    const client = this;
+    this.wm?.taskbar?.registerAvailableWindow(windowId, {
+      icon: '🔊',
+      label: 'Speaker',
+      windowType: 'speaker',
+      stateType: 'speaker',
+      openFn: () => client._openSpeakerWindow()
+    });
+
+    // Check if speaker window already exists
+    let win = this.wm?.getWindow(windowId);
+
+    if (!win) {
+      await this._openSpeakerWindow();
+      win = this.wm?.getWindow(windowId);
+    }
+
+    // Update the speaker window with current speaker
+    if (win && win.setSpeaker) {
+      const imageUrl = segment?.imageUrl || null;
+      win.setSpeaker(speakerId, speakerName, imageUrl);
+    }
+  }
+
+  _handleSpeakerEnd(speakerId) {
+    const windowId = 'speaker';
+    const win = this.wm?.getWindow(windowId);
+
+    if (win && win.clearSpeaker) {
+      win.clearSpeaker();
+    }
+  }
+
+  async _openSpeakerWindow() {
+    const windowId = 'speaker';
+    const area = this.wm.getWindowArea();
+    const winWidth = 280;
+    const winHeight = 360;
+
+    await this.wm.openWindow({
+      windowId: windowId,
+      windowType: 'speaker',
+      title: 'Speaker',
+      channel: 'win:speaker',
+      config: {
+        x: area.width - winWidth - 20,
+        y: 440,  // Below location window
+        width: winWidth,
+        height: winHeight,
+        minimized: false,
+        maximized: false,
+        resizable: true,
+        closable: true,
+        minimizable: true
+      }
+    });
   }
 
   onWmMessage(msg) {

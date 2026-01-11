@@ -47,6 +47,7 @@ import { TerminalWindow } from '/js/terminal-window';
 import { HtmlWindow } from '/js/html-window';
 import { IframeWindow } from '/js/iframe-window';
 import { LocationWindow } from '/js/location-window';
+import { SpeakerWindow } from '/js/speaker-window';
 import { Taskbar } from '/js/taskbar';
 
 /**
@@ -440,6 +441,9 @@ export class WindowManager {
       case 'location':
         win = new LocationWindow(this, config);
         break;
+      case 'speaker':
+        win = new SpeakerWindow(this, config);
+        break;
       default:
         win = new Window(this, config);
     }
@@ -492,6 +496,7 @@ export class WindowManager {
       case 'iframe': return '🌐';
       case 'map': return '🗺';
       case 'location': return '📍';
+      case 'speaker': return '🔊';
       default: return '□';
     }
   }
