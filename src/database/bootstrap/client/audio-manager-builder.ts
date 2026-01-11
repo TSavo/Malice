@@ -69,10 +69,14 @@ export class AudioManager {
     this.audioQueue = [];
     this.isPlaying = false;
     this.currentAudio = null;
+    this.currentSpeakerId = null;
 
     // Settings UI state
     this.settingsVisible = false;
     this.settingsElement = null;
+
+    // Callback for mute state changes (taskbar icon updates)
+    this.onMuteChange = null;
 
     // Load saved settings from localStorage
     this.loadSettings();
@@ -110,13 +114,29 @@ export class AudioManager {
       const saved = localStorage.getItem('malice-audio-settings');
       if (saved) {
         const data = JSON.parse(saved);
-        this.masterVolume = data.masterVolume ?? 1.0;
-        this.globalMuted = data.globalMuted ?? false;
 
-        // Restore object volumes
-        if (data.objectVolumes) {
+        // Validate masterVolume
+        if (typeof data.masterVolume === 'number' && data.masterVolume >= 0 && data.masterVolume <= 1) {
+          this.masterVolume = data.masterVolume;
+        }
+
+        // Validate globalMuted
+        if (typeof data.globalMuted === 'boolean') {
+          this.globalMuted = data.globalMuted;
+        }
+
+        // Restore object volumes with validation
+        if (data.objectVolumes && typeof data.objectVolumes === 'object') {
           for (const [id, settings] of Object.entries(data.objectVolumes)) {
-            this.objectVolumes.set(id, settings);
+            if (settings && typeof settings === 'object') {
+              const validated = {
+                volume: typeof settings.volume === 'number' && settings.volume >= 0 && settings.volume <= 1
+                  ? settings.volume : 1.0,
+                muted: typeof settings.muted === 'boolean' ? settings.muted : false,
+                name: typeof settings.name === 'string' ? settings.name : 'Unknown #' + id
+              };
+              this.objectVolumes.set(id, validated);
+            }
           }
         }
       }
@@ -209,15 +229,15 @@ export class AudioManager {
     this.isPlaying = true;
     const segment = this.audioQueue.shift();
 
-    // Check if muted
+    // Check if muted - use setTimeout to avoid stack overflow
     if (this.globalMuted) {
-      this.playNext();
+      setTimeout(() => this.playNext(), 0);
       return;
     }
 
     const speakerSettings = this.objectVolumes.get(segment.speaker);
     if (speakerSettings?.muted) {
-      this.playNext();
+      setTimeout(() => this.playNext(), 0);
       return;
     }
 
@@ -231,8 +251,8 @@ export class AudioManager {
       console.warn('[AudioManager] TTS error:', e);
     }
 
-    // Play next
-    this.playNext();
+    // Play next - use setTimeout to avoid stack buildup
+    setTimeout(() => this.playNext(), 0);
   }
 
   /**
@@ -296,16 +316,19 @@ export class AudioManager {
       const audio = new Audio(audioUrl);
       audio.volume = effectiveVolume;
       this.currentAudio = audio;
+      this.currentSpeakerId = speakerId;
 
       audio.onended = () => {
         URL.revokeObjectURL(audioUrl);
         this.currentAudio = null;
+        this.currentSpeakerId = null;
         resolve();
       };
 
       audio.onerror = (e) => {
         URL.revokeObjectURL(audioUrl);
         this.currentAudio = null;
+        this.currentSpeakerId = null;
         reject(e);
       };
 
@@ -322,6 +345,7 @@ export class AudioManager {
       this.currentAudio.pause();
       this.currentAudio = null;
     }
+    this.currentSpeakerId = null;
     this.isPlaying = false;
   }
 
@@ -330,9 +354,8 @@ export class AudioManager {
    */
   setMasterVolume(volume) {
     this.masterVolume = Math.max(0, Math.min(1, volume));
-    if (this.currentAudio) {
-      const speakerId = this.currentAudio.dataset?.speakerId;
-      const speakerSettings = speakerId ? this.objectVolumes.get(speakerId) : null;
+    if (this.currentAudio && this.currentSpeakerId) {
+      const speakerSettings = this.objectVolumes.get(this.currentSpeakerId);
       const speakerVolume = speakerSettings?.volume ?? 1.0;
       this.currentAudio.volume = this.masterVolume * speakerVolume;
     }
@@ -346,8 +369,15 @@ export class AudioManager {
     this.globalMuted = !this.globalMuted;
     if (this.globalMuted && this.currentAudio) {
       this.currentAudio.pause();
+    } else if (!this.globalMuted && this.currentAudio) {
+      // Resume playback when unmuting
+      this.currentAudio.play().catch(e => console.warn('[AudioManager] Failed to resume:', e));
     }
     this.saveSettings();
+    // Notify listeners of mute state change
+    if (this.onMuteChange) {
+      this.onMuteChange(this.globalMuted);
+    }
     return this.globalMuted;
   }
 
@@ -389,6 +419,19 @@ export class AudioManager {
       });
     }
     return voices;
+  }
+
+  /**
+   * Escape HTML special characters to prevent XSS
+   */
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   /**
@@ -506,8 +549,8 @@ export class AudioManager {
         <div style="color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Voice Volumes</div>
         \\\${voices.length === 0 ? '<div style="color: #666; font-size: 13px; padding: 16px 0;">No voices heard yet</div>' : ''}
         \\\${voices.map(v => \\\`
-          <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #222;" data-voice-id="\\\${v.id}">
-            <button class="voice-mute-btn" data-id="\\\${v.id}" style="
+          <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #222;" data-voice-id="\\\${this.escapeHtml(v.id)}">
+            <button class="voice-mute-btn" data-id="\\\${this.escapeHtml(v.id)}" style="
               background: \\\${v.muted ? '#ff4444' : '#333'};
               border: none;
               color: #e0e0e0;
@@ -517,8 +560,8 @@ export class AudioManager {
               cursor: pointer;
               font-size: 12px;
             ">\\\${v.muted ? '🔇' : '🔊'}</button>
-            <span style="color: #e0e0e0; font-size: 13px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="\\\${v.name}">\\\${v.name}</span>
-            <input type="range" class="voice-volume" data-id="\\\${v.id}" min="0" max="100" value="\\\${Math.round(v.volume * 100)}" style="width: 80px; accent-color: #00ff88;">
+            <span style="color: #e0e0e0; font-size: 13px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="\\\${this.escapeHtml(v.name)}">\\\${this.escapeHtml(v.name)}</span>
+            <input type="range" class="voice-volume" data-id="\\\${this.escapeHtml(v.id)}" min="0" max="100" value="\\\${Math.round(v.volume * 100)}" style="width: 80px; accent-color: #00ff88;">
           </div>
         \\\`).join('')}
       </div>
