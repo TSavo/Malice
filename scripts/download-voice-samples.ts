@@ -86,7 +86,7 @@ interface HFResponse {
   num_rows_per_page: number;
 }
 
-async function fetchRows(offset: number, length: number, retries = 3): Promise<HFResponse> {
+async function fetchRows(offset: number, length: number, retries = 5): Promise<HFResponse> {
   const url = `${HF_API}/rows?dataset=${DATASET}&config=${CONFIG}&split=${SPLIT}&offset=${offset}&length=${length}`;
 
   for (let attempt = 1; attempt <= retries; attempt++) {
@@ -97,9 +97,9 @@ async function fetchRows(offset: number, length: number, retries = 3): Promise<H
     }
 
     if (resp.status === 429 && attempt < retries) {
-      // Rate limited - wait and retry
-      const waitTime = attempt * 5000; // 5s, 10s, 15s
-      console.log(`\n  ⏳ Rate limited, waiting ${waitTime / 1000}s...`);
+      // Rate limited - exponential backoff: 10s, 30s, 60s, 120s
+      const waitTime = Math.min(10000 * Math.pow(2, attempt - 1), 120000);
+      console.log(`\n  ⏳ Rate limited (attempt ${attempt}/${retries}), waiting ${waitTime / 1000}s...`);
       await new Promise((r) => setTimeout(r, waitTime));
       continue;
     }
@@ -233,8 +233,8 @@ async function main() {
         });
       }
 
-      // Don't hammer the API - increased delay to avoid rate limits
-      await new Promise((r) => setTimeout(r, 500));
+      // Don't hammer the API - 2s delay to avoid rate limits
+      await new Promise((r) => setTimeout(r, 2000));
     }
 
     console.log('\n');

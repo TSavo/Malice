@@ -816,8 +816,263 @@
         "chapter_id": "185457",
         "id": "3977_185457_000006_000001"
       }
+    },
+    {
+      "id": "731",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/6024/audio/audio.wav?Expires=1768143611&Signature=lOizHPrXd~KZVqvRXOyahKMmAACLdtAVyR7e0D~ZMz-auNH58tw8GZCZiwvrnHeiYndzqvrybF8MvJkVhhbYZ2KzrlP1gQs504oD~~Gz-SS-znsocTKwS6JV4PIP6KT-30HvpJBDlss0xv-jPcSsYJJ3XXMALFBcV7YHSGvNN8u~~rrlLyGSRNHFeS3jfuhiMlKxysX81bucjITsIxbndUvI2uPbiXmjIQK8aikOUq0OxER5t3AfIDXGnhSQ5nAGKzaZnS5FtjafyrlnYWs1I0Prv8sIDqAcReCLSrS304gJLePa7ecFo9QCzt8ddOmfTpFoNywypzxldVO6W45JcQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "London was our present point of rest; we determined to remain several months in this wonderful and celebrated city.",
+        "text_original": "London was our present point of rest; we determined to remain several months in this wonderful and celebrated city.",
+        "speaker_id": "731",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/731/365/731_365_000002_000000.wav",
+        "chapter_id": "365",
+        "id": "731_365_000002_000000"
+      }
+    },
+    {
+      "id": "8459",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/6162/audio/audio.wav?Expires=1768143614&Signature=QZjV2Q3hDpcTx-7Tqf2tUoLF1pUj89hRSyizytblSNX1OtXICT3fLqjsYP9IErT89Gb8vykhZx6ft9nDQsqXIqbtwqqa1F1fM8ocLAN9TG~Se8Elb3DsvYSu3V9ektPrxlJ2vzAXD1Sd0vV7JAM7cPGirMAuVI1W9RQyB0OLn0MFHz7Wxf9AnwQSvyaRK-XWK7TMffdHjQWSXOOehr5CAoAHQy4B40jzEWO5H~t9dIrELnHLXnx5nPXCRO3htzp4aCJYOe28eEzC2aUj5DzsqaGGBeFwkAMusEACXy~M1y7dLzZeXAF~W45036ZAROw-TDLXUZYxCCX012uifG8KPA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "The result was that, after some days, I came across an old dry well, the mouth of which was nearly hidden by brambles; and here, at the bottom, I discovered what I sought.",
+        "text_original": "The result was that, after some days, I came across an old dry well, the mouth of which was nearly hidden by brambles; and here, at the bottom, I discovered what I sought.",
+        "speaker_id": "8459",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/8459/285137/8459_285137_000034_000001.wav",
+        "chapter_id": "285137",
+        "id": "8459_285137_000034_000001"
+      }
+    },
+    {
+      "id": "4039",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/6232/audio/audio.wav?Expires=1768143616&Signature=VoGIq~2yhBAS2B6RDoPkhEJD8diCDlkT~~EburVL7E8Y3D3iQKMHTkt7hKZNqzZrhToAPu-4RzPsqsOGvTTuRptgPyRapjSl0Q2AmRUX2bhQZ~q1r-HorMzLpEh2KszxA1SywGZtFF1L6kWfFno0kNTc0-d-YDtn0Y9ic5H949JvVZhxik1TnFvNVaMDcilwDwHKAdqt2pmkxH4zbc0bV0IjBfajdh3IwMud4f9ORhybJ3Pw5k0S~YnKJJVsxtaawgegNQn13KkQgCs8ymT5q5Dzg8xsK0Se-kiCx~ylk2mckwjCu11kRZW72bUqro~Ga13Z40FBmqcwFocbnA0nMA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "They sought it with thimbles, they sought it with care; They pursued it with forks and hope; They threatened its life with a railway share; They charmed it with smiles and soap.",
+        "text_original": "They sought it with thimbles, they sought it with care; They pursued it with forks and hope; They threatened its life with a railway-share; They charmed it with smiles and soap.",
+        "speaker_id": "4039",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/4039/184266/4039_184266_000003_000000.wav",
+        "chapter_id": "184266",
+        "id": "4039_184266_000003_000000"
+      }
+    },
+    {
+      "id": "7520",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/6363/audio/audio.wav?Expires=1768143618&Signature=XMYv0l0qBZkpz6Rkss7xJvyJB9gdYLP0kwFuEmOisX0mZfwQfG8EPUzt3-vL8-4lo0CkK8s1V9Gxku1XWBH7aCx5NLGwXaQr4xVNCdbRYOWOIS4Q1bNV9hwrNj9hHSXKninjNu3ENlT8FRK67379is7Fl4ZHzBTEIb7p2fHmqHG0xllxN1nrPv-x9yZM-y1iXQVv18xWtCuI3fVourt32Q2nqHSWHmWQo98dfDFFem6xSlAVcCV7Y2N0wtbS6jS3hbSmyIKbgwK4a8zeM8uzy2MwKcanJIpWi4j6ElYEgzPtaTbh-qz~ESqjHAUOuDTU97CxEmO5E5AthLQE2nxYgA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "As men become more the masters of circumstances, their desires anticipate mere physical wants; they seek a more varied food of finer flavor and more delicately prepared.",
+        "text_original": "As men become more the masters of circumstances, their desires anticipate mere physical wants; they seek a more varied food of finer flavor and more delicately prepared.",
+        "speaker_id": "7520",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/7520/258954/7520_258954_000013_000003.wav",
+        "chapter_id": "258954",
+        "id": "7520_258954_000013_000003"
+      }
+    },
+    {
+      "id": "4427",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/6455/audio/audio.wav?Expires=1768143620&Signature=TIBo9gkJN7-uAJcKNLOEOprB46vkoUykyvpfoTL9ssrDbTyQ6PHP4C7QvaLFKu-UA8W76W1OPbya7wni~SS6a4IJ0U0DqJEnkzAIrsGVWKROoq~835~U3lpk7T9Jt19X7G5KArGJXOnufMCUaFIf9IU6Dz6-NXahuPG5uJocLVmNOYXt8xIqKViYFyDygdPKCVc~yHANX1GB8Tn7C2dpGUI1RZsLkgVC1AZ93eVVnoqGobnJK5Ty95YEgKcR0MHeII63f~mv94BaROiavap8u2mzYaY511XhVZBC0yLB5OQwj3BAiyw5NlMmgyHgmt3SIvf8PANl7sh0XQq9r9Joug__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "The old-fashioned blanket, in which the baby was done up head and all, like a bundle, is thrown aside.",
+        "text_original": "The old-fashioned blanket, in which the baby was done up head and all, like a bundle, is thrown aside.",
+        "speaker_id": "4427",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/4427/20028/4427_20028_000003_000013.wav",
+        "chapter_id": "20028",
+        "id": "4427_20028_000003_000013"
+      }
+    },
+    {
+      "id": "8225",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/6648/audio/audio.wav?Expires=1768143623&Signature=xT9D-tI80HOU7Bub2KjONS3p0Ybe-W-b2or93ZOVHRZgF3R6YtbT3BQ6n4RR587ytYtSScVc-a7KxQ4knRfUsgAhTGdsuc57XFgYUakH4~1nSS0UgAJ8I2RbxZr9DEstiReXuqChOU8~t3pdRnQG~iR5~aBS7~AvdXfdJ6wNp-8EsZQNJ1glya-2gL4W72vAbTF2dekFJ1qbwq7H5RfPO5lnY05-Jj0k~6jvYmzkEhdbcL8RwKElfgpUgSjOB26z7ezuuJ0xyVraGgEzsu4RlU0~80xEr3IOSOXKmsKbquYCP6X2w8qQTYzAaSca564KeeDuHcZUe3yi9tnvBQRE-Q__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Having associated in their cause the counties of Hertford, Essex, Cambridge, Norfolk, Suffolk, Lincoln, and Huntingdon, they gave the earl of Manchester a commission to be general of the association, and appointed an army to be levied under his command.",
+        "text_original": "Having associated in their cause the counties of Hertford, Essex, Cambridge, Norfolk, Suffolk, Lincoln, and Huntingdon, they gave the earl of Manchester a commission to be general of the association, and appointed an army to be levied under his command.",
+        "speaker_id": "8225",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/8225/274375/8225_274375_000018_000002.wav",
+        "chapter_id": "274375",
+        "id": "8225_274375_000018_000002"
+      }
+    },
+    {
+      "id": "207",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/6771/audio/audio.wav?Expires=1768143625&Signature=oM0raWaBoXcGLy9zwzoaXd2YG6OMaX6s9xyQ-fWnyMzAgJfpT5FYu-LjW3M8XIsJahSK2kYSUwZ6p9V6dtahoy9gzHy9tl5nwbF7IXZxFMMPjwgxrBA8neYCbyY9xDgYYqI5wzlMCy37uhih3pcswbalcUEhTfq~QPLpcjUGhE9E-gs~hUmrtYL2JTsmgz3ZVLzSRtBc~57ILZqlXwAzO3gzeS9Ue2VMGho~YUVBzWPaz2EpMsQDegO83pSBV8ryRATjWdC8D6dMjUJg0Y1WAaQl9ZUNoMCkItiGDQjdAnI-7J3nmKYiEwj195lKZwIdwOaQXvnUd0FpzauAkVhHUA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "\"It won't do anything to me!\" shouted Tom, as he struck the creature, knocking it into the corner of the tent with a thud that told it must be completely stunned, if not killed.",
+        "text_original": "\"It won't do anything to me!\" shouted Tom, as he struck the creature, knocking it into the corner of the tent with a thud that told it must be completely stunned, if not killed.",
+        "speaker_id": "207",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/207/143321/207_143321_000017_000000.wav",
+        "chapter_id": "143321",
+        "id": "207_143321_000017_000000"
+      }
+    },
+    {
+      "id": "2652",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/6992/audio/audio.wav?Expires=1768143630&Signature=o29U9q75DRGnp9XwMCqO8dVRAiunum3vK3Js2bAdbdLDaFRAgaKfoQvaFzOKrVjYYAAtH6diZtYUEEWnWCJ52zSnqtSVDsRroGZHw1HnW5vZyYHO7tiVQKZfeG7Xei8zFN5D~-fuL2aBjVV13LgJiKCPOZ8psPLVvM4FduXOP9WoA125j2yRxoFbMW~dfg~4BCCI22G3JWerK7z88j1wW6~F5xljTOG04kTAsnC6jNbkK2FyBIv2KS8HP~5BJTYzWopSSn7waKq9d4NPA8od-pcJUSmwhVyNs9zYk7lax56ivFXCMX-atcbESbcZGaLU7ccGJiVdB3Ty18J83l6r2g__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "On the other hand, it is certain that from comparatively early in the seventeenth century there were to be found here and there women who smoked.",
+        "text_original": "On the other hand, it is certain that from comparatively early in the seventeenth century there were to be found here and there women who smoked.",
+        "speaker_id": "2652",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/2652/157644/2652_157644_000011_000000.wav",
+        "chapter_id": "157644",
+        "id": "2652_157644_000011_000000"
+      }
+    },
+    {
+      "id": "5935",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/7022/audio/audio.wav?Expires=1768143632&Signature=qS1DSWzE3dNCeKHPNoAgl9hiyYiApD1qyxobPEVAaNB3DCBXMlG1LEJqraf~8I8GQHXvATFc3AFAqWrMAWOvKBpDvlCgZjVrwne-hBi2rCC02Znlw~odqqlj4HqC~AK0M5Hqbjl07V3gYYdG4V-7hBeCn8QHnkH9410ug5yPZfuszSO4-DsMJ4wEgRp15-RpOJPK9d02GjtZEfQb3lqhF-SNrpFJg~N-UKuWBU4U0g3pjQNryndGJauS5PKBTu8GqheVLx4Tou72arfMeblHxuTrS6kkgq-o4O1IRbwHIIwjgXO8fm8nMNPykJnXHJgsRcNjAee9tI5OgDvGNMz0xA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "He arrived at last, walking in the soft light on the noiseless ribbed rubber, and stood by the door of the long car that ran straight through to the Junction.",
+        "text_original": "He arrived at last, walking in the soft light on the noiseless ribbed rubber, and stood by the door of the long car that ran straight through to the Junction.",
+        "speaker_id": "5935",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/5935/43305/5935_43305_000004_000000.wav",
+        "chapter_id": "43305",
+        "id": "5935_43305_000004_000000"
+      }
+    },
+    {
+      "id": "2853",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/7299/audio/audio.wav?Expires=1768143639&Signature=rnXh1rpvQ9ivS7jnPEzxbxBa6lZQgmo6xkt~cTcQvhEeomszAOjy6RcJ1wgfVFDZ8LkuuiUG4SDm6t~eMq2W6WWmS4LPTEy3pLuqvsA5XzDe58UGK6VpAyq70kTc6b6PGdMy68K2CPoo9EKDhQnOwXq6Yctb0fXRUObBE7XwGHmFyIqVTPac~RMq93Eo--79RBwwYLZTNg4YckqR7pdLT0aXstRCg~hvjelRAIki9p2tVmw1eDkEs4bQEqLFTmN6YOgENX~Rn8TIn0yipg0dE1KmS-v8IJfgAJJjHG~rLFy459XojNWXITj5vCRlIkx33UPyYSOH~bJ3bnpfmbV9rw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "The window of his bedroom was dark too: he must have already put out his light, and Miss Mapp made haste over her little tidyings so that she might not be found a transgressor to her own precepts.",
+        "text_original": "The window of his bedroom was dark too: he must have already put out his light, and Miss Mapp made haste over her little tidyings so that she might not be found a transgressor to her own precepts.",
+        "speaker_id": "2853",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/2853/164188/2853_164188_000002_000003.wav",
+        "chapter_id": "164188",
+        "id": "2853_164188_000002_000003"
+      }
+    },
+    {
+      "id": "6918",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/7577/audio/audio.wav?Expires=1768143647&Signature=C2xgznABBJK33foKQYDIdHB27Al2THAtskloNeMZDHYsQjbu-CZa74Vt1bjhAB4EfYOsDde-j~TgMNAvEFP2lLuKISpLZ~d1UQFrcoCGfa6LnoRHDe1416gMSLAHQ5yXecXF1IbkQucP2Z7q4XErFR213PlyCt8MGs6j~Q0qfg1eRxLiWrmhan7beQLDrDdG70mQz3rowXTiGGNbpv4Rr0FN-8hmE-c9kXFb7zvNFy-wFDks0-nQ8qI4y968LeiUecvNQ4M73f9xHefBsapIVuM0T1wK67FiABHWYNKt9o8VniWQ78NGdsprxvhWtWHJfTVWN4SNHUDN-u8sg0u47w__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "The religious attitude of a particular community, therefore, must have been largely dependent on its needs and experiences.",
+        "text_original": "The religious attitude of a particular community, therefore, must have been largely dependent on its needs and experiences.",
+        "speaker_id": "6918",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/6918/61317/6918_61317_000012_000000.wav",
+        "chapter_id": "61317",
+        "id": "6918_61317_000012_000000"
+      }
+    },
+    {
+      "id": "986",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/7685/audio/audio.wav?Expires=1768143650&Signature=gN-vyVzBvamv2LBiddz1JNQCsEzarRy2fQoxeN9m0xtBE8ouN2OJ2G2DlVHbcBWLS6fDxTXPS7c55Ili1F7OoL73QlZnX~wyLDfNQ5uPLE3KWoP~zpNV-HDze74Vdc1Jd97H5PBxQlDwdSDMp8i6671IAsv2-HRVgfU4mgKNlxZIdi6kUGb26XSgleivoI4Qd2pjaoEF4OhhowJTMm9szE7IrOGs7Y5bnqD4n5e20uGbYfV-SInCQ~psDHXkAReqM1y31xCfgRwMgi5m1rPbOPB7nGKyqATwyZjCapxf6ALxqgWsw9fFbWwEPEOCAN2YJ42tZDGZDzUsybA8E6qRFw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "They were not hot To hazard such disaster; They dared not close an eye-dared not See better than their master.",
+        "text_original": "They were not hot To hazard such disaster; They dared not close an eye--dared not See better than their master.",
+        "speaker_id": "986",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/986/129388/986_129388_000010_000001.wav",
+        "chapter_id": "129388",
+        "id": "986_129388_000010_000001"
+      }
+    },
+    {
+      "id": "7558",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/7699/audio/audio.wav?Expires=1768143650&Signature=KAuyLKGwNltZE0pHS7Z2vMj4K3XFz2fooDJm9axRgd60QJpQE--HQIA~4CAOonRMEC4-RsIkpRgpUgB21bhmogfGZMXXj3ZlPqa4qCQI7LyYbFyzYgTRJVgq62RdMSr7MH88Wjk8RP6evNKnp3XcbPTqJ4vwkJQKSBkGjV-9agDq-MEHsCoTWDlQMTIvWo1RP8q2FFS13S4nmPWJOZiSuXHxrKzr2cFlAch70HrbJc0OiwgMI3Hx6tqiYRb4lYNejAZmcU6jh4AbMyRrYBwqzKwY2JQ2HpO9u38TuEsTjRpuIPvjLCwgVYCR0NpAqRnZ6ASoxK~jUkpH7dOrI~U0SA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "They made known their resolve to Bishop Eadbert, and he consented to it, and bade them to be mindful to do it on the anniversary of his burial.",
+        "text_original": "They made known their resolve to Bishop Eadbert, and he consented to it, and bade them to be mindful to do it on the anniversary of his burial.",
+        "speaker_id": "7558",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/7558/89894/7558_89894_000019_000002.wav",
+        "chapter_id": "89894",
+        "id": "7558_89894_000019_000002"
+      }
+    },
+    {
+      "id": "3972",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/7739/audio/audio.wav?Expires=1768143653&Signature=hJ0hg0Tz4ulNcVRe5JObPhoSbFXYL5-elNy1Yi2i32fvsVPhzRqtq1BXhPTgcpnfHiw9pA7UYSW-fH64YlfU7Spsv0O2FCPrr4WJMBz4aDskzE7OV5z5a10Nw-3dQoQj46TOF2RuXotmC2y6vy6uVe5bfpdZI36~rc9JWtp6-Y31Tp2f8-sudLCbn-KmRFY241gcVRKS88XFgrSDLpPNWflwUmBlEiZ4l508HP8qXGbXuKdv-MhuCw8rOkQseqDzQ7qpqpcnFdqu7O0FCij5Zk8sPOWi83a8VSAoKaeqszcujL4SHFQl50tZQ-Tj4cPj2BVpV0FrfO92OkYqWMUouQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Consequently, he frequently reprimanded john, by telling him that his conduct was beneath the dignity, and inconsistent with the principles of good Indians; indecent and unbecoming a gentleman; and, as he never could reconcile himself to it, he was frequently, almost constantly, when they were together, talking to him on the same subject.",
+        "text_original": "Consequently, he frequently reprimanded John, by telling him that his conduct was beneath the dignity, and inconsistent with the principles of good Indians; indecent and unbecoming a gentleman; and, as he never could reconcile himself to it, he was frequently, almost constantly, when they were together, talking to him on the same subject.",
+        "speaker_id": "3972",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/3972/185074/3972_185074_000005_000003.wav",
+        "chapter_id": "185074",
+        "id": "3972_185074_000005_000003"
+      }
+    },
+    {
+      "id": "4356",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/7877/audio/audio.wav?Expires=1768143656&Signature=hNdX1WAvPh68cL3SB8OQTYQOSahNo4Gf2IqVdLf3c0N0D5TatXlXHSxXZAYQ6TrydAVHUS606SLSaFC1SlVsQy527PJYREQetsN58O6d~KOIlOc7-NbK9sHK4NZrW9XoEqqLxWcMp9GwuIQtLB9OxJntWFQdxoYNKWDZjELNVmpi-WuXGAHOyn2qktMsMs31jvXzWIPWUyLDNF9nO6jdunXTbVUO35UAOi7uPIGDrMrn-4SqEVf1n7ZPpJgJo7ER1XecFBphZwfCrpIksCObZBndaJGtQfHwvF2RG20XcH-~DuKDvEA72kDs7cw9GILSVrMFz1SOMP-nAzAurEAz~Q__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "That same afternoon Baldos, blissfully ignorant of the stir he had created in certain circles, rode out for the first time as a member of the Castle Guard.",
+        "text_original": "That same afternoon Baldos, blissfully ignorant of the stir he had created in certain circles, rode out for the first time as a member of the Castle Guard.",
+        "speaker_id": "4356",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/4356/6498/4356_6498_000003_000000.wav",
+        "chapter_id": "6498",
+        "id": "4356_6498_000003_000000"
+      }
     }
   ],
-  "scannedRows": 6000,
+  "scannedRows": 8000,
   "totalRows": 116500
 }
