@@ -10,6 +10,8 @@ A public fishing pier extends from the seawall, wooden planking rotting on concr
   x: -21,
   y: -12,
   z: 0,
+
+  imageOnDisk: 'alaskan-way-s-king-st-x-21-y-12-z0.png',
   intersection: ['Alaskan Way', 'S. King St'],
   // Environmental properties
   population: 0, // Empty (post-Event)

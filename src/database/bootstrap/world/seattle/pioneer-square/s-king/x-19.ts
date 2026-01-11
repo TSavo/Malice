@@ -11,6 +11,8 @@ The buildings flanking the crossing show the wear of decades without maintenance
   y: -12,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-king-st-x-19-y-12-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
