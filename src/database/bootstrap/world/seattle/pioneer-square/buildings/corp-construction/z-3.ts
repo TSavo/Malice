@@ -25,6 +25,7 @@ An emergency evacuation route leads up to Level -2. Deeper access—to levels th
       x: 2,
       y: 3,
       z: -3,
+      imageOnDisk: 'corp-construction-research-level-x2-y3-z-3.png',
       population: 0,
       ambientNoise: 25,
       lighting: 70,

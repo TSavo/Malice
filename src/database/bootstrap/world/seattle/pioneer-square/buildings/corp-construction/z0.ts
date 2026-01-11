@@ -362,6 +362,7 @@ A control panel lists the accessible levels: GROUND, LEVEL -1 (CONSTRUCTION), LE
       x: 2,
       y: 3,
       z: 0,
+      imageOnDisk: 'corp-construction-elevator-shaft-access-x2-y3-z0.png',
       population: 0,
       ambientNoise: 35,
       lighting: 70,
