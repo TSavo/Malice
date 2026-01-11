@@ -48,7 +48,8 @@ export class DescribableBuilder implements Builder {
           // TTS voice for speech synthesis (VibeVoice server)
           // Built-in: alloy, echo, fable, onyx, nova, shimmer
           // Custom: any voice added via $tts.addVoice() from audio samples
-          voiceId: null, // string - TTS voice ID
+          voiceId: null, // string - TTS voice ID (cached, set via getVoiceId or setVoice)
+          voiceSeed: 0, // number - seed offset for voice selection (increment to reroll)
           // TTS voice style for steerability - e.g., "speak slowly and menacingly"
           voiceStyle: null, // string - natural language instruction for how to speak
           // Image generation prompt template with ${variable} substitution
