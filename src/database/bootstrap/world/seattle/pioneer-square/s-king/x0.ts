@@ -10,6 +10,8 @@ The street is wider here than typical, extra lanes and broader sidewalks built f
   x: 0,
   y: -12,
   z: 0,
+
+  imageOnDisk: '2nd-ave-s-s-king-st-x0-y-12-z0.png',
   intersection: ['2nd Ave S', 'S. King St'],
   // Environmental properties
   population: 0, // Empty (post-Event)

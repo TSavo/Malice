@@ -10,6 +10,8 @@ A faded crosswalk marks an intersection with an alley that leads north, the whit
   x: -8,
   y: -12,
   z: 0,
+
+  imageOnDisk: 's-king-st-x-8-y-12-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

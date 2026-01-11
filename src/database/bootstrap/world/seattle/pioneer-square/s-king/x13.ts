@@ -10,6 +10,8 @@ A traditional Chinese gate once stood at this intersection, marking the entrance
   x: 13,
   y: -12,
   z: 0,
+
+  imageOnDisk: 's-king-st-x13-y-12-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

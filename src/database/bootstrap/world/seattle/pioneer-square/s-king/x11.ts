@@ -11,6 +11,8 @@ The building's ground floor housed a gift shop selling temple supplies: incense,
   y: -12,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-king-st-x11-y-12-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
