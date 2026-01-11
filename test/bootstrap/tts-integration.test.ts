@@ -46,7 +46,7 @@ describe('TTS Integration', () => {
       expect(typeof voice1).toBe('string');
     });
 
-    it('should assign one of the six valid OpenAI voices', async () => {
+    it('should assign one of the thirteen valid OpenAI voices', async () => {
       const obj = await $.recycler.create(
         {
           parent: $.describable,
@@ -56,7 +56,7 @@ describe('TTS Integration', () => {
       );
 
       const voice = await obj.call('getVoiceId');
-      const validVoices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
+      const validVoices = ['alloy', 'ash', 'ballad', 'coral', 'echo', 'fable', 'onyx', 'nova', 'sage', 'shimmer', 'verse', 'marin', 'cedar'];
 
       expect(validVoices).toContain(voice);
     });
@@ -98,11 +98,11 @@ describe('TTS Integration', () => {
       const voice2 = await obj2.call('getVoiceId');
 
       // Both should be valid voices
-      const validVoices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
+      const validVoices = ['alloy', 'ash', 'ballad', 'coral', 'echo', 'fable', 'onyx', 'nova', 'sage', 'shimmer', 'verse', 'marin', 'cedar'];
       expect(validVoices).toContain(voice1);
       expect(validVoices).toContain(voice2);
 
-      // With 6 voices, different IDs are likely to get different voices
+      // With 13 voices, different IDs are likely to get different voices
       // (not guaranteed but statistically likely with sequential IDs)
     });
 
@@ -260,6 +260,96 @@ describe('TTS Integration', () => {
       if (originalMethod) {
         room.setMethod('broadcastAudio', originalMethod.code);
       }
+    });
+
+    it('should include voiceStyle in audio segment when set', async () => {
+      const room = await $.recycler.create(
+        {
+          parent: $.location,
+          properties: { name: 'Style Room' },
+        },
+        null,
+      );
+
+      const speaker = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: {
+            name: 'Menacing NPC',
+            voiceId: 'onyx',
+            voiceStyle: 'speak slowly and menacingly, with a deep threatening tone',
+          },
+        },
+        null,
+      );
+
+      await speaker.moveTo(room);
+
+      // Track broadcastAudio calls
+      room._audioCalls = [];
+      room.setMethod(
+        'broadcastAudio',
+        `
+        const segments = args[0];
+        self._audioCalls = self._audioCalls || [];
+        self._audioCalls.push(segments);
+      `,
+      );
+
+      await speaker.call('say', 'I will find you');
+
+      expect(room._audioCalls.length).toBe(1);
+      expect(room._audioCalls[0]).toEqual([
+        {
+          speaker: String(speaker.id),
+          speakerName: 'Menacing NPC',
+          voiceId: 'onyx',
+          voiceStyle: 'speak slowly and menacingly, with a deep threatening tone',
+          text: 'I will find you',
+        },
+      ]);
+    });
+
+    it('should not include voiceStyle when not set', async () => {
+      const room = await $.recycler.create(
+        {
+          parent: $.location,
+          properties: { name: 'No Style Room' },
+        },
+        null,
+      );
+
+      const speaker = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Normal NPC', voiceId: 'nova' },
+        },
+        null,
+      );
+
+      await speaker.moveTo(room);
+
+      room._audioCalls = [];
+      room.setMethod(
+        'broadcastAudio',
+        `
+        const segments = args[0];
+        self._audioCalls = self._audioCalls || [];
+        self._audioCalls.push(segments);
+      `,
+      );
+
+      await speaker.call('say', 'Hello there');
+
+      expect(room._audioCalls.length).toBe(1);
+      const segment = room._audioCalls[0][0];
+      expect(segment.voiceStyle).toBeUndefined();
+      expect(segment).toEqual({
+        speaker: String(speaker.id),
+        speakerName: 'Normal NPC',
+        voiceId: 'nova',
+        text: 'Hello there',
+      });
     });
   });
 

@@ -46,7 +46,9 @@ export class DescribableBuilder implements Builder {
           systemPrompt: null, // string - AI personality/role prompt
           interactionSession: null, // string - session ID for conversation continuity
           // TTS voice for speech synthesis
-          voiceId: null, // string - TTS voice ID (alloy, echo, fable, onyx, nova, shimmer)
+          voiceId: null, // string - TTS voice ID (alloy, ash, ballad, coral, echo, fable, onyx, nova, sage, shimmer, verse, marin, cedar)
+          // TTS voice style for steerability (gpt-4o-mini-tts) - e.g., "speak slowly and menacingly"
+          voiceStyle: null, // string - natural language instruction for how to speak
           // Image generation prompt template with ${variable} substitution
           imagePrompt: null, // string - template for AI image generation
           // Negative prompt for image generation (things to exclude)
@@ -1043,12 +1045,12 @@ export class DescribableBuilder implements Builder {
       `
       /** Get this object's TTS voice ID. Deterministic based on object ID.
        *  Same object always gets same voice across sessions.
-       *  @returns voice ID string (alloy, echo, fable, onyx, nova, shimmer)
+       *  @returns voice ID string (alloy, ash, ballad, coral, echo, fable, onyx, nova, sage, shimmer, verse, marin, cedar)
        */
       if (self.voiceId) return self.voiceId;
 
-      // Deterministic assignment from object ID
-      const VOICES = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
+      // Deterministic assignment from object ID - 13 OpenAI TTS voices
+      const VOICES = ['alloy', 'ash', 'ballad', 'coral', 'echo', 'fable', 'onyx', 'nova', 'sage', 'shimmer', 'verse', 'marin', 'cedar'];
       self.voiceId = VOICES[self.id % VOICES.length];
       return self.voiceId;
     `,
@@ -1077,12 +1079,17 @@ export class DescribableBuilder implements Builder {
       // Audio broadcast for TTS-enabled clients
       const voiceId = await self.getVoiceId();
       if (location.broadcastAudio) {
-        await location.broadcastAudio([{
+        const segment = {
           speaker: String(self.id),
           speakerName: self.name,
           voiceId: voiceId,
           text: message
-        }]);
+        };
+        // Include voice style for gpt-4o-mini-tts steerability if set
+        if (self.voiceStyle) {
+          segment.voiceStyle = self.voiceStyle;
+        }
+        await location.broadcastAudio([segment]);
       }
     `,
     );
@@ -1131,7 +1138,11 @@ export class DescribableBuilder implements Builder {
     );
     obj.setPropertyDescription(
       'voiceId',
-      'TTS voice ID for speech synthesis (alloy, echo, fable, onyx, nova, shimmer)',
+      'TTS voice ID for speech synthesis (alloy, ash, ballad, coral, echo, fable, onyx, nova, sage, shimmer, verse, marin, cedar)',
+    );
+    obj.setPropertyDescription(
+      'voiceStyle',
+      'Natural language instruction for how to speak, e.g., "speak slowly and menacingly" or "cheerful and energetic" (requires gpt-4o-mini-tts)',
     );
     obj.setPropertyDescription(
       'imagePrompt',
