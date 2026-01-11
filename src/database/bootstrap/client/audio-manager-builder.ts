@@ -116,7 +116,7 @@ export class AudioManager {
         const data = JSON.parse(saved);
 
         // Validate masterVolume
-        if (typeof data.masterVolume === 'number' && data.masterVolume >= 0 && data.masterVolume <= 1) {
+        if (typeof data.masterVolume === 'number' && isFinite(data.masterVolume) && data.masterVolume >= 0 && data.masterVolume <= 1) {
           this.masterVolume = data.masterVolume;
         }
 
@@ -130,7 +130,7 @@ export class AudioManager {
           for (const [id, settings] of Object.entries(data.objectVolumes)) {
             if (settings && typeof settings === 'object') {
               const validated = {
-                volume: typeof settings.volume === 'number' && settings.volume >= 0 && settings.volume <= 1
+                volume: typeof settings.volume === 'number' && isFinite(settings.volume) && settings.volume >= 0 && settings.volume <= 1
                   ? settings.volume : 1.0,
                 muted: typeof settings.muted === 'boolean' ? settings.muted : false,
                 name: typeof settings.name === 'string' ? settings.name : 'Unknown #' + id
@@ -370,7 +370,8 @@ export class AudioManager {
     if (this.globalMuted && this.currentAudio) {
       this.currentAudio.pause();
     } else if (!this.globalMuted && this.currentAudio) {
-      // Resume playback when unmuting
+      // Resume playback when unmuting (only works if audio was paused mid-playback;
+      // segments that arrived while muted are discarded, not queued)
       this.currentAudio.play().catch(e => console.warn('[AudioManager] Failed to resume:', e));
     }
     this.saveSettings();
