@@ -37,6 +37,7 @@ CFG_SCALE = float(os.getenv("CFG_SCALE", "2.0"))
 # 7B model uses WAV files, streaming model uses .pt precomputed tensors
 VOICES_DIR_7B = Path(os.getenv("VIBEVOICE_VOICES_DIR_7B", "/opt/vibevoice/demo/voices"))
 VOICES_DIR_STREAMING = Path(os.getenv("VIBEVOICE_VOICES_DIR", "/opt/vibevoice/demo/voices/streaming_model"))
+CUSTOM_VOICES_DIR = Path("/app/voices")  # User-provided voice samples
 OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", "/app/output"))
 
 # Auto-detect model type from path
@@ -221,22 +222,37 @@ def load_model():
         raise
 
 
-def get_voice_wav_path(voice_name: str) -> Optional[Path]:
-    """Find a WAV voice sample file for the 7B model"""
+def get_voice_sample_path(voice_name: str) -> Optional[Path]:
+    """Find a voice sample file (MP3 or WAV) for the 7B model"""
     # Get the mapped voice name (preserving case for file matching)
     voice_key = DEFAULT_VOICES.get(voice_name.lower(), voice_name)
 
-    # Look for voice file
-    voice_files = list(VOICES_DIR.glob(f"**/*{voice_key}*.wav")) + \
-                  list(VOICES_DIR.glob(f"**/{voice_key}*.wav"))
+    # Check custom voices first (user-provided), then bundled voices
+    # Prefer MP3 (smaller), fall back to WAV
+    voice_files = []
+    for search_dir in [CUSTOM_VOICES_DIR, VOICES_DIR]:
+        if not search_dir.exists():
+            continue
+        voice_files.extend([
+            *search_dir.glob(f"**/*{voice_key}*.mp3"),
+            *search_dir.glob(f"**/{voice_key}*.mp3"),
+            *search_dir.glob(f"**/*{voice_key}*.wav"),
+            *search_dir.glob(f"**/{voice_key}*.wav"),
+        ])
+        if voice_files:
+            break
 
     if not voice_files:
-        # Try to find any voice file as default
-        voice_files = list(VOICES_DIR.glob("**/*.wav"))
-        if voice_files:
-            logger.warning(f"Voice '{voice_key}' not found, using default: {voice_files[0].name}")
-        else:
-            logger.error(f"No voice samples found in {VOICES_DIR}")
+        # Try to find any voice file as default (prefer custom, then bundled)
+        for search_dir in [CUSTOM_VOICES_DIR, VOICES_DIR]:
+            if not search_dir.exists():
+                continue
+            voice_files = list(search_dir.glob("**/*.mp3")) + list(search_dir.glob("**/*.wav"))
+            if voice_files:
+                logger.warning(f"Voice '{voice_key}' not found, using default: {voice_files[0].name}")
+                break
+        if not voice_files:
+            logger.error(f"No voice samples found in {CUSTOM_VOICES_DIR} or {VOICES_DIR}")
             return None
 
     return voice_files[0]
@@ -246,9 +262,9 @@ def generate_speech_7b(text: str, voice: Optional[str] = None) -> np.ndarray:
     """Generate speech using 7B/1.5B model (standard VibeVoice)"""
     global model, processor
 
-    # Get voice WAV file
+    # Get voice sample file (MP3 or WAV)
     voice_name = voice or "alloy"
-    voice_path = get_voice_wav_path(voice_name)
+    voice_path = get_voice_sample_path(voice_name)
 
     if voice_path is None:
         raise HTTPException(status_code=400, detail=f"Voice sample not found for '{voice_name}'")
