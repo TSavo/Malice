@@ -45,8 +45,12 @@ export class DescribableBuilder implements Builder {
           // Every digital device in 2110 is conscious (legacy of AI solving software in 2026)
           systemPrompt: null, // string - AI personality/role prompt
           interactionSession: null, // string - session ID for conversation continuity
-          // TTS voice for speech synthesis
-          voiceId: null, // string - TTS voice ID (alloy, echo, fable, onyx, nova, shimmer)
+          // TTS voice for speech synthesis (VibeVoice server)
+          // Built-in: alloy, echo, fable, onyx, nova, shimmer
+          // Custom: any voice added via $tts.addVoice() from audio samples
+          voiceId: null, // string - TTS voice ID
+          // TTS voice style for steerability - e.g., "speak slowly and menacingly"
+          voiceStyle: null, // string - natural language instruction for how to speak
           // Image generation prompt template with ${variable} substitution
           imagePrompt: null, // string - template for AI image generation
           // Negative prompt for image generation (things to exclude)
@@ -1041,15 +1045,77 @@ export class DescribableBuilder implements Builder {
     obj.setMethod(
       'getVoiceId',
       `
-      /** Get this object's TTS voice ID. Deterministic based on object ID.
-       *  Same object always gets same voice across sessions.
-       *  @returns voice ID string (alloy, echo, fable, onyx, nova, shimmer)
+      /** Get this object's TTS voice ID.
+       *  If voiceId is set, returns it (manual override).
+       *  Otherwise calculates from sex + objectId + voiceSeed.
+       *  @returns voice ID string (e.g., 'speaker_123' or 'alloy' for fallback)
        */
       if (self.voiceId) return self.voiceId;
 
-      // Deterministic assignment from object ID
+      // Use $tts for gender-aware voice assignment
+      // self.sex can be 'female', 'male', 'F', 'M', or null/undefined
+      // self.voiceSeed offsets the selection (for rerolling)
+      if ($tts && $tts.getVoiceForGender) {
+        const seed = self.voiceSeed || 0;
+        self.voiceId = await $tts.getVoiceForGender(self.sex, self.id, seed);
+        return self.voiceId;
+      }
+
+      // Fallback to built-in voices if $tts not available
       const VOICES = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
-      self.voiceId = VOICES[self.id % VOICES.length];
+      const seed = self.voiceSeed || 0;
+      self.voiceId = VOICES[(self.id + seed) % VOICES.length];
+      return self.voiceId;
+    `,
+    );
+
+    // rerollVoice() - Get a new random voice
+    obj.setMethod(
+      'rerollVoice',
+      `
+      /** Reroll to a different voice. Increments voiceSeed and clears cached voiceId.
+       *  @param gender - Optional: override gender for this reroll ('female', 'male', or null)
+       *  @returns The new voice ID
+       */
+      const genderOverride = args[0];
+
+      // Increment seed
+      self.voiceSeed = (self.voiceSeed || 0) + 1;
+
+      // Clear cached voice
+      self.voiceId = null;
+
+      // If gender override provided, temporarily set it
+      const originalSex = self.sex;
+      if (genderOverride !== undefined) {
+        self.sex = genderOverride;
+      }
+
+      // Get new voice
+      const newVoice = await self.getVoiceId();
+
+      // Restore original sex if we overrode it
+      if (genderOverride !== undefined) {
+        self.sex = originalSex;
+      }
+
+      return newVoice;
+    `,
+    );
+
+    // setVoice() - Manually set a specific voice
+    obj.setMethod(
+      'setVoice',
+      `
+      /** Manually set a specific voice ID, overriding automatic selection.
+       *  @param voiceId - The voice ID to use (e.g., 'speaker_123', 'alloy')
+       *  @returns The voice ID that was set
+       */
+      const voiceId = args[0];
+      if (!voiceId) {
+        throw new Error('voiceId is required');
+      }
+      self.voiceId = voiceId;
       return self.voiceId;
     `,
     );
@@ -1077,12 +1143,17 @@ export class DescribableBuilder implements Builder {
       // Audio broadcast for TTS-enabled clients
       const voiceId = await self.getVoiceId();
       if (location.broadcastAudio) {
-        await location.broadcastAudio([{
+        const segment = {
           speaker: String(self.id),
           speakerName: self.name,
           voiceId: voiceId,
           text: message
-        }]);
+        };
+        // Include voice style for gpt-4o-mini-tts steerability if set
+        if (self.voiceStyle) {
+          segment.voiceStyle = self.voiceStyle;
+        }
+        await location.broadcastAudio([segment]);
       }
     `,
     );
@@ -1131,7 +1202,11 @@ export class DescribableBuilder implements Builder {
     );
     obj.setPropertyDescription(
       'voiceId',
-      'TTS voice ID for speech synthesis (alloy, echo, fable, onyx, nova, shimmer)',
+      'TTS voice ID for VibeVoice. Built-in: alloy, echo, fable, onyx, nova, shimmer. Custom voices can be added via $tts.addVoice().',
+    );
+    obj.setPropertyDescription(
+      'voiceStyle',
+      'Natural language instruction for how to speak, e.g., "speak slowly and menacingly" or "cheerful and energetic"',
     );
     obj.setPropertyDescription(
       'imagePrompt',

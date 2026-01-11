@@ -9,6 +9,7 @@ import os
 import io
 import time
 import copy
+import json
 import logging
 from threading import Lock
 from typing import Optional, Literal
@@ -37,6 +38,7 @@ CFG_SCALE = float(os.getenv("CFG_SCALE", "2.0"))
 # 7B model uses WAV files, streaming model uses .pt precomputed tensors
 VOICES_DIR_7B = Path(os.getenv("VIBEVOICE_VOICES_DIR_7B", "/opt/vibevoice/demo/voices"))
 VOICES_DIR_STREAMING = Path(os.getenv("VIBEVOICE_VOICES_DIR", "/opt/vibevoice/demo/voices/streaming_model"))
+CUSTOM_VOICES_DIR = Path("/app/voices")  # User-provided voice samples
 OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", "/app/output"))
 
 # Auto-detect model type from path
@@ -73,15 +75,16 @@ app.add_middleware(
 model = None
 processor = None
 
-# OpenAI voice mapping to VibeVoice voice presets
-# Available 7B WAV files: en-Carter_man, en-Frank_man, en-Maya_woman, en-Alice_woman, en-Mary_woman
-OPENAI_VOICES = {
-    "alloy": "Carter",     # Male voice
-    "echo": "Frank",       # Male voice
-    "fable": "Maya",       # Female voice
-    "onyx": "Frank",       # Male voice (same as echo - limited options)
-    "nova": "Alice",       # Female voice
-    "shimmer": "Mary",     # Female voice
+# Default voice samples bundled with VibeVoice
+# Maps voice name -> sample filename (without extension)
+# Users can add custom voices by placing WAV files in the voices directory
+DEFAULT_VOICES = {
+    "alloy": "en-Carter_man",
+    "echo": "en-Frank_man",
+    "fable": "en-Maya_woman",
+    "onyx": "en-Frank_man",  # Reuses Frank (limited bundled samples)
+    "nova": "en-Alice_woman",
+    "shimmer": "en-Mary_woman",
 }
 
 
@@ -90,7 +93,7 @@ def get_voice_preset(voice_name: str) -> Optional[dict]:
     global voice_cache, voice_cache_lock
 
     # Map OpenAI voice names to VibeVoice presets
-    voice_key = OPENAI_VOICES.get(voice_name.lower(), voice_name.lower())
+    voice_key = DEFAULT_VOICES.get(voice_name.lower(), voice_name.lower())
 
     # Double-checked locking pattern
     with voice_cache_lock:
@@ -220,22 +223,37 @@ def load_model():
         raise
 
 
-def get_voice_wav_path(voice_name: str) -> Optional[Path]:
-    """Find a WAV voice sample file for the 7B model"""
+def get_voice_sample_path(voice_name: str) -> Optional[Path]:
+    """Find a voice sample file (MP3 or WAV) for the 7B model"""
     # Get the mapped voice name (preserving case for file matching)
-    voice_key = OPENAI_VOICES.get(voice_name.lower(), voice_name)
+    voice_key = DEFAULT_VOICES.get(voice_name.lower(), voice_name)
 
-    # Look for voice file
-    voice_files = list(VOICES_DIR.glob(f"**/*{voice_key}*.wav")) + \
-                  list(VOICES_DIR.glob(f"**/{voice_key}*.wav"))
+    # Check custom voices first (user-provided), then bundled voices
+    # Prefer MP3 (smaller), fall back to WAV
+    voice_files = []
+    for search_dir in [CUSTOM_VOICES_DIR, VOICES_DIR]:
+        if not search_dir.exists():
+            continue
+        voice_files.extend([
+            *search_dir.glob(f"**/*{voice_key}*.mp3"),
+            *search_dir.glob(f"**/{voice_key}*.mp3"),
+            *search_dir.glob(f"**/*{voice_key}*.wav"),
+            *search_dir.glob(f"**/{voice_key}*.wav"),
+        ])
+        if voice_files:
+            break
 
     if not voice_files:
-        # Try to find any voice file as default
-        voice_files = list(VOICES_DIR.glob("**/*.wav"))
-        if voice_files:
-            logger.warning(f"Voice '{voice_key}' not found, using default: {voice_files[0].name}")
-        else:
-            logger.error(f"No voice samples found in {VOICES_DIR}")
+        # Try to find any voice file as default (prefer custom, then bundled)
+        for search_dir in [CUSTOM_VOICES_DIR, VOICES_DIR]:
+            if not search_dir.exists():
+                continue
+            voice_files = list(search_dir.glob("**/*.mp3")) + list(search_dir.glob("**/*.wav"))
+            if voice_files:
+                logger.warning(f"Voice '{voice_key}' not found, using default: {voice_files[0].name}")
+                break
+        if not voice_files:
+            logger.error(f"No voice samples found in {CUSTOM_VOICES_DIR} or {VOICES_DIR}")
             return None
 
     return voice_files[0]
@@ -245,9 +263,9 @@ def generate_speech_7b(text: str, voice: Optional[str] = None) -> np.ndarray:
     """Generate speech using 7B/1.5B model (standard VibeVoice)"""
     global model, processor
 
-    # Get voice WAV file
+    # Get voice sample file (MP3 or WAV)
     voice_name = voice or "alloy"
-    voice_path = get_voice_wav_path(voice_name)
+    voice_path = get_voice_sample_path(voice_name)
 
     if voice_path is None:
         raise HTTPException(status_code=400, detail=f"Voice sample not found for '{voice_name}'")
@@ -480,22 +498,28 @@ async def list_models():
 async def list_voices():
     """List available voices"""
     voices = []
-    
-    # Add OpenAI-compatible voices
-    for voice_id in OPENAI_VOICES.keys():
+
+    # Add default bundled voices
+    for voice_id in DEFAULT_VOICES.keys():
         voices.append(VoiceInfo(voice_id=voice_id, name=voice_id.capitalize()))
-    
-    # Add custom voices from directory
-    for voice_file in VOICES_DIR.glob("*.wav"):
-        voice_id = voice_file.stem
-        if voice_id not in OPENAI_VOICES:
-            voices.append(VoiceInfo(voice_id=voice_id, name=voice_id))
-    
-    for voice_file in VOICES_DIR.glob("*.mp3"):
-        voice_id = voice_file.stem
-        if voice_id not in OPENAI_VOICES:
-            voices.append(VoiceInfo(voice_id=voice_id, name=voice_id))
-    
+
+    # Add custom voices from CUSTOM_VOICES_DIR and VOICES_DIR
+    seen_voices = set(DEFAULT_VOICES.keys())
+    for search_dir in [CUSTOM_VOICES_DIR, VOICES_DIR]:
+        if not search_dir.exists():
+            continue
+        for voice_file in search_dir.glob("*.wav"):
+            voice_id = voice_file.stem
+            if voice_id not in seen_voices:
+                voices.append(VoiceInfo(voice_id=voice_id, name=voice_id))
+                seen_voices.add(voice_id)
+
+        for voice_file in search_dir.glob("*.mp3"):
+            voice_id = voice_file.stem
+            if voice_id not in seen_voices:
+                voices.append(VoiceInfo(voice_id=voice_id, name=voice_id))
+                seen_voices.add(voice_id)
+
     return VoicesResponse(voices=voices)
 
 
@@ -509,8 +533,8 @@ async def create_speech(request: SpeechRequest):
     if len(request.input) > 10000:
         raise HTTPException(status_code=400, detail="Input text too long (max 10000 chars)")
     
-    # Map OpenAI voice to internal voice (for now, all use default)
-    voice = OPENAI_VOICES.get(request.voice, request.voice)
+    # Map default voice name to sample filename, or use voice name directly for custom voices
+    voice = DEFAULT_VOICES.get(request.voice, request.voice)
     
     # Generate audio
     audio = generate_speech(request.input, voice, request.speed)
@@ -552,6 +576,30 @@ async def generate_advanced(
         content=audio_bytes,
         media_type="audio/wav",
     )
+
+
+@app.get("/v1/voices/genders")
+async def get_voice_genders():
+    """Get voice gender mapping for all custom voices"""
+    genders_path = CUSTOM_VOICES_DIR / "voice-genders.json"
+
+    if not genders_path.exists():
+        # Also check app directory
+        genders_path = Path("/app/voice-genders.json")
+
+    if not genders_path.exists():
+        return {"female": [], "male": []}
+
+    try:
+        with open(genders_path, 'r') as f:
+            data = json.load(f)
+        return {
+            "female": data.get("female", []),
+            "male": data.get("male", [])
+        }
+    except Exception as e:
+        logger.error(f"Failed to load voice-genders.json: {e}")
+        return {"female": [], "male": []}
 
 
 @app.post("/v1/voices/add")
