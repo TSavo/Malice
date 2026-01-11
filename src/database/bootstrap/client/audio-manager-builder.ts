@@ -69,10 +69,14 @@ export class AudioManager {
     this.audioQueue = [];
     this.isPlaying = false;
     this.currentAudio = null;
+    this.currentSpeakerId = null;
 
     // Settings UI state
     this.settingsVisible = false;
     this.settingsElement = null;
+
+    // Callback for mute state changes (taskbar icon updates)
+    this.onMuteChange = null;
 
     // Load saved settings from localStorage
     this.loadSettings();
@@ -80,17 +84,6 @@ export class AudioManager {
     // Create audio context on first user interaction (browser requirement)
     this.audioContext = null;
     this.initAudioContext();
-  }
-
-  /**
-   * Escape HTML special characters to prevent XSS
-   * @param str - String to escape
-   * @returns Escaped string safe for HTML insertion
-   */
-  escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
   }
 
   /**
@@ -122,39 +115,27 @@ export class AudioManager {
       if (saved) {
         const data = JSON.parse(saved);
 
-        // Validate and sanitize masterVolume
-        if (typeof data.masterVolume === 'number' &&
-            isFinite(data.masterVolume) &&
-            data.masterVolume >= 0 &&
-            data.masterVolume <= 1) {
+        // Validate masterVolume
+        if (typeof data.masterVolume === 'number' && data.masterVolume >= 0 && data.masterVolume <= 1) {
           this.masterVolume = data.masterVolume;
-        } else {
-          this.masterVolume = 1.0;
         }
 
-        // Validate and sanitize globalMuted
+        // Validate globalMuted
         if (typeof data.globalMuted === 'boolean') {
           this.globalMuted = data.globalMuted;
-        } else {
-          this.globalMuted = false;
         }
 
         // Restore object volumes with validation
         if (data.objectVolumes && typeof data.objectVolumes === 'object') {
           for (const [id, settings] of Object.entries(data.objectVolumes)) {
-            // Validate settings structure
-            if (settings &&
-                typeof settings === 'object' &&
-                typeof settings.volume === 'number' &&
-                isFinite(settings.volume) &&
-                settings.volume >= 0 &&
-                settings.volume <= 1 &&
-                typeof settings.muted === 'boolean') {
-              this.objectVolumes.set(id, {
-                volume: settings.volume,
-                muted: settings.muted,
-                name: typeof settings.name === 'string' ? settings.name : 'Unknown'
-              });
+            if (settings && typeof settings === 'object') {
+              const validated = {
+                volume: typeof settings.volume === 'number' && settings.volume >= 0 && settings.volume <= 1
+                  ? settings.volume : 1.0,
+                muted: typeof settings.muted === 'boolean' ? settings.muted : false,
+                name: typeof settings.name === 'string' ? settings.name : 'Unknown #' + id
+              };
+              this.objectVolumes.set(id, validated);
             }
           }
         }
@@ -248,7 +229,7 @@ export class AudioManager {
     this.isPlaying = true;
     const segment = this.audioQueue.shift();
 
-    // Check if muted
+    // Check if muted - use setTimeout to avoid stack overflow
     if (this.globalMuted) {
       setTimeout(() => this.playNext(), 0);
       return;
@@ -270,8 +251,8 @@ export class AudioManager {
       console.warn('[AudioManager] TTS error:', e);
     }
 
-    // Play next
-    this.playNext();
+    // Play next - use setTimeout to avoid stack buildup
+    setTimeout(() => this.playNext(), 0);
   }
 
   /**
@@ -335,16 +316,19 @@ export class AudioManager {
       const audio = new Audio(audioUrl);
       audio.volume = effectiveVolume;
       this.currentAudio = audio;
+      this.currentSpeakerId = speakerId;
 
       audio.onended = () => {
         URL.revokeObjectURL(audioUrl);
         this.currentAudio = null;
+        this.currentSpeakerId = null;
         resolve();
       };
 
       audio.onerror = (e) => {
         URL.revokeObjectURL(audioUrl);
         this.currentAudio = null;
+        this.currentSpeakerId = null;
         reject(e);
       };
 
@@ -361,6 +345,7 @@ export class AudioManager {
       this.currentAudio.pause();
       this.currentAudio = null;
     }
+    this.currentSpeakerId = null;
     this.isPlaying = false;
   }
 
@@ -369,9 +354,8 @@ export class AudioManager {
    */
   setMasterVolume(volume) {
     this.masterVolume = Math.max(0, Math.min(1, volume));
-    if (this.currentAudio) {
-      const speakerId = this.currentAudio.dataset?.speakerId;
-      const speakerSettings = speakerId ? this.objectVolumes.get(speakerId) : null;
+    if (this.currentAudio && this.currentSpeakerId) {
+      const speakerSettings = this.objectVolumes.get(this.currentSpeakerId);
       const speakerVolume = speakerSettings?.volume ?? 1.0;
       this.currentAudio.volume = this.masterVolume * speakerVolume;
     }
@@ -385,8 +369,15 @@ export class AudioManager {
     this.globalMuted = !this.globalMuted;
     if (this.globalMuted && this.currentAudio) {
       this.currentAudio.pause();
+    } else if (!this.globalMuted && this.currentAudio) {
+      // Resume playback when unmuting
+      this.currentAudio.play().catch(e => console.warn('[AudioManager] Failed to resume:', e));
     }
     this.saveSettings();
+    // Notify listeners of mute state change
+    if (this.onMuteChange) {
+      this.onMuteChange(this.globalMuted);
+    }
     return this.globalMuted;
   }
 
@@ -428,6 +419,19 @@ export class AudioManager {
       });
     }
     return voices;
+  }
+
+  /**
+   * Escape HTML special characters to prevent XSS
+   */
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   /**

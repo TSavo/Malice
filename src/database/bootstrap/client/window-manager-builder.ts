@@ -81,6 +81,13 @@ export class WindowManager {
     // Create taskbar with audio manager reference
     this.taskbar = new Taskbar(taskbarContainer, this, audioManager);
 
+    // Wire up audio mute change callback to update taskbar icon
+    if (audioManager) {
+      audioManager.onMuteChange = () => {
+        this.taskbar.updateSoundIcon();
+      };
+    }
+
     // Cache Terminal and addons for window creation
     this.Terminal = null;
     this.FitAddon = null;
