@@ -222,6 +222,7 @@ In the eastern wall, behind the furnace, a section of brickwork has been removed
       x: -13,
       y: 6,
       z: -1,
+      imageOnDisk: 'interurban-building-basement-x-13-y6-z-1.png',
       population: 0,
       ambientNoise: 8,
       lighting: 15,
