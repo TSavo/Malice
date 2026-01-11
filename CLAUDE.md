@@ -404,7 +404,7 @@ room.broadcastAudio([
 2. Voice is **gender-aware**: objects with `sex` property get appropriate voices (374 female, 415 male)
 3. Voice is **deterministic**: same object + voiceSeed always gets same voice
 4. Audio segments sent to all players in location via `audio` channel
-5. Client requests TTS audio from VibeVoice server and plays it
+5. Client AudioManager receives segments, requests TTS from VibeVoice, and plays audio with volume controls
 
 **Voice assignment:**
 - Objects with `sex='female'` or `'F'` get female voices
@@ -412,6 +412,29 @@ room.broadcastAudio([
 - Objects without `sex` get voices from all available voices
 - 789 LibriTTS voices available (speaker_0 through speaker_788)
 - Fallback to 6 built-in voices if TTS server unavailable: alloy, echo, fable, onyx, nova, shimmer
+
+**Client-side AudioManager:**
+The web client includes an `AudioManager` (served via `/js/audio-manager.js`) that handles TTS playback:
+- Receives audio segments via `audio` channel
+- Requests TTS from VibeVoice server (`http://host:8880/tts`)
+- Queues and plays audio sequentially
+- Per-object volume controls (0-1) persisted to localStorage
+- Master volume control and global mute
+- Sound settings UI accessible via taskbar button (🔊)
+- Automatically registers new speakers as they're heard
+
+**Volume controls:**
+```javascript
+// In browser console
+malice.audio.setMasterVolume(0.8);           // 80% master volume
+malice.audio.toggleMute();                   // Mute/unmute all audio
+malice.audio.setObjectVolume('42', 0.5);     // Set speaker #42 to 50%
+malice.audio.toggleObjectMute('42');         // Mute/unmute speaker #42
+malice.audio.stop();                         // Stop playback, clear queue
+malice.audio.toggleSettings();               // Show/hide settings UI
+```
+
+Settings are saved to `localStorage` under key `malice-audio-settings` and persist across sessions.
 
 ### WebSocket Protocol
 
