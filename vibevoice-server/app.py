@@ -498,22 +498,28 @@ async def list_models():
 async def list_voices():
     """List available voices"""
     voices = []
-    
+
     # Add default bundled voices
     for voice_id in DEFAULT_VOICES.keys():
         voices.append(VoiceInfo(voice_id=voice_id, name=voice_id.capitalize()))
-    
-    # Add custom voices from directory
-    for voice_file in VOICES_DIR.glob("*.wav"):
-        voice_id = voice_file.stem
-        if voice_id not in DEFAULT_VOICES:
-            voices.append(VoiceInfo(voice_id=voice_id, name=voice_id))
-    
-    for voice_file in VOICES_DIR.glob("*.mp3"):
-        voice_id = voice_file.stem
-        if voice_id not in DEFAULT_VOICES:
-            voices.append(VoiceInfo(voice_id=voice_id, name=voice_id))
-    
+
+    # Add custom voices from CUSTOM_VOICES_DIR and VOICES_DIR
+    seen_voices = set(DEFAULT_VOICES.keys())
+    for search_dir in [CUSTOM_VOICES_DIR, VOICES_DIR]:
+        if not search_dir.exists():
+            continue
+        for voice_file in search_dir.glob("*.wav"):
+            voice_id = voice_file.stem
+            if voice_id not in seen_voices:
+                voices.append(VoiceInfo(voice_id=voice_id, name=voice_id))
+                seen_voices.add(voice_id)
+
+        for voice_file in search_dir.glob("*.mp3"):
+            voice_id = voice_file.stem
+            if voice_id not in seen_voices:
+                voices.append(VoiceInfo(voice_id=voice_id, name=voice_id))
+                seen_voices.add(voice_id)
+
     return VoicesResponse(voices=voices)
 
 
