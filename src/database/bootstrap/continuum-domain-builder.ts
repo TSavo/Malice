@@ -842,6 +842,30 @@ export class ContinuumDomainBuilder implements Builder {
       return { status: 404, contentType: 'text/plain', body: 'Module not found' };
     `,
     );
+
+    // /js/audio-manager.js - AudioManager class for TTS playback
+    const audioManagerJsRoute = await this.createRoute(webRoute, jsRoute, {
+      name: 'AudioManager JS Route',
+      segment: 'audio-manager.js',
+      methods: ['GET'],
+      contentType: 'application/javascript',
+    });
+    audioManagerJsRoute.setMethod(
+      'handleRequest',
+      `
+      const mod = $.audioManagerJs;
+      if (mod && mod.getScript) {
+        const script = await mod.getScript();
+        return {
+          status: 200,
+          contentType: 'application/javascript',
+          body: script,
+          headers: { 'Cache-Control': 'public, max-age=3600' }
+        };
+      }
+      return { status: 404, contentType: 'text/plain', body: 'Module not found' };
+    `,
+    );
   }
 
   async registerAliases(): Promise<void> {

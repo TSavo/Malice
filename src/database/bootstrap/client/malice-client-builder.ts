@@ -47,9 +47,10 @@ export class MaliceClientBuilder implements Builder {
  * Handles channel-based communication with the game server.
  */
 export class MaliceClient {
-  constructor(url, windowManager) {
+  constructor(url, windowManager, audioManager) {
     this.url = url;
     this.wm = windowManager;
+    this.audio = audioManager;
     this.ws = null;
     this.handlers = new Map();
     this.state = {
@@ -67,6 +68,7 @@ export class MaliceClient {
     this.on('ctrl', (data) => this.onCtrlMessage(data));
     this.on('state', (data) => this.onStateMessage(data));
     this.on('wm', (data) => this.onWmMessage(data));
+    this.on('audio', (data) => this.onAudioMessage(data));
     this.on('error', (data) => this.onErrorMessage(data));
   }
 
@@ -219,6 +221,13 @@ export class MaliceClient {
     // Route to window manager
     if (this.wm) {
       this.wm.handleWmMessage(msg);
+    }
+  }
+
+  onAudioMessage(msg) {
+    // Route to audio manager for TTS playback
+    if (this.audio) {
+      this.audio.handleAudioMessage(msg);
     }
   }
 

@@ -1,4 +1,5 @@
 import type { ObjectManager } from '../../object-manager';
+import { AudioManagerBuilder } from './audio-manager-builder';
 import { DesktopBuilder } from './desktop-builder';
 import { HtmlWindowBuilder } from './html-window-builder';
 import { IframeWindowBuilder } from './iframe-window-builder';
@@ -17,10 +18,11 @@ import { WindowManagerBuilder } from './window-manager-builder';
  * Build order matters - dependencies must be built first:
  * 1. Window (base class)
  * 2. TerminalWindow, HtmlWindow, IframeWindow (extend Window)
- * 3. Taskbar
- * 4. WindowManager (uses Window types, Taskbar)
- * 5. MaliceClient (WebSocket handling)
- * 6. Desktop (entry point, imports all)
+ * 3. AudioManager (TTS audio playback)
+ * 4. Taskbar (uses AudioManager)
+ * 5. WindowManager (uses Window types, Taskbar)
+ * 6. MaliceClient (WebSocket handling, uses AudioManager)
+ * 7. Desktop (entry point, imports all)
  */
 export class ClientBuilder {
   constructor(private manager: ObjectManager) {}
@@ -41,6 +43,9 @@ export class ClientBuilder {
     const iframeWindowBuilder = new IframeWindowBuilder(this.manager);
     await iframeWindowBuilder.build();
 
+    const audioManagerBuilder = new AudioManagerBuilder(this.manager);
+    await audioManagerBuilder.build();
+
     const taskbarBuilder = new TaskbarBuilder(this.manager);
     await taskbarBuilder.build();
 
@@ -58,6 +63,7 @@ export class ClientBuilder {
 }
 
 // Export individual builders for direct use
+export { AudioManagerBuilder } from './audio-manager-builder';
 export { DesktopBuilder } from './desktop-builder';
 export { HtmlWindowBuilder } from './html-window-builder';
 export { IframeWindowBuilder } from './iframe-window-builder';

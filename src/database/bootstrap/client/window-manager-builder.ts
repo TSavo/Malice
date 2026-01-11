@@ -53,9 +53,10 @@ import { Taskbar } from '/js/taskbar';
  * Handles window lifecycle, z-order, and wm channel protocol.
  */
 export class WindowManager {
-  constructor(windowArea, taskbarContainer, client) {
+  constructor(windowArea, taskbarContainer, client, audioManager) {
     this.windowArea = windowArea;
     this.client = client;
+    this.audio = audioManager;
     this.windows = new Map();  // windowId -> Window instance
     this.zOrder = [];          // windowIds in z-order (back to front)
     this.activeWindowId = null;
@@ -77,8 +78,8 @@ export class WindowManager {
     this._savedTerminalHistory = [];
     this._savedTerminalBuffer = '';
 
-    // Create taskbar
-    this.taskbar = new Taskbar(taskbarContainer, this);
+    // Create taskbar with audio manager reference
+    this.taskbar = new Taskbar(taskbarContainer, this, audioManager);
 
     // Cache Terminal and addons for window creation
     this.Terminal = null;
