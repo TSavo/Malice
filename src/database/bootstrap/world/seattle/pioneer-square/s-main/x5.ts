@@ -11,6 +11,8 @@ Bars cover the windows, iron grates bolted to the brick, security measures that 
   y: 0,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-main-st-x5-y0-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
