@@ -183,6 +183,7 @@ export class CartelDomainBuilder implements Builder {
       { segment: 'iframe-window.js', alias: 'iframeWindowJs' },
       { segment: 'taskbar.js', alias: 'taskbarJs' },
       { segment: 'audio-manager.js', alias: 'audioManagerJs' },
+      { segment: 'location-window.js', alias: 'locationWindowJs' },
     ];
 
     for (const mod of modules) {

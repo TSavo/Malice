@@ -866,6 +866,30 @@ export class ContinuumDomainBuilder implements Builder {
       return { status: 404, contentType: 'text/plain', body: 'Module not found' };
     `,
     );
+
+    // /js/location-window.js - LocationWindow class for room images
+    const locationWindowJsRoute = await this.createRoute(webRoute, jsRoute, {
+      name: 'LocationWindow JS Route',
+      segment: 'location-window.js',
+      methods: ['GET'],
+      contentType: 'application/javascript',
+    });
+    locationWindowJsRoute.setMethod(
+      'handleRequest',
+      `
+      const mod = $.locationWindowJs;
+      if (mod && mod.getScript) {
+        const script = await mod.getScript();
+        return {
+          status: 200,
+          contentType: 'application/javascript',
+          body: script,
+          headers: { 'Cache-Control': 'public, max-age=3600' }
+        };
+      }
+      return { status: 404, contentType: 'text/plain', body: 'Module not found' };
+    `,
+    );
   }
 
   async registerAliases(): Promise<void> {

@@ -211,10 +211,54 @@ export class MaliceClient {
       this.state[msg.type] = msg.data;
     }
 
+    // Handle location state - open/update location window
+    if (msg.type === 'location' && msg.data && this.wm) {
+      this._handleLocationState(msg.data);
+    }
+
     // Emit event for UI components
     document.dispatchEvent(new CustomEvent('moo-state', { detail: msg }));
 
     console.log('[MaliceClient] State:', msg.type, msg.data);
+  }
+
+  async _handleLocationState(locationData) {
+    const windowId = 'location';
+
+    // Check if location window already exists
+    let win = this.wm.getWindow(windowId);
+
+    if (!win) {
+      // Create location window (positioned to the right of screen, not maximized)
+      const area = this.wm.getWindowArea();
+      const winWidth = 320;
+      const winHeight = 400;
+
+      await this.wm.openWindow({
+        windowId: windowId,
+        windowType: 'location',
+        title: 'Location',
+        channel: 'win:location',
+        config: {
+          x: area.width - winWidth - 20,
+          y: 20,
+          width: winWidth,
+          height: winHeight,
+          minimized: false,
+          maximized: false,
+          resizable: true,
+          closable: true,
+          minimizable: true
+        }
+      });
+
+      win = this.wm.getWindow(windowId);
+    }
+
+    // Update the location window with new data
+    if (win && win.setLocation) {
+      win.setLocation(locationData);
+    }
   }
 
   onWmMessage(msg) {

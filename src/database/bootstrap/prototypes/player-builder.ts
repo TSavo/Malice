@@ -221,8 +221,34 @@ export class PlayerBuilder implements Builder {
       // Sync window layout for multiplexed web clients
       await self.syncWindowLayout();
 
+      // Send initial location state (room image/info) to client
+      await self.sendLocationState();
+
       // Show prompt (system - uses tell)
           `,
+    );
+
+    // Hook: called after arriving at new location
+    // Override parent to send location state to client
+    obj.setMethod(
+      'onArrived',
+      `
+      /** Called when this player arrives at a new location.
+       *  Sends location state to client for the location window.
+       */
+      const dest = args[0];
+      const source = args[1];
+      const mover = args[2];
+
+      // Call parent's onArrived first (handles verb registration etc)
+      await pass(dest, source, mover);
+
+      // Send location state to client if connected
+      // Only send if destination is a room (has coordinates or isRoom flag)
+      if (dest && (dest.x !== undefined || dest.isRoom)) {
+        await self.sendLocationState();
+      }
+    `,
     );
 
     obj.setMethod(
@@ -530,6 +556,66 @@ export class PlayerBuilder implements Builder {
       const windowId = args[0];
       const content = args[1];
       return self.channel('win:' + windowId, content);
+    `,
+    );
+
+    // Send current location state to client (room image, name, description, exits)
+    obj.setMethod(
+      'sendLocationState',
+      `
+      /** Send current room state to the client's location window.
+       *  Called automatically when player moves to a new room.
+       *  Includes room image URL, name, description, and exits.
+       */
+      const room = self.location;
+      if (!room) return false;
+
+      // Check if this is actually a room (has coordinate properties or is a $room descendant)
+      if (room.x === undefined && room.y === undefined && !room.isRoom) return false;
+
+      // Build room state
+      const roomState = {
+        id: room.id,
+        name: room.name || 'Unknown Location',
+        description: room.description || '',
+        exits: {},
+        imageUrl: null,
+        coordinates: null
+      };
+
+      // Add coordinates if present
+      if (room.x !== undefined && room.y !== undefined) {
+        roomState.coordinates = {
+          x: room.x,
+          y: room.y,
+          z: room.z ?? 0
+        };
+      }
+
+      // Add exits
+      if (room.exits && typeof room.exits === 'object') {
+        for (const [dir, dest] of Object.entries(room.exits)) {
+          if (dest) {
+            // dest could be an ID or an object
+            const destId = typeof dest === 'object' ? dest.id : dest;
+            roomState.exits[dir] = destId;
+          }
+        }
+      }
+
+      // Get image URL if room has one cached
+      const images = room.images || {};
+      // Prefer 16:9 landscape for location window
+      const blobKey = images['16:9'] || images['landscape'] || Object.values(images)[0];
+      if (blobKey) {
+        // Generate URL - use player's faction domain if available
+        const faction = self.faction;
+        const domain = faction?.domain || 'malice.world';
+        roomState.imageUrl = '/blob/' + blobKey;
+      }
+
+      // Send to state channel with type 'location'
+      return self.state('location', roomState);
     `,
     );
   }
