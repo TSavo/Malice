@@ -2839,8 +2839,280 @@
         "chapter_id": "108066",
         "id": "7240_108066_000005_000000"
       }
+    },
+    {
+      "id": "8163",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/21053/audio/audio.wav?Expires=1768144415&Signature=U~YMRdLfxgNFQr~f4ZuFe5iCVGSZQTW315~M7Detigg-RoVkmuvmVXLAYT2qTci53zTKoH8OHflVQZandF9J~PL0Pcf5KgDa6UBPieg7wNKns8H5CUChGxuV~HhImwp2vfrgQGzuZSeb9wjfKWgUup156fgyCjC18HeD7zb~wth6~EKeI0eycxOg7e3dPlQdRaUhDjbdQIzQ-c-WXf3NU7nTKE9RJPfTrVL6jyBvgBGTowDAefMafT~vHfwSCXlUZWe5a5SAmsrlKBajenMOtAtputAnqliefHRxCF06d~LJpDn7d5fJZ50ZuZVRhntGl0H6AVJJ213UwJAkQiZfug__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Let it suffice to say, that at the period of which I speak, there existed, in the interior of Hungary, a settled although hidden belief in the doctrines of the Metempsychosis. Of the doctrines themselves-that is, of their falsity, or of their probability-I say nothing.",
+        "text_original": "Let it suffice to say, that at the period of which I speak, there existed, in the interior of Hungary, a settled although hidden belief in the doctrines of the Metempsychosis. Of the doctrines themselves--that is, of their falsity, or of their probability--I say nothing.",
+        "speaker_id": "8163",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/8163/274549/8163_274549_000003_000002.wav",
+        "chapter_id": "274549",
+        "id": "8163_274549_000003_000002"
+      }
+    },
+    {
+      "id": "8575",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/21185/audio/audio.wav?Expires=1768144420&Signature=e9y2lzL77ZOpmnLedzDlHbw3ezCSkhSzOSNzGo56mLpSvO2fuSoTY6KzyoE8lWNtF3vXZZNgPVk9cq96kI1RZvkHayK3cYL~NTHnIdLWKFFjhPZ109i21VdivTtw8tY36Uzz4AhEWQBAXBMSY3xEdYQ-QRyXzmMPGCuaxMxj5G3LQ2UpZBekpuCRqCi07pZG9D7DPKrn1Wbb0bc~Lig1UuUu0oGgOzxmz9fZP4~tv-~TWFeKeIZfhGrIBupptkcEgwf0C~2VkXwjCB~BPgxxxyIKWkG4m8QtbAzYX8L1rwlR0Cl6S7T2vMLd6Cst0n1JneKdNtI~CWv1Cdu-OwnZeA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "To understand TIME and ETERNITY aright, we ought with attention to consider what idea it is we have of DURATION, and how we came by it.",
+        "text_original": "To understand TIME and ETERNITY aright, we ought with attention to consider what idea it is we have of DURATION, and how we came by it.",
+        "speaker_id": "8575",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/8575/290349/8575_290349_000007_000000.wav",
+        "chapter_id": "290349",
+        "id": "8575_290349_000007_000000"
+      }
+    },
+    {
+      "id": "55",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/21246/audio/audio.wav?Expires=1768144425&Signature=tN303oLOUFGjWEmjfaxzthvL0bx5SrBgvUVWbV0bnY2ublt2unypsQK3U20RV2B7er3Cmj8o0zZM~azO6VOuC5bzrMWfy5PIPqLYvGz9G5up6TfvK6UH~YyWq8Kg4beZguZHEWG4bZWBJBfWsOIeUDShwII0DBwQXw56c1tcTsW0gwfFBih42w4z~KBGkwGEJVya0SDwSvAKFngFx1cF2abWdf9YlaWLJlaN7S6vIBGXpl0XRzi5xTRCLluhtB1CDc1mLB0kVF7JJiCqYAUOVxL-Qx1guzQqJ5NRpSAyOIAb~wU1jgxJiV0n3UymnSUSTaL~OyhRp3bYmfSpf2XBkg__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Penelon, Penelon!\" An old man, who was digging busily at one of the beds, stuck his spade in the earth, and approached, cap in hand, striving to conceal a quid of tobacco he had just thrust into his cheek.",
+        "text_original": "Penelon, Penelon!\" An old man, who was digging busily at one of the beds, stuck his spade in the earth, and approached, cap in hand, striving to conceal a quid of tobacco he had just thrust into his cheek.",
+        "speaker_id": "55",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/55/121068/55_121068_000003_000001.wav",
+        "chapter_id": "121068",
+        "id": "55_121068_000003_000001"
+      }
+    },
+    {
+      "id": "30",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/21256/audio/audio.wav?Expires=1768144425&Signature=H~GX9efA7jgocQrgx05c5iZ~nGKWQZSuOB24WM7GTCtSddeb84cnfF5Tdcfe0LCQNAkMldbTcZQpFqbBf9TM38Cf0dlnIPLucpinqMv7~JQKVuGp9bHXtEPDJF1L2wKRqeurymiNib8TgwkY5T2dxyA~2MR~k28KW-S04ULYApONo~TtusituPvLDvoW66ynIwIbYwczjDIgER3W~5oL7QqtgMDnJhXsRmfXJoxEsEu1hlv52OkbQ2oasW8wiNXNma02e6tIUNPbYN0G5r1OIErpPVPpHc7XZbULnqTa8eN0CLJqL9pbEzKJ3S7UX-qZqRfw5NfgFRibJ4FUJvANvw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Sorrow came-a gentle sorrow-but not at all in the shape of any disagreeable consciousness.--Miss Taylor married.",
+        "text_original": "Sorrow came--a gentle sorrow--but not at all in the shape of any disagreeable consciousness.--Miss Taylor married.",
+        "speaker_id": "30",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/30/4445/30_4445_000011_000000.wav",
+        "chapter_id": "4445",
+        "id": "30_4445_000011_000000"
+      }
+    },
+    {
+      "id": "1335",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/21375/audio/audio.wav?Expires=1768144431&Signature=hq0cWvVRdPfWfTS9~W9M7LwDdftW~gS5hUfUjdRRfLEDqqO6DBG7Pg2K54xfE1Ha6IPZljsSCFdVNTBk2w3icoB5NkT4zlKMRB6pcluui3LIcaThfCzGNvg9zYCTR9RDWV~vLpX9TkQK6YmgWiFDHl47~3Z5~~tMrVGVGeDC7QlI1eTeovxWYctDikk-YRyzgOt4JjxUGhlkVRkm8IuANj-ouS7QgHnIFTxTYewEy0uMFLbZPPX10iBWlwHcNa41dq5wWtLc5ug12nT6~EPhrytqGRSVfndxhu48ld2ULGlyauhzumH3JCoD8JfT71bRxGkfU1As5JTORMNUOT2mMA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Joint the hind legs and backs of twelve frogs; put in a closely covered saucepan with some truffles, a small can of mushrooms sliced, a glass of white wine, salt, white pepper, cayenne, mace and four ounces of butter.",
+        "text_original": "Joint the hind legs and backs of twelve frogs; put in a closely covered saucepan with some truffles, a small can of mushrooms sliced, a glass of white wine, salt, white pepper, cayenne, mace and four ounces of butter.",
+        "speaker_id": "1335",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/1335/27593/1335_27593_000008_000000.wav",
+        "chapter_id": "27593",
+        "id": "1335_27593_000008_000000"
+      }
+    },
+    {
+      "id": "5876",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/21547/audio/audio.wav?Expires=1768144441&Signature=aC0WiJ0uo2k4odLWP60nYqt6p-BUY0ECHnyaWplYl3IYr4yPrgMlRIKFtcco5qHeC8XFjhYJdszwquz75tNWw1yxWH~buN0yzPp9RtZuYtXnCFJX~6G~9NVBz9R-Q7sTPbr5mPpJrs~4Mqxb5alHJK2wOoWNbfXuauXYiRvXku6dKD7CgVqqW7rIE5ZrC-SAxEvS6QawVLR9FNRN1ASJEUyt8bxqY8XAErj7CAh~06qXxtQnoLGFkcJlVIYUusWa58SzdQWv3k4b~e-Rx~1A3KXGmuAiU9DxPAalVAp6ePmi4Ogww1o9LQa10uHmjUSJ5bpNO0An78Dyvir-zXJluw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "We must next consider the work of adornment, first as to each day by itself, secondly as to all seven days in general.",
+        "text_original": "We must next consider the work of adornment, first as to each day by itself, secondly as to all seven days in general.",
+        "speaker_id": "5876",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/5876/10347/5876_10347_000000_000000.wav",
+        "chapter_id": "10347",
+        "id": "5876_10347_000000_000000"
+      }
+    },
+    {
+      "id": "1001",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/21728/audio/audio.wav?Expires=1768144450&Signature=f7uSJPS1~dIl7kOFs4wb19aSEmwChsNmEh2JA~nL2t0HZHFaNTnhaB0XOIWUXbv86~6F-XDu95nfqA9dTnVi0mlQbkZBiEWC-R26cjiCT1JXI4SDMyN~8ObF--tKxrBng4DmV8~4npIiMM~~72wubQ143uaBbn~UKQiN85fyY8cAOAkTHHHJG2xaT21vD6HOe67HoygnkVm4GZpzzXiFpE~Fil93ca8cbZAVYJCPQkrDFTfXSR12~m7frkCqRR1tiOBqj09o3t4WuaCCUguiZgX9qdwPk2M-MRKedEoofS8DMq5McC9rqBge7vfwg10e76sBz80AIzeAfX8nx1lnjQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "For man of you, your characteristic race, Here may he hardy, sweet, gigantic grow, here tower proportionate to Nature, Here climb the vast pure spaces unconfined, uncheck'd by wall or roof, Here laugh with storm or sun, here joy, here patiently inure, Here heed himself, unfold himself, (not others' formulas heed,) here fill his time, To duly fall, to aid, unreck'd at last, To disappear, to serve.",
+        "text_original": "For man of you, your characteristic race, Here may he hardy, sweet, gigantic grow, here tower proportionate to Nature, Here climb the vast pure spaces unconfined, uncheck'd by wall or roof, Here laugh with storm or sun, here joy, here patiently inure, Here heed himself, unfold himself, (not others' formulas heed,) here fill his time, To duly fall, to aid, unreck'd at last, To disappear, to serve.",
+        "speaker_id": "1001",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/1001/134708/1001_134708_000013_000000.wav",
+        "chapter_id": "134708",
+        "id": "1001_134708_000013_000000"
+      }
+    },
+    {
+      "id": "2812",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/21729/audio/audio.wav?Expires=1768144450&Signature=N8ZtmOt6uD6Mazd1JnFKMZZibilFObXQB-BLaJOawbstEkE8U6vc9VsM9S0DNpbojZYs5xdCO5tEEDUO30kUKvR7y~bPyVtZYIfIdqiYBciB0wPbcRz1ik29e26Ix8zIfJ~dp4m1LlDYFDWDpF0w1c34OP~kxj-AK5g1p491Zt0tSMv5jph86PvQru1ffDVYSj6wC7Eu3YDiFacUFEMFVUGu277JhGpyKD~YiaJEc-bkkL7zEQYbRoSegJo3XJmxibrIp2Q7S8AG6Mt0tdNCQJ1qb9F4UTawjk4S57VDci7JC2ci-ZHEbgYZ76zUHmgJg0nnVwYYPh-TzV~Kih8QPw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Our eyes beheld Messiah certainly now come, so long Expected of our fathers; we have heard His words, his wisdom full of grace and truth. 'Now, now, for sure, deliverance is at hand; The kingdom shall to Israel be restored:' Thus we rejoiced, but soon our joy is turned Into perplexity and new amaze. For whither is he gone?",
+        "text_original": "Our eyes beheld Messiah certainly now come, so long Expected of our fathers; we have heard His words, his wisdom full of grace and truth. 'Now, now, for sure, deliverance is at hand; The kingdom shall to Israel be restored:' Thus we rejoiced, but soon our joy is turned Into perplexity and new amaze. For whither is he gone?",
+        "speaker_id": "2812",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/2812/160187/2812_160187_000001_000001.wav",
+        "chapter_id": "160187",
+        "id": "2812_160187_000001_000001"
+      }
+    },
+    {
+      "id": "3513",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/21742/audio/audio.wav?Expires=1768144450&Signature=PAQSOU1zK4UzK~pLtqyvUC~yOumgth0RvwhyHPyVrvURWN0U6LX1nkdejBD3-KFQgFsZLaUfOTz8vDXTvXuwrpGxErH4ZXAqY03OwXesVdOTp9y0ceDUF2HP9GjfnLG4I1-0yhoORCkm4UpRm~ZojZPZ2nZO9ma7QwL-5g1W-mFGQWHk8LObBuxfOjUI2jr474qsUzxh4NOfCxyFJSS6e5zFk5yKynw4eOs55ioVYZfql7CLa451q-~lQEL~~nAdWspOl5JxQuv6--OFp9lUJDyZgjMsbD2xUMeTS9sYDAwDSrRw9yYBnrpKW6J~P~B-9Xew5bIfmNP2rUx4g-O4ew__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Drakestail said to himself: 'One can't have too many friends.' ... 'I will,' says he, 'but with your wooden legs you will soon be tired.",
+        "text_original": "Drakestail said to himself: 'One can't have too many friends.' ... 'I will,' says he, 'but with your wooden legs you will soon be tired.",
+        "speaker_id": "3513",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/3513/163606/3513_163606_000015_000000.wav",
+        "chapter_id": "163606",
+        "id": "3513_163606_000015_000000"
+      }
+    },
+    {
+      "id": "2531",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/21892/audio/audio.wav?Expires=1768144458&Signature=Ho3rSQ5kK3ZkvziQlDvRBfvfaL7L0oJ6pfWjVp81ihulNgqdq6kc9ovoyfmva8~jHB5ZKVZSuMJ8XmsDDMkUuOQ5Y~UFff7GGOzzNa9q4skARemzY8G~~eLdGc5axYPngYCagTYoGSEdFLXYL2INv7EsmHCFdeFW6qP0cnB4oBYnBa1BC34Y41q2GhcEfZkcLyh~~Pogt0N7ECi33-EzI117BgRYkHUaRovH2PmPOSzyNJR9aLRnKbm1R8Kxfl0HfKaFC72qE8AulbjQLTiBEcPV1Q~HKB9Sc9sp3HW~C9yS~-xjcxHbC80CDbFGi~Q5Hzj5zdthUd7fLPRj-NNDwQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "All the way there David had saved this moment for himself, struggling not to peek until the proper time came.",
+        "text_original": "All the way there David had saved this moment for himself, struggling not to peek until the proper time came.",
+        "speaker_id": "2531",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/2531/156718/2531_156718_000009_000000.wav",
+        "chapter_id": "156718",
+        "id": "2531_156718_000009_000000"
+      }
+    },
+    {
+      "id": "8591",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/22274/audio/audio.wav?Expires=1768144475&Signature=Xo-iZo5753TDFDwTVoTCPrs~lXCfR3HvWAm9rhf~OizOTuz8SmFWTpjClHkNiOe6TmBWe0vXip9tBErMdy3P3V5P1RL1nofJsRGkaeWJB1oFOWOPQZgStda38B1-rLlEqPevJGhdye5yczdaH5T5zjeYH0CSNpKyIDemyqq73hvFN1HpUxOcP0GFwFTfm9CZgm-68505hD515RrnRkYsrxbcmLL6VzFZOOMBe1PNz5ymMCw1nSsNqDoeI4WwxTP4oWJsZTqosB29zvbV1RZ~Ns8TqY2n-M7JuQH6POWzSIrycoRuyLUO988mRIUbc7R5cLnbUW5g~LlbXhzfa7-Y8Q__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "The cord didn't wind around the Pinkie, as he was too far off, but the weight hit him in the eye and made him howl lustily as he trotted back to his comrades at full speed.",
+        "text_original": "The cord didn't wind around the Pinkie, as he was too far off, but the weight hit him in the eye and made him howl lustily as he trotted back to his comrades at full speed.",
+        "speaker_id": "8591",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/8591/284444/8591_284444_000007_000001.wav",
+        "chapter_id": "284444",
+        "id": "8591_284444_000007_000001"
+      }
+    },
+    {
+      "id": "7051",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/22427/audio/audio.wav?Expires=1768144484&Signature=tV8gQH45sT3yoNfheqyFlucUPuBc~~miUgZPN0RoqTfivbgNyvP3Jmf1cfDWYuUhMq3JjtwVpd2XDtUs2DgqEOHFZPUmMrirVLcRj1Tpk8oySFZc7R~fAacHgx6ZPRDch0T-ZgdMH8wARcMI63oLbzTJjoef25WSQ0VR~zRcuzP7nMF3dHULhVNprSYbpGBq4Lx4jTeRB~gnrK2rLMnkWU-dlaY2hw4gJpS2qifx52PyCX80Ux5yQonkCqG1L0dLWHIqHy5jwhjCWGKoU~Y3EX4-m4krjKyTXFHDX2H6zRf1NeLR6RSyGSvpT-K~vf2HJHPsQ8uLa1UXuYmcUZ11ag__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "While the economists of that day believed the conditions of poverty and misery to be inevitable, the pessimists pronounced them unendurable, and advocated a radical social change as the only hope of saving the masses from starvation.",
+        "text_original": "While the economists of that day believed the conditions of poverty and misery to be inevitable, the pessimists pronounced them unendurable, and advocated a radical social change as the only hope of saving the masses from starvation.",
+        "speaker_id": "7051",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/7051/259009/7051_259009_000008_000013.wav",
+        "chapter_id": "259009",
+        "id": "7051_259009_000008_000013"
+      }
+    },
+    {
+      "id": "2638",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/22494/audio/audio.wav?Expires=1768144485&Signature=GfwPfMCMNycWcMuPJBkp6nDmKe6KIoY3lJ~9xD6BD9QOObO0LRr6oNeuyYyRtrvrnidZxBqQOCZos2dYGdqi7UcMmJyxGuBik1cAcD0Lzd1LoXtUqV4MBh2TbUF1m9PrVZE5~xeW-C6YKda34ozxjyfUIBanQzKSxjzh5defU-K-EieUysDbCvxfOSoZFVl~u~VVOmDNRm9AiJfEkEjw-rrWVorKmFZVxk9hPQZ3gPn8F0lKy7Irn7lIbuAaYG4xsLvunn21soSqTZZXC-5ckx~y3jL4W1sBPVUjdOo3ZTzMGFeV0MdUBmCMo-8UltUU8L3sbC2~nF1YdKp5Cwtc4g__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Captain Wragge gleaned the human field, and on that unoccupied afternoon the York terminus was as likely a corner to look about in as any other.",
+        "text_original": "Captain Wragge gleaned the human field, and on that unoccupied afternoon the York terminus was as likely a corner to look about in as any other.",
+        "speaker_id": "2638",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/2638/10172/2638_10172_000006_000006.wav",
+        "chapter_id": "10172",
+        "id": "2638_10172_000006_000006"
+      }
+    },
+    {
+      "id": "119",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/22672/audio/audio.wav?Expires=1768144496&Signature=MnvyPQAw4kxS5T8Au7rfaLECbmJyF6OgOB5C0woxv0JLAkpDqT9vmadfnHYx8mLkRbwlbYC6sPjslQ83krBAUu6mVZtFH9WiL3BDEZa3DPwLXhIjsQmT0xPCUdl96keiazlN4SEK9~4g3eIqakv8BpGrZgom2cZXIC2SqKDp0yMKCRMBKSuDggF5EEVw-zmamrOcDcX2VgZtCWK~6iF5TlrlM7cU4GbdrBk8Ua0g1cSMhF9fUzDxlAi45CYG5ZBVZERUXR0fxWtzqHXG-gSVPaPVjuCiPD6B8QucVEeskgUU2UcElQ6OvFIGF9QlvQ9nr9deDPtXjS5BitLyrXn2JA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Simple tradesmen jumped their counters to become extemporized captains, colonels, and generals, without having ever passed the School of Instruction at West Point; nevertheless; they quickly rivaled their compeers of the old continent, and, like them, carried off victories by dint of lavish expenditure in ammunition, money, and men.",
+        "text_original": "Simple tradesmen jumped their counters to become extemporized captains, colonels, and generals, without having ever passed the School of Instruction at West Point; nevertheless; they quickly rivaled their compeers of the old continent, and, like them, carried off victories by dint of lavish expenditure in ammunition, money, and men.",
+        "speaker_id": "119",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/119/129513/119_129513_000003_000001.wav",
+        "chapter_id": "129513",
+        "id": "119_129513_000003_000001"
+      }
+    },
+    {
+      "id": "8635",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/22751/audio/audio.wav?Expires=1768144501&Signature=NFRKnWqLNTvUpEYma210hphLXMUQxy2k5qqDlaZ9N91hQ7ki320Ieau-uBKU7yCl72D7jeAllNT9~sSDkD-O-FGgR-3SBBoU5UIaX5fWzjLJHnxot4GHF9HiBG02fbk6IHeMxq4AHk2O95Rne3rbew~386JX71itP-qXhbuNWiXA-34BgosBEwO1rHCbwg1iez1xTMFTPAXAH5fOZTwWnNjEBJmBmCBf8wqKKXj0LzYjRCn09N7fzQr5pAXM61qJcNgo87Dfes9s5aUgx8FK8-N7m5-W35SoETu2-3urwQkIkFUcujbCWjHmrhoXgFathgnrVVYKunWGn25fUZ6fCQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "They were fond of the chase, and were well armed with knives and guns, and looked quite like a tribe of red skins as they came out of the wood.",
+        "text_original": "They were fond of the chase, and were well-armed with knives and guns, and looked quite like a tribe of red-skins as they came out of the wood.",
+        "speaker_id": "8635",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/8635/295759/8635_295759_000016_000001.wav",
+        "chapter_id": "295759",
+        "id": "8635_295759_000016_000001"
+      }
+    },
+    {
+      "id": "7540",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/22864/audio/audio.wav?Expires=1768144506&Signature=Zb4B271VoReY~cxAaAiU~XRJpLA98kOqR2M9kZmD~qe12rRh4BJhUqrMh6QFAB-Yos2oSmAdKVVUAyBcMPkPDZQ6MbpobqUZsMfyqiepLQzbN6EOJdNrmq6zFd76bhA4Ba1DIpAiA4TdeSc4X-vgO~-6iuPiejMY-ljUB2rreZ4KBoLFkdzLsqXJzTT~hPcx-fAjrMYPsUfgthSQ342ghAkjFZ42cSztsrbodWUEmJqhwUuj63jtqhxDZqSDwQ-XcBvgLDLDBjm79zjWc~MNER01rcaVnFvuxGvVMDKZH2bZGXSmZz~LRpIyqZq0zgJ0wYx8w1ysiI24n0MHddPI4A__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "The three old men stood in the middle of the loft, leaning on their sticks, with their long grey beards flowing down over their hands, and were talking together in low voices.",
+        "text_original": "The three old men stood in the middle of the loft, leaning on their sticks, with their long grey beards flowing down over their hands, and were talking together in low voices.",
+        "speaker_id": "7540",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/7540/101258/7540_101258_000006_000000.wav",
+        "chapter_id": "101258",
+        "id": "7540_101258_000006_000000"
+      }
     }
   ],
-  "scannedRows": 21000,
+  "scannedRows": 23000,
   "totalRows": 116500
 }
