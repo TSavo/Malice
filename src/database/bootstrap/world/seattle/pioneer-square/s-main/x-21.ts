@@ -10,6 +10,8 @@ IVAR'S ACRES OF CLAMS occupies the corner building, a Seattle institution since 
   x: -21,
   y: 0,
   z: 0,
+
+  imageOnDisk: 'alaskan-way-s-main-st-x-21-y0-z0.png',
   intersection: ['Alaskan Way', 'S. Main St'],
   // Environmental properties
   population: 0, // Empty (post-Event)

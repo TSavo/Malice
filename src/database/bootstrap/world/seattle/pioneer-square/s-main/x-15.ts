@@ -10,6 +10,8 @@ A brass plaque mounted on one building commemorates the 1889 fire that destroyed
   x: -15,
   y: 0,
   z: 0,
+
+  imageOnDisk: 's-main-st-x-15-y0-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,
