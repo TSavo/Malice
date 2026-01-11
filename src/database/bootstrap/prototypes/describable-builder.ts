@@ -1210,6 +1210,10 @@ export class DescribableBuilder implements Builder {
       'Natural language instruction for how to speak, e.g., "speak slowly and menacingly" or "cheerful and energetic"',
     );
     obj.setPropertyDescription(
+      'voiceSeed',
+      'Seed offset for voice selection. Increment this value to reroll to a different voice (used by rerollVoice())',
+    );
+    obj.setPropertyDescription(
       'imagePrompt',
       'Template for AI image generation with ${variable} substitution (e.g., "${name}: ${description}")',
     );

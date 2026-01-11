@@ -123,6 +123,56 @@ describe('TTS Integration', () => {
       const voice = await obj.call('getVoiceId');
       expect(obj.voiceId).toBe(voice);
     });
+
+    it('should reroll voice and increment voiceSeed', async () => {
+      const obj = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Reroll Test' },
+        },
+        null,
+      );
+
+      // Initial state: voiceSeed should be 0
+      expect(obj.voiceSeed).toBe(0);
+
+      // Get initial voice
+      const voice1 = await obj.call('getVoiceId');
+      expect(typeof voice1).toBe('string');
+      expect(obj.voiceId).toBe(voice1);
+
+      // Reroll voice - should increment voiceSeed and clear cached voiceId
+      const voice2 = await obj.call('rerollVoice');
+      expect(obj.voiceSeed).toBe(1);
+      expect(obj.voiceId).toBe(voice2);
+      expect(typeof voice2).toBe('string');
+
+      // Reroll again
+      const voice3 = await obj.call('rerollVoice');
+      expect(obj.voiceSeed).toBe(2);
+      expect(obj.voiceId).toBe(voice3);
+      expect(typeof voice3).toBe('string');
+    });
+
+    it('should reroll voice with gender override', async () => {
+      const obj = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Gender Override Test', sex: 'male' },
+        },
+        null,
+      );
+
+      // Reroll with female gender override
+      const femaleVoice = await obj.call('rerollVoice', 'female');
+      expect(obj.voiceSeed).toBe(1);
+      expect(typeof femaleVoice).toBe('string');
+
+      // Reroll with male gender override
+      const maleVoice = await obj.call('rerollVoice', 'male');
+      expect(obj.voiceSeed).toBe(2);
+      expect(typeof maleVoice).toBe('string');
+    });
   });
 
   describe('say(message) - Speech broadcasting', () => {
