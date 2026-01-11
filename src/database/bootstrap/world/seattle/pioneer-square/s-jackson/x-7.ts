@@ -10,6 +10,8 @@ PIKE PLACE FLOWERS occupied the corner building, its refrigerated display cases 
   x: -7,
   y: -6,
   z: 0,
+
+  imageOnDisk: 'occidental-ave-s-s-jackson-st-x-7-y-6-z0.png',
   intersection: ['Occidental Ave S', 'S. Jackson St'],
   // Environmental properties
   population: 0, // Empty (post-Event)

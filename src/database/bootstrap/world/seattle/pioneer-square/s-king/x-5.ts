@@ -11,6 +11,8 @@ The buildings along this stretch show varied construction spanning eras—early 
   y: -12,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-king-st-x-5-y-12-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

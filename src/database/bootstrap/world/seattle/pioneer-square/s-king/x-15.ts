@@ -10,6 +10,8 @@ The sinkhole's edge is visible to the north, its flooded depression a constant p
   x: -15,
   y: -12,
   z: 0,
+
+  imageOnDisk: 's-king-st-x-15-y-12-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

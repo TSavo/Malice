@@ -11,6 +11,8 @@ A fire hydrant stands at the corner, painted Seattle yellow, the color mandated 
   y: 0,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-main-st-x-16-y0-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

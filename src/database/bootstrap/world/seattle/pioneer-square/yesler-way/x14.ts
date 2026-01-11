@@ -13,6 +13,8 @@ This is as far east as you can go. The International District lies beyond the ba
   x: 14,
   y: 12,
   z: 0,
+
+  imageOnDisk: '4th-ave-s-yesler-way-x14-y12-z0.png',
   intersection: ['4th Ave S', 'Yesler Way'],
   // Environmental properties
   population: 0, // Empty (post-Event)

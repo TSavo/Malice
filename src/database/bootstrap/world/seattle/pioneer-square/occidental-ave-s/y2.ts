@@ -11,6 +11,8 @@ Concrete planters flank the walkway, their metal cages meant to discourage skate
   y: 2,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'occidental-ave-s-x-7-y2-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

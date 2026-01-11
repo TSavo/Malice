@@ -11,6 +11,8 @@ OBLIQUE STRATEGIES reads the plaque beneath a public art installation—steel ro
   y: 7,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'occidental-ave-s-x-7-y7-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

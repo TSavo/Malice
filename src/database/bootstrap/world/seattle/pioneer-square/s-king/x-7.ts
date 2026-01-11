@@ -10,6 +10,8 @@ The streetscape transitions here: Occidental's cracked cobblestones ending where
   x: -7,
   y: -12,
   z: 0,
+
+  imageOnDisk: 'occidental-ave-s-s-king-st-x-7-y-12-z0.png',
   intersection: ['Occidental Ave S', 'S. King St'],
   // Environmental properties
   population: 0, // Empty (post-Event)

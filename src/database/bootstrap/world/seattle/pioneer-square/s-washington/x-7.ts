@@ -10,6 +10,8 @@ The buildings surrounding the park maintain their Victorian facades—arched win
   x: -7,
   y: 6,
   z: 0,
+
+  imageOnDisk: 'occidental-ave-s-s-washington-st-x-7-y6-z0.png',
   intersection: ['Occidental Ave S', 'S. Washington St'],
   // Environmental properties
   population: 0, // Empty (post-Event)

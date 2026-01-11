@@ -11,6 +11,8 @@ Yesler Way continues east toward 2nd Ave and west toward Occidental. The street'
   y: 12,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'yesler-way-x-2-y12-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 15, // Occasional wind through tower
   lighting: 100, // Daylight (outdoor)

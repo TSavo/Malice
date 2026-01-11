@@ -51,6 +51,7 @@ bun scripts/generate-room-images.ts --world-only    # Only world rooms
 bun scripts/generate-room-images.ts --buildings-only # Only building rooms
 bun scripts/generate-room-images.ts --underground   # Only underground rooms (z < 0)
 bun scripts/generate-room-images.ts --surface       # Only surface rooms (z >= 0)
+bun scripts/generate-room-images.ts --parallel 3    # Process 3 rooms concurrently (default: 2)
 ```
 
 ## Architecture

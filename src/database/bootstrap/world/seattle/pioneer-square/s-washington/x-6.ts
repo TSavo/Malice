@@ -11,6 +11,8 @@ The building opposite held a pottery studio, FIREHOUSE CLAY, its name a referenc
   y: 6,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-washington-st-x-6-y6-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

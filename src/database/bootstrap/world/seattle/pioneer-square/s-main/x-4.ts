@@ -11,6 +11,8 @@ A Seattle Times newspaper box stands at the corner, its window displaying a fron
   y: 0,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-main-st-x-4-y0-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

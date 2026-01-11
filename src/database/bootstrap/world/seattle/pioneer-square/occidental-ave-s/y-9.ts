@@ -10,6 +10,8 @@ The street narrows where debris has spilled across the roadway, forcing passage 
   x: -7,
   y: -9,
   z: 0,
+
+  imageOnDisk: 'occidental-ave-s-x-7-y-9-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

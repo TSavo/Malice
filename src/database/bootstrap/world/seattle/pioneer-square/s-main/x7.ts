@@ -10,6 +10,8 @@ Parking meters line the curb in ranks, their mechanical faces showing TIME EXPIR
   x: 7,
   y: 0,
   z: 0,
+
+  imageOnDisk: '3rd-ave-s-s-main-st-x7-y0-z0.png',
   intersection: ['3rd Ave S', 'S. Main St'],
   // Environmental properties
   population: 0, // Empty (post-Event)

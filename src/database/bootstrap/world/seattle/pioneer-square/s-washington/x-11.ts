@@ -11,6 +11,8 @@ The building's upper floors hold apartments, their windows curtained or bare, th
   y: 6,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-washington-st-x-11-y6-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

@@ -12,6 +12,8 @@ The market continues east. Occidental Park opens to the south.`,
   x: -6,
   y: 5,
   z: 0,
+
+  imageOnDisk: 'occidental-mall-x-6-y5-z0.png',
   population: 0,
   ambientNoise: 10,
   lighting: 100,

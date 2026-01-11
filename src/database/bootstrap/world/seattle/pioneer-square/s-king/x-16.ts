@@ -11,6 +11,8 @@ The buildings along this stretch date to the 1920s and 1930s, brick facades repl
   y: -12,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-king-st-x-16-y-12-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

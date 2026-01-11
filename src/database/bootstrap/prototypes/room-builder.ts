@@ -977,6 +977,17 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       // Get base prompt config from parent (walks inheritance)
       const baseConfig = await pass();
 
+      // Sanitize prompt to remove --, em-dashes, en-dashes which Midjourney interprets as parameters
+      // Also replace " -N" (space-dash-number) patterns like "Level -3" with "Level minus 3"
+      // Note: Use [0-9] instead of \\d because this code is stored as a string
+      const sanitize = (p) => p
+        .replace(/--/g, '-')
+        .replace(/—/g, '-')
+        .replace(/–/g, '-')
+        .replace(/ -([0-9])/g, ' minus $1')
+        .replace(/\\n/g, ' ')
+        .replace(/\\s+/g, ' ');
+
       // Put room-specific description FIRST (more prominent in Midjourney)
       // Then add generic context SECOND (less influence)
       if (baseConfig && typeof baseConfig === 'object') {
@@ -984,16 +995,16 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
         const roomPrompt = baseConfig.prompt || '';
         return {
           ...baseConfig,
-          prompt: roomPrompt + ' ' + context,
+          prompt: sanitize(roomPrompt + ' ' + context),
         };
       } else if (baseConfig && typeof baseConfig === 'string') {
         // Legacy fallback if parent returns string
-        return { prompt: baseConfig + ' ' + context };
+        return { prompt: sanitize(baseConfig + ' ' + context) };
       }
 
       // Fallback if no imagePrompt defined anywhere
       const fallbackPrompt = self.name + ': ' + (self.description || '');
-      return { prompt: fallbackPrompt + ' ' + context };
+      return { prompt: sanitize(fallbackPrompt + ' ' + context) };
     `,
     );
 

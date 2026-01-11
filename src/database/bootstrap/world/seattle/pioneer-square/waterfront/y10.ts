@@ -15,6 +15,8 @@ To the west, Elliott Bay offers nothing but grey water and the distant promise o
   y: 10,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'alaskan-way-x-21-y10-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

@@ -10,6 +10,8 @@ A seawall overlook interrupts the streetscape, a small plaza with benches facing
   x: -15,
   y: 6,
   z: 0,
+
+  imageOnDisk: 's-washington-st-x-15-y6-z0.png',
   population: 0,
   ambientNoise: 10,
   lighting: 100,

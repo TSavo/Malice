@@ -12,6 +12,8 @@ Wind comes off the bay carrying the smell of salt and marine decay—seaweed rot
   x: -21,
   y: 6,
   z: 0,
+
+  imageOnDisk: 's-washington-st-x-21-y6-z0.png',
   intersection: ['Waterfront', 'S. Washington St'],
   // Environmental properties
   population: 0, // Empty (post-Event)

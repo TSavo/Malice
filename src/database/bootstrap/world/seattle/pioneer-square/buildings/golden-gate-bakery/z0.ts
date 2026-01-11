@@ -86,6 +86,7 @@ The air should smell of baked goods: yeast and sugar and the red bean paste that
       x: 5,
       y: -12,
       z: 0,
+      imageOnDisk: 's-king-st-x5-y-12-z0.png',
       population: 0,
       ambientNoise: 0,
       lighting: 50,

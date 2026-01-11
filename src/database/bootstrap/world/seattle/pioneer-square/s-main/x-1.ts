@@ -10,6 +10,8 @@ Occidental Park is visible to the north, its dead trees standing sentinel over t
   x: -1,
   y: 0,
   z: 0,
+
+  imageOnDisk: 's-main-st-x-1-y0-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

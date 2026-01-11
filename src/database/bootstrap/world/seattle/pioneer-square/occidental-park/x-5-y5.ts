@@ -12,6 +12,8 @@ The smell of rotting fruit is long gone. Only brick and wood and the faint green
   x: -5,
   y: 5,
   z: 0,
+
+  imageOnDisk: 'occidental-mall-x-5-y5-z0.png',
   population: 0,
   ambientNoise: 10,
   lighting: 100,

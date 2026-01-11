@@ -10,6 +10,8 @@ The buildings at this intersection represent different eras of Seattle developme
   x: -14,
   y: -6,
   z: 0,
+
+  imageOnDisk: '1st-ave-s-s-jackson-st-x-14-y-6-z0.png',
   intersection: ['1st Ave S', 'S. Jackson St'],
   // Environmental properties
   population: 0, // Empty (post-Event)

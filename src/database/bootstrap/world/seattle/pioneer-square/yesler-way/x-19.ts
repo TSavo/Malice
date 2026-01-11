@@ -11,6 +11,8 @@ The debris wall rises beyond the furniture store—collapsed structures and accu
   y: 12,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'yesler-way-x-19-y12-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

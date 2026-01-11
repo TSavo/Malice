@@ -11,6 +11,8 @@ Third Avenue is visible ahead, the intersection threading between the debris fie
   y: 6,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-washington-st-x4-y6-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

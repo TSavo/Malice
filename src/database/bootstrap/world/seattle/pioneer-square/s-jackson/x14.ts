@@ -12,6 +12,8 @@ CATHAY BANK occupies the corner building, its windows dark. This is as far east 
   x: 14,
   y: -6,
   z: 0,
+
+  imageOnDisk: '4th-ave-s-s-jackson-st-x14-y-6-z0.png',
   intersection: ['4th Ave S', 'S. Jackson St'],
   // Environmental properties
   population: 0, // Empty (post-Event)

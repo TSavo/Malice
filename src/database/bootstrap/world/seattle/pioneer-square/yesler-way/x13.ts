@@ -10,6 +10,8 @@ The light rail crater is visible to the west, its flooded depression marking the
   x: 13,
   y: 12,
   z: 0,
+
+  imageOnDisk: 'yesler-way-x13-y12-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

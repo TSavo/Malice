@@ -10,6 +10,8 @@ The street is quieter here than at the main intersections, the foot traffic that
   x: 6,
   y: -6,
   z: 0,
+
+  imageOnDisk: 's-jackson-st-x6-y-6-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

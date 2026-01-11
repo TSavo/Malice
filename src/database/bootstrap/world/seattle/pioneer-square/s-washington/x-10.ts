@@ -11,6 +11,8 @@ Occidental Park opens at the end of the block, the iron pergola visible through 
   y: 6,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-washington-st-x-10-y6-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

@@ -11,6 +11,8 @@ The brick plaza stretches away in all directions, sun-faded and cracked. But her
   y: 1,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'occidental-park-x-3-y1-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 15, // Open plaza, wind across brick
   lighting: 100, // Full daylight (open space)

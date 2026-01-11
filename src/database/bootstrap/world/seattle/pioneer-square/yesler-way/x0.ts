@@ -11,6 +11,8 @@ The street grid shifts at this intersection, a quirk of Seattle's founding visib
   x: 0,
   y: 12,
   z: 0,
+
+  imageOnDisk: '2nd-ave-s-yesler-way-x0-y12-z0.png',
   intersection: ['2nd Ave S', 'Yesler Way'],
   // Environmental properties
   population: 0, // Empty (post-Event)

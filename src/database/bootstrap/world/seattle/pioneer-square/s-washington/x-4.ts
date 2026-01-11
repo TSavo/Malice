@@ -11,6 +11,8 @@ A bronze plaque mounted on the brick facade marks this as a Seattle Landmark, ex
   y: 6,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-washington-st-x-4-y6-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

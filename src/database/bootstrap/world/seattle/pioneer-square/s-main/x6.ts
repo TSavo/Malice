@@ -10,6 +10,8 @@ A former coffee shop occupies one corner, its espresso machine still visible thr
   x: 6,
   y: 0,
   z: 0,
+
+  imageOnDisk: 's-main-st-x6-y0-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

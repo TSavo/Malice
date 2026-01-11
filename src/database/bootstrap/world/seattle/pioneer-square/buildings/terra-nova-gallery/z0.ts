@@ -127,6 +127,7 @@ A small safe sits in the corner, its door hanging open, its contents long since 
       x: -16,
       y: -6,
       z: 0,
+      imageOnDisk: 's-jackson-st-x-16-y-6-z0.png',
       population: 0,
       ambientNoise: 2,
       lighting: 35,

@@ -11,6 +11,8 @@ A fire escape descends the building opposite, cast iron stairs zigzagging down t
   y: 0,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-main-st-x-11-y0-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

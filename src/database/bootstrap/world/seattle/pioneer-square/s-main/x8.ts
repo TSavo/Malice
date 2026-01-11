@@ -11,6 +11,8 @@ A flagpole rises from the courthouse plaza, aluminum and hollow, its rope slappi
   y: 0,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-main-st-x8-y0-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

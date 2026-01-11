@@ -10,6 +10,8 @@ A traditional herbalist shop occupies one corner, its windows still displaying t
   x: 13,
   y: -6,
   z: 0,
+
+  imageOnDisk: 's-jackson-st-x13-y-6-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

@@ -10,6 +10,8 @@ Fire escapes zigzag down the eastern building's facade, their metal ladders exte
   x: -7,
   y: -7,
   z: 0,
+
+  imageOnDisk: 'occidental-ave-s-x-7-y-7-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

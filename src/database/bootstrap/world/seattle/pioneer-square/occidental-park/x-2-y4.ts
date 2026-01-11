@@ -11,6 +11,8 @@ The soil in the planter has shrunk away from the concrete edges, cracked and dry
   y: 4,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'occidental-park-x-2-y4-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 15, // Open plaza, wind across brick
   lighting: 100, // Full daylight (open space)

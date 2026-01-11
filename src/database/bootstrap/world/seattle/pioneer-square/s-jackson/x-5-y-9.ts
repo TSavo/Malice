@@ -12,6 +12,8 @@ The plaza is empty now, its benches gone or broken, its lampposts dark. This was
   y: -9,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-jackson-st-union-station-plaza-x-5-y-9-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

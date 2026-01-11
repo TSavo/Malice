@@ -11,6 +11,8 @@ S. Washington Street is visible beyond the park's northern edge, Victorian build
   y: 4,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'occidental-park-x-1-y4-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 15, // Open plaza, wind across brick
   lighting: 100, // Full daylight (open space)

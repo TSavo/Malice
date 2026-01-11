@@ -12,6 +12,8 @@ The waterfront continues north and south along the seawall. The bay continues we
   x: -21,
   y: -1,
   z: 0,
+
+  imageOnDisk: 'waterfront-x-21-y-1-z0.png',
   population: 0,
   ambientNoise: 15,
   lighting: 100,

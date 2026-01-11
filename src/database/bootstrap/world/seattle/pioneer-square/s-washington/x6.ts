@@ -10,6 +10,8 @@ The contrast is stark: corporate activity on one side, abandonment on the other.
   x: 6,
   y: 6,
   z: 0,
+
+  imageOnDisk: 's-washington-st-x6-y6-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

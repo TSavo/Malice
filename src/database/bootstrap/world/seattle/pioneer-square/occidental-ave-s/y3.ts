@@ -11,6 +11,8 @@ A bicycle pump is chained to a stand bolted into the cobblestones, one of those 
   y: 3,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'occidental-ave-s-x-7-y3-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

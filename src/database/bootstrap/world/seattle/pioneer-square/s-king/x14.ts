@@ -12,6 +12,8 @@ Fourth Avenue continues north from here. King Street continues west. East is a d
   x: 14,
   y: -12,
   z: 0,
+
+  imageOnDisk: '4th-ave-s-s-king-st-x14-y-12-z0.png',
   intersection: ['4th Ave S', 'S. King St'],
   // Environmental properties
   population: 0, // Empty (post-Event)

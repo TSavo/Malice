@@ -88,6 +88,7 @@ The air smells of mildew and decay, the ghost of detergent long since overwhelme
       x: -9,
       y: 12,
       z: 0,
+      imageOnDisk: 'yesler-way-x-9-y12-z0.png',
       population: 0,
       ambientNoise: 0,
       lighting: 45,

@@ -10,6 +10,8 @@ PACIFIC WIRELESS occupies the corner building, its windows smashed, its inventor
   x: 7,
   y: -12,
   z: 0,
+
+  imageOnDisk: '3rd-ave-s-s-king-st-x7-y-12-z0.png',
   intersection: ['3rd Ave S', 'S. King St'],
   // Environmental properties
   population: 0, // Empty (post-Event)

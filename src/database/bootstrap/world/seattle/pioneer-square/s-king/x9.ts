@@ -11,6 +11,8 @@ A fire hydrant at the corner is painted in red and gold, the auspicious colors f
   y: -12,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-king-st-x9-y-12-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

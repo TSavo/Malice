@@ -10,6 +10,8 @@ Broken glass crunches underfoot where it's collected in the gaps between cobbles
   x: -7,
   y: -8,
   z: 0,
+
+  imageOnDisk: 'occidental-ave-s-x-7-y-8-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

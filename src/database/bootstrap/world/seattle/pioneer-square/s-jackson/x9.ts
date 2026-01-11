@@ -11,6 +11,8 @@ A mural covers the windowless wall of the adjacent building, depicting the neigh
   y: -6,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-jackson-st-x9-y-6-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

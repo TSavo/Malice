@@ -11,6 +11,8 @@ The viaduct's former alignment is legible in the landscape: the spacing between 
   y: -12,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-king-st-x-18-y-12-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

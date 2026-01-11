@@ -11,6 +11,8 @@ The wind shifts, carrying the smell of salt from the bay mixed with the musty sc
   y: 2,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'occidental-park-x-1-y2-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 15, // Open plaza, wind across brick
   lighting: 100, // Full daylight (open space)

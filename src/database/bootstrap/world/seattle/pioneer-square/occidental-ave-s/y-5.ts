@@ -11,6 +11,8 @@ Cafe tables lie scattered across the bricks like debris from an explosion of lei
   y: -5,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'occidental-ave-s-x-7-y-5-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

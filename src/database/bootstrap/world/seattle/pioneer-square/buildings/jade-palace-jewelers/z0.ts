@@ -107,6 +107,7 @@ The air smells of decades: dust and the faint chemical memory of jewelry cleaner
       x: 11,
       y: -6,
       z: 0,
+      imageOnDisk: 's-jackson-st-x11-y-6-z0.png',
       population: 0,
       ambientNoise: 0,
       lighting: 30,

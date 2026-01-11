@@ -10,6 +10,8 @@ A street corner that once hosted a flower vendor's cart shows the wear pattern o
   x: -1,
   y: -6,
   z: 0,
+
+  imageOnDisk: 's-jackson-st-x-1-y-6-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

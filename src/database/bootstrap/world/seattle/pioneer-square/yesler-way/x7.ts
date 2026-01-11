@@ -13,6 +13,8 @@ Third Avenue had a reputation before the war. It still does, though the nature o
   x: 7,
   y: 12,
   z: 0,
+
+  imageOnDisk: '3rd-ave-s-yesler-way-x7-y12-z0.png',
   intersection: ['3rd Ave S', 'Yesler Way'],
   // Environmental properties
   population: 0, // Empty (post-Event)

@@ -16,6 +16,8 @@ The avenue continues north and south between the close walls.`,
   y: 2,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: '2nd-ave-s-x0-y2-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 3, // Very quiet, oppressive silence
   lighting: 30, // Very dark (most enclosed section)

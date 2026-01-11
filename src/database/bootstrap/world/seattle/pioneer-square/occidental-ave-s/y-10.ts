@@ -11,6 +11,8 @@ Someone dragged a shopping cart here and left it tipped on its side, wheels stil
   y: -10,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'occidental-ave-s-x-7-y-10-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

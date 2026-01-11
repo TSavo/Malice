@@ -10,6 +10,8 @@ A collapsed pier extends into the water to the west, its wooden planks rotted th
   x: -21,
   y: -8,
   z: 0,
+
+  imageOnDisk: 'waterfront-x-21-y-8-z0.png',
   population: 0,
   ambientNoise: 15,
   lighting: 100,

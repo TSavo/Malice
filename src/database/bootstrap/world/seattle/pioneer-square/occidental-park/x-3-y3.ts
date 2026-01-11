@@ -11,6 +11,8 @@ Someone placed the mannequin here. Someone thought it was funny, or meaningful, 
   y: 3,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'occidental-park-x-3-y3-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 15, // Open plaza, wind across brick
   lighting: 100, // Full daylight (open space)

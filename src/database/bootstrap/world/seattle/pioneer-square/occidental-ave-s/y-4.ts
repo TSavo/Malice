@@ -10,6 +10,8 @@ Moss has colonized the north-facing surfaces of every building here, green creep
   x: -7,
   y: -4,
   z: 0,
+
+  imageOnDisk: 'occidental-ave-s-x-7-y-4-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

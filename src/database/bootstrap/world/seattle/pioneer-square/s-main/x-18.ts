@@ -11,6 +11,8 @@ CARNEY BADLEY SPELLMAN reads the brass plaque beside a door on the north side—
   y: 0,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-main-st-x-18-y0-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

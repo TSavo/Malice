@@ -11,6 +11,8 @@ The street rises eastward from here, climbing the grade that Yesler's original r
   x: -21,
   y: 12,
   z: 0,
+
+  imageOnDisk: 'yesler-way-at-waterfront-x-21-y12-z0.png',
   intersection: ['Waterfront', 'Yesler Way'],
   // Environmental properties
   population: 0, // Empty (post-Event)

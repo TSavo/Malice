@@ -8,6 +8,7 @@
  * - Saves to both MongoDB GridFS and assets/images/
  *
  * Resumable - skips rooms that already have imageOnDisk.
+ * Processes 3 rooms in parallel for faster throughput.
  *
  * Usage:
  *   bun scripts/generate-room-images.ts [--dry-run] [--limit N] [--world-only] [--buildings-only]
@@ -20,7 +21,8 @@
  *   --underground     Only process underground rooms (z < 0)
  *   --surface         Only process surface rooms (z >= 0)
  *   --mcp-url URL     MCP server URL (default: http://localhost:3010)
- *   --delay MS        Fixed delay between images in ms (default: random 5s-3min)
+ *   --delay MS        Fixed delay between batches in ms (default: random 5s-25s)
+ *   --parallel N      Number of parallel requests (default: 3)
  */
 
 import * as fs from 'node:fs';
@@ -57,6 +59,32 @@ interface ImageGenerationResult {
   filename: string | null;
 }
 
+// Immutable result types for parallel processing
+type ProcessingSuccess = {
+  readonly status: 'success';
+  readonly roomFile: Readonly<RoomFile>;
+  readonly roomId: number;
+  readonly blobKey: string;
+  readonly imageFilename: string;
+  readonly imageData: string; // base64
+};
+
+type ProcessingSkipped = {
+  readonly status: 'skipped';
+  readonly roomFile: Readonly<RoomFile>;
+  readonly reason: string;
+};
+
+type ProcessingError = {
+  readonly status: 'error';
+  readonly roomFile: Readonly<RoomFile>;
+  readonly error: string;
+  readonly isTokenError: boolean;
+  readonly isRateLimit: boolean;
+};
+
+type ProcessingResult = ProcessingSuccess | ProcessingSkipped | ProcessingError;
+
 // Parse command line args
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
@@ -72,7 +100,9 @@ const MCP_URL = mcpUrlIdx >= 0 ? args[mcpUrlIdx + 1] : 'http://localhost:3010';
 const delayIdx = args.indexOf('--delay');
 const DELAY_MS = delayIdx >= 0 ? parseInt(args[delayIdx + 1], 10) : 0; // 0 means use random delay
 const MIN_DELAY_MS = 5000;   // 5 seconds
-const MAX_DELAY_MS = 180000; // 3 minutes
+const MAX_DELAY_MS = 25000;  // 25 seconds
+const parallelIdx = args.indexOf('--parallel');
+const PARALLEL_COUNT = parallelIdx >= 0 ? parseInt(args[parallelIdx + 1], 10) : 2;
 
 // MCP session management
 let mcpSessionId: string | null = null;
@@ -238,17 +268,142 @@ function sleep(ms: number): Promise<void> {
 }
 
 /**
- * Get delay for next image (random if DELAY_MS is 0, otherwise fixed)
+ * Get delay for next batch (random if DELAY_MS is 0, otherwise fixed)
  */
 function getDelay(): number {
   if (DELAY_MS > 0) return DELAY_MS;
-  // Random delay between 5 seconds and 3 minutes
+  // Random delay between 5 seconds and 25 seconds
   return Math.floor(Math.random() * (MAX_DELAY_MS - MIN_DELAY_MS + 1)) + MIN_DELAY_MS;
+}
+
+/**
+ * Generate filename for a room (pure function)
+ */
+function generateFilename(roomFile: Readonly<RoomFile>): string {
+  const { name, x, y, z } = roomFile.room;
+  const baseName = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 40);
+  return `${baseName}-x${x}-y${y}-z${z ?? 0}.png`;
+}
+
+/**
+ * Process a single room - pure function that returns immutable result
+ * Does NOT write to disk - that's handled separately after all parallel work completes
+ */
+async function processRoom(roomFile: Readonly<RoomFile>, index: number, total: number): Promise<ProcessingResult> {
+  const { x, y, z } = roomFile.room;
+  const logPrefix = `[${index + 1}/${total}]`;
+
+  // Validate coordinates
+  if (x === undefined || y === undefined) {
+    return {
+      status: 'skipped',
+      roomFile,
+      reason: 'No coordinates',
+    };
+  }
+
+  try {
+    // Resolve room ID by coordinates
+    const roomId = await getRoomIdByCoords(x, y, z ?? 0);
+    if (!roomId) {
+      return {
+        status: 'skipped',
+        roomFile,
+        reason: `Room not found in MOO at (${x}, ${y}, ${z ?? 0})`,
+      };
+    }
+
+    console.log(`${logPrefix} ${roomFile.room.name} (#${roomId}) - generating...`);
+
+    // Generate image via MCP (saves to GridFS)
+    const result = await generateRoomImage(roomId);
+
+    // Validate result - API may return error object instead of blobKey
+    if (!result || !result.blobKey || typeof result.blobKey !== 'string') {
+      console.error(`${logPrefix} ${roomFile.room.name} - invalid result: ${JSON.stringify(result)}`);
+      return {
+        status: 'error',
+        roomFile,
+        error: `Invalid API result: ${JSON.stringify(result)}`,
+        isTokenError: true, // Treat as potential token error
+        isRateLimit: false,
+      };
+    }
+
+    // Download from GridFS
+    const imageFilename = generateFilename(roomFile);
+    const imageData = await downloadBlob(result.blobKey);
+
+    // Validate image data
+    if (!imageData || typeof imageData !== 'string') {
+      console.error(`${logPrefix} ${roomFile.room.name} - invalid image data from blob`);
+      return {
+        status: 'error',
+        roomFile,
+        error: 'Invalid image data from blob storage',
+        isTokenError: false,
+        isRateLimit: false,
+      };
+    }
+
+    console.log(`${logPrefix} ${roomFile.room.name} - done (${result.blobKey})`);
+
+    return {
+      status: 'success',
+      roomFile,
+      roomId,
+      blobKey: result.blobKey,
+      imageFilename,
+      imageData,
+    };
+  } catch (err) {
+    const errStr = String(err);
+    const isTokenError = errStr.includes('ERR_INVALID_ARG_TYPE') || errStr.includes('Received an instance of Object');
+
+    // Check for rate limit in docker logs
+    let isRateLimit = false;
+    if (isTokenError) {
+      try {
+        const { execSync } = await import('child_process');
+        const logs = execSync('docker compose logs midjourney-api --tail 5 2>&1', { encoding: 'utf-8' });
+        isRateLimit = logs.includes('429') || logs.includes('rate limit');
+      } catch {
+        // Ignore log check errors
+      }
+    }
+
+    console.error(`${logPrefix} ${roomFile.room.name} - ERROR: ${err}`);
+
+    return {
+      status: 'error',
+      roomFile,
+      error: errStr,
+      isTokenError: isTokenError && !isRateLimit,
+      isRateLimit,
+    };
+  }
+}
+
+/**
+ * Write successful results to disk (side effect, done after parallel processing)
+ */
+async function writeResultsToDisk(results: readonly ProcessingSuccess[]): Promise<void> {
+  for (const result of results) {
+    const filePath = path.join(ASSETS_DIR, result.imageFilename);
+    fs.writeFileSync(filePath, Buffer.from(result.imageData, 'base64'));
+    await addImageOnDiskToFile(result.roomFile.filePath, result.imageFilename, result.roomFile);
+    console.log(`    ✅ Saved: ${result.imageFilename}`);
+  }
 }
 
 async function main() {
   console.log('🖼️  Room Image Generator (Midjourney)');
   console.log('=====================================');
+  console.log(`🔀 Parallel mode: ${PARALLEL_COUNT} concurrent requests`);
   if (dryRun) console.log('🔍 DRY RUN MODE - no changes will be made\n');
 
   // Check MCP connection and Midjourney health
@@ -307,84 +462,105 @@ async function main() {
   }
 
   // Process rooms up to the limit
-  const toGenerate = overrideLimit ? filtered.slice(0, overrideLimit) : filtered;
-  console.log(`🎨 Will generate ${toGenerate.length} images\n`);
+  const toGenerate: readonly RoomFile[] = overrideLimit ? filtered.slice(0, overrideLimit) : filtered;
+  console.log(`🎨 Will generate ${toGenerate.length} images in batches of ${PARALLEL_COUNT}\n`);
   if (DELAY_MS > 0) {
-    console.log(`⏱️  Delay between images: ${DELAY_MS}ms (fixed)\n`);
+    console.log(`⏱️  Delay between batches: ${DELAY_MS}ms (fixed)\n`);
   } else {
-    console.log(`⏱️  Delay between images: ${MIN_DELAY_MS / 1000}s - ${MAX_DELAY_MS / 1000}s (random)\n`);
+    console.log(`⏱️  Delay between batches: ${MIN_DELAY_MS / 1000}s - ${MAX_DELAY_MS / 1000}s (random)\n`);
   }
 
+  if (dryRun) {
+    for (let i = 0; i < toGenerate.length; i++) {
+      const roomFile = toGenerate[i];
+      console.log(`[${i + 1}/${toGenerate.length}] ${roomFile.room.name} - would generate`);
+    }
+    console.log(`\n✅ Dry run complete. Would generate ${toGenerate.length} images.`);
+    process.exit(0);
+  }
+
+  // Process in batches of PARALLEL_COUNT
   let generated = 0;
   let errors = 0;
+  let skipped = 0;
+  let consecutiveTokenErrors = 0;
+  let batchIndex = 0;
 
-  for (const roomFile of toGenerate) {
-    console.log(`[${generated + 1}/${toGenerate.length}] ${roomFile.room.name}`);
-    console.log(`    File: ${roomFile.relativePath}`);
-    console.log(`    Coords: (${roomFile.room.x}, ${roomFile.room.y}, ${roomFile.room.z ?? 0})`);
+  for (let i = 0; i < toGenerate.length; i += PARALLEL_COUNT) {
+    batchIndex++;
+    const batch = toGenerate.slice(i, i + PARALLEL_COUNT);
+    const batchStart = i;
 
-    if (dryRun) {
-      console.log(`    ⏭️  Skipped (dry run)\n`);
-      generated++;
-      continue;
+    console.log(`\n📦 Batch ${batchIndex} (${batch.length} rooms):`);
+    for (const rf of batch) {
+      console.log(`   - ${rf.room.name} (${rf.room.x}, ${rf.room.y}, ${rf.room.z ?? 0})`);
+    }
+    console.log('');
+
+    // Process batch in parallel - each returns an immutable result
+    const results: ProcessingResult[] = await Promise.all(
+      batch.map((roomFile, idx) => processRoom(roomFile, batchStart + idx, toGenerate.length))
+    );
+
+    // Separate results by status
+    const successes = results.filter((r): r is ProcessingSuccess => r.status === 'success');
+    const skips = results.filter((r): r is ProcessingSkipped => r.status === 'skipped');
+    const errs = results.filter((r): r is ProcessingError => r.status === 'error');
+
+    // Write successful results to disk (sequential to avoid file conflicts)
+    if (successes.length > 0) {
+      console.log(`\n📝 Writing ${successes.length} images to disk...`);
+      await writeResultsToDisk(successes);
+      consecutiveTokenErrors = 0; // Reset on any success
     }
 
-    try {
-      // Resolve room ID by coordinates
-      const { x, y, z } = roomFile.room;
-      if (x === undefined || y === undefined) {
-        console.log(`    ⚠️  No coordinates, skipping\n`);
-        continue;
+    // Log skips
+    for (const skip of skips) {
+      console.log(`    ⏭️  Skipped: ${skip.roomFile.room.name} - ${skip.reason}`);
+    }
+
+    // Handle errors
+    for (const err of errs) {
+      if (err.isRateLimit) {
+        console.log(`    ⏳ Rate limited on ${err.roomFile.room.name} - will retry after delay`);
+        // Re-add to end of queue by not counting as processed
+        // Note: In immutable approach, we'd need to restructure for retry queue
+        // For now, just wait and continue
+        await sleep(60000);
+      } else if (err.isTokenError) {
+        consecutiveTokenErrors++;
+        console.error(`    ⚠️  Token error on ${err.roomFile.room.name} (${consecutiveTokenErrors} consecutive)`);
+
+        if (consecutiveTokenErrors >= 3) {
+          console.error('\n🛑 Too many consecutive token errors - likely invalid Midjourney token');
+          console.error('🔄 Stopping midjourney-api container...');
+          try {
+            const { execSync } = await import('child_process');
+            execSync('docker compose stop midjourney-api', { stdio: 'inherit' });
+            console.error('✅ Container stopped. Please update MIDJOURNEY_SALAI_TOKEN and restart.');
+          } catch (stopErr) {
+            console.error('❌ Failed to stop container:', stopErr);
+          }
+          process.exit(1);
+        }
       }
+    }
 
-      const roomId = await getRoomIdByCoords(x, y, z ?? 0);
-      if (!roomId) {
-        console.log(`    ⚠️  Room not found in MOO at (${x}, ${y}, ${z ?? 0})\n`);
-        continue;
-      }
+    generated += successes.length;
+    skipped += skips.length;
+    errors += errs.length;
 
-      console.log(`    MOO ID: #${roomId}`);
-      console.log(`    ⏳ Generating image via Midjourney...`);
-
-      // Generate image via MCP (saves to GridFS)
-      const result = await generateRoomImage(roomId);
-      console.log(`    ✅ Generated: ${result.blobKey}`);
-
-      // Download from GridFS and save to host filesystem
-      const baseName = roomFile.room.name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '')
-        .slice(0, 40);
-      const filename = `${baseName}-x${x}-y${y}-z${z ?? 0}.png`;
-
-      console.log(`    📥 Downloading to ${filename}...`);
-      const imageData = await downloadBlob(result.blobKey);
-      const filePath = path.join(ASSETS_DIR, filename);
-      fs.writeFileSync(filePath, Buffer.from(imageData, 'base64'));
-      console.log(`    ✅ Saved to assets/images/${filename}`);
-
-      // Update the source file with imageOnDisk
-      await addImageOnDiskToFile(roomFile.filePath, filename, roomFile);
-      console.log(`    ✅ Updated source file\n`);
-
-      generated++;
-
-      // Delay between images to avoid rate limiting
-      if (generated < toGenerate.length) {
-        const delay = getDelay();
-        console.log(`    ⏱️  Waiting ${(delay / 1000).toFixed(0)}s before next image...`);
-        await sleep(delay);
-      }
-    } catch (err) {
-      console.error(`    ❌ Error: ${err}`);
-      errors++;
-      console.log('');
+    // Delay between batches
+    if (i + PARALLEL_COUNT < toGenerate.length) {
+      const delay = getDelay();
+      console.log(`\n⏱️  Batch complete. Waiting ${(delay / 1000).toFixed(0)}s before next batch...`);
+      await sleep(delay);
     }
   }
 
   console.log('\n=====================================');
   console.log(`✅ Generated: ${generated}`);
+  console.log(`⏭️  Skipped: ${skipped}`);
   console.log(`❌ Errors: ${errors}`);
 }
 
@@ -465,13 +641,26 @@ async function addImageOnDiskToFile(filePath: string, imageFilename: string, roo
   let content = fs.readFileSync(filePath, 'utf-8');
 
   // Check if it's a building file (has 'building' export with rooms)
-  if (content.includes('export const building')) {
-    // TODO: Implement building file updates
-    // Building files have structure: export const building = { rooms: { '%0': {...}, '%1': {...} } }
-    // This requires parsing the room key, finding the correct room object, and adding imageOnDisk.
-    // For now, building room images are stored in GridFS but not added to source files.
-    // This means the imageOnDisk property must be added manually or via a separate tool.
-    console.log(`    ⚠️  Building file - manual edit needed (automatic update not implemented)`);
+  if (content.includes('export const building') && roomFile?.relativePath.includes(':')) {
+    // Extract placeholder key from relativePath (e.g., "path/to/file.ts:%ARTERY_N1")
+    const placeholder = roomFile.relativePath.split(':').pop();
+    if (!placeholder) {
+      console.log(`    ⚠️  Could not extract room placeholder from path`);
+      return;
+    }
+
+    // Find the room object by its placeholder key and add imageOnDisk after z coordinate
+    // Pattern: 'placeholder': { ... z: N, ... }
+    const roomKeyPattern = new RegExp(`('${placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}':\\s*\\{[^}]*?)(z:\\s*-?\\d+,?)`, 's');
+    const match = content.match(roomKeyPattern);
+
+    if (match) {
+      const replacement = `${match[1]}${match[2]}\n      imageOnDisk: '${imageFilename}',`;
+      content = content.replace(roomKeyPattern, replacement);
+      fs.writeFileSync(filePath, content);
+    } else {
+      console.log(`    ⚠️  Could not find room ${placeholder} z coordinate in building file`);
+    }
     return;
   }
 

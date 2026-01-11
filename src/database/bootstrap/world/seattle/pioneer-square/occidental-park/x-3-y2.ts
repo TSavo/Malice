@@ -11,6 +11,8 @@ The dead trees ringing the plaza create an accidental amphitheater, their bare b
   y: 2,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'occidental-park-x-3-y2-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 15, // Open plaza, wind across brick
   lighting: 100, // Full daylight (open space)

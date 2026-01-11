@@ -11,6 +11,8 @@ PACIFIC TRAVEL occupied the building across the street, a travel agency that spe
   y: 0,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-main-st-x-3-y0-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

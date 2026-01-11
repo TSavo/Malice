@@ -10,6 +10,8 @@ The street is wide here, designed for the vehicle and pedestrian traffic that on
   x: -1,
   y: -12,
   z: 0,
+
+  imageOnDisk: 's-king-st-x-1-y-12-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

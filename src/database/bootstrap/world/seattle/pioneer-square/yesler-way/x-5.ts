@@ -11,6 +11,8 @@ The buildings along the north side of the street look down at the park with dark
   y: 12,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'yesler-way-x-5-y12-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

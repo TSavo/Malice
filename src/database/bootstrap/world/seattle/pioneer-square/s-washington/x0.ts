@@ -11,6 +11,8 @@ Second Avenue stretches north and south from here, the cross-axis that connects 
   x: 0,
   y: 6,
   z: 0,
+
+  imageOnDisk: '2nd-ave-s-s-washington-st-x0-y6-z0.png',
   intersection: ['2nd Ave S', 'S. Washington St'],
   // Environmental properties
   population: 0, // Empty (post-Event)

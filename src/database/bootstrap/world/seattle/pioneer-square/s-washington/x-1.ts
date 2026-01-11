@@ -10,6 +10,8 @@ A row of young trees was planted along this block in the 1990s, intended to soft
   x: -1,
   y: 6,
   z: 0,
+
+  imageOnDisk: 's-washington-st-x-1-y6-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

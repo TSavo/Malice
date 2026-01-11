@@ -10,6 +10,8 @@ A rusted pickup truck sits at the curb, its tires flat, its bed filled with rain
   x: -15,
   y: -6,
   z: 0,
+
+  imageOnDisk: 's-jackson-st-x-15-y-6-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

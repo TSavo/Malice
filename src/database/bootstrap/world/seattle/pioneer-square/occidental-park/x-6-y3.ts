@@ -15,6 +15,8 @@ The park extends in all cardinal directions from here.`,
   y: 3,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'occidental-park-x-6-y3-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 12, // Pergola slightly muffles wind
   lighting: 90, // Slight shade from pergola
