@@ -83,6 +83,17 @@ export class AudioManager {
   }
 
   /**
+   * Escape HTML special characters to prevent XSS
+   * @param str - String to escape
+   * @returns Escaped string safe for HTML insertion
+   */
+  escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  /**
    * Initialize Web Audio API context
    * Must be done after user interaction in most browsers
    */
@@ -110,13 +121,41 @@ export class AudioManager {
       const saved = localStorage.getItem('malice-audio-settings');
       if (saved) {
         const data = JSON.parse(saved);
-        this.masterVolume = data.masterVolume ?? 1.0;
-        this.globalMuted = data.globalMuted ?? false;
 
-        // Restore object volumes
-        if (data.objectVolumes) {
+        // Validate and sanitize masterVolume
+        if (typeof data.masterVolume === 'number' &&
+            isFinite(data.masterVolume) &&
+            data.masterVolume >= 0 &&
+            data.masterVolume <= 1) {
+          this.masterVolume = data.masterVolume;
+        } else {
+          this.masterVolume = 1.0;
+        }
+
+        // Validate and sanitize globalMuted
+        if (typeof data.globalMuted === 'boolean') {
+          this.globalMuted = data.globalMuted;
+        } else {
+          this.globalMuted = false;
+        }
+
+        // Restore object volumes with validation
+        if (data.objectVolumes && typeof data.objectVolumes === 'object') {
           for (const [id, settings] of Object.entries(data.objectVolumes)) {
-            this.objectVolumes.set(id, settings);
+            // Validate settings structure
+            if (settings &&
+                typeof settings === 'object' &&
+                typeof settings.volume === 'number' &&
+                isFinite(settings.volume) &&
+                settings.volume >= 0 &&
+                settings.volume <= 1 &&
+                typeof settings.muted === 'boolean') {
+              this.objectVolumes.set(id, {
+                volume: settings.volume,
+                muted: settings.muted,
+                name: typeof settings.name === 'string' ? settings.name : 'Unknown'
+              });
+            }
           }
         }
       }
@@ -506,8 +545,8 @@ export class AudioManager {
         <div style="color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Voice Volumes</div>
         \\\${voices.length === 0 ? '<div style="color: #666; font-size: 13px; padding: 16px 0;">No voices heard yet</div>' : ''}
         \\\${voices.map(v => \\\`
-          <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #222;" data-voice-id="\\\${v.id}">
-            <button class="voice-mute-btn" data-id="\\\${v.id}" style="
+          <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #222;" data-voice-id="\\\${this.escapeHtml(v.id)}">
+            <button class="voice-mute-btn" data-id="\\\${this.escapeHtml(v.id)}" style="
               background: \\\${v.muted ? '#ff4444' : '#333'};
               border: none;
               color: #e0e0e0;
@@ -517,8 +556,8 @@ export class AudioManager {
               cursor: pointer;
               font-size: 12px;
             ">\\\${v.muted ? '🔇' : '🔊'}</button>
-            <span style="color: #e0e0e0; font-size: 13px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="\\\${v.name}">\\\${v.name}</span>
-            <input type="range" class="voice-volume" data-id="\\\${v.id}" min="0" max="100" value="\\\${Math.round(v.volume * 100)}" style="width: 80px; accent-color: #00ff88;">
+            <span style="color: #e0e0e0; font-size: 13px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="\\\${this.escapeHtml(v.name)}">\\\${this.escapeHtml(v.name)}</span>
+            <input type="range" class="voice-volume" data-id="\\\${this.escapeHtml(v.id)}" min="0" max="100" value="\\\${Math.round(v.volume * 100)}" style="width: 80px; accent-color: #00ff88;">
           </div>
         \\\`).join('')}
       </div>
