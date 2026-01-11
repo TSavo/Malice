@@ -28,6 +28,7 @@ The air is damp here, the moisture increasing as the passage extends east toward
       x: -8,
       y: -4,
       z: -4,
+      imageOnDisk: 'deep-western-access-x-8-y-4-z-4.png',
       population: 0,
       ambientNoise: 12,
       lighting: 10,
