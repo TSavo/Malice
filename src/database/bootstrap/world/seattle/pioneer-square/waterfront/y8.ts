@@ -13,6 +13,8 @@ To the east, the Fabrication Factory's southern wall rises four stories—a soli
   y: 8,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'alaskan-way-x-21-y8-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

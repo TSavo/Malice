@@ -12,6 +12,8 @@ North leads toward the gap—the only way to downtown. South continues along the
   x: -21,
   y: 9,
   z: 0,
+
+  imageOnDisk: 'waterfront-x-21-y9-z0.png',
   population: 0,
   ambientNoise: 25,
   lighting: 100,

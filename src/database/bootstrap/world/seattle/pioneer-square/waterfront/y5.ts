@@ -12,6 +12,8 @@ The waterfront continues north toward Yesler and south toward Washington. The ba
   x: -21,
   y: 5,
   z: 0,
+
+  imageOnDisk: 'alaskan-way-x-21-y5-z0.png',
   population: 0,
   ambientNoise: 15,
   lighting: 100,

@@ -12,6 +12,8 @@ Yesler Way intersection lies just ahead to the north—the crossing point to dow
   x: -21,
   y: 11,
   z: 0,
+
+  imageOnDisk: 'alaskan-way-x-21-y11-z0.png',
   population: 0,
   ambientNoise: 20,
   lighting: 100,

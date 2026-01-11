@@ -13,6 +13,8 @@ Beyond the seawall, Elliott Bay stretches toward Bainbridge Island and the Kitsa
   y: 3,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'alaskan-way-x-21-y3-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
