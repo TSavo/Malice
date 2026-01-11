@@ -398,11 +398,61 @@ export class PlayerBuilder implements Builder {
       'syncWindowLayout',
       `
       const layout = self.windowLayout || { windows: [], taskbarOrder: [] };
-      return self.channel('wm', {
+
+      // Send basic layout sync for standard windows
+      self.channel('wm', {
         action: 'sync',
         windows: layout.windows || [],
         taskbarOrder: layout.taskbarOrder || []
       });
+
+      // Restore show windows by re-sending their state
+      // This triggers the client-side handlers to open them properly
+      for (const win of (layout.windows || [])) {
+        if (win.windowType === 'show' && win.showData) {
+          const showData = win.showData;
+          // For show windows, we need to re-fetch content from the object
+          // if it was an object-type window (we stored id but not full content)
+          if (showData.type === 'object' && showData.id) {
+            const obj = await $load(showData.id);
+            if (obj) {
+              // Re-send show state with fresh content
+              const data = {
+                window: showData.window,
+                persist: showData.persist || false,
+                icon: showData.icon || win.icon || null,
+                title: showData.title || win.title || null,
+                type: 'object',
+                id: obj.id,
+                name: obj.name || 'Unknown',
+                description: obj.description || '',
+                imageUrl: null
+              };
+
+              // Get image URL
+              const images = obj.images || {};
+              const blobKey = images['9:16'] || images['portrait'] || images['1:1'] || images['square'] || Object.values(images)[0];
+              if (blobKey) {
+                data.imageUrl = '/blob/' + blobKey;
+              }
+
+              self.state('show', data);
+            }
+          } else if (showData.type === 'html') {
+            // For HTML windows, we can't restore the content without storing it
+            // For now, just restore the window frame - AI can re-populate if needed
+            // This is intentional: HTML content could be stale/large
+            self.state('show', {
+              window: showData.window,
+              persist: showData.persist || false,
+              icon: showData.icon || win.icon || null,
+              title: showData.title || win.title || 'View',
+              type: 'html',
+              html: '<p style="color:#666;text-align:center;padding:20px;">Content expired. The AI can refresh this window.</p>'
+            });
+          }
+        }
+      }
     `,
     );
 
@@ -508,6 +558,35 @@ export class PlayerBuilder implements Builder {
       if (!msg || typeof msg !== 'object') return;
 
       switch (msg.action) {
+        case 'open':
+          // Client opened a window - store in layout
+          {
+            const layout = self.windowLayout || { windows: [], taskbarOrder: [], lastUpdated: null };
+            const windowConfig = {
+              windowId: msg.windowId,
+              windowType: msg.windowType,
+              title: msg.title,
+              icon: msg.icon || null,
+              channel: msg.channel,
+              config: msg.config || {},
+              showData: msg.showData || null  // For show windows: { window, type, persist, icon, title }
+            };
+
+            // Update or add window
+            const existingIdx = layout.windows.findIndex(w => w.windowId === msg.windowId);
+            if (existingIdx >= 0) {
+              layout.windows[existingIdx] = windowConfig;
+            } else {
+              layout.windows.push(windowConfig);
+              if (!layout.taskbarOrder.includes(msg.windowId)) {
+                layout.taskbarOrder.push(msg.windowId);
+              }
+            }
+            layout.lastUpdated = new Date().toISOString();
+            self.windowLayout = layout;
+          }
+          break;
+
         case 'geometry':
           // Client moved/resized a window
           await self.updateWindowGeometry(msg.windowId, {
@@ -529,11 +608,13 @@ export class PlayerBuilder implements Builder {
 
         case 'close':
           // Client closed a window - update layout
-          const layout = self.windowLayout || { windows: [], taskbarOrder: [], lastUpdated: null };
-          layout.windows = layout.windows.filter(w => w.windowId !== msg.windowId);
-          layout.taskbarOrder = layout.taskbarOrder.filter(id => id !== msg.windowId);
-          layout.lastUpdated = new Date().toISOString();
-          self.windowLayout = layout;
+          {
+            const layout = self.windowLayout || { windows: [], taskbarOrder: [], lastUpdated: null };
+            layout.windows = layout.windows.filter(w => w.windowId !== msg.windowId);
+            layout.taskbarOrder = layout.taskbarOrder.filter(id => id !== msg.windowId);
+            layout.lastUpdated = new Date().toISOString();
+            self.windowLayout = layout;
+          }
           break;
 
         case 'reorder':

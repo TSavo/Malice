@@ -1,3 +1,4 @@
+import { Subject, type Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import type { WebSocket } from 'ws';
 import { BaseTransport } from '../base-transport';
@@ -16,6 +17,10 @@ export class MultiplexedTransport extends BaseTransport {
   public readonly remoteAddress: string;
   public readonly mux: ChannelMux;
 
+  // Window manager channel messages
+  private readonly wmSubject: Subject<unknown>;
+  public readonly wm$: Observable<unknown>;
+
   constructor(
     private ws: WebSocket,
     remoteAddr?: string,
@@ -25,6 +30,10 @@ export class MultiplexedTransport extends BaseTransport {
 
     this.remoteAddress = remoteAddr || 'websocket-client';
     this.mux = new ChannelMux(ws, codec);
+
+    // Initialize wm channel observable
+    this.wmSubject = new Subject<unknown>();
+    this.wm$ = this.wmSubject.asObservable();
 
     this.initialize();
   }
@@ -47,6 +56,11 @@ export class MultiplexedTransport extends BaseTransport {
     // Handle control channel messages
     this.mux.ctrl.input$.pipe(takeUntil(this.closed$)).subscribe({
       next: (msg) => this.handleCtrlMessage(msg),
+    });
+
+    // Handle window manager channel messages
+    this.mux.channel('wm').input$.pipe(takeUntil(this.closed$)).subscribe({
+      next: (msg) => this.wmSubject.next(msg),
     });
 
     // Handle mux events

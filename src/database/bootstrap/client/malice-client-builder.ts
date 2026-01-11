@@ -456,7 +456,7 @@ export class MaliceClient {
     }
     icon = icon || '👁';
 
-    await this.wm.openWindow({
+    const windowConfig = {
       windowId: windowId,
       windowType: 'show',
       title: data?.title || windowName,
@@ -473,6 +473,24 @@ export class MaliceClient {
         closable: true,
         minimizable: true
       }
+    };
+
+    await this.wm.openWindow(windowConfig);
+
+    // Notify server about the new window (for persistence)
+    this.send('wm', {
+      action: 'open',
+      ...windowConfig,
+      // Include show-specific data for restore
+      showData: data ? {
+        window: data.window,
+        type: data.type,
+        persist: data.persist,
+        icon: data.icon,
+        title: data.title,
+        id: data.id,  // Object ID for restore (only for object type)
+        // Don't include large data like html or imageUrl - those come from server
+      } : null
     });
 
     // Set content if data provided

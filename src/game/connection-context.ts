@@ -37,6 +37,16 @@ export class ConnectionContext {
       }
     });
 
+    // Forward wm channel messages to handler if multiplexed
+    const transport = this.connection.transport;
+    if (transport instanceof MultiplexedTransport) {
+      transport.wm$.subscribe((msg) => {
+        if (this.currentHandler) {
+          this.handleWmMessage(msg);
+        }
+      });
+    }
+
     // Log disconnect when closed
     this.connection.transport.closed$.subscribe(() => {
       const logger = getGameLogger();
@@ -93,6 +103,25 @@ export class ConnectionContext {
         err instanceof Error ? err.message : String(err),
       );
       this.send('An error occurred processing your input.\r\n');
+    }
+  }
+
+  /**
+   * Handle window manager channel messages
+   */
+  private async handleWmMessage(msg: unknown): Promise<void> {
+    if (!this.currentHandler) return;
+
+    try {
+      // Call the handler's onWmMessage method if it exists
+      if (this.currentHandler.hasMethod('onWmMessage')) {
+        await this.currentHandler.call('onWmMessage', msg);
+      }
+    } catch (err) {
+      console.error(
+        `Error in handler #${this.currentHandler.id} onWmMessage:`,
+        err instanceof Error ? err.message : String(err),
+      );
     }
   }
 
