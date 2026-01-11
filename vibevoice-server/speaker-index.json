@@ -1071,8 +1071,263 @@
         "chapter_id": "6498",
         "id": "4356_6498_000003_000000"
       }
+    },
+    {
+      "id": "8388",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/8210/audio/audio.wav?Expires=1768143677&Signature=FTnmhOB67YSyq-P7oBwKy3i-luxkYEm4gIgW7ov7Kx4i67UTp14Q2bkflD8RB0HnvaSrdB6~wzrKHuS4n7tmqCxNYipylZ~E4KGxM64ynD644m7~8hlK1wf04WxJRHULtAcxPkhVW4WMvvZ55hpzukFzZRJYduM5gKplLWQ1ZcnaW23o4TbOdshhoUF33rvLLBXgGg1ZaIQxW1Y0palS1SOhB4YQdouf-x8iAEumZhAKA8Q5DRoUdGzjCyZIxdRpBWHERV-MKCi8z0fkXg9571fhhzT7qUP8qapc44zKTPL3Yg7H9x5n5Qtx0oUEQaz18lIq-YKY4AOwamJgwKW4-Q__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "But all the same they flew out; for they had been sitting all the winter in the hive, and they longed for a breath of fresh air.",
+        "text_original": "But all the same they flew out; for they had been sitting all the winter in the hive, and they longed for a breath of fresh air.",
+        "speaker_id": "8388",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/8388/275212/8388_275212_000004_000001.wav",
+        "chapter_id": "275212",
+        "id": "8388_275212_000004_000001"
+      }
+    },
+    {
+      "id": "7789",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/8423/audio/audio.wav?Expires=1768143717&Signature=C5Pkg3usYWN8eVr3vRyGcPQEDJLx94Ix85G5H4UY-ZoG337ldUN~wXfvyKR9gYqHMBeAbXkrd70Ng855T4NKEYvugKlcwC7a3HiwkQXnyXA4I5qqWxDqvN0hdque7DZu-KVpoA4R2MFQ735NmPUf~TdvnTGLR5PktzTaei77va~ZzcDaoVtxYoklUSbybMkR5JPtLEOAmhV-x42iYrtUb8OTtM1jot1B99cWmf4Mbefi3YeMrdvm9Uq6TD~nByRwojYRuMQAXNqXMKzyQgF~gA83fBG6SkwRpYFpk6WSOVmufBZwKIK9w5DzGQA-SpCOzrHUhdlBcYMyQ5BknpeDIg__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "She continued, It hath reached me, O auspicious King, that when Yunus the Scribe said to Walid, \"Allah forbid I should repent over her!",
+        "text_original": "She continued, It hath reached me, O auspicious King, that when Yunus the Scribe said to Walid, \"Allah forbid I should repent over her!",
+        "speaker_id": "7789",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/7789/258266/7789_258266_000001_000000.wav",
+        "chapter_id": "258266",
+        "id": "7789_258266_000001_000000"
+      }
+    },
+    {
+      "id": "2654",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/8603/audio/audio.wav?Expires=1768143726&Signature=ZqBunJflG-78gVEjS0aTxG0~Xy~VEGS-uW0wl~npRKEU~8aDvkKq4qgbEnxnkAr3fpB-Bxs6UkKxAQ521iOb4iokj~XeWe5W5rIP0Igvn9OvpQ~TcZ39eMDIMQjHOvKkHLNH10d5EWReCmAxz3how39V3T38eRMXarNYBkNGdhouHVgZVt4ZYUZWmttwSv4~Ft29zc5YATyznzsu0lc~Uf1UkuONB1YjYbWxVPlK70RLOeI7R1YAm9-CaTtfkV23OU3Tfn1IQnfxw2Y7jplmmi3BHocGzC9Sq8q1weaGYMUxxl8cOUzQczNF9Stefs-MqGvfvOERCEGagZ3C4RpuYw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "The dean and the dean's wife and the dean's daughters had been her best friends, but they were not friends on whom she could be dependent.",
+        "text_original": "The dean and the dean's wife and the dean's daughters had been her best friends, but they were not friends on whom she could be dependent.",
+        "speaker_id": "2654",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/2654/158744/2654_158744_000004_000007.wav",
+        "chapter_id": "158744",
+        "id": "2654_158744_000004_000007"
+      }
+    },
+    {
+      "id": "2254",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/8675/audio/audio.wav?Expires=1768143727&Signature=OHkBIDG7WopnJrPh11P~wL4fLt8j0GuRZfTOpOcXHkSTIYoeKn06phr0T07LI3kA-~fnJgXKgFucy1qgbKYJuzqbIGaDf6tqddibFcH2BlRuwXXmuhaGOpzlx~R0uAMpirlIJ9IhfeBWpwTfsK~XuxDTWww-rvJwO7tf8KZGB~l-w3F4e8eZ-z2~dq-hHLQhhePjz6A7WFbpLWZUE0UrSo0M2Pjm6-oXvCPIKSLw7mmkmEOtHSnIPGQO9auOj8bYat49ow4fQudR79GZZYjCNyN0vusiysYq2U7tWShapKugU9DFwhBvwkX1yBIYaujQPBCA1biDKaiTWLSQPIgkjw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Never was seen such an army, pitiful, futile, unfit; Never was seen such a spirit, manifold courage and grit. Never has been such a cohort under one banner unrolled As surged to the ragged edged Arctic, urged by the arch tempter-Gold.",
+        "text_original": "Never was seen such an army, pitiful, futile, unfit; Never was seen such a spirit, manifold courage and grit. Never has been such a cohort under one banner unrolled As surged to the ragged-edged Arctic, urged by the arch-tempter--Gold.",
+        "speaker_id": "2254",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/2254/152831/2254_152831_000004_000000.wav",
+        "chapter_id": "152831",
+        "id": "2254_152831_000004_000000"
+      }
+    },
+    {
+      "id": "6300",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/8716/audio/audio.wav?Expires=1768143731&Signature=sfihXp-jiLOSX~~-sbaFrBB4VZxJaNC7OUGMoIQ25gak~ttiMTXHQPr9bTakGHoWHXYQpfqb2A6tMwcuvjYIByQQ0195q2KIUupgc17cxS~7maqWfryaS8CQzneSLFEZ~lf70dhGm9z-gMyy0ayAOPkAcFtWjNDlR7aPcjx9Fk8FHPVqYA53Q5IBjr-UrvMuBvCQu63ILu05~iarRFL-RYo~JC2kcFG6vKpTAU0EHVrggH1r96kC9Kt580EbeuSgThfep4koi1eaKnniApzEZlbM2jU8RRnvkQ3w6W2t9-mmDn8NU-S-b8iDjUhiygHdZiotAolOuN43lvegRkqTRw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Colbert was, without doubt, very much affected, for he quitted the chamber, calling Bernouin to attend to the dying man, and went into the corridor.",
+        "text_original": "Colbert was, without doubt, very much affected, for he quitted the chamber, calling Bernouin to attend to the dying man, and went into the corridor.",
+        "speaker_id": "6300",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/6300/39660/6300_39660_000072_000002.wav",
+        "chapter_id": "39660",
+        "id": "6300_39660_000072_000002"
+      }
+    },
+    {
+      "id": "3537",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/8880/audio/audio.wav?Expires=1768143736&Signature=xRAvCjq6MtYEjV4bFAbFcbyZq6hnHkwZiqVRiQXwqqW0AXZnKYNmhGjzz4l6W3ih4gliKbPmVUKqp2frzjPmiSZBLNwaKTjBNZ9FGhJi~cbUi~02lGPnMg2EZFcSjZh~VsuDM~aFbkNHGEfmtIf43BscnA~Ds6-kJCe35~zPAk60eguiCRgrq~go~8-rsRtw-9Qh8UZfrNCvnRi3XxS-nQc4QGr~SX~5beaedy7uBF-JMP7swFcS9qjIgHxS4rPIkz74h3doHmx1F6lm-wVUW7WmUQe5g2wacRElDHNTJeVohrgs~jRdb4tvKW0u0ii1tzMvw7vG3yNoYBeliFlM5w__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "A new style comes into vogue and remains in favor for a season, and, at least so long as it is a novelty, people very generally find the new style attractive.",
+        "text_original": "A new style comes into vogue and remains in favor for a season, and, at least so long as it is a novelty, people very generally find the new style attractive.",
+        "speaker_id": "3537",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/3537/5704/3537_5704_000001_000002.wav",
+        "chapter_id": "5704",
+        "id": "3537_5704_000001_000002"
+      }
+    },
+    {
+      "id": "2012",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/8886/audio/audio.wav?Expires=1768143737&Signature=a9PSR0C60AazI-CkVWVUmIOL5zsqsRUMOoVFKb5-3cdBEnyYClaFxyMDT74LhYfjOFfaC90GUqFllp9lSj4fHsu7BaJMOl56ZQRVkfH~flcYdGrPXZhzqkQLrH9krSH5Ms-licR43gvChh~Qzo-GeJvDNlWM5gSOLyUGjdvVPTLihgZ6G8Xb7U-Lcb-ioK3RgxZswmm9Z-KlUx2IlyE0ST87lSkDbDXLiOQTjhm34GUu3YwubEtYY-FVBd4hagio3xkeVEL~fjFfpIfxkVAPTf4oO3pLduQ4C1VGkQZ6GlqmJEMit31tcPHVd1tXd~tfRIZEUTYNiVwQqMcp5uzZyQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "These were, in fact, the horrible vampires which suck the blood of the cattle, and even attack man if he is imprudent enough to sleep out in the fields.",
+        "text_original": "These were, in fact, the horrible vampires which suck the blood of the cattle, and even attack man if he is imprudent enough to sleep out in the fields.",
+        "speaker_id": "2012",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/2012/139356/2012_139356_000003_000000.wav",
+        "chapter_id": "139356",
+        "id": "2012_139356_000003_000000"
+      }
+    },
+    {
+      "id": "1313",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/9019/audio/audio.wav?Expires=1768143745&Signature=J4XGbrGn3HLM1oB5V7B8PUx5yRjqaj-SIPE~V2w3uSKH0NvsLWeG8aKQeXpwv32~le29pGYJOHU10YaW0A0UAg4o~e-uL1ARjWss2LMrmkhVwfAY~WkQd8kk02N1TqaENsnoO6pJSJdkl0a6jWUaQirXdFPk-sFNYq-ggWQAJjmfVn8Zu7Ufi09XiNsBNIMLJejHdd7zJtNHLKRg35nr-4tKpCYrU1JyNXTmJTDtaBTu~fmPdLGoKhETBsaGd-lAjDziNxyAjckHycPMGIXURZyWe41PQ6Z2bJKjg8oYXUUMIznNFaqbHDMs6-fp8LRD1ggb89g5-Q1KqO9wm1s1Sw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "But no one suspected any especial danger until after they had entered Ruggedo's cavern, and so they were journeying along in quite a contented manner when Tik Tok, who marched ahead, suddenly disappeared.",
+        "text_original": "But no one suspected any especial danger until after they had entered Ruggedo's cavern, and so they were journeying along in quite a contented manner when Tik-Tok, who marched ahead, suddenly disappeared.",
+        "speaker_id": "1313",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/1313/135022/1313_135022_000004_000001.wav",
+        "chapter_id": "135022",
+        "id": "1313_135022_000004_000001"
+      }
+    },
+    {
+      "id": "3258",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/9250/audio/audio.wav?Expires=1768143754&Signature=hUcQ-Qoo6MXgNM9oY6CzGJEmSyBF6fGrIjPgBiUp~MiQSYLpPhl4O~dyQsb-9U-v1Jcmk6OULYoW7SPZIHKsgPPN1JkA7SFbAmRY3ezxNZR1o5b4bR98ZUUUL-E0Pwx1Uzt~F0855ozs-7BLWlJatApKrhGKH-yy-KTzusIT70FvUkFTDxLk3p9tAlAdGZUKMXO7zTsaatiTtt0VVIPzfaKyX0ZjsrD~xz~aSNvbbCiMUjrZfjNKXpF1eVTJNLiLgOSx3WJwDu7SWY6J7Q2ViMx4KldUr91mx3uBoxQy4QZCnRJxFFjNSojsbfJMA1Za67lPqgLAJdWQWEq21RdfaQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Two years after this visit a letter came to Tuskegee from this man, which read like this: \"Enclosed I send you a New York draft for ten thousand dollars, to be used in furtherance of your work.",
+        "text_original": "Two years after this visit a letter came to Tuskegee from this man, which read like this: \"Enclosed I send you a New York draft for ten thousand dollars, to be used in furtherance of your work.",
+        "speaker_id": "3258",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/3258/169291/3258_169291_000017_000000.wav",
+        "chapter_id": "169291",
+        "id": "3258_169291_000017_000000"
+      }
+    },
+    {
+      "id": "636",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/9335/audio/audio.wav?Expires=1768143758&Signature=lyIJAwvY0HG3lWfFAXSpL0X~4kG~Bo4kfn9zzk9iHSk1o2yJ4iz6kMPzd2T7YjE7KS5dIGK7Q-~VI-dx92hCe7jOJNYI99~XXDRSHI64BdZtORUQRUrWSgglaqevKZzDIC8G1J7Zq11SKdpZlZm1q8D9wl1GjNWLhAu0iRd0UepiZqW0bGnqcb-e8hC4UtSorUVcRTwR9FnSJSB07IvWBpWNB~S5cPdCD36K-4Wm39vffFk97f7HXV3DajUtKRvoTekpnHZKBH6uLVL-wtmLCmuAJ8BWCdnohArmP6HtIExhFDQ4SYl0I0aJDR9KOHYpikoQDD9noiKtKz63LNOOig__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "A fat shad is very nice boiled, although rock and bass are preferred generally; when done, take it up on a fish dish, and cover it with egg sauce or drawn butter and parsley.",
+        "text_original": "A fat shad is very nice boiled, although rock and bass are preferred generally; when done, take it up on a fish dish, and cover it with egg sauce or drawn butter and parsley.",
+        "speaker_id": "636",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/636/123163/636_123163_000027_000001.wav",
+        "chapter_id": "123163",
+        "id": "636_123163_000027_000001"
+      }
+    },
+    {
+      "id": "3490",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/9358/audio/audio.wav?Expires=1768143758&Signature=moFIPfX-xs9Xyx1ls2doOm-cBXw16ybQBcik3bnqn~BDqlTtLFGRDr9qX0MT5JrVdn-XfRMy-zwXpeW9yCekDI4~rF4NYNxoeLEgkzYv7rX8nhH7HsjjXMrQrGBOxWqfxtBcnb9hzeOJ1C3mv1T0fdqFMFFJEQzbV4AN2Ku7PyKJEOUY92-bwzaW0s1M-cxkwwTpH9aYqyn5xs0ezKEgtC-QUh-R2fi1ug31CTIqnqDgiGi6K09FTVsDUeCo99NlygjXL4qxHMps3FGM9sEk-yeJXf0Cc3~VS2tGtzwwKHXHwS9p6lI-imAAjGTPqjOCoTCN8S5Xhn9tC-WQ4KllBQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "It was immense, at least two meters thick and with no indication of its length. The flames didn't stop it at all, just annoyed it.",
+        "text_original": "It was immense, at least two meters thick and with no indication of its length. The flames didn't stop it at all, just annoyed it.",
+        "speaker_id": "3490",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/3490/177627/3490_177627_000038_000005.wav",
+        "chapter_id": "177627",
+        "id": "3490_177627_000038_000005"
+      }
+    },
+    {
+      "id": "7515",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/9470/audio/audio.wav?Expires=1768143762&Signature=I4QgO7pcQWFFWvedcrAsFybIGfJhzvDRhB5XFgdfWq1FWs0Mo-ZmB09Q2uXXA1FuuMwKF~NXJC4ZyJoK173DTGgEGaNsSbaBxD4cc~npOSznYi3K-enAxG4NfLrb7lwziN1sj66ao-Q7r5KRe~PxDVbr32TpgxLhAAbJT8-V-LQIxUau6F-GtEfbJpRObm6NIyv2Nx7SbaqCfgiKCxhSipjHS0LVGbs6ht3S-npWe3nkD8Oi6fe6kna7Mox1Rer6~AaYrRaWEwbHX5yCVppx6H6qIR-m4cqB~kYOQc2mUFBh36SPQoQJoTJgvBAdqBUKm4SwIoqSBZbdahCDCcoBWw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "A schoolmaster can be referred to contemptuously as an usher; a doctor is regarded humorously as a licensed murderer; a solicitor is always retiring to gaol for making away with trust funds, and, in any case, is merely an attorney; while a civil servant sleeps from ten to four every day, and is only waked up at sixty in order to be given a pension.",
+        "text_original": "A schoolmaster can be referred to contemptuously as an usher; a doctor is regarded humorously as a licensed murderer; a solicitor is always retiring to gaol for making away with trust funds, and, in any case, is merely an attorney; while a civil servant sleeps from ten to four every day, and is only waked up at sixty in order to be given a pension.",
+        "speaker_id": "7515",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/7515/100431/7515_100431_000004_000002.wav",
+        "chapter_id": "100431",
+        "id": "7515_100431_000004_000002"
+      }
+    },
+    {
+      "id": "475",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/9625/audio/audio.wav?Expires=1768143772&Signature=snvkpyvL~nI~H9zIrAwbVY76lmtak2ykUY~kLfeV2s6fG-UQeqhCuJvufLuAtrVNNM5a7VYw1bjcdGGvLw8lGQlahFnNMap9nSwSXZ8qMGdYp~1HwVKm4vGG-FXqc6EjrGQu~WxAQjWKFG9rVfEVqP6h~gekwUffpi6N9u8hWtVFExDFrzEvRwmQH83v7DJ7simAcOZoid64vrU6K7E79xuBvINdZLwmKZ1KqYGz9bBcXvDoTtIMZp-SfHgPBNO7cWI~7Hkhx4t6WdXvwvlDH-Smxbv2gE~PKcA4c5W2HUsi1CuNwaKLKk~CbOTezbp4TS3oS35kNW9b-595AeKGng__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "The young have aspirations that never come to pass, the old have reminiscences of what never happened.",
+        "text_original": "The young have aspirations that never come to pass, the old have reminiscences of what never happened.",
+        "speaker_id": "475",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/475/125002/475_125002_000024_000001.wav",
+        "chapter_id": "125002",
+        "id": "475_125002_000024_000001"
+      }
+    },
+    {
+      "id": "459",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/9681/audio/audio.wav?Expires=1768143772&Signature=muapueXit-pWQJxeRkfUCzQobt6pc70ckSoFIAJTG~2vP3Uyl0gT-0XEY5fJ9PYC4gZxTSTttRcU-n7mkdvpEKRC0X00ZHI96t8r1AUS5x~UYUxtsWNkt63un3cjFyXw8vQLbCyl79Y9OwlIPe2Ay~3M9RJ7SewGBazuNTwo6KJx029SPOiT7GY6ajIXI9Ey1vPfaIQZL9~SuURyHHQKxhEe5SH6upjq3ToLMYqVDtwNSTmsQy1H0orbRJ0LtGh8nRnuSaFbFLs2xxDtSf5QVVdrtQ5Y907OqZfAw6Pf~~qj-XM~gWFw-EsPK3jDpyJwQuyIvxrzQPLf9FougyrtXw__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Although the breeze had now utterly ceased, we had made a great deal of way during the night and were now lying becalmed about half a mile to the south-east of the low eastern coast. Grey coloured woods covered a large part of the surface.",
+        "text_original": "Although the breeze had now utterly ceased, we had made a great deal of way during the night and were now lying becalmed about half a mile to the south-east of the low eastern coast. Grey-coloured woods covered a large part of the surface.",
+        "speaker_id": "459",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/459/127521/459_127521_000003_000001.wav",
+        "chapter_id": "127521",
+        "id": "459_127521_000003_000001"
+      }
+    },
+    {
+      "id": "7802",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/9913/audio/audio.wav?Expires=1768143785&Signature=Aznv8DXPiE0hRbiKlSwUJolOuvJgufIDTQZ02LtONufAmSHtHJ5WEP13Lr85jWPwnFk8UJpTwo8tvArLLKeaskPYAIFNdroZDYyzxRb4Cs9NPFAYJsTxFzWYSZziWGDs0lpxJMCpegsqms2wbtvlVOaAQlA4kXg5TZloIENTTeuF4Hzlvve6F84dgUp7d~kjSovd53MGAig2W5C5YBa0bmFR2G4wZ6YsDBfKPKfnR6ArIenMACoMT33cGjcm22HQog9y1LbJ7QuPRxMI~BZkmx-9DFnNAUFsbByyDz4eQuw5R85TiHF-dE27VyJJ6VQ3gtNqEQSk3Gc52bm09wj~bg__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Down in the pasture by the house half a dozen Snow Witches were dancing in a circle, now near, now far, all over the pasture, and sometimes right up to the farm house windows.",
+        "text_original": "Down in the pasture by the house half a dozen Snow Witches were dancing in a circle, now near, now far, all over the pasture, and sometimes right up to the farm-house windows.",
+        "speaker_id": "7802",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/7802/104394/7802_104394_000004_000004.wav",
+        "chapter_id": "104394",
+        "id": "7802_104394_000004_000004"
+      }
     }
   ],
-  "scannedRows": 8000,
+  "scannedRows": 10000,
   "totalRows": 116500
 }

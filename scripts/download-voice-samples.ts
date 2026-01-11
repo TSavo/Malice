@@ -110,13 +110,46 @@ async function fetchRows(offset: number, length: number, retries = 5): Promise<H
   throw new Error('Max retries exceeded');
 }
 
-async function downloadAudio(url: string): Promise<Buffer> {
-  const resp = await fetch(url);
-  if (!resp.ok) {
+async function downloadAudio(url: string, retries = 3): Promise<Buffer> {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    const resp = await fetch(url);
+    if (resp.ok) {
+      const arrayBuffer = await resp.arrayBuffer();
+      return Buffer.from(arrayBuffer);
+    }
+    if (resp.status === 429 && attempt < retries) {
+      const waitTime = Math.min(5000 * Math.pow(2, attempt - 1), 60000);
+      await new Promise((r) => setTimeout(r, waitTime));
+      continue;
+    }
     throw new Error(`Download failed: ${resp.status}`);
   }
-  const arrayBuffer = await resp.arrayBuffer();
-  return Buffer.from(arrayBuffer);
+  throw new Error('Max retries exceeded');
+}
+
+async function downloadSpeaker(
+  speakerId: string,
+  sample: LibriTTSRow,
+  outputDir: string
+): Promise<boolean> {
+  const filename = `speaker_${speakerId}.wav`;
+  const filepath = join(outputDir, filename);
+
+  try {
+    const audioUrl = sample.audio?.[0]?.src;
+    if (!audioUrl) {
+      console.log(`  ⏭️  ${filename} - no audio URL`);
+      return false;
+    }
+
+    const audioBuffer = await downloadAudio(audioUrl);
+    await writeFile(filepath, audioBuffer);
+    console.log(`  ✅ ${filename} (${(audioBuffer.length / 1024).toFixed(1)}KB)`);
+    return true;
+  } catch (err) {
+    console.log(`  ❌ ${filename} - ${(err as Error).message}`);
+    return false;
+  }
 }
 
 interface SpeakerCache {
@@ -177,7 +210,13 @@ async function main() {
   // If we need more speakers, scan the dataset
   const needMore = speakerSamples.size < COUNT && (!cache || cache.scannedRows < cache.totalRows);
 
-  if (needMore) {
+  // Create output directory early
+  await mkdir(OUTPUT_DIR, { recursive: true });
+
+  let downloaded = existingVoices.size;
+  let failed = 0;
+
+  if (needMore && !DRY_RUN && !LIST_ONLY) {
     console.log('📡 Fetching dataset info from Hugging Face...');
     const initial = await fetchRows(0, 100);
     console.log(`📊 Dataset has ${initial.num_rows_total.toLocaleString()} total samples\n`);
@@ -194,25 +233,38 @@ async function main() {
       }
     }
 
-    console.log(`🔍 Scanning for unique speakers (starting at row ${offset.toLocaleString()})...`);
+    console.log(`🔍 Scanning and downloading (starting at row ${offset.toLocaleString()})...`);
+    console.log(`   Target: ${COUNT} speakers | Found: ${speakerSamples.size} | Downloaded: ${downloaded}\n`);
 
-    // Scan through data to find diverse speakers
-    while (speakerSamples.size < COUNT && offset < initial.num_rows_total) {
+    // Scan through data to find diverse speakers AND download immediately
+    while (downloaded < COUNT && offset < initial.num_rows_total) {
       const batch = await fetchRows(offset, batchSize);
 
       for (const { row } of batch.rows) {
         const speakerId = row.speaker_id;
 
-        // Skip if we already have this speaker
+        // Skip if we already have this speaker in cache or downloaded
         if (speakerSamples.has(speakerId)) continue;
+        if (existingVoices.has(`speaker_${speakerId}`)) continue;
 
         // Skip samples with very short text (likely too short audio)
         if (row.text_normalized.length < 100) continue;
 
+        // Found new speaker - download immediately!
         speakerSamples.set(speakerId, row);
+        const success = await downloadSpeaker(speakerId, row, OUTPUT_DIR);
+        if (success) {
+          downloaded++;
+          existingVoices.add(`speaker_${speakerId}`);
+        } else {
+          failed++;
+        }
 
         // Stop if we have enough
-        if (speakerSamples.size >= COUNT) break;
+        if (downloaded >= COUNT) break;
+
+        // Small delay between downloads
+        await new Promise((r) => setTimeout(r, 500));
       }
 
       scanned += batch.rows.length;
@@ -220,7 +272,7 @@ async function main() {
 
       // Progress update
       process.stdout.write(
-        `\r  Scanned ${scanned.toLocaleString()} samples, found ${speakerSamples.size} unique speakers`
+        `\r  Scanned ${scanned.toLocaleString()} rows | Found ${speakerSamples.size} speakers | Downloaded ${downloaded}   `
       );
 
       // Save cache periodically (every 1000 rows)
@@ -272,43 +324,8 @@ async function main() {
     return;
   }
 
-  // Create output directory
-  await mkdir(OUTPUT_DIR, { recursive: true });
-
-  // Download samples
-  console.log(`⬇️  Downloading ${speakers.length} voice samples...\n`);
-
-  let downloaded = 0;
-  let failed = 0;
-
-  for (const [speakerId, sample] of speakers) {
-    const filename = `speaker_${speakerId}.wav`;
-    const filepath = join(OUTPUT_DIR, filename);
-
-    try {
-      // Get audio URL from the sample
-      const audioUrl = sample.audio?.[0]?.src;
-      if (!audioUrl) {
-        console.log(`  ⏭️  ${filename} - no audio URL`);
-        failed++;
-        continue;
-      }
-
-      // Download the audio file
-      const audioBuffer = await downloadAudio(audioUrl);
-      await writeFile(filepath, audioBuffer);
-      downloaded++;
-      console.log(`  ✅ ${filename} (${(audioBuffer.length / 1024).toFixed(1)}KB)`);
-    } catch (err) {
-      console.log(`  ❌ ${filename} - ${(err as Error).message}`);
-      failed++;
-    }
-
-    // Rate limit
-    await new Promise((r) => setTimeout(r, 200));
-  }
-
-  console.log('\n=====================================');
+  // Summary
+  console.log('=====================================');
   console.log(`✅ Downloaded: ${downloaded}`);
   console.log(`❌ Failed: ${failed}`);
   console.log(`📁 Output: ${OUTPUT_DIR}`);
