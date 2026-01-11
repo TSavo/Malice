@@ -11,6 +11,8 @@ The building's upper floors hold residential units, their windows dark, their fi
   y: -12,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-king-st-x3-y-12-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

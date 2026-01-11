@@ -10,6 +10,8 @@ The street dips slightly where it crosses the old rail alignment, a subtle depre
   x: 6,
   y: -12,
   z: 0,
+
+  imageOnDisk: 's-king-st-x6-y-12-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,
