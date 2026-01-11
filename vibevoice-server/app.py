@@ -73,15 +73,16 @@ app.add_middleware(
 model = None
 processor = None
 
-# OpenAI voice mapping to VibeVoice voice presets
-# Available 7B WAV files: en-Carter_man, en-Frank_man, en-Maya_woman, en-Alice_woman, en-Mary_woman
-OPENAI_VOICES = {
-    "alloy": "Carter",     # Male voice
-    "echo": "Frank",       # Male voice
-    "fable": "Maya",       # Female voice
-    "onyx": "Frank",       # Male voice (same as echo - limited options)
-    "nova": "Alice",       # Female voice
-    "shimmer": "Mary",     # Female voice
+# Default voice samples bundled with VibeVoice
+# Maps voice name -> sample filename (without extension)
+# Users can add custom voices by placing WAV files in the voices directory
+DEFAULT_VOICES = {
+    "alloy": "en-Carter_man",
+    "echo": "en-Frank_man",
+    "fable": "en-Maya_woman",
+    "onyx": "en-Frank_man",  # Reuses Frank (limited bundled samples)
+    "nova": "en-Alice_woman",
+    "shimmer": "en-Mary_woman",
 }
 
 
@@ -90,7 +91,7 @@ def get_voice_preset(voice_name: str) -> Optional[dict]:
     global voice_cache, voice_cache_lock
 
     # Map OpenAI voice names to VibeVoice presets
-    voice_key = OPENAI_VOICES.get(voice_name.lower(), voice_name.lower())
+    voice_key = DEFAULT_VOICES.get(voice_name.lower(), voice_name.lower())
 
     # Double-checked locking pattern
     with voice_cache_lock:
@@ -223,7 +224,7 @@ def load_model():
 def get_voice_wav_path(voice_name: str) -> Optional[Path]:
     """Find a WAV voice sample file for the 7B model"""
     # Get the mapped voice name (preserving case for file matching)
-    voice_key = OPENAI_VOICES.get(voice_name.lower(), voice_name)
+    voice_key = DEFAULT_VOICES.get(voice_name.lower(), voice_name)
 
     # Look for voice file
     voice_files = list(VOICES_DIR.glob(f"**/*{voice_key}*.wav")) + \
@@ -481,19 +482,19 @@ async def list_voices():
     """List available voices"""
     voices = []
     
-    # Add OpenAI-compatible voices
-    for voice_id in OPENAI_VOICES.keys():
+    # Add default bundled voices
+    for voice_id in DEFAULT_VOICES.keys():
         voices.append(VoiceInfo(voice_id=voice_id, name=voice_id.capitalize()))
     
     # Add custom voices from directory
     for voice_file in VOICES_DIR.glob("*.wav"):
         voice_id = voice_file.stem
-        if voice_id not in OPENAI_VOICES:
+        if voice_id not in DEFAULT_VOICES:
             voices.append(VoiceInfo(voice_id=voice_id, name=voice_id))
     
     for voice_file in VOICES_DIR.glob("*.mp3"):
         voice_id = voice_file.stem
-        if voice_id not in OPENAI_VOICES:
+        if voice_id not in DEFAULT_VOICES:
             voices.append(VoiceInfo(voice_id=voice_id, name=voice_id))
     
     return VoicesResponse(voices=voices)
@@ -509,8 +510,8 @@ async def create_speech(request: SpeechRequest):
     if len(request.input) > 10000:
         raise HTTPException(status_code=400, detail="Input text too long (max 10000 chars)")
     
-    # Map OpenAI voice to internal voice (for now, all use default)
-    voice = OPENAI_VOICES.get(request.voice, request.voice)
+    # Map default voice name to sample filename, or use voice name directly for custom voices
+    voice = DEFAULT_VOICES.get(request.voice, request.voice)
     
     # Generate audio
     audio = generate_speech(request.input, voice, request.speed)
