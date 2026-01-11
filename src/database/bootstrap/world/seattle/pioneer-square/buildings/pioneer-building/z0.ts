@@ -300,6 +300,7 @@ A door in the eastern wall leads to the Seattle Underground—the network of tun
       x: 3,
       y: 9,
       z: -1,
+      imageOnDisk: 'pioneer-building-basement-x3-y9-z-1.png',
       population: 0,
       ambientNoise: 10,
       lighting: 25,
