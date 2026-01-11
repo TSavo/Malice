@@ -13,11 +13,11 @@ jobs:
   claude-fixer:
     # Only run if:
     # 1. Comment is on a PR (not an issue)
-    # 2. Comment contains the review marker
+    # 2. Comment contains the review marker (with or without escaped !)
     # 3. Comment contains "Changes Requested" (not LGTM)
     if: |
       github.event.issue.pull_request &&
-      contains(github.event.comment.body, '<!-- CLAUDE_REVIEW_MARKER -->') &&
+      (contains(github.event.comment.body, '<!-- CLAUDE_REVIEW_MARKER -->') || contains(github.event.comment.body, '<\!-- CLAUDE_REVIEW_MARKER -->')) &&
       contains(github.event.comment.body, 'Changes Requested')
 
     runs-on: [self-hosted, malice]
