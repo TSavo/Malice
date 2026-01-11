@@ -53,6 +53,7 @@ export class Window {
     this.windowType = config.windowType || 'generic';
     this.config = config.config || {};
     this.title = config.title || 'Window';
+    this.icon = config.icon || null;  // Unicode icon for title bar
     this.channel = config.channel || null;
 
     // State
@@ -76,6 +77,7 @@ export class Window {
     this.element = null;
     this.titlebar = null;
     this.content = null;
+    this.iconEl = null;
   }
 
   /**
@@ -114,6 +116,21 @@ export class Window {
       cursor: default;
       user-select: none;
     \\\`;
+
+    // Icon (optional)
+    const iconEl = document.createElement('span');
+    iconEl.className = 'window-icon';
+    iconEl.style.cssText = \\\`
+      font-size: 14px;
+      margin-right: 6px;
+      flex-shrink: 0;
+    \\\`;
+    if (this.icon) {
+      iconEl.textContent = this.icon;
+    } else {
+      iconEl.style.display = 'none';
+    }
+    this.iconEl = iconEl;
 
     // Title text
     const titleText = document.createElement('span');
@@ -156,6 +173,7 @@ export class Window {
       buttons.appendChild(closeBtn);
     }
 
+    this.titlebar.appendChild(iconEl);
     this.titlebar.appendChild(titleText);
     this.titlebar.appendChild(buttons);
 
@@ -528,6 +546,21 @@ export class Window {
     if (this.titleText) {
       this.titleText.textContent = title;
     }
+  }
+
+  setIcon(icon) {
+    this.icon = icon;
+    if (this.iconEl) {
+      if (icon) {
+        this.iconEl.textContent = icon;
+        this.iconEl.style.display = '';
+      } else {
+        this.iconEl.textContent = '';
+        this.iconEl.style.display = 'none';
+      }
+    }
+    // Also update taskbar button
+    this.wm?.taskbar?.updateButtonIcon(this.id, icon);
   }
 
   updateGeometry(changes) {

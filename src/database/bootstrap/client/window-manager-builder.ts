@@ -463,8 +463,8 @@ export class WindowManager {
     this.windows.set(config.windowId, win);
     this.zOrder.push(config.windowId);
 
-    // Add to taskbar
-    const icon = this._getWindowIcon(windowType);
+    // Add to taskbar - use provided icon or derive from type
+    const icon = config.icon || this._getWindowIcon(windowType);
     this.taskbar.addWindow(config.windowId, config.title, icon);
 
     // Initialize window based on type

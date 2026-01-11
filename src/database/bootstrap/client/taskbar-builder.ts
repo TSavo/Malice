@@ -281,7 +281,7 @@ export class Taskbar {
       }
     });
 
-    this.buttons.set(windowId, { button: btn, titleSpan });
+    this.buttons.set(windowId, { button: btn, iconSpan, titleSpan });
     this.buttonsArea.appendChild(btn);
   }
 
@@ -327,6 +327,13 @@ export class Taskbar {
     const entry = this.buttons.get(windowId);
     if (entry) {
       entry.titleSpan.textContent = title;
+    }
+  }
+
+  updateButtonIcon(windowId, icon) {
+    const entry = this.buttons.get(windowId);
+    if (entry && entry.iconSpan) {
+      entry.iconSpan.textContent = icon || '□';
     }
   }
 

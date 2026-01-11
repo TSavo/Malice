@@ -626,8 +626,9 @@ export class PlayerBuilder implements Builder {
       /** Show a window to the player.
        *  @param name - Window identifier (e.g., 'lock', 'item', 'note')
        *  @param content - RuntimeObject (shows image/name/desc) or string (HTML content)
-       *  @param options - { persist?: boolean, title?: string }
+       *  @param options - { persist?: boolean, icon?: string, title?: string }
        *    persist: if true, adds to start menu so player can reopen
+       *    icon: unicode character for title bar/taskbar/start menu (e.g., '🔐', '📜')
        *    title: override the window title (defaults to object name or 'View')
        */
       const name = args[0];
@@ -639,6 +640,7 @@ export class PlayerBuilder implements Builder {
       const data = {
         window: name,
         persist: options.persist || false,
+        icon: options.icon || null,
         title: options.title || null
       };
 
@@ -650,6 +652,8 @@ export class PlayerBuilder implements Builder {
         data.name = content.name || 'Unknown';
         data.description = content.description || '';
         data.title = data.title || content.name || 'View';
+        // Default icon for objects
+        data.icon = data.icon || '🖼';
 
         // Get image URL
         const images = content.images || {};
@@ -662,6 +666,8 @@ export class PlayerBuilder implements Builder {
         data.type = 'html';
         data.html = content;
         data.title = data.title || 'View';
+        // Default icon for HTML
+        data.icon = data.icon || '📄';
       } else {
         return false;
       }

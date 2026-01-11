@@ -371,6 +371,7 @@ export class MaliceClient {
 
   async _handleShowState(data) {
     const windowId = 'show:' + data.window;
+    const icon = data.icon || '👁';
 
     // Track show windows for state management
     if (!this.showWindows) {
@@ -382,7 +383,7 @@ export class MaliceClient {
     if (data.persist) {
       const client = this;
       this.wm?.taskbar?.registerAvailableWindow(windowId, {
-        icon: '👁',
+        icon: icon,
         label: data.title || data.window,
         windowType: 'show',
         stateType: 'show:' + data.window,
@@ -403,9 +404,10 @@ export class MaliceClient {
       win.setContent(data);
     }
 
-    // Update title if provided
-    if (win && data.title) {
-      win.setTitle(data.title);
+    // Update title and icon if provided
+    if (win) {
+      if (data.title) win.setTitle(data.title);
+      if (data.icon) win.setIcon(data.icon);
     }
   }
 
@@ -446,10 +448,19 @@ export class MaliceClient {
     const existingShowWindows = Array.from(this.wm.windows.keys()).filter(id => id.startsWith('show:'));
     const offset = (existingShowWindows.length * 30) % 150;
 
+    // Get icon from data or stored showWindows
+    let icon = data?.icon;
+    if (!icon && this.showWindows) {
+      const stored = this.showWindows.get(windowName);
+      icon = stored?.icon;
+    }
+    icon = icon || '👁';
+
     await this.wm.openWindow({
       windowId: windowId,
       windowType: 'show',
       title: data?.title || windowName,
+      icon: icon,
       channel: 'win:' + windowId,
       config: {
         x: 100 + offset,
