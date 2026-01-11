@@ -9078,8 +9078,195 @@
         "chapter_id": "61356",
         "id": "5968_61356_000004_000002"
       }
+    },
+    {
+      "id": "1769",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/72019/audio/audio.wav?Expires=1768147069&Signature=drYHCGOeBg~Z5Svn3Bpi8a5R30RDC1SHd8lSM4eBuCW5Hz4tfroe5grQVl5JO67sfq0Ya~mW~of1CEpbNPEL0tjf6XwTTojNw9Jo1P1uxZ2OwLW9UkjQYws-23t3weWpkuVBwgOvfeJPSsPaxC38Ay9357KhovsPYrtfTaX762x7C7s5~WonOXdJKxBhUCwb7~OXWS~VJT80XBedYEvIxWvil7DndUTa-4KH0Yt-EvwUhQ2Wh7OOCs3blkAlPXfNbgxekN5g5-r4L8TfUNCuJup3vbCc~P3TC0wadp1rGElRXfdnbxLFDCedpxLSFH5ztpBkqD7bYOniYdmAjcHMAQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "How many different accidents must have concurred to make them acquainted with the most common uses of this element?",
+        "text_original": "How many different accidents must have concurred to make them acquainted with the most common uses of this element?",
+        "speaker_id": "1769",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/1769/143485/1769_143485_000009_000002.wav",
+        "chapter_id": "143485",
+        "id": "1769_143485_000009_000002"
+      }
+    },
+    {
+      "id": "6620",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/72087/audio/audio.wav?Expires=1768147070&Signature=V6d-X9jUUJX9Qz0HanB-Pwr7R0XNGpg9bxxMKL2HaWtAev~dMQGZz6lVAjYKStq5XX52OFlepspE~sRbQRFJ2WEn0UhhOFnrvxuO11pt80MR6nb9IkfHg7zsN9eAOboT9mKdDK2znLQlqX1WvFHDm9LAcko~EKAfWjpu~Iy7s-N4bczf6aNSRemhHQvrxH4LNnTBhthz9EDbDBHejdbhMIMowwjFPF01eg6pfsZmLCcgJaqPddQFur2d4UwFz1BcDjcCb2vJFQMNYy~qLs9-P0JDZ20NugmXZ5~sKgmHe8Pzzf1YeJq2zQ8ONe5k44bil4yRV9-4m2yEffQABveJOQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Nor could it be supposed, at all times, in every man's power to attain every kind of mental more than of exterior beauty.",
+        "text_original": "Nor could it be supposed, at all times, in every man's power to attain every kind of mental more than of exterior beauty.",
+        "speaker_id": "6620",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/6620/283138/6620_283138_000026_000008.wav",
+        "chapter_id": "283138",
+        "id": "6620_283138_000026_000008"
+      }
+    },
+    {
+      "id": "6188",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/72124/audio/audio.wav?Expires=1768147076&Signature=WZEk2UCTIlLGQMlkIBb4vCFyco2~zv0x70t~uVothKz2sADC5C~FR~iDyI-G0LqKNMsZFYeBT5OGXNQTuA2XgIqzOV5DZLrpI-y5UyQMhAlUoW4HyMKuWKPKJD7TkFVMYmFfL8I5KsS0bopRUlJID-1DYToYFsVByAJNDxONAlUFE9LDUVRx4zUxdLMCz8sOqvMhC1yfcVCnoWHsRRjFIxcm~8NGsrQ0ZBqweoRacZpuhD2D7759~7HO4D9i-HRsM8qL89jl9wQjq-zOP31K4-jHM2J3gfAE1AHUk7YXPG83Y~iO9NE0eYB6tdpS4TzBjUme~cASy3qApZb1ptKZPg__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "He had professed to himself that his reason for not going there was the non performance of the commission which Lady Ongar had given him with reference to Count Pateroff.",
+        "text_original": "He had professed to himself that his reason for not going there was the non-performance of the commission which Lady Ongar had given him with reference to Count Pateroff.",
+        "speaker_id": "6188",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/6188/73024/6188_73024_000003_000001.wav",
+        "chapter_id": "73024",
+        "id": "6188_73024_000003_000001"
+      }
+    },
+    {
+      "id": "6139",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/72249/audio/audio.wav?Expires=1768147082&Signature=J8O4BaHcspqwckVi~RKeVWYdw2dYq44~YSlHjckQqt-QTiabVlVSYj4UsElgwkpdv12TVnsGys95j7WJg4kliSmEQuMcUFktxV3PIYK3HVU7RgnQV7ou-4cfYF5632EJTrZWNIUg6lhhFX2pU949syyk8jNWaUV3tZJuHUgZd1jJ~xfFOShNqrNDwMsoL4wkPbIS2hg1zdbkNtO8QGPMmN5rujm5elaLPoVkGwctRW1qOb8UZ6PpbSuV0jq3guqpvDHLK7jO98~5lEIMIm3TcN2OjrCrH6C86IH5sF9FPcxvn5yUCOrnlAyh59ZkzFZ5YO7A3NIcA~KskPGs7IiY2A__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Under the blossoms rode the Little Colonel, all in white herself this May morning, except the little Napoleon hat of black velvet, set jauntily over her short light hair.",
+        "text_original": "Under the blossoms rode the Little Colonel, all in white herself this May morning, except the little Napoleon hat of black velvet, set jauntily over her short light hair.",
+        "speaker_id": "6139",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/6139/58868/6139_58868_000020_000000.wav",
+        "chapter_id": "58868",
+        "id": "6139_58868_000020_000000"
+      }
+    },
+    {
+      "id": "708",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/72426/audio/audio.wav?Expires=1768147091&Signature=r2fLr9cgNEo4YKhdFqf6Q3aUWhSs9htzeClTNE8Mbmq9RXZAkX4RGcthLILR~GrqnpP7s6OKdsYXqq4Q1S-1U9SDElXm-5YlH7W1IiSV~Il1kZY~-h8RIB0jHWfvJ3F-axfMu3vw2YlXvTDx65s42PBbu7trSGCsHyfzhrWGRbvIrH30E0-s3Pl89gW2bTLmnlA8c9L~3fM5vxEJtC78mvtDiVcOTmHZv0iKwEMjQZ27lXx7IXi6ocplgKUTp7ALBUQ1Pbfef4k0h06lR-adFz3lgFsdNTnXwpyUsZb16rJahfEcOv~YWrkG3JoBHXTRIR4jxPv4nL7BKS89pmBEdg__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "The personal pronoun in English has three cases, the dominative, the objectionable and the oppressive.",
+        "text_original": "The personal pronoun in English has three cases, the dominative, the objectionable and the oppressive.",
+        "speaker_id": "708",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/708/129393/708_129393_000045_000002.wav",
+        "chapter_id": "129393",
+        "id": "708_129393_000045_000002"
+      }
+    },
+    {
+      "id": "7069",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/72452/audio/audio.wav?Expires=1768147091&Signature=dwFwqIkuSZmD-brLDhRqGgWqw~kNmZ1X1kIQHjfnTKRpyxJ-PRIDtj~eA7miEsAsGbEZZFZ6AymvlQCVrJ4RsHdinGLFh9GGVcO~nBBbACVyo9~cq9EayHNa9aWqGlwWPiL2P6mZUbniFv4jRagFMx3HOnGVidbVq~R6zjfA3nMGGwI28w9VhH3GY9oGGsxPQx7Tb6M7-DfFGR5uoEIU9iqQLZ4OTla48~6UJZnZwJ60wYBApdDstePCIpxXpNmdahaecOnqWfcju8P6ExF9N6XLval4fj3WCxPrhS8JEbND5BjMqZnqr23~aVUYJ6bbEMaZsD-CN88ZYI8EhwFg0g__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "\"But,\" he concluded, \"since you set me about it, my judgment has capsized itself, and it now seems to me worse to use my uncle's sermons than to have used the bishop's, which anyone might discover to be what they are.\"",
+        "text_original": "\"But,\" he concluded, \"since you set me about it, my judgment has capsized itself, and it now seems to me worse to use my uncle's sermons than to have used the bishop's, which anyone might discover to be what they are.\"",
+        "speaker_id": "7069",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/7069/246904/7069_246904_000011_000000.wav",
+        "chapter_id": "246904",
+        "id": "7069_246904_000011_000000"
+      }
+    },
+    {
+      "id": "7555",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/72536/audio/audio.wav?Expires=1768147097&Signature=nZGlk0rqBDHZIFvyR4Uqds3twAeHLBotYB7TCp5WZhWUOUMIng36ICth3bCMvkKXGu7dsnqpjRsXu8HP5qSdfGeW4llDPm9XMzYzecdpHuz8fiKbHHSFJqFYm-rkFHzIFjQ5WZEEUsxxpbx~UD8g4ljh-g5Pri-QI9pQTJ2quS9yg2QXcGnlHgy14y0XmzEio0wV-hTBIPRDTpsYveaPZcCJwECuwVYloXyeFfFiNi7jM3c2YjwpF~bR36v-gBE-3BFeX20zFu72F4MlL6wOJWpScEiNUmEH4jYlM636JfGl8C~r~qPz-i1vxJFfgVFb2tO1xwMxRgoOhfWkOkebgQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "'And I will have you,' 'And I you,' exclaimed two of his friends, and they all rode back to the palace together.",
+        "text_original": "'And I will have you,' 'And I you,' exclaimed two of his friends, and they all rode back to the palace together.",
+        "speaker_id": "7555",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/7555/101283/7555_101283_000014_000000.wav",
+        "chapter_id": "101283",
+        "id": "7555_101283_000014_000000"
+      }
+    },
+    {
+      "id": "1425",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/72623/audio/audio.wav?Expires=1768147102&Signature=eJVTpCSHFlg29KUcTO2dETrlo4Vmg0aB8pQPVkhCrtS3Nsno1ZUOE7PB~UbJw2OEr-iU6oG8WMowlITrd8AR1RxpScON4eUwEtCDiGO4hEc2NEqJk~D9RVuGuziDOKeHMTKePv5~8r82~w~Kdh~9ytZsY8RhEgrJF~lAvPQhA-uQ6Vi5IvYWJgx4HTt7NBVBv8ldaiIW58VXuSa2qzyihYHmnaGTM3qtifEUoMYUBL68swmSsJ8~AHzfsk931hr77hPve8NP~srqv7xqNFBiOdVy781zPPceltwSKxJd8kefX6ntz~cpx0ZB65XPqIxxrbvYBMjVK4uRFepYETTAXQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "My master's family consisted of two sons, Andrew and Richard; one daughter, Lucretia, and her husband, Captain Thomas Auld.",
+        "text_original": "My master's family consisted of two sons, Andrew and Richard; one daughter, Lucretia, and her husband, Captain Thomas Auld.",
+        "speaker_id": "1425",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/1425/139291/1425_139291_000001_000000.wav",
+        "chapter_id": "139291",
+        "id": "1425_139291_000001_000000"
+      }
+    },
+    {
+      "id": "5389",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/72669/audio/audio.wav?Expires=1768147102&Signature=Lm9J6AgviScEaLy-9MVLEGFLg5Jc8UdItA7sNepixyeLBbP5v0dFchiYk18eVckm7A5nnz4g2DfoGiSMeRxYVQ0WwXf-UQAksfCzoJh5cUEzo6~ee9egVW77ekMQswHMbL5h8JFoJdV-iNzGGPa7NhWOqxUw648Yp1NtWJ15~dBQn4ZMcEJtN879JtThr4vjwLogKsyAdpkxvSq1ngXeEM6~q2LX~KHATvR64kKiZDyuA3FFb7AvdPnySn9AsfeP8G5L~UEuYOgcyqH5EtZPiCJkTcFwXvzTr2rg9ZOB3TtiuzvA-qUTT9TmunPrT8LMRwCHXm7M00F6wReXmgPS0g__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "In the course of time Janni's parents died, and he and his sister were left alone in the world; soon affairs went badly with them, so they determined to wander away to seek their fortune.",
+        "text_original": "In the course of time Janni's parents died, and he and his sister were left alone in the world; soon affairs went badly with them, so they determined to wander away to seek their fortune.",
+        "speaker_id": "5389",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/5389/41911/5389_41911_000008_000000.wav",
+        "chapter_id": "41911",
+        "id": "5389_41911_000008_000000"
+      }
+    },
+    {
+      "id": "8329",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/72784/audio/audio.wav?Expires=1768147109&Signature=VZNdV5~b56IIwQC196vZZMEvYV-B5Q4dtAVboZxaiXjbNoRGRigbJhFUTO6w~ug0wW3oMCOAjBxNd~ehB00iy7XIJw-uVRq6cKhzn9fA-wrf1v4NPnGygUMOrQ2ahgmPfumtpAEPpH0aRd0j9UEwt70vGjsIh43vkXPLJwUA8eXbKo0zRTJSnl61ks5HG4c8sapsMZkqvHktyrv8KaATfx5UCuqeM6wvqw4Cvzj3Zxan8GM7uvTGo1sUUuTdc0N1243srt034x2u~KWXLdA0OnHJHRMr4qBV332U3cu0wzokxBC08su8Y~hghFNZAG-5L-toyXB~DwN-2I-qRnVvVA__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "Every day she had given her a different dress, of gold brocade, velvet, or satin; yet she was neither conceited nor boastful.",
+        "text_original": "Every day she had given her a different dress, of gold brocade, velvet, or satin; yet she was neither conceited nor boastful.",
+        "speaker_id": "8329",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/8329/279775/8329_279775_000003_000003.wav",
+        "chapter_id": "279775",
+        "id": "8329_279775_000003_000003"
+      }
+    },
+    {
+      "id": "6965",
+      "sample": {
+        "audio": [
+          {
+            "src": "https://datasets-server.huggingface.co/cached-assets/mythicinfinity/libritts/--/35f26bdafa9883b5524f17931216af78632db8eb/--/clean/train.clean.360/72926/audio/audio.wav?Expires=1768147120&Signature=n3e5T1KvkEbUUC3mM~580FW-iXFobeTWmiwnFAgNG3OPhX2O03avlw42XzWzAEJqfgrLDNxaVMD02vTsJlpPyOB7HfRDAtDMpbQG6Qg45yslsZhLUFDwfIUARXc33crdn-3SgwgZL~KliSioip4G-hbciXh21MmwHDc7jyhIEel6BRUM2fHN6mYfWZup48y3mryPfSnnsNR~abg0xSQLjO3uEBwtI-uVxMPhmGvhh5z8616iSZwkz3OkD8ct-C8ZLtzxVqQIoj~djby1fJ8SoQi0kipPICBPZnKqSi8eGe~bOV2QPFuEHYerVAstf3ywX2RWy4gpyAC-fp-t~Sn8RQ__&Key-Pair-Id=K3EI6M078Z3AC3",
+            "type": "audio/wav"
+          }
+        ],
+        "text_normalized": "As you may imagine, I did not get any sleep that night, not even so much as a cat's nap, as people say, though how cat's naps differ from men's and women's naps, I don't know.",
+        "text_original": "As you may imagine, I did not get any sleep that night, not even so much as a cat's nap, as people say, though how cat's naps differ from men's and women's naps, I don't know.",
+        "speaker_id": "6965",
+        "path": "/root/.cache/huggingface/datasets/downloads/extracted/a69f18a51f0442390103b2658ad18b56496a3594e950fce0c259e506478e11f4/LibriTTS/train-clean-360/6965/291718/6965_291718_000007_000000.wav",
+        "chapter_id": "291718",
+        "id": "6965_291718_000007_000000"
+      }
     }
   ],
-  "scannedRows": 72000,
+  "scannedRows": 73000,
   "totalRows": 116500
 }
