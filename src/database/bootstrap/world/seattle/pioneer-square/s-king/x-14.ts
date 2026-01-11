@@ -10,6 +10,8 @@ First Avenue stretches north toward Pioneer Square's historic core. King Street 
   x: -14,
   y: -12,
   z: 0,
+
+  imageOnDisk: '1st-ave-s-s-king-st-x-14-y-12-z0.png',
   intersection: ['1st Ave S', 'S. King St'],
   // Environmental properties
   population: 0, // Empty (post-Event)

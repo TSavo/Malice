@@ -10,6 +10,8 @@ The buildings at this intersection span eras, all arriving at the same destinati
   x: 7,
   y: -6,
   z: 0,
+
+  imageOnDisk: '3rd-ave-s-s-jackson-st-x7-y-6-z0.png',
   intersection: ['3rd Ave S', 'S. Jackson St'],
   // Environmental properties
   population: 0, // Empty (post-Event)

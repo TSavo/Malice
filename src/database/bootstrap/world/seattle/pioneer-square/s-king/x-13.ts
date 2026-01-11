@@ -11,6 +11,8 @@ The streetscape shows the stadium district's design priorities: wide sidewalks f
   y: -12,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-king-st-x-13-y-12-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
