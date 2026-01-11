@@ -13,6 +13,7 @@ import { type Builder, registerBuilder } from './builder-registry';
  *   const voices = await $tts.listVoices();
  *   await $tts.addVoice('villain', audioBase64);
  *   const audio = await $tts.speak('Hello', 'villain');
+ *   const voice = await $tts.getVoiceForGender('female', objectId);
  */
 export class TtsBuilder implements Builder {
   static provides = ['tts'];
@@ -52,6 +53,9 @@ export class TtsBuilder implements Builder {
           builtinVoices: ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'],
           // Custom voices added via addVoice() - maps name -> true
           customVoices: {},
+          // Voice gender cache (fetched from server, cached for 30 min)
+          _genderCache: null, // { female: [], male: [], fetchedAt: timestamp }
+          _genderCacheTTL: 30 * 60 * 1000, // 30 minutes in ms
         },
       });
     }
@@ -291,6 +295,159 @@ export class TtsBuilder implements Builder {
     `,
     );
 
+    // Fetch voice genders from server (with 30-min cache)
+    this.tts.setMethod(
+      'fetchVoiceGenders',
+      `
+      /** Fetch voice gender data from TTS server with caching.
+       *  Cached for 30 minutes to avoid repeated HTTP calls.
+       *  @param forceRefresh - Force refresh cache even if not expired
+       *  @returns { female: string[], male: string[] }
+       */
+      const forceRefresh = args[0] || false;
+      const now = Date.now();
+
+      // Check cache validity
+      if (!forceRefresh && self._genderCache) {
+        const age = now - (self._genderCache.fetchedAt || 0);
+        if (age < self._genderCacheTTL) {
+          return { female: self._genderCache.female, male: self._genderCache.male };
+        }
+      }
+
+      // Fetch from server
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+      try {
+        const resp = await fetch(self.serverUrl + '/v1/voices/genders', {
+          method: 'GET',
+          signal: controller.signal,
+        });
+
+        if (!resp.ok) {
+          console.error('Failed to fetch voice genders:', resp.status);
+          // Return cached data if available, even if expired
+          if (self._genderCache) {
+            return { female: self._genderCache.female, male: self._genderCache.male };
+          }
+          return { female: [], male: [] };
+        }
+
+        const data = await resp.json();
+
+        // Update cache
+        self._genderCache = {
+          female: data.female || [],
+          male: data.male || [],
+          fetchedAt: now
+        };
+
+        console.log('[TTS] Cached ' + self._genderCache.female.length + ' female, ' +
+                    self._genderCache.male.length + ' male voices');
+
+        return { female: self._genderCache.female, male: self._genderCache.male };
+      } catch (e) {
+        console.error('TTS fetchVoiceGenders error:', e.message);
+        // Return cached data if available
+        if (self._genderCache) {
+          return { female: self._genderCache.female, male: self._genderCache.male };
+        }
+        return { female: [], male: [] };
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    `,
+    );
+
+    // Get all female voices
+    this.tts.setMethod(
+      'getFemaleVoices',
+      `
+      /** Get all available female voice IDs.
+       *  Fetches from server with 30-min cache.
+       *  @returns Array of female voice IDs (e.g., ['speaker_14', 'speaker_16', ...])
+       */
+      const genders = await self.fetchVoiceGenders();
+      return genders.female || [];
+    `,
+    );
+
+    // Get all male voices
+    this.tts.setMethod(
+      'getMaleVoices',
+      `
+      /** Get all available male voice IDs.
+       *  Fetches from server with 30-min cache.
+       *  @returns Array of male voice IDs (e.g., ['speaker_17', 'speaker_55', ...])
+       */
+      const genders = await self.fetchVoiceGenders();
+      return genders.male || [];
+    `,
+    );
+
+    // Get voice for gender (deterministic based on object ID)
+    this.tts.setMethod(
+      'getVoiceForGender',
+      `
+      /** Get a deterministic voice ID based on gender and object ID.
+       *  Same object always gets the same voice.
+       *  Fetches voice data from server with 30-min cache.
+       *  @param gender - 'female', 'male', or null/undefined for neutral
+       *  @param objectId - Numeric object ID for deterministic selection
+       *  @returns Voice ID (e.g., 'speaker_123' or 'alloy' for fallback)
+       */
+      const gender = args[0];
+      const objectId = args[1] || 0;
+
+      // Normalize gender
+      const normalizedGender = (gender || '').toLowerCase();
+
+      // Fetch voice genders (uses cache)
+      const genders = await self.fetchVoiceGenders();
+
+      let voicePool;
+      if (normalizedGender === 'female' || normalizedGender === 'f') {
+        voicePool = genders.female || [];
+      } else if (normalizedGender === 'male' || normalizedGender === 'm') {
+        voicePool = genders.male || [];
+      } else {
+        // Neutral/unknown - use all voices
+        voicePool = [...(genders.female || []), ...(genders.male || [])];
+      }
+
+      // Fallback to built-in voices if no custom voices available
+      if (voicePool.length === 0) {
+        const builtins = self.builtinVoices || ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
+        return builtins[objectId % builtins.length];
+      }
+
+      // Deterministic selection based on object ID
+      return voicePool[objectId % voicePool.length];
+    `,
+    );
+
+    // Get voice stats
+    this.tts.setMethod(
+      'getVoiceStats',
+      `
+      /** Get statistics about available voices.
+       *  Fetches from server with 30-min cache.
+       *  @returns { female: number, male: number, total: number, builtin: number }
+       */
+      const genders = await self.fetchVoiceGenders();
+      const female = (genders.female || []).length;
+      const male = (genders.male || []).length;
+      const builtin = (self.builtinVoices || []).length;
+      return {
+        female,
+        male,
+        total: female + male,
+        builtin,
+      };
+    `,
+    );
+
     // Property descriptions
     this.tts.setPropertyDescription(
       'serverUrl',
@@ -303,6 +460,14 @@ export class TtsBuilder implements Builder {
     this.tts.setPropertyDescription(
       'customVoices',
       'Map of custom voice names added via addVoice()',
+    );
+    this.tts.setPropertyDescription(
+      '_genderCache',
+      'Cached voice gender data from server (auto-expires after 30 min)',
+    );
+    this.tts.setPropertyDescription(
+      '_genderCacheTTL',
+      'Cache TTL in milliseconds (default: 30 minutes)',
     );
   }
 

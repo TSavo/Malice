@@ -1047,13 +1047,19 @@ export class DescribableBuilder implements Builder {
       `
       /** Get this object's TTS voice ID. Deterministic based on object ID.
        *  Same object always gets same voice across sessions.
-       *  Built-in voices: alloy, echo, fable, onyx, nova, shimmer
-       *  Custom voices can be added via $tts.addVoice() from audio samples.
-       *  @returns voice ID string
+       *  Uses $tts.getVoiceForGender() to match voice gender to object's sex property.
+       *  @returns voice ID string (e.g., 'speaker_123' or 'alloy' for fallback)
        */
       if (self.voiceId) return self.voiceId;
 
-      // Deterministic assignment from object ID - 6 built-in VibeVoice voices
+      // Use $tts for gender-aware voice assignment
+      // self.sex can be 'female', 'male', 'F', 'M', or null/undefined
+      if ($tts && $tts.getVoiceForGender) {
+        self.voiceId = await $tts.getVoiceForGender(self.sex, self.id);
+        return self.voiceId;
+      }
+
+      // Fallback to built-in voices if $tts not available
       const VOICES = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
       self.voiceId = VOICES[self.id % VOICES.length];
       return self.voiceId;

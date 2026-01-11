@@ -9,6 +9,7 @@ import os
 import io
 import time
 import copy
+import json
 import logging
 from threading import Lock
 from typing import Optional, Literal
@@ -569,6 +570,30 @@ async def generate_advanced(
         content=audio_bytes,
         media_type="audio/wav",
     )
+
+
+@app.get("/v1/voices/genders")
+async def get_voice_genders():
+    """Get voice gender mapping for all custom voices"""
+    genders_path = CUSTOM_VOICES_DIR / "voice-genders.json"
+
+    if not genders_path.exists():
+        # Also check app directory
+        genders_path = Path("/app/voice-genders.json")
+
+    if not genders_path.exists():
+        return {"female": [], "male": []}
+
+    try:
+        with open(genders_path, 'r') as f:
+            data = json.load(f)
+        return {
+            "female": data.get("female", []),
+            "male": data.get("male", [])
+        }
+    except Exception as e:
+        logger.error(f"Failed to load voice-genders.json: {e}")
+        return {"female": [], "male": []}
 
 
 @app.post("/v1/voices/add")
