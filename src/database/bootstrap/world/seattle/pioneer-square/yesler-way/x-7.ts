@@ -11,6 +11,8 @@ A totem pole rises near the pergola, the carved cedar column that has stood in v
   x: -7,
   y: 12,
   z: 0,
+
+  imageOnDisk: 'occidental-ave-s-yesler-way-x-7-y12-z0.png',
   intersection: ['Occidental Ave S', 'Yesler Way'],
   // Environmental properties
   population: 0, // Empty (post-Event)
