@@ -57,6 +57,39 @@ jobs:
           fetch-depth: 0
           ref: ${{ steps.pr-number.outputs.branch }}
 
+      - name: Wait for Greptile review
+        id: wait-greptile
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUM=${{ steps.pr-number.outputs.number }}
+          MAX_WAIT=300  # 5 minutes max
+          POLL_INTERVAL=15
+          ELAPSED=0
+
+          echo "⏳ Waiting for Greptile review on PR #$PR_NUM..."
+
+          while [ $ELAPSED -lt $MAX_WAIT ]; do
+            # Check for Greptile's summary comment (contains "Greptile Summary" or "Greptile Overview")
+            GREPTILE_COMMENT=$(gh pr view $PR_NUM --json comments \
+              --jq '[.comments[] | select(.author.login == "greptile-apps" and (.body | contains("Greptile")))] | length')
+
+            if [ "$GREPTILE_COMMENT" -gt 0 ]; then
+              echo "✅ Greptile review found!"
+              echo "greptile_ready=true" >> $GITHUB_OUTPUT
+              break
+            fi
+
+            echo "  Waiting... ($ELAPSED/$MAX_WAIT seconds)"
+            sleep $POLL_INTERVAL
+            ELAPSED=$((ELAPSED + POLL_INTERVAL))
+          done
+
+          if [ "$GREPTILE_COMMENT" -eq 0 ]; then
+            echo "⚠️ Greptile review not found after ${MAX_WAIT}s, proceeding anyway"
+            echo "greptile_ready=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Check iteration count
         id: check-iterations
         env:
@@ -88,21 +121,52 @@ jobs:
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ steps.pr-number.outputs.number }}
             REVIEW ITERATION: ${{ steps.check-iterations.outputs.review_count }}
+            GREPTILE READY: ${{ steps.wait-greptile.outputs.greptile_ready }}
 
             You are the REVIEWER agent in a two-agent feedback loop. Your job is to review code and provide actionable feedback.
 
+            ## CRITICAL: Read Greptile's Review First
+
+            Before doing your own review, you MUST read what Greptile (another code review bot) has already found:
+
+            ```bash
+            # Get Greptile's summary comment
+            gh pr view ${{ steps.pr-number.outputs.number }} --json comments \
+              --jq '.comments[] | select(.author.login == "greptile-apps") | .body'
+
+            # Get Greptile's inline code comments (these are the detailed findings!)
+            gh api repos/${{ github.repository }}/pulls/${{ steps.pr-number.outputs.number }}/comments \
+              --jq '.[] | select(.user.login == "greptile-apps") | {path: .path, line: .line, body: .body}'
+            ```
+
+            Greptile uses severity labels:
+            - **P0**: Critical bugs that will break functionality
+            - **P1**: Serious issues that should be fixed
+            - **P2**: Moderate issues worth addressing
+            - **P3**: Minor issues/suggestions
+
             ## Your Task
-            1. Review the PR diff thoroughly
-            2. Check for: bugs, security issues, performance problems, code quality, test coverage
-            3. Use CLAUDE.md for project conventions
-            4. For world/building files (src/database/bootstrap/world/**), verify:
+
+            1. **Read Greptile's findings** using the commands above
+            2. Review the PR diff yourself for anything Greptile missed
+            3. Check for: bugs, security issues, performance problems, code quality, test coverage
+            4. Use CLAUDE.md for project conventions
+            5. For world/building files (src/database/bootstrap/world/**), verify:
                - Room coordinates (x, y, z) fall within declared building footprint
                - Building footprint formula: x ∈ [x - width + 1, x], y ∈ [y - height + 1, y]
                - Exit bi-directionality: if room A exits north to room B, room B must exit south to room A
                - Stair exits: stairs going up (z+1) must have corresponding stairs down (z-1)
                - Street exits: rooms at z=0 with street exits must connect to valid street coordinates
 
+            ## Verdict Logic
+
+            Your verdict MUST consider Greptile's findings:
+            - If Greptile found ANY P0 or P1 issues → "Changes Requested" (even if you think the code looks fine)
+            - If Greptile found P2/P3 issues → Consider whether they're valid and include in your assessment
+            - If Greptile gave a low confidence score (1-2/5) → Likely has critical issues, investigate thoroughly
+
             ## Response Format
+
             You MUST respond with a structured review comment using `gh pr comment`.
 
             CRITICAL: Your comment body MUST begin with exactly these 29 characters (no escaping, no backslashes, copy verbatim):
@@ -112,16 +176,23 @@ jobs:
 
             After the marker, include a verdict heading: "## ✅ LGTM" or "## 🔧 Changes Requested"
 
+            Structure your review:
+            1. **Greptile Findings** - Summarize what Greptile found and whether you agree
+            2. **Additional Issues** - Any issues you found that Greptile missed
+            3. **Verdict** - Your final decision considering ALL findings
+
             If changes requested, list SPECIFIC issues with file paths, line numbers, and exact fixes needed.
-            If everything looks good, just say the code looks good.
+            If everything looks good (Greptile too), just say the code looks good.
 
             ## Important
+
             - Be specific with file paths and line numbers
             - Only flag real issues, not style preferences
             - If this is iteration 2+, focus only on NEW issues (previous ones should be fixed)
             - The fixer agent will read your comment and implement changes automatically
+            - DO NOT ignore Greptile's P0/P1 findings - they are often correct
 
             Use `gh pr comment ${{ steps.pr-number.outputs.number }} --body "YOUR_REVIEW"` to post.
 
-          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'
+          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(gh api:*)"'
 
