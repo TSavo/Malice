@@ -208,6 +208,7 @@ Something built these passages before the city existed. The city just found them
       x: 0,
       y: -15,
       z: -4,
+      imageOnDisk: 'deep-passage-north-x0-y-15-z-4.png',
       population: 0,
       ambientNoise: 3,
       lighting: 0,
