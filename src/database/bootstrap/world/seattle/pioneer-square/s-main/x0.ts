@@ -10,6 +10,8 @@ A clock is mounted above the bank's entrance, analog hands showing 3:47—the mo
   x: 0,
   y: 0,
   z: 0,
+
+  imageOnDisk: '2nd-ave-s-s-main-st-x0-y0-z0.png',
   intersection: ['2nd Ave S', 'S. Main St'],
   // Environmental properties
   population: 0, // Empty (post-Event)

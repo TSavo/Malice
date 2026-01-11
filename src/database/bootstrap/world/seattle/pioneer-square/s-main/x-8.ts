@@ -10,6 +10,8 @@ The Underground tours once started somewhere near here, guides leading tourists 
   x: -8,
   y: 0,
   z: 0,
+
+  imageOnDisk: 's-main-st-x-8-y0-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

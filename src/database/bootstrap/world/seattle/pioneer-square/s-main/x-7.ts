@@ -10,6 +10,8 @@ Occidental Mall stretches north and south, its cobblestones and maples and wroug
   x: -7,
   y: 0,
   z: 0,
+
+  imageOnDisk: 'occidental-ave-s-s-main-st-x-7-y0-z0.png',
   intersection: ['Occidental Ave S', 'S. Main St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
