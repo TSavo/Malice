@@ -25,6 +25,7 @@ An elevator continues down to Level -3, but access is restricted. The corridor w
       x: 2,
       y: 3,
       z: -2,
+      imageOnDisk: 'corp-construction-infrastructure-hub-x2-y3-z-2.png',
       population: 0,
       ambientNoise: 55,
       lighting: 75,
