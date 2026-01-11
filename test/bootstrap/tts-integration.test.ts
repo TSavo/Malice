@@ -46,7 +46,7 @@ describe('TTS Integration', () => {
       expect(typeof voice1).toBe('string');
     });
 
-    it('should assign one of the six valid VibeVoice voices', async () => {
+    it('should assign a valid voice (built-in or speaker_XXX)', async () => {
       const obj = await $.recycler.create(
         {
           parent: $.describable,
@@ -56,9 +56,12 @@ describe('TTS Integration', () => {
       );
 
       const voice = await obj.call('getVoiceId');
-      const validVoices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
+      const builtinVoices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
 
-      expect(validVoices).toContain(voice);
+      // Voice is either a built-in or a speaker_XXX from LibriTTS
+      const isBuiltin = builtinVoices.includes(voice);
+      const isSpeaker = /^speaker_\d+$/.test(voice);
+      expect(isBuiltin || isSpeaker).toBe(true);
     });
 
     it('should use existing voiceId property if set', async () => {
@@ -97,12 +100,14 @@ describe('TTS Integration', () => {
       const voice1 = await obj1.call('getVoiceId');
       const voice2 = await obj2.call('getVoiceId');
 
-      // Both should be valid voices
-      const validVoices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
-      expect(validVoices).toContain(voice1);
-      expect(validVoices).toContain(voice2);
+      // Both should be valid voices (built-in or speaker_XXX)
+      const builtinVoices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
+      const isValid = (v: string) =>
+        builtinVoices.includes(v) || /^speaker_\d+$/.test(v);
+      expect(isValid(voice1)).toBe(true);
+      expect(isValid(voice2)).toBe(true);
 
-      // With 6 voices, different IDs are likely to get different voices
+      // With many voices, different IDs are likely to get different voices
       // (not guaranteed but statistically likely with sequential IDs)
     });
 
@@ -117,6 +122,56 @@ describe('TTS Integration', () => {
 
       const voice = await obj.call('getVoiceId');
       expect(obj.voiceId).toBe(voice);
+    });
+
+    it('should reroll voice and increment voiceSeed', async () => {
+      const obj = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Reroll Test' },
+        },
+        null,
+      );
+
+      // Initial state: voiceSeed should be 0
+      expect(obj.voiceSeed).toBe(0);
+
+      // Get initial voice
+      const voice1 = await obj.call('getVoiceId');
+      expect(typeof voice1).toBe('string');
+      expect(obj.voiceId).toBe(voice1);
+
+      // Reroll voice - should increment voiceSeed and clear cached voiceId
+      const voice2 = await obj.call('rerollVoice');
+      expect(obj.voiceSeed).toBe(1);
+      expect(obj.voiceId).toBe(voice2);
+      expect(typeof voice2).toBe('string');
+
+      // Reroll again
+      const voice3 = await obj.call('rerollVoice');
+      expect(obj.voiceSeed).toBe(2);
+      expect(obj.voiceId).toBe(voice3);
+      expect(typeof voice3).toBe('string');
+    });
+
+    it('should reroll voice with gender override', async () => {
+      const obj = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Gender Override Test', sex: 'male' },
+        },
+        null,
+      );
+
+      // Reroll with female gender override
+      const femaleVoice = await obj.call('rerollVoice', 'female');
+      expect(obj.voiceSeed).toBe(1);
+      expect(typeof femaleVoice).toBe('string');
+
+      // Reroll with male gender override
+      const maleVoice = await obj.call('rerollVoice', 'male');
+      expect(obj.voiceSeed).toBe(2);
+      expect(typeof maleVoice).toBe('string');
     });
   });
 
@@ -677,10 +732,14 @@ describe('TTS Integration', () => {
       await speaker.call('say', 'Attention everyone');
 
       // All listeners should receive the same audio
+      const builtinVoices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
       for (let i = 0; i < 3; i++) {
         expect(deliveredAudio[i].length).toBe(1);
         expect(deliveredAudio[i][0].segments[0].text).toBe('Attention everyone');
-        expect(deliveredAudio[i][0].segments[0].voiceId).toBe('alloy');
+        const voiceId = deliveredAudio[i][0].segments[0].voiceId;
+        const isValid =
+          builtinVoices.includes(voiceId) || /^speaker_\d+$/.test(voiceId);
+        expect(isValid).toBe(true);
       }
     });
   });
