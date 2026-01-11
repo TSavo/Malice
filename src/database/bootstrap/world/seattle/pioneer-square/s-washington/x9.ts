@@ -10,6 +10,8 @@ The south side is intact enough to offer cover: alcoves, recessed doorways, load
   x: 9,
   y: 6,
   z: 0,
+
+  imageOnDisk: 's-washington-st-x9-y6-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

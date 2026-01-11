@@ -11,6 +11,8 @@ A row of dark storefronts faces the rubble, their plate glass long since broken 
   y: 6,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 's-washington-st-x8-y6-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

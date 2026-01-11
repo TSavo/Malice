@@ -10,6 +10,8 @@ The northwest corner holds a building that survived, its brick facade cracked bu
   x: 7,
   y: 6,
   z: 0,
+
+  imageOnDisk: '3rd-ave-s-s-washington-st-x7-y6-z0.png',
   intersection: ['3rd Ave S', 'S. Washington St'],
   // Environmental properties
   population: 0, // Empty (post-Event)

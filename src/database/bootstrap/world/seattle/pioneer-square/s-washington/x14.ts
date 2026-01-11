@@ -10,6 +10,8 @@ North on Fourth, you can see the line of the city climbing toward Yesler. South,
   x: 14,
   y: 6,
   z: 0,
+
+  imageOnDisk: '4th-ave-s-s-washington-st-x14-y6-z0.png',
   intersection: ['4th Ave S', 'S. Washington St'],
   population: 0,
   ambientNoise: 0,
