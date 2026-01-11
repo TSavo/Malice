@@ -388,7 +388,7 @@ async function main() {
         consecutiveErrors++;
         console.error(`    ⚠️  Consecutive errors: ${consecutiveErrors}`);
 
-        if (consecutiveErrors >= 3) {
+        if (consecutiveErrors >= 1) {
           console.error('\n🛑 Too many consecutive errors - likely invalid Midjourney token');
           console.error('🔄 Stopping midjourney-api container...');
           try {
