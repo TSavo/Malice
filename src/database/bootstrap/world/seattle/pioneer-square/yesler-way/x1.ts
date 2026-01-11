@@ -11,6 +11,8 @@ Yesler Way continues its gentle slope toward the waterfront, following the grade
   y: 12,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'yesler-way-x1-y12-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)

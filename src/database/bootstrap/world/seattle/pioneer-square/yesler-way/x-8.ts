@@ -10,6 +10,8 @@ A historic marker is mounted on one building, commemorating Yesler's original sa
   x: -8,
   y: 12,
   z: 0,
+
+  imageOnDisk: 'yesler-way-x-8-y12-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

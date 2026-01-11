@@ -11,6 +11,8 @@ The streetscape mixes eras and styles: early twentieth-century brick beside mid-
   y: 12,
   z: 0,
   // Environmental properties
+
+  imageOnDisk: 'yesler-way-x10-y12-z0.png',
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned
   lighting: 100, // Daylight (outdoor)
