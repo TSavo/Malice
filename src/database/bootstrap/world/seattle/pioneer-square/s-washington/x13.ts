@@ -10,6 +10,8 @@ Fourth Avenue is close enough to smell differently—less brick dust, more wet c
   x: 13,
   y: 6,
   z: 0,
+
+  imageOnDisk: 's-washington-st-x13-y6-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

@@ -10,6 +10,8 @@ To the east, you can see Fourth Avenue’s broader right-of-way cutting north an
   x: 12,
   y: 6,
   z: 0,
+
+  imageOnDisk: 's-washington-st-x12-y6-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

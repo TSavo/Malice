@@ -10,6 +10,8 @@ A decorative clock is mounted on one building's corner, its hands frozen at a ti
   x: -8,
   y: 6,
   z: 0,
+
+  imageOnDisk: 's-washington-st-x-8-y6-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

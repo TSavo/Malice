@@ -10,6 +10,8 @@ The street is quiet enough to hear small sounds: gravel shifting underfoot, wate
   x: 10,
   y: 6,
   z: 0,
+
+  imageOnDisk: 's-washington-st-x10-y6-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,

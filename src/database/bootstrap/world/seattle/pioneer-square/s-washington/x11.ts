@@ -10,6 +10,8 @@ Eastward, Fourth Avenue’s wider corridor is visible between structures—more 
   x: 11,
   y: 6,
   z: 0,
+
+  imageOnDisk: 's-washington-st-x11-y6-z0.png',
   population: 0,
   ambientNoise: 0,
   lighting: 100,
