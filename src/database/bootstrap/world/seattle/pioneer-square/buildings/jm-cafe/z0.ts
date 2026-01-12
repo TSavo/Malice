@@ -139,16 +139,7 @@ The walls are covered in photographs and memorabilia: Seattle when it was a fron
 
 A jukebox stands in one corner, a Wurlitzer from the '60s, its bubble tubes dark but its selection still visible behind the curved glass. The songs are standards: Sinatra, Bennett, Mathis, the crooners who provided background music for a million drinks. The jukebox doesn't play anymore, but the songs are still there, waiting.
 
-The menu board on the wall lists simple food at simple prices: BURGER $8. FISH & CHIPS '%DINING': {
-      name: 'J&M Cafe - Dining Room',
-      description: `The dining room extends behind the bar, a space of dark wood and red leather that hasn't changed since the 1950s renovation. Booths line the walls, their leather cracked but comfortable, their tables scarred by generations of diners who didn't use coasters. The lighting is dim—intentionally so, hiding age and wear and the faces of people who preferred not to be seen clearly.
-
-A jukebox stands in one corner, a Wurlitzer from the '60s, its bubble tubes dark but its selection still visible behind the curved glass. The songs are standards: Sinatra, Bennett, Mathis, the crooners who provided background music for a million drinks. The jukebox doesn't play anymore, but the songs are still there, waiting.
-
 The menu board on the wall lists simple food at simple prices: BURGER $8. FISH & CHIPS $10. SOUP OF THE DAY $4. The J&M was never a destination restaurant. It was the place you ate when you were already drinking and realized you were hungry.`,
-      x: -15,
-      y: 5,
-      0. SOUP OF THE DAY $4. The J&M was never a destination restaurant. It was the place you ate when you were already drinking and realized you were hungry.`,
       x: -15,
       y: 5,
       z: 0,
