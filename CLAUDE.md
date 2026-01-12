@@ -263,7 +263,7 @@ Each faction gets its own isolated network infrastructure. Ports are calculated 
 Factions are created dynamically via `$factionManager.create()` - see Faction System below.
 
 **AI Services:**
-- **3000** (internal) - Midjourney API server (Discord bot proxy)
+- **Midjourney API** - Discord bot proxy (internal only, accessed via Docker network at midjourney-api:3000)
 
 ### Midjourney API Server
 
@@ -297,6 +297,9 @@ The Midjourney API server (`midjourney-api` service) runs as a Docker container 
 
 **Integration:**
 The `$aiImageGen` MOO object uses this service internally. You don't need to call the API directly - just use `$aiImageGen.generate()` from MOO code.
+
+**Image Compression:**
+When the `download: true` parameter is used, the server downloads the Midjourney-generated image from Discord CDN, compresses it using oxipng (lossless PNG optimization achieving ~12% size reduction), and returns the compressed image data. This reduces storage costs and bandwidth without any quality loss. The MOO integration always uses `download: true` to ensure all stored images are compressed.
 
 See `midjourney-api/API.md` for full API documentation.
 
@@ -739,7 +742,7 @@ return {roomId: room.id, torchId: torch.id};
 - `$query()` - Fluent query builder for finding objects
 - `$aiQuery(system, prompt, session?)` - Query Claude AI with MCP tools
 - `$recycler` - Create/destroy objects via recycler pattern
-- All `$aliases` - `$room`, `$player`, `$exit`, `$ai`, `$plot`, `$spatial`, `$faction`, `$factionManager`, `$transports`, `$continuum`, `$cartel`, `$greeter`, furniture prototypes (`$bed`, `$table`, `$chair`, `$cabinet`, `$trunk`, `$crate`, `$locker`, `$bench`, `$couch`, `$safe`, `$furniture`), security (`$door`, `$lock`, `$biometricLock`, `$guardedExit`), utilities (`$http`, `$email`, `$blob`, `$tts`, `$aiImageGen`), etc.
+- All `$aliases` - `$room`, `$player`, `$exit`, `$ai`, `$plot`, `$spatial`, `$faction`, `$factionManager`, `$transports`, `$continuum`, `$cartel`, `$greeter`, furniture prototypes (`$bed`, `$table`, `$chair`, `$cabinet`, `$trunk`, `$crate`, `$locker`, `$bench`, `$couch`, `$safe`, `$furniture`), security (`$door`, `$lock`, `$biometricLock`, `$guardedExit`), utilities (`$http`, `$email`, `$blob`, `$tts`, `$aiImageGen`, `$docs`, `$issues`), etc.
 - `player` - Your authenticated player object (if HTTP Basic Auth provided)
 - Full JavaScript - loops, conditionals, async/await, etc.
 
@@ -854,6 +857,166 @@ const status = await $scheduler.describe();
 - `pluribusWake` - Wakes Pluribus AI every hour (on the hour)
 - `sisterGrayWake` - Wakes Sister Gray AI every hour (on the half-hour)
 - `greeterPoolMaintenance` - Replenishes greeter NPC pools every 5 minutes
+
+## Documentation System ($docs)
+
+The `$docs` singleton loads all markdown documentation from `docs/` into MOO objects at startup. Each document becomes a queryable object with content, path, and category.
+
+### Browsing Documentation
+
+```typescript
+// List all documents
+const allDocs = await $docs.list();
+
+// List documents in a folder
+const mooDocs = await $docs.list('moo');
+const protoDocs = await $docs.list('moo/prototypes');
+
+// Get document by name
+const guide = await $docs.get('BUILDERS-GUIDE');
+
+// Get document by exact path
+const agents = await $docs.getByPath('moo/prototypes/agents');
+
+// Get folder structure
+const tree = await $docs.tree();
+const mooTree = await $docs.tree('moo');
+
+// Get top-level categories
+const categories = await $docs.getCategories();
+// ['city-ai', 'greeter', 'moo', 'prompts', ...]
+```
+
+### Searching Documentation
+
+```typescript
+// Search all docs
+const results = await $docs.search('bootstrap');
+
+// Search within a category
+const results = await $docs.search('prototype', { category: 'moo' });
+
+// Limit results
+const results = await $docs.search('room', { limit: 10 });
+```
+
+### Document Properties
+
+Each `$doc` object has:
+- `name` - Filename without extension
+- `path` - Full path from docs root (e.g., "moo/prototypes/agents")
+- `category` - Top-level folder (e.g., "moo", "city-ai")
+- `title` - Extracted from first `#` heading
+- `content` - Full markdown content
+- `filename` - Original filename with extension
+
+## Issue Tracker ($issues)
+
+The `$issues` singleton provides in-game issue/bug tracking. Issues are stored with metadata for filtering and searching.
+
+### Creating Issues
+
+```typescript
+// Create a bug report
+const result = await $issues.create({
+  title: 'Exit command not working in basement',
+  body: 'When trying to go north from basement, nothing happens',
+  type: 'bug',
+  priority: 'high',
+  tags: ['rooms', 'exits'],
+  reporter: 'alice',
+  relatedObject: 42,  // Optional: related MOO object ID
+});
+// { success: true, id: 1, issue: {...} }
+
+// Create a feature request
+await $issues.create({
+  title: 'Add voice chat support',
+  type: 'feature',
+  priority: 'low',
+});
+```
+
+### Querying Issues
+
+```typescript
+// List open issues (default)
+const issues = await $issues.list();
+
+// Filter by status, type, priority
+const bugs = await $issues.list({ type: 'bug' });
+const critical = await $issues.list({ priority: 'critical' });
+const inProgress = await $issues.list({ status: 'in_progress' });
+
+// Filter by assignee or tag
+const mine = await $issues.list({ assignee: 'alice' });
+const roomIssues = await $issues.list({ tag: 'rooms' });
+
+// Include closed issues
+const all = await $issues.list({ all: true });
+
+// Get specific issue
+const issue = await $issues.get(42);
+
+// Search issues
+const results = await $issues.search('exit');
+```
+
+### Managing Issues
+
+```typescript
+// Update an issue
+await $issues.update(42, { priority: 'critical', status: 'in_progress' });
+
+// Assign to someone
+await $issues.assign(42, 'bob');
+
+// Add a comment
+await $issues.comment(42, 'Found the root cause - bad exit link', 'alice');
+
+// Add/remove tags
+await $issues.tag(42, 'urgent', 'blocking');
+await $issues.untag(42, 'low-priority');
+
+// Resolve with explanation
+await $issues.resolve(42, 'Fixed in commit abc123');
+
+// Close or reopen
+await $issues.close(42);
+await $issues.reopen(42);
+
+// Mark as won't fix
+await $issues.wontfix(42, 'Working as designed');
+```
+
+### Issue Statistics
+
+```typescript
+const stats = await $issues.stats();
+// {
+//   total: 45,
+//   openCount: 12,
+//   byStatus: { open: 8, in_progress: 4, resolved: 20, closed: 13 },
+//   byType: { bug: 25, feature: 15, task: 5 },
+//   byPriority: { critical: 2, high: 10, medium: 20, low: 13 },
+//   createdThisWeek: 5,
+//   resolvedThisWeek: 8,
+// }
+
+// Get all tags in use
+const tags = await $issues.getTags();
+
+// Get all assignees
+const assignees = await $issues.getAssignees();
+```
+
+### Issue Types and Statuses
+
+**Types:** `bug`, `feature`, `task`, `question`
+
+**Statuses:** `open`, `in_progress`, `resolved`, `closed`, `wontfix`
+
+**Priorities:** `low`, `medium`, `high`, `critical`
 
 ## Greeter System ($greeter)
 
@@ -1439,21 +1602,12 @@ const health = await $tts.health();
 
 ### $aiImageGen - AI Image Generation Object
 
-Generate images using Midjourney and store them in `$blob`. All generated images are automatically compressed using lossless PNG optimization (sharp library) before storage.
+Generate images using Midjourney and store them in `$blob`. The Midjourney API server downloads, compresses with oxipng (lossless PNG optimization, ~12% reduction), and returns the compressed image data, which is then stored in blob storage.
 
 ```typescript
 // Generate image and store in $blob
 const result = await $aiImageGen.generate('A cyberpunk banana with neon lights');
-// {
-//   success: true,
-//   blobKey: '...',
-//   contentType: 'image/png',
-//   prompt: '...',
-//   uri: 'https://...',
-//   originalSize: 12345678,      // Size before compression (bytes)
-//   compressedSize: 9876543,     // Size after compression (bytes)
-//   compressionRatio: '20.0%'    // Percentage saved
-// }
+// { success: true, blobKey: '...', contentType: 'image/png', prompt: '...', uri: 'https://...' }
 
 // Get URL for the generated image
 const url = $blob.url(result.blobKey, 'thecontinuum.city');
