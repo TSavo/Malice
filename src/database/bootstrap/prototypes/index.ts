@@ -59,7 +59,9 @@ export { ChairBuilder } from './chair-builder';
 export { ChromeEyeBuilder } from './chrome-eye-builder';
 export { CigarBuilder } from './cigar-builder';
 export { CigaretteBuilder } from './cigarette-builder';
-// Clone system removed - permadeath is real
+export { CloneRecordingStudioBuilder } from './clone-recording-studio-builder';
+// Clone system
+export { CloneTankBuilder } from './clone-tank-builder';
 export { ClothingBuilder } from './clothing-builder';
 export { CoffeeBuilder } from './coffee-builder';
 export { CombatBootsBuilder } from './combat-boots-builder';

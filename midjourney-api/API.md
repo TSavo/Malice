@@ -1,294 +1,319 @@
-# MidJourney REST API
+# Midjourney API Server Documentation
 
-A Docker-ready REST API for MidJourney image generation with full parameter support and Swagger documentation.
+This is a REST API server for interacting with Midjourney via Discord bot proxy. It wraps the `midjourney-client` library to provide a simple HTTP interface for image generation.
 
-## Quick Start
+## Requirements
 
-### Docker (Recommended)
+- Discord account with an active Midjourney subscription
+- Discord server with Midjourney bot present
+- Discord authentication token (SALAI_TOKEN)
 
-1. Create a `.env` file with your Discord credentials:
-
-```bash
-SERVER_ID="your-discord-server-id"
-CHANNEL_ID="your-discord-channel-id"
-SALAI_TOKEN="your-discord-token"
-HUGGINGFACE_TOKEN=""  # Optional, for human verification
-```
-
-2. Start the API:
-
-```bash
-docker compose up -d
-```
-
-3. Access the API:
-   - **Swagger UI**: http://localhost:3000/docs
-   - **Health Check**: http://localhost:3000/health
-   - **OpenAPI Spec**: http://localhost:3000/openapi.json
-
-### Local Development
-
-```bash
-npm install
-npm run dev
-```
-
-## API Endpoints
-
-### `GET /health`
-Health check endpoint.
-
-**Response:**
-```json
-{
-  "status": "ok",
-  "connected": true
-}
-```
-
-### `GET /options`
-Get all available prompt options with descriptions and valid values.
-
-### `POST /imagine`
-Generate an initial 4-image grid from a prompt.
-
-**Request:**
-```json
-{
-  "prompt": "A beautiful sunset over mountains",
-  "options": {
-    "aspectRatio": "16:9",
-    "stylize": 150,
-    "no": "text, watermark"
-  }
-}
-```
-
-### `POST /upscale`
-Upscale a specific image from the grid (U1-U4).
-
-**Request:**
-```json
-{
-  "msgId": "message-id-from-imagine",
-  "hash": "hash-from-imagine",
-  "flags": 0,
-  "content": "original-content",
-  "index": 1
-}
-```
-
-### `POST /custom`
-Execute custom actions like Upscale (Subtle), Vary, Zoom, Pan, etc.
-
-**Request:**
-```json
-{
-  "msgId": "message-id",
-  "customId": "MJ::JOB::upsample_v7_2x_subtle::1::hash::SOLO",
-  "flags": 0,
-  "content": "original-content"
-}
-```
-
-### `POST /generate` (Full Pipeline)
-Complete workflow: Imagine -> Upscale -> Upscale (Subtle) -> Download
-
-**Request:**
-```json
-{
-  "prompt": "A cyberpunk city at night",
-  "options": {
-    "aspectRatio": "16:9",
-    "no": "text, watermark, blurry",
-    "stylize": 200,
-    "fast": true
-  },
-  "upscaleIndex": 1,
-  "download": true
-}
-```
-
-**Response:**
-```json
-{
-  "id": "message-id",
-  "hash": "image-hash",
-  "content": "full-prompt-with-parameters",
-  "uri": "https://cdn.discordapp.com/...",
-  "localPath": "outputs/image-hash.png",
-  "width": 2048,
-  "height": 2048
-}
-```
-
-## Prompt Options
-
-All options are passed in the `options` object:
-
-| Option | Type | Range | Description |
-|--------|------|-------|-------------|
-| `aspectRatio` | string | e.g., "16:9" | Image dimensions |
-| `no` | string | text | Negative prompt - elements to exclude |
-| `stylize` | integer | 0-1000 | Artistic influence (default: 100) |
-| `chaos` | integer | 0-100 | Variation/randomness (default: 0) |
-| `quality` | number | 0.25, 0.5, 1 | Detail level (default: 1) |
-| `seed` | integer | 0-4294967295 | For reproducible results |
-| `stop` | integer | 10-100 | Stop early (default: 100) |
-| `version` | string | "5"-"7" | MidJourney version (default: "7") |
-| `style` | string | "raw", "scenic" | Style mode |
-| `weird` | integer | 0-3000 | Unusual qualities (default: 0) |
-| `tile` | boolean | - | Seamless pattern |
-| `repeat` | integer | 1-40 | Multiple variations |
-| `niji` | string | "5", "6" | Anime model |
-| `styleRef` | string | URL | Style reference image |
-| `styleWeight` | integer | 0-1000 | Style ref influence (default: 100) |
-| `characterRef` | string | URL | Character reference image |
-| `characterWeight` | integer | 0-100 | Character ref influence (default: 100) |
-| `imageWeight` | number | 0-3 | Image vs text weight (default: 1) |
-| `fast` | boolean | - | Fast generation mode |
-| `relax` | boolean | - | Relaxed generation mode |
-| `turbo` | boolean | - | Turbo generation mode |
-
-## Examples
-
-### Simple Generation
-```bash
-curl -X POST http://localhost:3000/generate \
-  -H "Content-Type: application/json" \
-  -d '{"prompt": "A serene Japanese garden"}'
-```
-
-### With Options
-```bash
-curl -X POST http://localhost:3000/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "prompt": "A futuristic robot",
-    "options": {
-      "aspectRatio": "16:9",
-      "stylize": 300,
-      "no": "text, watermark",
-      "chaos": 20,
-      "fast": true
-    }
-  }'
-```
-
-### Anime Style (Niji)
-```bash
-curl -X POST http://localhost:3000/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "prompt": "A magical girl with flowing hair",
-    "options": {
-      "niji": "6",
-      "aspectRatio": "2:3"
-    }
-  }'
-```
-
-### Seamless Tile Pattern
-```bash
-curl -X POST http://localhost:3000/imagine \
-  -H "Content-Type: application/json" \
-  -d '{
-    "prompt": "Geometric pattern, abstract shapes",
-    "options": {
-      "tile": true,
-      "aspectRatio": "1:1"
-    }
-  }'
-```
-
-## Docker Configuration
+## Setup
 
 ### Environment Variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `SERVER_ID` | Yes | Discord server ID |
-| `CHANNEL_ID` | Yes | Discord channel ID |
-| `SALAI_TOKEN` | Yes | Discord auth token |
-| `HUGGINGFACE_TOKEN` | No | For human verification |
-| `PORT` | No | API port (default: 3000) |
-| `DEBUG` | No | Enable debug logs (default: false) |
-| `OUTPUT_DIR` | No | Image output directory (default: /app/outputs) |
+Create a `.env` file with the following variables:
 
-### Volumes
+```bash
+# Required: Discord server and channel where Midjourney bot is present
+MIDJOURNEY_SERVER_ID=your_discord_server_id
+MIDJOURNEY_CHANNEL_ID=your_discord_channel_id
 
-The `outputs` directory is mounted to persist generated images:
+# Required: Your Discord authentication token
+# Get from Discord DevTools: F12 > Application > Local Storage > token
+# WARNING: This is a highly sensitive credential - never commit to git
+MIDJOURNEY_SALAI_TOKEN=your_discord_token
 
-```yaml
-volumes:
-  - ./outputs:/app/outputs
+# Optional: Enable debug logging
+MIDJOURNEY_DEBUG=false
+
+# Optional: HuggingFace token for human verification challenges
+HUGGINGFACE_TOKEN=hf_xxxxxxxxxx
 ```
 
-### Custom docker-compose.yml
+### Getting Discord Credentials
 
-```yaml
-services:
-  midjourney-api:
-    build: .
-    ports:
-      - "3000:3000"
-    environment:
-      - PORT=3000
-      - DEBUG=true
-      - SERVER_ID=${SERVER_ID}
-      - CHANNEL_ID=${CHANNEL_ID}
-      - SALAI_TOKEN=${SALAI_TOKEN}
-    volumes:
-      - ./outputs:/app/outputs
-    restart: unless-stopped
+1. **SALAI_TOKEN** - Your Discord authentication token:
+   - Open Discord in browser
+   - Press F12 to open DevTools
+   - Go to Application tab > Local Storage > https://discord.com
+   - Find the `token` key and copy its value
+   - **WARNING**: Treat this like a password - it grants full access to your Discord account
+
+2. **SERVER_ID** - Discord server ID where Midjourney bot is present:
+   - Right-click on the server icon
+   - Click "Copy Server ID" (requires Developer Mode enabled in Discord settings)
+
+3. **CHANNEL_ID** - Channel ID for Midjourney commands:
+   - Right-click on a channel where Midjourney bot can receive commands
+   - Click "Copy Channel ID"
+
+### Running the Server
+
+```bash
+# Using Docker Compose (recommended)
+docker compose up midjourney-api
+
+# Using Docker directly
+docker run -p 3000:3000 --env-file .env midjourney-api
+
+# Using Node.js
+cd midjourney-api
+npm install
+npm start
 ```
 
-## Getting Discord Credentials
+The server will start on port 3000.
 
-### Server ID & Channel ID
-1. Enable Developer Mode in Discord (Settings > Advanced > Developer Mode)
-2. Right-click on your server name > Copy Server ID
-3. Right-click on the channel > Copy Channel ID
+## API Endpoints
 
-### Discord Token (SALAI_TOKEN)
-1. Open Discord in a browser
-2. Press F12 to open Developer Tools
-3. Go to Network tab
-4. Send any message or perform any action
-5. Look for requests to `discord.com/api`
-6. Find the `Authorization` header - that's your token
+### POST /generate
 
-**Note:** Your Discord token is sensitive. Never share it publicly.
+Full pipeline: Imagine → Wait → Upscale → Return image
 
-## Output Files
+Generates an image using Midjourney and returns the upscaled result.
 
-Generated images are saved to the `outputs` directory with their hash as the filename:
-
-```
-outputs/
-  abc123-def456.png   # 2048x2048 upscaled image
-  xyz789-uvw012.png   # Another image
-```
-
-Access via API: `http://localhost:3000/outputs/abc123-def456.png`
-
-## Error Handling
-
-All endpoints return errors in this format:
+**Request:**
 
 ```json
 {
-  "error": "Error message description"
+  "prompt": "A cyberpunk banana with neon lights",
+  "options": {
+    "aspectRatio": "16:9",
+    "stylize": 750,
+    "chaos": 25,
+    "no": "people, text",
+    "version": "7",
+    "style": "raw",
+    "seed": 12345,
+    "quality": 1,
+    "weird": 500,
+    "tile": false
+  },
+  "upscaleIndex": 1,
+  "download": false
 }
 ```
 
-Common errors:
-- `400` - Invalid request (missing prompt, invalid options)
-- `500` - Generation failed (MidJourney error, connection issue)
+**Request Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `prompt` | string | Yes | Text description of the image to generate |
+| `options` | object | No | Midjourney-specific generation options (see below) |
+| `upscaleIndex` | number | No | Which image from 2x2 grid to upscale (1-4, default: 1) |
+| `download` | boolean | No | Whether to download image to server (default: false) |
+
+**Midjourney Options:**
+
+| Option | Type | Range | Default | Description |
+|--------|------|-------|---------|-------------|
+| `aspectRatio` | string | - | "1:1" | Image aspect ratio (e.g., "16:9", "9:16", "1:1") |
+| `stylize` | number | 0-1000 | 100 | Artistic influence (higher = more artistic) |
+| `chaos` | number | 0-100 | 0 | Variation/randomness (higher = more varied) |
+| `no` | string | - | - | Comma-separated elements to exclude (e.g., "people, text") |
+| `version` | string | - | "7" | Midjourney version ("5", "6", "6.1", "7", "niji6", etc.) |
+| `style` | string | - | - | Style preset ("raw" or "scenic") |
+| `seed` | number | - | - | Deterministic seed for reproducible results |
+| `quality` | number | 0.25-2 | 1 | Image quality (0.25, 0.5, 1, or 2) |
+| `weird` | number | 0-3000 | 0 | Weirdness factor for experimental results |
+| `tile` | boolean | - | false | Enable seamless tiling |
+
+**Response:**
+
+```json
+{
+  "id": "1234567890",
+  "hash": "abc123def456",
+  "uri": "https://cdn.midjourney.com/abc123def456/0_0.png",
+  "width": 1920,
+  "height": 1080,
+  "flags": 0,
+  "content": "base64..." // Only if download: true
+}
+```
+
+**Response Fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Midjourney message ID |
+| `hash` | string | Midjourney image hash |
+| `uri` | string | CDN URL for the generated image |
+| `width` | number | Image width in pixels |
+| `height` | number | Image height in pixels |
+| `flags` | number | Discord message flags |
+| `content` | string | Base64-encoded image (only if download: true) |
+
+**Error Response:**
+
+```json
+{
+  "error": "Error message here"
+}
+```
+
+**Status Codes:**
+
+- `200 OK` - Image generated successfully
+- `400 Bad Request` - Invalid parameters
+- `500 Internal Server Error` - Generation failed
+
+### GET /health
+
+Health check endpoint to verify server and Discord connection status.
+
+**Response:**
+
+```json
+{
+  "connected": true,
+  "status": "Connected to Discord"
+}
+```
+
+**Status Codes:**
+
+- `200 OK` - Server is healthy and connected
+- `503 Service Unavailable` - Server not ready or disconnected
+
+### GET /options
+
+Get documentation for available Midjourney options and parameters.
+
+**Response:**
+
+```json
+{
+  "aspectRatio": {
+    "type": "string",
+    "description": "Image aspect ratio (e.g., '16:9', '9:16', '1:1')",
+    "examples": ["16:9", "9:16", "1:1", "2:3", "3:2"]
+  },
+  "stylize": {
+    "type": "number",
+    "range": [0, 1000],
+    "default": 100,
+    "description": "Artistic influence (higher = more artistic interpretation)"
+  },
+  "chaos": {
+    "type": "number",
+    "range": [0, 100],
+    "default": 0,
+    "description": "Variation/randomness (higher = more varied results)"
+  },
+  ...
+}
+```
+
+**Status Codes:**
+
+- `200 OK` - Options documentation returned
+
+## Midjourney Versions
+
+Available Midjourney model versions:
+
+| Version | Name | Description |
+|---------|------|-------------|
+| `7` | Midjourney v7 | Latest version (default) |
+| `6.1` | Midjourney v6.1 | Previous stable version |
+| `6` | Midjourney v6 | Older stable version |
+| `5.2` | Midjourney v5.2 | Legacy version |
+| `niji6` | Niji 6 | Anime/illustration style |
+| `niji5` | Niji 5 | Legacy anime style |
+
+## Usage Examples
+
+### Basic Generation
+
+```bash
+curl -X POST http://localhost:3000/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "A cyberpunk banana with neon lights"
+  }'
+```
+
+### With Options
+
+```bash
+curl -X POST http://localhost:3000/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "A glowing orb in a dark forest",
+    "options": {
+      "aspectRatio": "16:9",
+      "stylize": 750,
+      "chaos": 25,
+      "no": "people, text",
+      "version": "7",
+      "style": "raw"
+    },
+    "upscaleIndex": 2
+  }'
+```
+
+### Health Check
+
+```bash
+curl http://localhost:3000/health
+```
+
+### Get Options Documentation
+
+```bash
+curl http://localhost:3000/options
+```
+
+## Integration with Malice MOO
+
+The Malice game engine uses this API server internally via the `$aiImageGen` MOO object. See CLAUDE.md for MOO integration examples.
 
 ## Rate Limiting
 
-MidJourney has its own rate limits. The API doesn't add additional limiting, but you may encounter:
-- Subscription limits (fast hours, relax mode queue)
-- Concurrent job limits
-- Content moderation blocks
+Midjourney has rate limits based on your subscription tier. To avoid rate limits when generating multiple images:
+
+- Add random delays between requests (5 seconds to 3 minutes recommended)
+- Use the `generate-room-images.ts` script which implements automatic rate limiting
+- Monitor Discord for rate limit warnings
+
+## Troubleshooting
+
+### "Not connected to Discord"
+
+- Verify your `MIDJOURNEY_SALAI_TOKEN` is correct and up-to-date
+- Discord tokens can expire - get a fresh one from DevTools
+- Check that the server and channel IDs are correct
+- Ensure Midjourney bot is present in the specified channel
+
+### "Generation timed out"
+
+- Midjourney generation can take 1-5 minutes depending on complexity
+- The API has a 5-minute timeout - simple prompts should complete faster
+- Check Discord for any errors or warnings from Midjourney bot
+
+### "Human verification required"
+
+- Set `HUGGINGFACE_TOKEN` in your environment
+- This helps the server pass Discord's human verification challenges
+
+### Token Security
+
+**CRITICAL**: Your `SALAI_TOKEN` grants full access to your Discord account.
+
+- Never commit `.env` files to git
+- Never share your token publicly
+- Rotate your token immediately if compromised (change Discord password)
+- Use environment variables, never hardcode tokens
+
+## Architecture
+
+The API server is a lightweight wrapper around the `midjourney-client` library:
+
+1. Accepts REST requests
+2. Translates to Discord bot commands
+3. Monitors Discord for Midjourney responses
+4. Returns image URLs and metadata
+
+The server maintains a persistent WebSocket connection to Discord for real-time message monitoring.
