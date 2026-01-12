@@ -120,7 +120,7 @@ See `docs/moo/reference/types-vs-objects.md` for full documentation.
 
 ### Abilities-First Architecture
 
-**IMPORTANT**: Malice uses an abilities-first paradigm. See `docs/ABILITIES-FIRST.md` for full details.
+**IMPORTANT**: Malice uses an abilities-first paradigm. See `docs/guides/ABILITIES-FIRST.md` for full details.
 
 **The core idea**: Instead of procedural methods, objects have:
 - **Property descriptions** - explain what each property MEANS
@@ -810,7 +810,7 @@ The MCP server provides moo:// resources for querying game state:
 **Individual MCP tools** (legacy, avoid):
 - `mcp__malice__*` tools are available but not recommended
 - They're just wrappers around MOO code - use the MOO code directly instead
-- See `docs/MCP-TOOLS.md` if you need the tool reference
+- See `docs/reference/MCP-TOOLS.md` if you need the tool reference
 
 ## Scheduler
 
