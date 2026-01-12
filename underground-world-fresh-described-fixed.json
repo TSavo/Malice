@@ -2447,7 +2447,8 @@
       "neighborTypes": [
         "room"
       ],
-      "description": "Brick arches arch above, their once vibrant hues now faded to dull reds and browns by time's merciless touch. Iron railings corrode, spiraling downwards in twisted knots that groan under the weight of years. Water stains mark trails down the walls like rivers of antiquity. Worn wood floorboards creak softly beneath footfalls, echoing faintly through the damp chamber. A musty scent fills the air, mingling with the metallic tang from the nearby gas lamps. The bricks beneath plaster walls crumble slightly, revealing patches of rough stone that seem to whisper tales of the past. An iron window frame, long since bricked up, lies silent and cold against the wall, its outline still visible in ghostly shadows. To the east lies a labyrinth of brick archways, while southward leads towards another chamber filled with iron tracks. Westward takes you deeper into the underground city's forgotten past, while an upward exit lurks shrouded in darkness, promising unseen dangers or mysteries hidden beneath. A staircase spirals downwards below, disappearing into gloom and silence - a silent testament to days long past when this city thrived above ground."
+      "description": "Brick arches arch above, their once vibrant hues now faded to dull reds and browns by time's merciless touch. Iron railings corrode, spiraling downwards in twisted knots that groan under the weight of years. Water stains mark trails down the walls like rivers of antiquity. Worn wood floorboards creak softly beneath footfalls, echoing faintly through the damp chamber. A musty scent fills the air, mingling with the metallic tang from the nearby gas lamps. The bricks beneath plaster walls crumble slightly, revealing patches of rough stone that seem to whisper tales of the past. An iron window frame, long since bricked up, lies silent and cold against the wall, its outline still visible in ghostly shadows. To the east lies a labyrinth of brick archways, while southward leads towards another chamber filled with iron tracks. Westward takes you deeper into the underground city's forgotten past, while an upward exit lurks shrouded in darkness, promising unseen dangers or mysteries hidden beneath. A staircase spirals downwards below, disappearing into gloom and silence - a silent testament to days long past when this city thrived above ground.",
+      "imageOnDisk": "r103-x-16-y12-z-2.png"
     },
     {
       "id": "r104",
@@ -2484,7 +2485,8 @@
         "room",
         "railway"
       ],
-      "description": "Dank concrete slabs line the corridor, encrusted with years of grime and rust. Rusty iron beams sag above, their bolts corroded to an orange patina. A heavy asbestos blanket insulates pipes, frayed edges billowing like decaying lungs. The damp permeates everything; it hangs thick in the air, seeping into skin with a cold bite. A distant echo of water dripping reverberates off the walls. The scent is foul - wet earth mixed with the acrid tang of old metal and mold. The ground beneath is slick with moisture, leaving footprints that disappear as quickly as they're made."
+      "description": "Dank concrete slabs line the corridor, encrusted with years of grime and rust. Rusty iron beams sag above, their bolts corroded to an orange patina. A heavy asbestos blanket insulates pipes, frayed edges billowing like decaying lungs. The damp permeates everything; it hangs thick in the air, seeping into skin with a cold bite. A distant echo of water dripping reverberates off the walls. The scent is foul - wet earth mixed with the acrid tang of old metal and mold. The ground beneath is slick with moisture, leaving footprints that disappear as quickly as they're made.",
+      "imageOnDisk": "r104-x-15-y12-z-3.png"
     },
     {
       "id": "r105",
