@@ -823,7 +823,7 @@ export class WebsiteBuilder implements Builder {
 
       <div class="p-3 border-l-2 border-gray-800">
         <div class="text-gray-400 font-bold mb-1">Medical</div>
-        <p class="text-gray-600 text-xs">Clone support, sanitation</p>
+        <p class="text-gray-600 text-xs">Trauma care, sanitation</p>
       </div>
 
       <div class="p-3 border-l-2 border-gray-800">

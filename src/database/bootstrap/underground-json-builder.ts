@@ -74,7 +74,7 @@ const SISTER_GRAY_COORDS = new Set([
   '-14,-1,-5',  // TV - The Vault
   '-16,-1,-5',  // CC - Council Chambers
   '-14,1,-5',   // SQ - Sister's Quarters
-  '-16,1,-5',   // CL - Clone Lab
+  '-16,1,-5',   // ML - Medical Lab
   '-16,-3,-5',  // AR - Archive
   '-10,-3,-5',  // HC - Holding Cells
   // z=-6 The Blind

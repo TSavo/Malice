@@ -36,7 +36,7 @@ Malice is not a game you "win." It's a world you survive in - or don't.
 
 **Realistic mechanics, simplified models.** Real-world scenarios inform the design, but complexity is reduced to be playable. Bodies, metabolism, and everything they can do reduce to *calories*. Skills grow with use, not arbitrary point allocation.
 
-**Permadeath with continuity.** When you die, you die. Clone technology exists - but clones only have memories up to their last backup. Die between backups? Those memories are gone forever.
+**Permadeath is real.** When you die, you die. No resurrection. No backups. No second chances. Your story ends where you fall.
 
 **Emergent storytelling.** There are no quest markers. No NPCs waiting to give you missions. The story emerges from survival, from other players, from the choices you make when resources are scarce and everyone is hungry.
 
@@ -45,7 +45,7 @@ Malice is not a game you "win." It's a world you survive in - or don't.
 | Traditional MUD | Malice |
 |-----------------|--------|
 | Grind mobs for XP | Skills grow through realistic use |
-| Respawn at temple | Death is permanent (clones lose recent memories) |
+| Respawn at temple | Death is permanent — no resurrection |
 | Safe zones everywhere | Safety is earned, not given |
 | Theme park content | Emergent player-driven narrative |
 | Combat-focused | Survival-focused (combat is dangerous) |
@@ -63,11 +63,9 @@ Your character knows only what they have learned through play. Period.
 
 **Examples of violations:**
 - Reading the source code and having your character "know" where resources spawn
-- Your clone "remembering" events that happened after the backup
 - Acting on information from Discord/forums that your character couldn't know
 - "Intuiting" the location of hidden areas you found on an alt
-
-**The clone example:** You back up your memories on Monday. You discover a secret cache on Tuesday. You die on Wednesday. Your clone wakes up with Monday's memories. *You do not know about the cache.* If you go straight to it, that's cheating.
+- Your new character "knowing" things your dead character discovered
 
 ### 2. No Metagaming
 
@@ -382,42 +380,15 @@ Skills grow through use. There is no XP allocation.
 
 ---
 
-## Death and Clones
+## Death
 
 ### Death Is Permanent
 
 When your character dies, they are dead. Their body becomes a corpse. Their possessions remain where they fell. Their story is over.
 
-### Clone Technology
+There is no resurrection technology. No backup systems. No second chances. When you die, you create a new character and start fresh. Your old character's knowledge, relationships, and progress are gone forever.
 
-Clone technology exists in the Malice world. Here's how it works:
-
-1. **Backup:** You can back up your memories to a clone facility
-2. **Storage:** The backup is stored until needed
-3. **Death:** When your original body dies, the clone can be activated
-4. **Awakening:** The clone wakes up with memories only up to the backup point
-
-### The Memory Gap
-
-**This is critical:** The clone does not have memories of events between the backup and death.
-
-If you:
-- Backed up Monday
-- Discovered a secret Tuesday
-- Made a deal Wednesday
-- Died Thursday
-
-Your clone knows *nothing* about Tuesday, Wednesday, or Thursday. As far as the clone is concerned, it's Monday. They don't know what killed them. They don't know about the deal. They don't know the secret.
-
-**You must roleplay this honestly.** Your clone cannot "just happen" to remember convenient information.
-
-### Clone Limitations
-
-- Backups are not free or instant
-- Clone bodies need to be prepared in advance
-- There may be wait times between death and clone activation
-- Clone facilities can be destroyed or compromised
-- Multiple deaths without backups = permanent death
+**This is what makes your choices matter.** Every risk is real. Every betrayal could be your last. Every friend might be the person who saves your life — or ends it.
 
 ---
 
@@ -472,7 +443,7 @@ We won't tell you much about the world here. That's IC information.
 - It's cyberpunk
 - It's harsh
 - Resources are scarce
-- Technology exists (including cloning)
+- Death is permanent
 - Society has structures (discover them in play)
 
 **What you discover through play:**
