@@ -319,6 +319,7 @@ Messages are JSON envelopes with channel routing:
 | `state` | server→client | State pushes (room, inventory, etc.) |
 | `ctrl` | bidirectional | Control signals (resize, ready, prompt) |
 | `audio` | server→client | TTS audio segments for speech synthesis |
+| `wm` | bidirectional | Window management (open/close/update windows) |
 | `custom:*` | bidirectional | Custom channels (open with `t: 'open'`) |
 
 ### MOO Methods for Channels
@@ -364,6 +365,45 @@ ws.send(JSON.stringify({ ch: 'game', t: 'data', p: 'look' }));
 // Send resize
 ws.send(JSON.stringify({ ch: 'ctrl', t: 'data', p: { type: 'resize', w: 80, h: 24 } }));
 ```
+
+### Showing Windows to Players
+
+Players can be shown visual content in popup windows via the `player.show()` API. Windows can display either object images or HTML content, and can optionally persist across reconnects.
+
+**Display an object's image:**
+```typescript
+// Show a locked door's image to the player
+const lock = await $load(42);
+player.show('lock', lock, {
+  icon: '🔐',
+  persist: true  // Adds to start menu, persists across reconnects
+});
+```
+
+**Display HTML content:**
+```typescript
+// Show a document or custom UI
+player.show('note', '<h1>Classified Memo</h1><p>Project UNUM is active...</p>', {
+  icon: '📄',
+  title: 'Classified Document',
+  persist: false
+});
+```
+
+**Close and hide windows:**
+```typescript
+player.close('lock');  // Closes window, keeps in start menu if persist was true
+player.hide('note');   // Closes window AND removes from start menu
+```
+
+**How it works:**
+- `show()` uses the `state` channel to send window data to the client
+- Client renders a ShowWindow with the object's image or HTML content
+- If `persist: true`, window config is stored in `player.windowLayout` and restored on reconnect
+- For object-type windows, image URLs are refreshed on reconnect (content may have changed)
+- For HTML-type windows, frame persists but content is not stored (to avoid stale/large data)
+
+See `docs/city-ai/WINDOW-MANAGEMENT.md` for the lower-level `player.openWindow()` API which provides more control over window types (html, iframe, terminal) and configuration.
 
 ### Text-to-Speech (TTS)
 
