@@ -18,29 +18,7 @@ export const building = {
       name: 'Trinity - Club Lobby',
       description: `The bottom of the stairs opens into the club's lobby, a transitional space between the world above and the world below. The ceiling here is the original brick vaulting from 1890—arched tunnels that once held storefronts, now painted black and hung with defunct disco balls that catch what little light remains.
 
-A cashier's window is built into one wall, barred and empty, where cover charges were once collected. Signs list prices for different nights: THURSDAYS $5, FRIDAYS '%LOBBY': {
-      name: 'Trinity - Club Lobby',
-      description: `The bottom of the stairs opens into the club's lobby, a transitional space between the world above and the world below. The ceiling here is the original brick vaulting from 1890—arched tunnels that once held storefronts, now painted black and hung with defunct disco balls that catch what little light remains.
-
 A cashier's window is built into one wall, barred and empty, where cover charges were once collected. Signs list prices for different nights: THURSDAYS $5, FRIDAYS $10, SATURDAY SPECIAL $15. The prices seem quaint now, relics of an economy that measured things in dollars.
-
-The main room opens to the south, a cavern of darkness visible through the archway. The bar is visible to the east, its bottles catching the emergency light. The floor is sticky with the residue of countless spilled drinks, the kind of sticky that never quite cleans up.
-
-Restrooms are marked to the west—stick figures in white on black doors. The graffiti inside was legendary. Some of it was art.`,
-      x: -13,
-      y: 2,
-      0, SATURDAY SPECIAL '%LOBBY': {
-      name: 'Trinity - Club Lobby',
-      description: `The bottom of the stairs opens into the club's lobby, a transitional space between the world above and the world below. The ceiling here is the original brick vaulting from 1890—arched tunnels that once held storefronts, now painted black and hung with defunct disco balls that catch what little light remains.
-
-A cashier's window is built into one wall, barred and empty, where cover charges were once collected. Signs list prices for different nights: THURSDAYS $5, FRIDAYS $10, SATURDAY SPECIAL $15. The prices seem quaint now, relics of an economy that measured things in dollars.
-
-The main room opens to the south, a cavern of darkness visible through the archway. The bar is visible to the east, its bottles catching the emergency light. The floor is sticky with the residue of countless spilled drinks, the kind of sticky that never quite cleans up.
-
-Restrooms are marked to the west—stick figures in white on black doors. The graffiti inside was legendary. Some of it was art.`,
-      x: -13,
-      y: 2,
-      5. The prices seem quaint now, relics of an economy that measured things in dollars.
 
 The main room opens to the south, a cavern of darkness visible through the archway. The bar is visible to the east, its bottles catching the emergency light. The floor is sticky with the residue of countless spilled drinks, the kind of sticky that never quite cleans up.
 
