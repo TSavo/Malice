@@ -59,8 +59,7 @@ export class PlayerBuilder implements Builder {
           fitnessXPToday: 0, // XP earned today (max 3)
           fitnessLastDay: null, // Date string of last XP day (for reset)
 
-          // Clone system
-          cloneBackupTank: null, // ObjRef to tank holding our backup (or null)
+          // Death is permanent - no resurrection technology exists
 
           // Window layout for web client
           windowLayout: {
@@ -118,10 +117,7 @@ export class PlayerBuilder implements Builder {
       'fitnessPlaytime',
       'Minutes played toward next XP (resets at 180 minutes)',
     );
-    obj.setPropertyDescription(
-      'cloneBackupTank',
-      'Reference to clone tank holding backup of this character',
-    );
+    // Clone system property removed - permadeath is real
     obj.setPropertyDescription(
       'windowLayout',
       'Web client window positions, sizes, and state for session restore',
@@ -2716,137 +2712,14 @@ export class PlayerBuilder implements Builder {
       self.sleepDebt = 0;
       self.statusEffects = {};
 
-      // Check for clone backup
-      const cloneTank = self.cloneBackupTank;
-      const hasBackup = cloneTank && await cloneTank.hasBackup(self);
-      
-      if (hasBackup) {
-        // Get backup info for display
-        const backup = await cloneTank.getBackup(self);
-        const backupDate = backup?.backupTimestamp 
-          ? new Date(backup.backupTimestamp).toLocaleString()
-          : 'unknown';
-        
-        // Enter death funnel with clone option
-        self._deathFunnelState = 'choosing';
-        self._deathFunnelCorpse = corpse;
-        
-        await self.tell('=== DEATH OPTIONS ===');
-        await self.tell('');
-        await self.tell('1. RESURRECT FROM CLONE');
-        await self.tell('   Tank: ' + (cloneTank.name || 'Clone Tank'));
-        await self.tell('   Last backup: ' + backupDate);
-        await self.tell('   WARNING: You will only have memories up to this backup.');
-        await self.tell('   Everything after that moment is permanently lost.');
-        await self.tell('');
-        await self.tell('2. CREATE NEW CHARACTER');
-        await self.tell('   Start fresh with a new identity.');
-        await self.tell('   Your backup data will remain for later use.');
-        await self.tell('');
-        await self.tell('Type CLONE or NEW to choose.');
-        
-        // Register death funnel verbs
-        await self.registerVerb(['clone', 'resurrect', '1'], self, 'deathFunnelClone');
-        await self.registerVerb(['new', 'new character', '2'], self, 'deathFunnelNew');
-        
-      } else {
-        // No backup - go straight to chargen
-        await self.tell('You have no clone backup. Your story ends here.');
-        await self.tell('');
-        
-        // Send to chargen for new character
-        if (self._context && $.charGen) {
-          await self.tell('Creating a new character...');
-          await self.tell('');
-          await $.charGen.start(self._context, self);
-        } else if (self._context) {
-          await self.tell('Please reconnect to create a new character.');
-          self._context.close();
-        }
-      }
-    `,
-    );
+      // Death is permanent - no resurrection technology exists
+      await self.tell('=== DEATH ===');
+      await self.tell('');
+      await self.tell('Your story ends here.');
+      await self.tell('There is no resurrection. No backup. No second chances.');
+      await self.tell('What you were is gone forever.');
+      await self.tell('');
 
-    // Death funnel: player chose to resurrect from clone
-    obj.setMethod(
-      'deathFunnelClone',
-      `
-      /** Handle player choosing to resurrect from clone. */
-      if (self._deathFunnelState !== 'choosing') {
-        await self.tell('You are not at the death screen.');
-        return;
-      }
-      
-      const cloneTank = self.cloneBackupTank;
-      if (!cloneTank) {
-        await self.tell('Error: No clone tank found. Proceeding to new character...');
-        await self.deathFunnelNew();
-        return;
-      }
-      
-      // Clear death funnel state
-      self._deathFunnelState = null;
-      self._deathFunnelCorpse = null;
-      
-      // Unregister death funnel verbs
-      await self.unregisterVerb('clone');
-      await self.unregisterVerb('resurrect');
-      await self.unregisterVerb('1');
-      await self.unregisterVerb('new');
-      await self.unregisterVerb('new character');
-      await self.unregisterVerb('2');
-      
-      await self.tell('');
-      await self.tell('Initiating resurrection sequence...');
-      await self.tell('');
-      
-      // Begin resurrection (this sets up the timer)
-      const result = await cloneTank.beginResurrection(self);
-      
-      if (!result.success) {
-        await self.tell('Resurrection failed: ' + result.message);
-        await self.tell('Proceeding to new character...');
-        await self.deathFunnelNew();
-        return;
-      }
-      
-      await self.tell('Clone growth initiated.');
-      await self.tell('Estimated time: ' + (result.estimatedTime || 5) + ' minutes.');
-      await self.tell('');
-      await self.tell('Your consciousness drifts in darkness...');
-      await self.tell('Fragments of memory reassemble...');
-      await self.tell('');
-      await self.tell('You will awaken when the process completes.');
-      
-      // The tank's tick() will call completeResurrection() when ready
-      // which will place the player in the tank's room with a new body
-    `,
-    );
-
-    // Death funnel: player chose to create new character
-    obj.setMethod(
-      'deathFunnelNew',
-      `
-      /** Handle player choosing to create a new character instead of cloning. */
-      if (self._deathFunnelState === 'choosing') {
-        // Clear death funnel state
-        self._deathFunnelState = null;
-        self._deathFunnelCorpse = null;
-        
-        // Unregister death funnel verbs
-        await self.unregisterVerb('clone');
-        await self.unregisterVerb('resurrect');
-        await self.unregisterVerb('1');
-        await self.unregisterVerb('new');
-        await self.unregisterVerb('new character');
-        await self.unregisterVerb('2');
-      }
-      
-      await self.tell('');
-      await self.tell('You release your hold on this life.');
-      await self.tell('Your backup remains stored, awaiting a future that will never come.');
-      await self.tell('');
-      
       // Send to chargen for new character
       if (self._context && $.charGen) {
         await self.tell('Creating a new character...');
@@ -2858,6 +2731,8 @@ export class PlayerBuilder implements Builder {
       }
     `,
     );
+
+    // Clone resurrection methods removed - permadeath is real
 
     // Override canFallAsleep to check for combat, etc.
     obj.setMethod(

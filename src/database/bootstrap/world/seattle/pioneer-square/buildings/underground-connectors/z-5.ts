@@ -83,7 +83,7 @@ Sound-dampening materials line the walls, ensuring that conversations in the Cou
 
   '%LAB_LINK': {
     name: 'Lab Approach',
-    description: `A sterile passage connects the Council section to the Clone Lab approach. The transition from administrative to scientific is marked by a decontamination zone—anyone continuing north must pass through UV sterilization and chemical spray before reaching the laboratory.
+    description: `A sterile passage connects the Council section to the Medical Lab approach. The transition from administrative to scientific is marked by a decontamination zone—anyone continuing north must pass through UV sterilization and chemical spray before reaching the laboratory.
 
 The floor here shows a different wear pattern: fewer footsteps, more deliberate movement. The people who come this way come with purpose, not for transit. The corridor serves a specific function in the Cartel's hierarchy of access.
 
