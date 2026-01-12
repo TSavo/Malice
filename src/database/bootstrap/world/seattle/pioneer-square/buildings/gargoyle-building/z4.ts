@@ -25,6 +25,7 @@ A stone serpent coils around a sphere at this corner—the last of the four garg
       x: -18,
       y: 12,
       z: 4,
+      imageOnDisk: 'gargoyle-building-roof-southeast-x-18-y12-z4.png',
       population: 0,
       ambientNoise: 25,
       lighting: 100,
