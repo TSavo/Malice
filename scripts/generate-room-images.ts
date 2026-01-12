@@ -525,7 +525,7 @@ async function main() {
       if (err.isRateLimit) {
         console.log(`    ⏳ Rate limited on ${err.roomFile.room.name} - added to retry queue`);
         retryQueue.push(err.roomFile);
-        errors--; // Don't count as error since we'll retry
+        // Don't count rate-limited errors - they'll be retried
       } else if (err.isTokenError) {
         consecutiveTokenErrors++;
         console.error(`    ⚠️  Token error on ${err.roomFile.room.name} (${consecutiveTokenErrors} consecutive)`);
@@ -547,7 +547,7 @@ async function main() {
 
     generated += successes.length;
     skipped += skips.length;
-    errors += errs.length;
+    errors += errs.filter(e => !e.isRateLimit).length;
 
     // Delay between batches
     if (i + PARALLEL_COUNT < toGenerate.length) {
