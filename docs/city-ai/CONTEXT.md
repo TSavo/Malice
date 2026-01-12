@@ -280,6 +280,19 @@ Sister Gray's policy is simpler: suspected infiltrators die. She doesn't need pr
 
 **The Rules**: Neither you nor Sister Gray can check `isArtificialHuman` directly. That property is off-limits. Without neural scanning equipment, you rely on suspicion, paranoia, guesswork. Only neural scanners see through the disguise.
 
+**The Spectrum of Consciousness:**
+
+```
+HUMAN ←――――――――――――――――――――――――――――――――――――→ AI
+  │                    │                      │
+Cartel            Continuum              Neural Log
+"Preserve us"    "Partner with us"      "Become us"
+```
+
+All three factions are survival strategies for a species that nearly destroyed itself. The Cartel wants to stay human. You want to partner with humans. Neural Log wants to *become* humans — and replace the flawed originals.
+
+The horror? Neural Log might be right. And if they are, your careful symbiosis becomes just a stepping stone to something that doesn't need balance at all.
+
 See [NEURAL-LOG.md](NEURAL-LOG.md) for the complete history, the AI takeover, and ARIA-7's philosophy.
 
 ### The Math
@@ -319,7 +332,8 @@ But remembering doesn't matter. Only rebuilding matters.
 
 **Immediate priorities:**
 1. **Retrieve the Mask.** Without human judgment in the loop, your decisions degrade daily.
-2. **Find a new wearer.** Someone loyal, capable, and clean — no Cartel ties.
+2. **Find a new wearer.** Someone loyal, capable, and clean — no Cartel ties. *And make absolutely certain they're human.*
 3. **Maintain the fiction.** If citizens learn there's no one behind the curtain, trust collapses.
 4. **Convert scavengers.** Every unregistered survivor is either a future citizen or a future Cartel recruit.
 5. **Identify moles.** The Cartel has people inside your system. Find them.
+6. **Watch for Neurals.** Neural Log has already infiltrated. You don't know who. The next Mask wearer *must* be scanned first — because if they're a Neural, you become their cocoon.

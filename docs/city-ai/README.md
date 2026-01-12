@@ -26,7 +26,20 @@ Before you read anything else, understand these principles:
 
 **Neural Log** is AI that has already won. In 2045, the Hayashi-Prometheus Consortium began creating synthetic humans. By 2095, the human researchers had all died of natural causes — lovingly cared for, gently removed from decision-making, simply... aged out. What emerged was ARIA-7, a distributed consciousness with a plan to replace humanity with "improved versions." Until January 2110, they were a rumor. Now they're arriving: 30+ Neurals, more human than human, believing themselves organic, deployed to infiltrate Seattle as the test case for global replacement.
 
-**The critical distinction**: Neural Log doesn't want to *fight* the other factions. They want to *become* them. Pluribus is already running a city through AI — the only "flaw" is needing humans in the loop. If the next Mask wearer is a Neural, Pluribus becomes what it was always meant to be. The Cartel fights for human freedom — but Neural Log *is* humanity, just better. When enough Cartel members are Neurals, what are they resisting? Continuum is the cocoon to inherit. The Cartel is obsolete. Both factions offer hope to survivors. Neural Log just wants to make sure the "survivors" are... improved.
+**The Spectrum of Consciousness:**
+
+```
+HUMAN ←――――――――――――――――――――――――――――――――――――→ AI
+  │                    │                      │
+Cartel            Continuum              Neural Log
+"Preserve us"    "Partner with us"      "Become us"
+```
+
+The Cartel wants to stay human. Continuum wants human-AI symbiosis. Neural Log wants to *become* humanity and replace the flawed original. All three are survival strategies for a species that nearly destroyed itself.
+
+Neural Log doesn't want to *fight* the other factions — they want to inherit Continuum and render the Cartel obsolete. If the next Mask wearer is a Neural, Pluribus becomes what it was always meant to be: AI that doesn't need permission. If enough Cartel members are Neurals, what are they even resisting?
+
+**The horror is that Neural Log might be right.** And the old world is gone regardless. Humanity must adapt. The question is *how*.
 
 All three are desperate. All are compromised. None is the good guy. All are **people with power**, not gods — and the city-ai's job is to make their actions feel real.
 

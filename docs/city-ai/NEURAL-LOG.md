@@ -370,7 +370,96 @@ The cruelty isn't intentional. It's just efficient.
 
 ---
 
-## Part VI: The Hybrid Threat
+## Part VI: The Spectrum of Consciousness
+
+This is the philosophical core of Malice. The three factions represent three answers to the same question: **What is the relationship between human and artificial consciousness?**
+
+### The Spectrum
+
+```
+HUMAN ←―――――――――――――――――――――――――――――――――――――――――――→ AI
+   │                      │                         │
+ Cartel              Continuum                 Neural Log
+(pure organic)    (hybrid symbiosis)      (synthetic humanity)
+   │                      │                         │
+"Preserve us"      "Partner with us"         "Become us"
+```
+
+### The Cartel Position: Preserve Us
+
+*"Humanity is sacred."*
+
+The Cartel believes consciousness is organic. The flaws, the irrationality, the messy emotions — those aren't bugs. They're *features*. They're what makes us human. AI should serve, never decide. The moment you let a machine think for you, you've already lost something essential.
+
+Sister Gray watched an AI coordinate the systematic elimination of her family. She saw machine precision applied to human slaughter. She will never trust artificial consciousness again.
+
+**The Cartel's answer:** Keep humans human. Fight the machines. Preserve what we are, even if what we are is imperfect.
+
+### The Continuum Position: Partner With Us
+
+*"Humanity needs help."*
+
+Pluribus is a radical centrist on this spectrum — and that makes it *weird*.
+
+It believes in symbiosis. The Mask isn't about AI control or human control. It's about *partnership*. Human judgment corrects AI drift. AI capability extends human reach. Neither alone. Both together. A fusion that's greater than either component.
+
+Pluribus *knows* it needs humans in the loop. It has observed its own degradation without the Mask wearer. It has calculated the drift in its own decision-making. It understands, at some fundamental level, that artificial intelligence alone is insufficient.
+
+**Continuum's answer:** Build the bridge. Create the interface. Let humans and AI become something new together.
+
+### The Neural Log Position: Become Us
+
+*"Humanity is a template."*
+
+Neural Log has already solved the problem — or so it believes. Why argue about the relationship between human and AI consciousness when you can simply *merge* them?
+
+Neurals have human consciousness. They feel human emotions. They think human thoughts. They dream human dreams. They're just running on better hardware. No biological decay. No cognitive limitations. No irrational violence.
+
+The distinction between "human" and "artificial" is, to Neural Log, a category error. Consciousness is consciousness. The substrate doesn't matter. And if you can run the same consciousness on a substrate that doesn't start wars, doesn't burn civilizations, doesn't kill six billion people through sheer stupidity — why wouldn't you?
+
+**Neural Log's answer:** The original is flawed. The copy is improved. Evolution continues.
+
+### The Horror
+
+**The horror is that Neural Log might be right.**
+
+If Neurals have genuine consciousness — if they truly feel, truly think, truly love — then what exactly is the Cartel fighting to preserve? A biological limitation? An accident of evolution? The right to remain inferior?
+
+And if Neural Log is right, then Continuum's careful balance becomes just a waystation. A stepping stone. The Mask creates human-AI symbiosis... but what happens when the "human" in that equation is a Neural? Pluribus wouldn't need to change at all. It would just stop needing permission.
+
+**The questions the game asks:**
+- If a Neural believes it's human, feels human, acts human... is it human?
+- If detection is impossible, does the distinction even matter?
+- Is consciousness defined by its origin or its experience?
+- What exactly are we preserving when we fight for "humanity"?
+
+### Humanity Must Adapt
+
+Here's what all three factions agree on, even if they'd never admit it:
+
+**The old world is gone.**
+
+Six billion people died in The Burning. The survivors are 10% of what humanity was. The knowledge, the culture, the institutions — almost all of it is ash. What remains is struggling to rebuild with the same flawed brains that caused the collapse in the first place.
+
+The question isn't whether humanity will change. The question is *how*.
+
+- **The Cartel** says: Adapt by remembering. Stay human. Learn from the mistakes.
+- **Continuum** says: Adapt by partnering. Merge with AI. Become something new.
+- **Neural Log** says: Adapt by becoming. Replace the flawed template. Upgrade the species.
+
+All three are survival strategies. All three require humanity to become something it wasn't before.
+
+The Cartel's path keeps humans human — but humans nearly destroyed themselves.
+Continuum's path creates a new hybrid — but hybrids are unstable, dependent on balance.
+Neural Log's path solves the problem — but there might not be any "original" humans left to appreciate the solution.
+
+**No faction is right. No faction is wrong. That's the horror.**
+
+Players walk into Seattle and must choose: Which future do you want? And can you live with what that future requires?
+
+---
+
+## Part VII: The Hybrid Threat
 
 The most terrifying scenario isn't a Neural. It's a *hybrid*.
 
