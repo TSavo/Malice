@@ -296,10 +296,7 @@ The Midjourney API server (`midjourney-api` service) runs as a Docker container 
 - `GET /options` - Get available Midjourney options documentation
 
 **Integration:**
-The `$aiImageGen` MOO object uses this service internally. You don't need to call the API directly - just use `$aiImageGen.generate()` from MOO code.
-
-**Image Compression:**
-When the `download: true` parameter is used, the server downloads the Midjourney-generated image from Discord CDN, compresses it using oxipng (lossless PNG optimization achieving ~12% size reduction), and returns the compressed image data. This reduces storage costs and bandwidth without any quality loss. The MOO integration always uses `download: true` to ensure all stored images are compressed.
+The `$aiImageGen` MOO object uses this service internally. Images are fetched from Discord CDN and compressed client-side using oxipng before storage. You don't need to call the API directly - just use `$aiImageGen.generate()` from MOO code.
 
 See `midjourney-api/API.md` for full API documentation.
 
@@ -1602,12 +1599,21 @@ const health = await $tts.health();
 
 ### $aiImageGen - AI Image Generation Object
 
-Generate images using Midjourney and store them in `$blob`. The Midjourney API server downloads, compresses with oxipng (lossless PNG optimization, ~12% reduction), and returns the compressed image data, which is then stored in blob storage.
+Generate images using Midjourney and store them in `$blob`. Images are fetched from Discord CDN and automatically compressed using oxipng (lossless PNG optimization, ~10-12% size reduction) before storing in blob storage.
 
 ```typescript
 // Generate image and store in $blob
 const result = await $aiImageGen.generate('A cyberpunk banana with neon lights');
-// { success: true, blobKey: '...', contentType: 'image/png', prompt: '...', uri: 'https://...' }
+// {
+//   success: true,
+//   blobKey: '...',
+//   contentType: 'image/png',
+//   prompt: '...',
+//   uri: 'https://...',
+//   originalSize: 12345678,      // Size before compression (bytes)
+//   compressedSize: 10987654,    // Size after compression (bytes)
+//   compressionRatio: '11.0%'    // Percentage saved
+// }
 
 // Get URL for the generated image
 const url = $blob.url(result.blobKey, 'thecontinuum.city');
