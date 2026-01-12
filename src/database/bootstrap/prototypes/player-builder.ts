@@ -181,7 +181,7 @@ export class PlayerBuilder implements Builder {
       }
 
       // ZERO VERBS: All command handling moved to AI narrator prompt.
-      // See docs/NARRATOR-PROMPT.md "Command Handling" section.
+      // See docs/internal/NARRATOR-PROMPT.md "Command Handling" section.
       // Only keep meta/admin commands that bypass the narrator:
       await self.registerVerb(['@options', '@options %s', '@options %s %s'], self, 'options');
 
@@ -1410,7 +1410,7 @@ export class PlayerBuilder implements Builder {
         .replace(/\\{\\{recentSensory\\}\\}/g, worldContext.recentSensory?.length > 0 ? worldContext.recentSensory.map(e => '[' + e.type + '] ' + e.content).join('\\n') : 'Nothing recent')
         .replace(/\\{\\{lastConversationPartner\\}\\}/g, worldContext.lastConversationPartner?.name || 'nobody recently');
 
-      // Prompt is now loaded from docs/NARRATOR-PROMPT.md via $aiPrompts.narrator
+      // Prompt is now loaded from docs/internal/NARRATOR-PROMPT.md via $aiPrompts.narrator
 
       const userPrompt = inputs.length === 1
         ? inputs[0]

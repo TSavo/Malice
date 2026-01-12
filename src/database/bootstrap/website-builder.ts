@@ -264,7 +264,7 @@ export class WebsiteBuilder implements Builder {
       // Map URL to file path
       let filePath = path.replace('/docs', './docs');
       if (filePath === './docs' || filePath === './docs/') {
-        filePath = './docs/WHAT-IS-MALICE.md';
+        filePath = './docs/lore/WHAT-IS-MALICE.md';
       } else if (!filePath.endsWith('.md')) {
         filePath = filePath + '.md';
       }
