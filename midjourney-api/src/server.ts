@@ -355,14 +355,14 @@ async function downloadImage(url: string, filepath: string): Promise<void> {
   if (filepath.endsWith('.png')) {
     try {
       const originalSize = fs.statSync(filepath).size;
-      const oxipngModule = require('oxipng-bin');
-      const oxipng = oxipngModule.default || oxipngModule;
+      const oxipng = '/usr/bin/oxipng'; // Use system binary (installed in Dockerfile)
       await execFileAsync(oxipng, ['-o', '4', '--strip', 'safe', filepath]);
       const compressedSize = fs.statSync(filepath).size;
       const savings = ((originalSize - compressedSize) / originalSize * 100).toFixed(1);
       console.log(`[Compress] ${path.basename(filepath)}: ${(originalSize/1024/1024).toFixed(2)}MB -> ${(compressedSize/1024/1024).toFixed(2)}MB (${savings}% smaller)`);
     } catch (err: any) {
-      console.warn(`[Compress] oxipng failed, keeping original: ${err.message}`);
+      console.warn(`[Compress] oxipng failed for ${path.basename(filepath)}: ${err.message}`);
+      console.warn(`[Compress] Stack trace:`, err.stack);
     }
   }
 }

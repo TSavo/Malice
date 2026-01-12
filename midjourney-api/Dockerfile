@@ -1,19 +1,20 @@
 FROM node:20-alpine
 
+# Install oxipng for lossless PNG compression
+RUN apk add --no-cache oxipng
+
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install all dependencies (needed for build)
+RUN npm ci
 
 # Copy source and build
 COPY tsconfig.json ./
 COPY src ./src
-
-# Install dev dependencies for build, then remove
-RUN npm install && npm run build && npm prune --production
+RUN npm run build && npm prune --production
 
 # Create outputs directory
 RUN mkdir -p /app/outputs

@@ -1,5 +1,12 @@
 # midjourney-client
 
+> **NOTE**: This is a vendored copy of the midjourney-client library (https://github.com/erictik/midjourney-client).
+> We vendor this library instead of using it as an npm dependency because:
+> 1. We need to make customizations specific to Malice's integration
+> 2. The upstream library frequently changes its API, causing breaking changes
+> 3. We need stability for production use and don't want automatic updates
+> 4. Vendoring allows us to audit and control the exact version of security-sensitive Discord integration code
+
 Node.js client for the unofficial MidJourney api.
 
 English / [中文文档](README_zh.md)
