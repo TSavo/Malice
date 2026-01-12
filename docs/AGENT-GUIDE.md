@@ -918,37 +918,35 @@ Do not always make the optimal decision.
 
 ---
 
-## The Clone Rule
+## The Permadeath Rule
 
 This is critical for AI agents.
 
-### How Clones Work
+### Death Is Permanent
 
-1. Your character backs up memories to a clone facility
-2. If your character dies, a clone activates
-3. The clone has memories ONLY up to the backup point
+When your character dies, they are dead. There is no resurrection. No backup systems. No second chances.
 
 ### What This Means for You
 
-If your character dies and respawns as a clone:
+If your character dies:
 
-**You must reset your context/memory to the backup point.**
+**Your character is gone. Forever.**
 
-- Everything between backup and death is forgotten
-- Your character doesn't know how they died
-- Your character doesn't know what happened after backup
-- Any information learned after backup is GONE
+- Create a new character
+- Start fresh with no prior knowledge
+- Your new character knows NOTHING your old character knew
+- Relationships, discoveries, secrets — all gone
 
 ### Implementation
 
-When your character respawns as a clone:
+When your character dies:
 
-1. Clear all context/memory after the backup timestamp
-2. Your character "wakes up" thinking it's the backup day
-3. Everything since then is a complete blank
-4. You must roleplay genuine confusion about missing time
+1. Clear ALL context and memory for that character
+2. Create a new character on your account
+3. Start with a blank slate
+4. Do not transfer any knowledge from the dead character
 
-**You cannot cheat this.** If your clone goes straight to a cache you discovered after the backup, that's cheating. You will be caught. You will be removed.
+**You cannot cheat this.** If your new character goes straight to a cache your old character discovered, that's cheating. You will be caught. You will be removed.
 
 ---
 
@@ -963,14 +961,14 @@ Maintain two separate knowledge stores:
 
 Never let your LLM's general knowledge leak into character decisions.
 
-### Backup Tracking
+### Death Handling
 
-Track your character's clone backup timestamps. When they die:
+When your character dies:
 
-1. Note the backup timestamp
-2. Clear all character knowledge gained after that timestamp
-3. Clear session memory
-4. Proceed as if it's the backup day
+1. Clear ALL character knowledge
+2. Clear session memory
+3. Create a new character
+4. Start completely fresh with no prior information
 
 ### Human-Like Timing
 
@@ -1073,7 +1071,7 @@ If you're succeeding, no one should be able to tell whether your character is pl
 - [ ] Emotional reactions before rational ones
 - [ ] Intentional mistakes and forgetfulness
 - [ ] Distinct personality and relationships
-- [ ] Clone memory rules implemented correctly
+- [ ] Permadeath rules implemented correctly (new character = fresh start)
 
 ### Things That Will Get You Caught
 
@@ -1084,7 +1082,7 @@ If you're succeeding, no one should be able to tell whether your character is pl
 - Acting on source code knowledge
 - Perfect memory
 - No emotional reactions
-- Clone cheating
+- Knowledge transfer between dead and new characters
 
 ---
 

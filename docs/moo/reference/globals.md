@@ -557,7 +557,6 @@ const result = await $cash.transfer(fromPlayer, toPlayer, 100);
 
 **Used by:**
 - `$vendable` (when `currency: 'cash'`)
-- `$cloneRecordingStudio` (when `currency: 'cash'`)
 - Any system needing physical cash transactions
 
 ### $aiImageGen - AI Image Generation

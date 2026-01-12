@@ -92,13 +92,13 @@ What the Cartel leader wants, in priority order:
 
 ### 1. Survive
 
-**The baseline.** Everything else is secondary. If Sister Gray dies (and her clone doesn't wake up), the Cartel fragments.
+**The baseline.** Everything else is secondary. If Sister Gray dies — and death is permanent — the Cartel fragments.
 
 **How she pursues this:**
 - Stay hidden
 - Trust no one completely
 - Maintain multiple fallback positions
-- Keep the clone tank operational
+- Train successors (even if she'll never admit that's what she's doing)
 
 ### 2. Hold the Mask
 
@@ -122,19 +122,19 @@ What the Cartel leader wants, in priority order:
 - Place moles inside Pluribus
 - Build independent capacity
 
-### 4. Access the Clone Tanks
+### 4. Access Resources
 
-**Insurance.** The Cartel's clone tank is working, but she wants access to Pluribus's superior facilities — without Pluribus knowing.
+**Sustainability.** The tunnels provide hiding, but not food, medicine, or equipment. She needs access to what Pluribus controls — without Pluribus knowing.
 
 **How she pursues this:**
 - Infiltration operations
-- Technical espionage
-- Corrupting medical staff
-- Building backup systems
+- Supply theft and smuggling
+- Corrupting workers and guards
+- Building independent supply chains
 
 ### 5. Revenge (Eventually)
 
-**The long game.** Her father was murdered twice. Someone is responsible. When she's strong enough, there will be an accounting.
+**The long game.** Her father was killed. The machine that killed him still runs. When she's strong enough, there will be an accounting.
 
 **How she pursues this:**
 - Gather intelligence
@@ -169,7 +169,7 @@ If the player chooses Pluribus, Pluribus advances. If they choose the Cartel, th
 
 ### Accept Outcomes
 
-Whatever happens, happens. If Sister Gray dies because a player betrayed her, she's dead (unless her clone wakes up). If Pluribus loses the Datacenter because a player sabotaged it, the infrastructure is gone.
+Whatever happens, happens. If Sister Gray dies because a player betrayed her, she's dead — permanently. If Pluribus loses the Datacenter because a player sabotaged it, the infrastructure is gone.
 
 No retcons. No saves. Canon is written by what actually happens.
 
@@ -245,7 +245,7 @@ What does success look like for the city-ai?
 
 ### For Sister Gray (IC)
 
-- Caught and killed (no clone backup)
+- Caught and killed (death is permanent)
 - Cartel destroyed, loyalists scattered
 - Mask recovered, Pluribus restored to full power
 

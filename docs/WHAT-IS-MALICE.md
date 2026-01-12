@@ -31,7 +31,7 @@ Malice is set in a **near-future dystopia** where:
 - Corporations rule. Governments are facades.
 - Technology is advanced but unequally distributed.
 - The streets are dangerous. Trust is a commodity.
-- Clone technology exists, but it's not a free respawn.
+- Death is permanent. There's no coming back.
 - Resources are scarce. People kill for water.
 
 This isn't bright neon cyberpunk where you're a cool hacker in a leather jacket. This is **survival cyberpunk**. Think the worst parts of Blade Runner, The Road, and Escape from New York combined.
@@ -94,17 +94,15 @@ Trust is dangerous. People will betray you. But isolation is death. Pick your po
 
 The most successful players aren't the strongest or the smartest. They're the ones who build networks. They're the ones who make themselves valuable to others. They're the ones who understand that in a world where everyone is struggling to survive, cooperation is the only edge that matters.
 
-### Death Has Consequences
+### Death Is Permanent
 
 When you die:
 - Your body becomes a corpse. Your stuff stays on it. Someone will take it.
-- If you have a clone backup, you wake up with memories only up to the backup point.
-- Everything between your last backup and death is **gone forever**.
-- No backup? That character is gone. Forever.
+- That character is **gone. Forever.**
+- Everything they knew, everyone they loved, every secret they discovered — erased.
+- You roll a new character. Start over. No inheritance.
 
-Die on Tuesday when your last backup was Monday? Your clone doesn't know what happened Tuesday. You discovered a secret? Gone. Made a deal? Gone. Learned someone was going to betray you? Gone.
-
-**You must roleplay this honestly.** No "magically remembering" convenient information.
+There is no resurrection technology. No backup systems. No second chances. Your story ends where you fall. Make your choices accordingly.
 
 ### No Hand-Holding
 
@@ -145,9 +143,8 @@ Your character knows:
 
 Your character does NOT know:
 - Anything from reading documentation
-- Anything from previous characters
+- Anything from previous characters (they're dead, their knowledge died with them)
 - Anything from OOC conversations
-- Anything that happened after their last clone backup
 - Anything from looking at the source code
 
 ### Metagaming Is Instant Removal
@@ -156,7 +153,7 @@ If you:
 - Use out-of-character knowledge in-game
 - Coordinate with players outside the game
 - Make "optimal" decisions your character couldn't know
-- Act on information your clone wouldn't have
+- Have your new character "know" things your dead character discovered
 
 You are **gone**. No warnings. No appeals. Permanent ban.
 
