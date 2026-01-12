@@ -651,7 +651,7 @@ async function addImageOnDiskToFile(filePath: string, imageFilename: string, roo
 
     // Find the room object by its placeholder key and add imageOnDisk after z coordinate
     // Pattern: 'placeholder': { ... z: N, ... }
-    const roomKeyPattern = new RegExp(`('${placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}':\\s*\\{[^}]*?)(z:\\s*-?\\d+,?)`, 's');
+    const roomKeyPattern = new RegExp(`('${placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}':\\s*\\{[^}]*?)(z:\\s*-?\\d+,?)`);
     const match = content.match(roomKeyPattern);
 
     if (match) {
