@@ -159,12 +159,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "🔄 Triggering workflows for PR #${{ github.event.issue.number }}"
-          # Trigger code review (runs immediately)
+          # Trigger code review (which will trigger LGTM when done)
           gh workflow run claude-code-review.yml \
-            --repo ${{ github.repository }} \
-            --field pr_number=${{ github.event.issue.number }}
-          # Trigger LGTM verdict (waits 6 min, then synthesizes all feedback)
-          gh workflow run claude-lgtm.yml \
             --repo ${{ github.repository }} \
             --field pr_number=${{ github.event.issue.number }}
           # Trigger tests
