@@ -45,6 +45,7 @@ jobs:
           ref: ${{ steps.pr-details.outputs.branch }}
           # Use PAT to allow push to trigger workflows (GITHUB_TOKEN doesn't trigger workflows)
           token: ${{ secrets.PAT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+          lfs: false
 
       - name: Configure git
         run: |
