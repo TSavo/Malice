@@ -92,10 +92,12 @@ export class Window {
       top: \\\${this.y}px;
       width: \\\${this.width}px;
       height: \\\${this.height}px;
-      background: #141414;
-      border: 1px solid #333;
-      border-radius: 4px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      background: linear-gradient(180deg, #1a1a1a 0%, #141414 100%);
+      border: 2px solid #2a2a2a;
+      border-top-color: #3a3a3a;
+      border-left-color: #353535;
+      border-radius: 6px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.03);
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -106,13 +108,14 @@ export class Window {
     this.titlebar = document.createElement('div');
     this.titlebar.className = 'window-titlebar';
     this.titlebar.style.cssText = \\\`
-      height: 32px;
-      min-height: 32px;
-      background: #1a1a1a;
-      border-bottom: 1px solid #333;
+      height: 34px;
+      min-height: 34px;
+      background: linear-gradient(180deg, #222 0%, #1a1a1a 100%);
+      border-bottom: 1px solid #2a2a2a;
+      border-radius: 4px 4px 0 0;
       display: flex;
       align-items: center;
-      padding: 0 8px;
+      padding: 0 10px;
       cursor: default;
       user-select: none;
     \\\`;
@@ -185,6 +188,7 @@ export class Window {
       position: relative;
       overflow: hidden;
       background: #0d0d0d;
+      border-radius: 0 0 4px 4px;
     \\\`;
 
     this.element.appendChild(this.titlebar);
@@ -380,54 +384,93 @@ export class Window {
   }
 
   _initResize() {
-    const handle = document.createElement('div');
-    handle.style.cssText = \\\`
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      width: 16px;
-      height: 16px;
-      cursor: se-resize;
-    \\\`;
+    const handleSize = 8;  // Larger handles for easier grabbing
+    const cornerSize = 14; // Even larger corners
 
-    let startX, startY, origW, origH;
-    let resizing = false;
+    // Create resize handles for all 8 directions
+    const handles = [
+      { cursor: 'n-resize', top: '0', left: handleSize + 'px', right: handleSize + 'px', height: handleSize + 'px', dirs: { top: true } },
+      { cursor: 's-resize', bottom: '0', left: handleSize + 'px', right: handleSize + 'px', height: handleSize + 'px', dirs: { bottom: true } },
+      { cursor: 'w-resize', left: '0', top: handleSize + 'px', bottom: handleSize + 'px', width: handleSize + 'px', dirs: { left: true } },
+      { cursor: 'e-resize', right: '0', top: handleSize + 'px', bottom: handleSize + 'px', width: handleSize + 'px', dirs: { right: true } },
+      { cursor: 'nw-resize', top: '0', left: '0', width: cornerSize + 'px', height: cornerSize + 'px', dirs: { top: true, left: true } },
+      { cursor: 'ne-resize', top: '0', right: '0', width: cornerSize + 'px', height: cornerSize + 'px', dirs: { top: true, right: true } },
+      { cursor: 'sw-resize', bottom: '0', left: '0', width: cornerSize + 'px', height: cornerSize + 'px', dirs: { bottom: true, left: true } },
+      { cursor: 'se-resize', bottom: '0', right: '0', width: cornerSize + 'px', height: cornerSize + 'px', dirs: { bottom: true, right: true } },
+    ];
 
-    handle.addEventListener('mousedown', (e) => {
-      if (this.maximized) return;
-      resizing = true;
-      startX = e.clientX;
-      startY = e.clientY;
-      origW = this.width;
-      origH = this.height;
+    for (const h of handles) {
+      const handle = document.createElement('div');
+      handle.style.position = 'absolute';
+      handle.style.cursor = h.cursor;
+      if (h.top !== undefined) handle.style.top = h.top;
+      if (h.bottom !== undefined) handle.style.bottom = h.bottom;
+      if (h.left !== undefined) handle.style.left = h.left;
+      if (h.right !== undefined) handle.style.right = h.right;
+      if (h.width !== undefined) handle.style.width = h.width;
+      if (h.height !== undefined) handle.style.height = h.height;
+      handle.style.zIndex = '10';
 
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
-      e.preventDefault();
-      e.stopPropagation();
-    });
+      let startX, startY, origX, origY, origW, origH;
+      let resizing = false;
 
-    const onMouseMove = (e) => {
-      if (!resizing) return;
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
-      this.width = Math.max(200, origW + dx);
-      this.height = Math.max(100, origH + dy);
-      this.element.style.width = this.width + 'px';
-      this.element.style.height = this.height + 'px';
-      this.onResize();
-    };
+      handle.addEventListener('mousedown', (e) => {
+        if (this.maximized) return;
+        resizing = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        origX = this.x;
+        origY = this.y;
+        origW = this.width;
+        origH = this.height;
 
-    const onMouseUp = () => {
-      if (resizing) {
-        resizing = false;
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-        this.wm?.userResized(this.id, this.width, this.height);
-      }
-    };
+        const onMouseMove = (e) => {
+          if (!resizing) return;
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
 
-    this.element.appendChild(handle);
+          let newX = origX, newY = origY, newW = origW, newH = origH;
+
+          if (h.dirs.right) newW = Math.max(200, origW + dx);
+          if (h.dirs.bottom) newH = Math.max(100, origH + dy);
+          if (h.dirs.left) {
+            newW = Math.max(200, origW - dx);
+            if (newW !== origW - dx + 200) newX = origX + (origW - newW);
+          }
+          if (h.dirs.top) {
+            newH = Math.max(100, origH - dy);
+            if (newH !== origH - dy + 100) newY = origY + (origH - newH);
+          }
+
+          this.x = newX;
+          this.y = newY;
+          this.width = newW;
+          this.height = newH;
+          this.element.style.left = this.x + 'px';
+          this.element.style.top = this.y + 'px';
+          this.element.style.width = this.width + 'px';
+          this.element.style.height = this.height + 'px';
+          this.onResize();
+        };
+
+        const onMouseUp = () => {
+          if (resizing) {
+            resizing = false;
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            this.wm?.userResized(this.id, this.width, this.height);
+            this.wm?.userMoved(this.id, this.x, this.y);
+          }
+        };
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+        e.preventDefault();
+        e.stopPropagation();
+      });
+
+      this.element.appendChild(handle);
+    }
   }
 
   _initFocus() {
@@ -438,14 +481,20 @@ export class Window {
 
   focus() {
     this.focused = true;
-    this.element.style.borderColor = '#00ff88';
+    this.element.style.borderColor = '#00cc6a';
+    this.element.style.borderTopColor = '#00ff88';
+    this.element.style.borderLeftColor = '#00dd77';
+    this.element.style.boxShadow = '0 4px 24px rgba(0,255,136,0.15), inset 0 1px 0 rgba(255,255,255,0.05)';
     this.element.style.zIndex = this.wm?.getTopZIndex() || 200;
     this.titleText.style.color = '#e0e0e0';
   }
 
   blur() {
     this.focused = false;
-    this.element.style.borderColor = '#333';
+    this.element.style.borderColor = '#2a2a2a';
+    this.element.style.borderTopColor = '#3a3a3a';
+    this.element.style.borderLeftColor = '#353535';
+    this.element.style.boxShadow = '0 4px 20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.03)';
     this.titleText.style.color = '#888';
   }
 
@@ -477,7 +526,7 @@ export class Window {
       this.element.style.top = this.y + 'px';
       this.element.style.width = this.width + 'px';
       this.element.style.height = this.height + 'px';
-      this.element.style.borderRadius = '4px';
+      this.element.style.borderRadius = '6px';
       setTimeout(() => {
         this.element.style.transition = '';
         this.onResize();
