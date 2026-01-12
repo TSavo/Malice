@@ -14,10 +14,12 @@ jobs:
     # Only run if:
     # 1. Comment is on a PR (not an issue)
     # 2. Comment contains the verdict marker (from claude-lgtm.yml)
+    #    Note: Claude sometimes escapes ! as \! so we check for both variants
     # 3. Comment contains "Changes Requested" (not LGTM)
     if: |
       github.event.issue.pull_request &&
-      contains(github.event.comment.body, '<!-- CLAUDE_VERDICT_MARKER -->') &&
+      (contains(github.event.comment.body, '<!-- CLAUDE_VERDICT_MARKER -->') ||
+       contains(github.event.comment.body, '<\!-- CLAUDE_VERDICT_MARKER -->')) &&
       contains(github.event.comment.body, 'Changes Requested')
 
     runs-on: [self-hosted, malice]

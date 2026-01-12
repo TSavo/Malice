@@ -53,8 +53,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Count how many Claude verdict cycles have happened
+          # Note: Check for both escaped (\!) and unescaped (!) variants since Claude sometimes escapes HTML comments
           VERDICT_COUNT=$(gh pr view ${{ steps.pr-number.outputs.number }} --json comments \
-            --jq '[.comments[] | select(.body | contains("<!-- CLAUDE_VERDICT_MARKER -->"))] | length')
+            --jq '[.comments[] | select(.body | test("CLAUDE_VERDICT_MARKER"))] | length')
           echo "verdict_count=$VERDICT_COUNT" >> $GITHUB_OUTPUT
 
           # Max 20 iterations to prevent runaway loops
@@ -106,8 +107,10 @@ jobs:
 
             Use `gh pr comment` to post your verdict.
 
-            CRITICAL: Your comment body MUST begin with exactly:
+            CRITICAL: Your comment body MUST begin with this exact HTML comment (do NOT escape any characters):
             <!-- CLAUDE_VERDICT_MARKER -->
+
+            WARNING: Do NOT write \! or backslash-escape anything. The marker must be exactly as shown above.
 
             Then include ONE of these headings:
             - "## ✅ LGTM" - All reviewers agree, no outstanding issues
