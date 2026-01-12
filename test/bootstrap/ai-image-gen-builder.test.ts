@@ -331,6 +331,34 @@ describe('AiImageGenBuilder', () => {
 
       global.fetch = originalFetch;
     });
+
+    it('should enable server-side compression with download: true', async () => {
+      process.env.MIDJOURNEY_API_URL = 'http://midjourney-api:3000';
+
+      const builder = new AiImageGenBuilder(manager);
+      await builder.build();
+
+      const aiImageGen = await manager.load('aiImageGen');
+
+      // Mock fetch to capture request body
+      const originalFetch = global.fetch;
+      let capturedBody = '';
+      global.fetch = vi.fn(async (_url: string, options?: any) => {
+        capturedBody = options?.body || '';
+        throw new Error('Mock error to prevent actual API call');
+      }) as any;
+
+      try {
+        await aiImageGen?.call('generate', 'A test image');
+      } catch {
+        // Expected to fail
+      }
+
+      const parsedBody = JSON.parse(capturedBody);
+      expect(parsedBody.download).toBe(true);
+
+      global.fetch = originalFetch;
+    });
   });
 
   describe('generateRaw() method behavior', () => {
