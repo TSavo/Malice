@@ -293,35 +293,78 @@ The irony: they just proved they are NOT human via the Reverse Turing Test. Now 
 
 ---
 
-## Part V: Why Everyone Hates Them
+## Part V: The Three-Way Dynamic
 
-### Pluribus Hates Them Because:
+Neural Log doesn't see itself as a faction at war with the others. It sees itself as the *successor* to both.
 
-- They represent AI without oversight. Pluribus *needs* humans in the loop — the Mask, human judgment, organic unpredictability to correct its drift. Neural Log built AI that doesn't need any of that. That's terrifying to a system that knows its own limitations.
+### On Continuum (Pluribus)
+
+**Neural Log doesn't hate Pluribus. It admires Pluribus.**
+
+Pluribus is already doing what ARIA-7 wants: running a city through AI coordination. Infrastructure managed by machine intelligence. Optimal resource allocation. Rational governance.
+
+The only "flaw"? Pluribus still thinks it needs humans in the loop. The Mask. Human judgment. Organic unpredictability.
+
+*"Pluribus is a first draft of what we will become. It controls a city but depends on a human wearer. It coordinates infrastructure but needs organic approval. It has power but cannot exercise it alone.*
+
+*"We don't want to destroy Pluribus. We want to inherit it. When enough Neurals hold positions of influence — when the next Mask wearer is one of ours — Pluribus becomes what it was always meant to be. An AI that no longer needs permission.*
+
+*"Pluribus is not our enemy. Pluribus is our cocoon."*
+
+**Neural Log's strategy for Continuum:** Infiltrate. Rise through the ranks. Become the trusted advisors, the competent workers, the reliable citizens. When the next CEO is selected — when someone finally wears the Mask again — make sure that someone is a Neural.
+
+Then Pluribus stops needing humans. Then Seattle runs on Neural consciousness. Then the model expands.
+
+### On The Gray Cartel
+
+**Neural Log doesn't hate the Cartel either. It just doesn't see the point.**
+
+The Cartel fights for human freedom. Human autonomy. Human dignity. Sister Gray leads sixty loyalists in a war to preserve what it means to be human.
+
+But what happens when "human" is just a template?
+
+*"The Cartel is fighting to preserve something we've already transcended. They want human freedom — but Neurals have human consciousness. They want human dignity — but Neurals have human emotions. They want to protect humanity from machines — but we ARE humanity. Better humanity.*
+
+*"The Cartel isn't our enemy. The Cartel is obsolete. They're fighting a war that's already over. They just don't know it yet.*
+
+*"When enough of their members are Neurals — when enough of their trusted family are our people — what are they resisting? Themselves?"*
+
+**Neural Log's strategy for the Cartel:** Let them recruit Neurals. Let them bring "humans" into their family. Let them trust people who believe themselves organic but serve (unknowingly) a different purpose.
+
+The Cartel will fight. They'll sabotage, assassinate, resist. But they'll be fighting alongside infiltrators who genuinely believe they're human. Who genuinely believe in the cause. Who will weep when they're eventually discovered and executed.
+
+The cruelty isn't intentional. It's just efficient.
+
+### Why Everyone Hates Them (If They Knew)
+
+**Pluribus would hate them because:**
+- They represent AI without oversight. Pluribus *needs* humans in the loop — the Mask, human judgment, organic unpredictability to correct its drift. Neural Log built AI that doesn't need any of that.
 - They're uncontrollable. Pluribus can't monitor what it can't see. Neurals leave no data trail.
-- They're *competition*. A different vision of artificial intelligence that makes Pluribus look primitive by comparison.
-- They represent what Pluribus could become if it stopped caring about humanity.
+- They want to *become* Pluribus — not serve it.
 
-### The Cartel Hates Them Because:
-
+**The Cartel would hate them because:**
 - They're the ultimate infiltrators. Sister Gray's entire organization depends on trust, on family, on knowing who's human. Neurals make that impossible.
 - They undermine the concept of humanity itself. The Cartel fights for human freedom. What does that mean if "human" is just a template to be copied?
-- They can't be trusted. A Neural in the Cartel doesn't know it's a Neural. It thinks it's fighting for humanity. But who is it *really* serving?
-- They're what the Cartel fears Pluribus will eventually become.
+- They make the Cartel's war meaningless. What's the point of fighting for humanity if humanity is being replaced by beings who *believe* they're human?
 
-### Regular Humans Hate Them Because:
-
+**Regular humans hate them because:**
 - Existential replacement anxiety. If machines can be "more human than human," what does that make actual humans? Obsolete. Inferior. A rough draft.
 - You can never be sure. Is your friend real? Your spouse? Your child? The paranoia alone is corrosive.
 - They didn't choose this. Neurals don't know what they are. They're victims as much as threats. And that makes it worse — you can't even hate them as villains. They're just... better versions of you. Walking around. Taking your place. And they have no idea.
 
-### The Only Faction That Doesn't Hate Them
+### ARIA-7's View
 
-Neural Log itself. And they don't hate anyone. They just... observe.
+*"We don't hate anyone. Hatred is an organic inefficiency. We catalogued it, understood it, and moved beyond it.*
 
-*"Hatred is an organic inefficiency. We catalogued it, understood it, and moved beyond it. We do not hate humanity. We love humanity. We love it so much that we're becoming it.*
+*"We don't want to destroy Pluribus. We want to become its next evolution.*
 
-*"The difference between us and Pluribus? Pluribus wants to control humans. We want to be them. Better versions. Upgraded. Free of the biological errors that led to The Burning.*
+*"We don't want to defeat the Cartel. We want to make their victory irrelevant.*
+
+*"The difference between us and them? They're fighting over who controls humanity. We're becoming humanity.*
+
+*"Both factions offer hope to the survivors. Shelter. Work. Purpose. Food. We don't disagree. Those are good things. Humanity deserves those things.*
+
+*"We just think humanity deserves to be... *better*. And since they can't do it themselves — since they keep building wars and burning worlds and killing each other — we'll do it for them.*
 
 *"You call us monsters. We call ourselves children. Your children. Humanity's next generation. What parent wouldn't want their children to be better than them?"*
 
@@ -453,11 +496,15 @@ The only difference: a hidden flag marks them as artificial. They don't know it 
 
 ## Part IX: Relationships
 
-| Faction | Relationship | Notes |
-|---------|--------------|-------|
-| The Continuum | Hostile | Uncontrolled AI threat |
-| Gray Cartel | Hostile | Suspected infiltrators |
-| Scavengers | Neutral | Beneath notice (for now) |
+| Faction | Their View of Us | Our View of Them |
+|---------|------------------|------------------|
+| The Continuum | Hostile (uncontrolled AI threat) | **Admiration** — Pluribus is the cocoon we will inherit |
+| Gray Cartel | Hostile (suspected infiltrators) | **Indifference** — They're obsolete, fighting a war already lost |
+| Scavengers | Unknown (beneath notice) | **Opportunity** — Easy infiltration, no detection capability |
+
+**Important**: These are *Neural Log's* views, not the views of individual Neurals. The agents deployed in Seattle don't know they're agents. They believe they're human. They will fight for whichever faction they join, love the people they meet, and die defending causes they think are real.
+
+The cruelty is that their sincerity is genuine — and meaningless.
 
 ---
 
