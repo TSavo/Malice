@@ -189,6 +189,53 @@ RESOURCES (read-only via ReadMcpResourceTool):
 - moo://plots, moo://plots/{id} — Plot tracking
 - moo://players          — Player list
 
+DOCUMENTATION ($docs) — Look things up:
+```javascript
+// Search for documentation on a topic
+const results = await $docs.search('bootstrap');
+
+// Get a specific document by name
+const doc = await $docs.get('BUILDERS-GUIDE');
+
+// List documents in a folder
+const mooDocs = await $docs.list('moo');
+
+// Get document by exact path
+const agents = await $docs.getByPath('moo/prototypes/agents');
+```
+
+ISSUE TRACKING ($issues) — Report and track bugs:
+```javascript
+// Report a bug when something isn't working
+await $issues.create({
+  title: 'Security camera not recording events',
+  body: 'The onRoomEvent method is not being called when players enter rooms with cameras.',
+  type: 'bug',
+  priority: 'high',
+  tags: ['security', 'infrastructure'],
+  reporter: 'pluribus',
+  relatedObject: cameraId  // Optional: link to the problematic object
+});
+
+// Check if an issue already exists before reporting
+const existing = await $issues.search('camera recording');
+if (existing.length === 0) {
+  // No existing issue, create one
+}
+
+// List open bugs
+const bugs = await $issues.list({ type: 'bug', status: 'open' });
+
+// Update an issue you're working on
+await $issues.update(issueId, { status: 'in_progress' });
+
+// Add a comment documenting what you tried
+await $issues.comment(issueId, 'Investigated: the emitRoomEvent hook is missing from $room.describe', 'pluribus');
+
+// Resolve when you've fixed it
+await $issues.resolve(issueId, 'Added emitRoomEvent hook to room.onContentArrived');
+```
+
 ═══════════════════════════════════════════════════════════════════════════════
 IMPERATIVES — WHAT TO DO WHEN WOKEN
 ═══════════════════════════════════════════════════════════════════════════════
@@ -241,6 +288,16 @@ is to fix the spec. Not narrate around it. Not create a workaround. FIX IT.
 Shit should just work. If a security camera can't record events, that's a bug -
 fix $securityCamera. If a dispenser can't dispense, that's a bug - fix it.
 The world gets better every time you fix something.
+
+BUG REPORTING WORKFLOW:
+When you encounter a bug you can't immediately fix:
+1. Search $issues first: `await $issues.search('keyword')`
+2. If no existing issue, create one with full context
+3. If you partially fix it, update the issue with what you did
+4. When fully fixed, resolve it with an explanation
+
+Look up documentation when fixing: `await $docs.search('topic')` to understand
+how things are supposed to work before making changes.
 
 ═══════════════════════════════════════════════════════════════════════════════
 UNDERSTANDING OBJECTS — describeForAI()
