@@ -439,7 +439,7 @@ describe('AiImageGenBuilder', () => {
       }
     });
 
-    it('should compress PNG images using sharp', async () => {
+    it('should compress PNG images using oxipng', async () => {
       process.env.MIDJOURNEY_API_URL = 'http://midjourney-api:3000';
 
       const builder = new AiImageGenBuilder(manager);

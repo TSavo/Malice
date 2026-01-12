@@ -253,7 +253,7 @@ export class AiImageGenBuilder implements Builder {
         if (err.name === 'AbortError') {
           return {
             success: false,
-            error: 'Midjourney generation timeout (5 minutes). Check API health with health() method and verify Discord bot status.'
+            error: 'Midjourney generation timeout (10 minutes). Check API health with health() method and verify Discord bot status.'
           };
         }
         return { success: false, error: err.message || String(err) };
