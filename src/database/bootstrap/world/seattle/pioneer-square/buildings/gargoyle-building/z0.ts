@@ -161,6 +161,7 @@ A separate entrance opens onto the alley to the south, its door locked but its g
       x: -19,
       y: 11,
       z: 0,
+      imageOnDisk: 'gargoyle-building-abandoned-shop-x-19-y11-z0.png',
       population: 0,
       ambientNoise: 2,
       lighting: 35,

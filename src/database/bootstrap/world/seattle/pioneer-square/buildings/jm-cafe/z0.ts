@@ -70,6 +70,7 @@ The walls are covered in photographs and memorabilia: Seattle when it was a fron
       x: -15,
       y: 4,
       z: 0,
+      imageOnDisk: 'j-m-cafe-bar-x-15-y4-z0.png',
       population: 0,
       ambientNoise: 2,
       lighting: 25,
@@ -138,10 +139,20 @@ The walls are covered in photographs and memorabilia: Seattle when it was a fron
 
 A jukebox stands in one corner, a Wurlitzer from the '60s, its bubble tubes dark but its selection still visible behind the curved glass. The songs are standards: Sinatra, Bennett, Mathis, the crooners who provided background music for a million drinks. The jukebox doesn't play anymore, but the songs are still there, waiting.
 
+The menu board on the wall lists simple food at simple prices: BURGER $8. FISH & CHIPS '%DINING': {
+      name: 'J&M Cafe - Dining Room',
+      description: `The dining room extends behind the bar, a space of dark wood and red leather that hasn't changed since the 1950s renovation. Booths line the walls, their leather cracked but comfortable, their tables scarred by generations of diners who didn't use coasters. The lighting is dim—intentionally so, hiding age and wear and the faces of people who preferred not to be seen clearly.
+
+A jukebox stands in one corner, a Wurlitzer from the '60s, its bubble tubes dark but its selection still visible behind the curved glass. The songs are standards: Sinatra, Bennett, Mathis, the crooners who provided background music for a million drinks. The jukebox doesn't play anymore, but the songs are still there, waiting.
+
 The menu board on the wall lists simple food at simple prices: BURGER $8. FISH & CHIPS $10. SOUP OF THE DAY $4. The J&M was never a destination restaurant. It was the place you ate when you were already drinking and realized you were hungry.`,
       x: -15,
       y: 5,
+      0. SOUP OF THE DAY $4. The J&M was never a destination restaurant. It was the place you ate when you were already drinking and realized you were hungry.`,
+      x: -15,
+      y: 5,
       z: 0,
+      imageOnDisk: 'j-m-cafe-dining-room-x-15-y5-z0.png',
       population: 0,
       ambientNoise: 1,
       lighting: 20,
@@ -198,6 +209,7 @@ The walls are bare except for posted rules (HOUSE TAKES 5%) and a few photograph
       x: -16,
       y: 4,
       z: 0,
+      imageOnDisk: 'j-m-cafe-card-room-x-16-y4-z0.png',
       population: 0,
       ambientNoise: 1,
       lighting: 30,
@@ -253,6 +265,7 @@ The back door leads to the alley, its multiple locks all disengaged. Someone lef
       x: -16,
       y: 5,
       z: 0,
+      imageOnDisk: 'j-m-cafe-kitchen-x-16-y5-z0.png',
       population: 0,
       ambientNoise: 5,
       lighting: 35,
@@ -305,6 +318,7 @@ A narrow stairway continues up to the roof access, its steps worn by decades of 
       x: -15,
       y: 5,
       z: 1,
+      imageOnDisk: 'j-m-cafe-storage-x-15-y5-z1.png',
       population: 0,
       ambientNoise: 2,
       lighting: 20,
@@ -345,6 +359,7 @@ A small safe sits open in the corner, contents gone. Someone knew it was here an
       x: -16,
       y: 5,
       z: 1,
+      imageOnDisk: 'j-m-cafe-office-x-16-y5-z1.png',
       population: 0,
       ambientNoise: 1,
       lighting: 15,
@@ -389,6 +404,7 @@ From here you can see the neighborhood laid out like a map—the grid of streets
       x: -15,
       y: 5,
       z: 2,
+      imageOnDisk: 'j-m-cafe-roof-northeast-x-15-y5-z2.png',
       population: 0,
       ambientNoise: 15,
       lighting: 100,
@@ -426,6 +442,7 @@ The parapet here is low enough to look over comfortably—or low enough to fall 
       x: -15,
       y: 4,
       z: 2,
+      imageOnDisk: 'j-m-cafe-roof-southeast-x-15-y4-z2.png',
       population: 0,
       ambientNoise: 12,
       lighting: 100,
@@ -456,6 +473,7 @@ The view is limited—taller buildings block the sightlines—but the sky is vis
       x: -16,
       y: 5,
       z: 2,
+      imageOnDisk: 'j-m-cafe-roof-northwest-x-16-y5-z2.png',
       population: 0,
       ambientNoise: 10,
       lighting: 100,
@@ -494,6 +512,7 @@ The fire escape is rusted but sound, the iron construction of an era when things
       x: -16,
       y: 4,
       z: 2,
+      imageOnDisk: 'j-m-cafe-roof-southwest-x-16-y4-z2.png',
       population: 0,
       ambientNoise: 15,
       lighting: 100,

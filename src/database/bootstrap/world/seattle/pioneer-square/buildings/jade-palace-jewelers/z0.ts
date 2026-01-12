@@ -186,6 +186,7 @@ A small bathroom and a cramped kitchenette occupy one corner—the amenities tha
       x: 11,
       y: -5,
       z: 0,
+      imageOnDisk: 'jade-palace-jewelers-back-room-x11-y-5-z0.png',
       population: 0,
       ambientNoise: 0,
       lighting: 20,

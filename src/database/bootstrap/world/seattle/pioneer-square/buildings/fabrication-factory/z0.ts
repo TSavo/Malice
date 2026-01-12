@@ -79,6 +79,7 @@ The air smells of machine oil and ozone. Through the loading door, you can see t
       x: -20,
       y: 11,
       z: 0,
+      imageOnDisk: 'fabrication-factory-loading-bay-x-20-y11-z0.png',
       exits: {
         west: {
           to: 'waterfront/y11.ts',
@@ -102,6 +103,7 @@ The shelving units hum with embedded sensors. The warehouse knows exactly what i
       x: -19,
       y: 11,
       z: 0,
+      imageOnDisk: 'fabrication-factory-warehouse-storage-x-19-y11-z0.png',
       exits: {
         west: '%LOADING_BAY',
         east: '%SECURITY',
@@ -119,6 +121,7 @@ A coffee maker sits unplugged on the desk. Someone's mug still rests beside it, 
       x: -18,
       y: 11,
       z: 0,
+      imageOnDisk: 'fabrication-factory-security-station-x-18-y11-z0.png',
       exits: {
         west: '%WAREHOUSE',
         east: {
@@ -143,6 +146,7 @@ The counter is unstaffed. A speaker grille handles customer inquiries. The AI's 
       x: -20,
       y: 10,
       z: 0,
+      imageOnDisk: 'fabrication-factory-public-services-x-20-y10-z0.png',
       exits: {
         down: {
           description: 'A maintenance door conceals stairs to the basement',
@@ -170,6 +174,7 @@ Safety markings cover the floor: yellow hazard stripes, designated walking paths
       x: -19,
       y: 10,
       z: 0,
+      imageOnDisk: 'fabrication-factory-elevator-lobby-x-19-y10-z0.png',
       exits: {
         north: '%WAREHOUSE',
         east: '%BREAKROOM',
@@ -189,6 +194,7 @@ A bulletin board displays outdated safety notices and a shift schedule from befo
       x: -18,
       y: 10,
       z: 0,
+      imageOnDisk: 'fabrication-factory-breakroom-x-18-y10-z0.png',
       exits: {
         west: '%ELEVATORS',
         east: {
@@ -213,6 +219,7 @@ The noise is constant: the whine of servos, the screech of cutting tools, the th
       x: -20,
       y: 9,
       z: 0,
+      imageOnDisk: 'fabrication-factory-factory-floor-1-x-20-y9-z0.png',
       exits: {
         east: '%FACTORY_2',
         south: '%FACTORY_3',
@@ -229,6 +236,7 @@ A central monitoring station displays production queues, material consumption ra
       x: -19,
       y: 9,
       z: 0,
+      imageOnDisk: 'fabrication-factory-factory-floor-2-x-19-y9-z0.png',
       exits: {
         north: '%ELEVATORS',
         east: '%OPERATIONS',
@@ -247,6 +255,7 @@ A supervisor's desk sits empty in the corner, personal effects still arranged on
       x: -18,
       y: 9,
       z: 0,
+      imageOnDisk: 'fabrication-factory-operations-center-x-18-y9-z0.png',
       exits: {
         west: '%FACTORY_2',
         south: '%FOREMAN',
@@ -267,6 +276,7 @@ Finished assemblies queue on output conveyors, tagged with RFID chips that track
       x: -20,
       y: 8,
       z: 0,
+      imageOnDisk: 'fabrication-factory-factory-floor-3-x-20-y8-z0.png',
       exits: {
         north: '%FACTORY_1',
         east: '%FACTORY_4',
@@ -283,6 +293,7 @@ A testing station occupies one corner: pressure vessels, electrical test benches
       x: -19,
       y: 8,
       z: 0,
+      imageOnDisk: 'fabrication-factory-factory-floor-4-x-19-y8-z0.png',
       exits: {
         north: '%FACTORY_2',
         east: '%FOREMAN',
@@ -300,6 +311,7 @@ A window in the back wall looks into Operations—the foreman could supervise bo
       x: -18,
       y: 8,
       z: 0,
+      imageOnDisk: 'fabrication-factory-foreman-s-office-x-18-y8-z0.png',
       exits: {
         north: '%OPERATIONS',
         west: '%FACTORY_4',
