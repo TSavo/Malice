@@ -13,11 +13,11 @@ jobs:
   claude-fixer:
     # Only run if:
     # 1. Comment is on a PR (not an issue)
-    # 2. Comment contains the review marker
+    # 2. Comment contains the verdict marker (from claude-lgtm.yml)
     # 3. Comment contains "Changes Requested" (not LGTM)
     if: |
       github.event.issue.pull_request &&
-      contains(github.event.comment.body, '<!-- CLAUDE_REVIEW_MARKER -->') &&
+      contains(github.event.comment.body, '<!-- CLAUDE_VERDICT_MARKER -->') &&
       contains(github.event.comment.body, 'Changes Requested')
 
     runs-on: [self-hosted, malice]
@@ -159,8 +159,12 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "🔄 Triggering workflows for PR #${{ github.event.issue.number }}"
-          # Trigger review
+          # Trigger code review (runs immediately)
           gh workflow run claude-code-review.yml \
+            --repo ${{ github.repository }} \
+            --field pr_number=${{ github.event.issue.number }}
+          # Trigger LGTM verdict (waits 6 min, then synthesizes all feedback)
+          gh workflow run claude-lgtm.yml \
             --repo ${{ github.repository }} \
             --field pr_number=${{ github.event.issue.number }}
           # Trigger tests

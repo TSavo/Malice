@@ -1,0 +1,142 @@
+name: Claude LGTM Verdict
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  # Allow fixer to re-trigger verdict after pushing fixes
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to check'
+        required: true
+        type: string
+
+# Prevent multiple verdict checks from running simultaneously
+concurrency:
+  group: claude-lgtm-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+  cancel-in-progress: false
+
+jobs:
+  claude-lgtm:
+    # Skip if PR title indicates it was already fixed (only for pull_request events)
+    if: github.event_name == 'workflow_dispatch' || !contains(github.event.pull_request.title, '[claude-fixed]')
+
+    runs-on: [self-hosted, malice]
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      id-token: write
+      actions: read
+
+    steps:
+      - name: Get PR details for workflow_dispatch
+        id: pr-info
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_DATA=$(gh pr view ${{ github.event.inputs.pr_number }} --repo ${{ github.repository }} --json headRefName)
+          echo "branch=$(echo $PR_DATA | jq -r '.headRefName')" >> $GITHUB_OUTPUT
+          echo "pr_number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
+
+      - name: Set PR number
+        id: pr-number
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
+            echo "branch=${{ steps.pr-info.outputs.branch }}" >> $GITHUB_OUTPUT
+          else
+            echo "number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+            echo "branch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ steps.pr-number.outputs.branch }}
+          lfs: false
+
+      - name: Wait for reviewers to finish
+        run: |
+          echo "⏳ Waiting 6 minutes for all review bots to complete..."
+          sleep 360
+          echo "✅ Proceeding with verdict"
+
+      - name: Check iteration count
+        id: check-iterations
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Count how many Claude verdict cycles have happened
+          VERDICT_COUNT=$(gh pr view ${{ steps.pr-number.outputs.number }} --json comments \
+            --jq '[.comments[] | select(.body | contains("<!-- CLAUDE_VERDICT_MARKER -->"))] | length')
+          echo "verdict_count=$VERDICT_COUNT" >> $GITHUB_OUTPUT
+
+          # Max 20 iterations to prevent runaway loops
+          if [ "$VERDICT_COUNT" -ge 20 ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "::warning::Max verdict iterations (20) reached. Stopping review loop."
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run Claude LGTM Check
+        if: steps.check-iterations.outputs.skip != 'true'
+        id: claude-lgtm
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          path_to_claude_code_executable: /usr/local/bin/claude
+          additional_permissions: |
+            actions: read
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ steps.pr-number.outputs.number }}
+            VERDICT ITERATION: ${{ steps.check-iterations.outputs.verdict_count }}
+
+            You are the VERDICT agent. Your ONLY job is to determine if all reviewers agree the PR is ready to merge.
+
+            ## Step 1: Read ALL Comments and Reviews
+
+            ```bash
+            # Get ALL PR comments (from bots and humans)
+            gh pr view ${{ steps.pr-number.outputs.number }} --json comments,reviews \
+              --jq '.comments[].body, .reviews[].body'
+
+            # Get ALL inline code review comments (line-specific feedback)
+            gh api repos/${{ github.repository }}/pulls/${{ steps.pr-number.outputs.number }}/comments \
+              --jq '.[] | {author: .user.login, path: .path, line: .line, body: .body}'
+            ```
+
+            ## Step 2: Analyze Reviewer Consensus
+
+            Check if:
+            1. Are there any unresolved issues raised by ANY reviewer (human or bot)?
+            2. Are there any "Changes Requested" reviews that haven't been addressed?
+            3. Are all reviewers in agreement that the code is ready?
+
+            DO NOT do your own code review. Your job is ONLY to synthesize existing feedback.
+
+            ## Step 3: Post Your Verdict
+
+            Use `gh pr comment` to post your verdict.
+
+            CRITICAL: Your comment body MUST begin with exactly:
+            <!-- CLAUDE_VERDICT_MARKER -->
+
+            Then include ONE of these headings:
+            - "## ✅ LGTM" - All reviewers agree, no outstanding issues
+            - "## 🔧 Changes Requested" - There are unresolved issues
+
+            Structure:
+            1. **Reviewer Summary** - List each reviewer and their stance (approved/changes requested/commented)
+            2. **Outstanding Issues** - List any unresolved issues (or "None" if all clear)
+            3. **Verdict** - Your final call
+
+            If changes are requested, briefly summarize WHAT needs to be fixed (the fixer agent will read this).
+
+            Use `gh pr comment ${{ steps.pr-number.outputs.number }} --body "YOUR_VERDICT"` to post.
+
+          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(gh api:*)"'
