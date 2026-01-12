@@ -59,8 +59,8 @@ jobs:
 
       - name: Wait for other reviewers to finish
         run: |
-          echo "⏳ Waiting 3 minutes for other review bots to complete..."
-          sleep 180
+          echo "⏳ Waiting 6 minutes for other review bots to complete..."
+          sleep 360
           echo "✅ Proceeding with review"
 
       - name: Check iteration count
