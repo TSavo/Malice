@@ -2227,7 +2227,8 @@
         "room",
         "railway"
       ],
-      "description": "The room stands as a testament to an era long past, its brick walls marred by time and decay. Rust-streaked iron columns, reminiscent of ancient fortresses, loom overhead, old gas pipes crisscrossing the ceiling like veins through aged flesh. Hexagonal floor tiles, once polished, are now cracked and missing, revealing darkened mortar beneath. The air is heavy with stale odors of damp stone and corroded iron, a somber symphony echoed by the groans of weak wooden supports. A decorative brick arch spans the space, a symbol of craftsmanship from an era that prized precision over haste."
+      "description": "The room stands as a testament to an era long past, its brick walls marred by time and decay. Rust-streaked iron columns, reminiscent of ancient fortresses, loom overhead, old gas pipes crisscrossing the ceiling like veins through aged flesh. Hexagonal floor tiles, once polished, are now cracked and missing, revealing darkened mortar beneath. The air is heavy with stale odors of damp stone and corroded iron, a somber symphony echoed by the groans of weak wooden supports. A decorative brick arch spans the space, a symbol of craftsmanship from an era that prized precision over haste.",
+      "imageOnDisk": "r97-x-16-y-3-z-2.png"
     },
     {
       "id": "r98",
@@ -2264,7 +2265,8 @@
         "room",
         "railway"
       ],
-      "description": "Intricately woven brick arches loom high above, their once glossy surface faded to a dull, mustard patina. Iron girders crisscross the space, corroded and brittle, their shadows dancing eerily on the rough stone floor below. Gas lamps, hollow husks of yesteryears, cast an ominous glow that flickers through the gloom. Dust clouds swirl in the still air, settling as a thick layer on ancient wooden shelves lined with decaying merchandise. The scent of damp earth and musty iron lingers heavy in the stale atmosphere.\n\nA worn brick wall bears scratched graffiti from another era, while the bricked-up storefront window still outlines its former grandeur. Dried candle wax pools on a ledge high above, remnants of rituals long forgotten. The silence is broken only by distant echoes reverberating through the hollow chambers, whispering tales untold since the Victorian era."
+      "description": "Intricately woven brick arches loom high above, their once glossy surface faded to a dull, mustard patina. Iron girders crisscross the space, corroded and brittle, their shadows dancing eerily on the rough stone floor below. Gas lamps, hollow husks of yesteryears, cast an ominous glow that flickers through the gloom. Dust clouds swirl in the still air, settling as a thick layer on ancient wooden shelves lined with decaying merchandise. The scent of damp earth and musty iron lingers heavy in the stale atmosphere.\n\nA worn brick wall bears scratched graffiti from another era, while the bricked-up storefront window still outlines its former grandeur. Dried candle wax pools on a ledge high above, remnants of rituals long forgotten. The silence is broken only by distant echoes reverberating through the hollow chambers, whispering tales untold since the Victorian era.",
+      "imageOnDisk": "r98-x-15-y-2-z-2.png"
     },
     {
       "id": "r99",
@@ -2301,7 +2303,8 @@
         "room",
         "entrance"
       ],
-      "description": "In this preserved hub, brick arches loom, their crumbling mortar whispering tales of age. Rusted iron supports stand tall, their once gleaming bolts now dulled by time. Wooden floor joists bear the weight of silence beneath, while a pile of fallen debris - brick, plaster, and rotted wood - testifies to the passing years. The corners harbor rat droppings, scattered like discarded memories in the shadows.\n\nA muffled quiet prevails within this Victorian-era hub. The air holds the smell of decay, mingled with the faint trace of gas that still clings to the old pipes snaking through the walls. The feel of cold stone and rotted wood underfoot speaks of a past long buried beneath the modern world above.\n\nTo the south, north, east, and west lie portals leading deeper into the forgotten depths: railway stations preserved in 1889 splendor. To the north, however, lies a room that time has claimed for its own, collapsed under the weight of years uncounted."
+      "description": "In this preserved hub, brick arches loom, their crumbling mortar whispering tales of age. Rusted iron supports stand tall, their once gleaming bolts now dulled by time. Wooden floor joists bear the weight of silence beneath, while a pile of fallen debris - brick, plaster, and rotted wood - testifies to the passing years. The corners harbor rat droppings, scattered like discarded memories in the shadows.\n\nA muffled quiet prevails within this Victorian-era hub. The air holds the smell of decay, mingled with the faint trace of gas that still clings to the old pipes snaking through the walls. The feel of cold stone and rotted wood underfoot speaks of a past long buried beneath the modern world above.\n\nTo the south, north, east, and west lie portals leading deeper into the forgotten depths: railway stations preserved in 1889 splendor. To the north, however, lies a room that time has claimed for its own, collapsed under the weight of years uncounted.",
+      "imageOnDisk": "r99-x-14-y8-z-2.png"
     },
     {
       "id": "r100",
@@ -2338,7 +2341,8 @@
         "room",
         "railway"
       ],
-      "description": "In this preserved hub, brick and iron from an era long past stand steadfast against the frigid chill. Cobblestones, worn smooth by time, peek through gaps in the floor where mortar has crumbled away. A ledge bears pools of hardened wax from candles long extinguished.\n\nAbove, a plaster ceiling sags slightly under its own weight, peeling to reveal the iron girders beneath. The air is silent save for the distant creaking of wrought iron hinges echoing through the room's vastness. A musty aroma permeates the space, mingling with the earthy scent of the buried city streets.\n\nThe north and south exits are flanked by ornate brick arches, while the east and west paths are lined with gas pipes that hiss softly as they release their sulphurous breath into the cold air. The ground is damp beneath one's boots, a testament to the city's relentless seepage from below."
+      "description": "In this preserved hub, brick and iron from an era long past stand steadfast against the frigid chill. Cobblestones, worn smooth by time, peek through gaps in the floor where mortar has crumbled away. A ledge bears pools of hardened wax from candles long extinguished.\n\nAbove, a plaster ceiling sags slightly under its own weight, peeling to reveal the iron girders beneath. The air is silent save for the distant creaking of wrought iron hinges echoing through the room's vastness. A musty aroma permeates the space, mingling with the earthy scent of the buried city streets.\n\nThe north and south exits are flanked by ornate brick arches, while the east and west paths are lined with gas pipes that hiss softly as they release their sulphurous breath into the cold air. The ground is damp beneath one's boots, a testament to the city's relentless seepage from below.",
+      "imageOnDisk": "r100-x-13-y7-z-2.png"
     },
     {
       "id": "r101",
@@ -2372,7 +2376,8 @@
       "neighborTypes": [
         "railway"
       ],
-      "description": "In this chamber, remnants of the past merge with the ruins of time. Exposed rough-cut stone foundation stands firm amidst damaged brick walls, their efflorescence glimmering under dim light. Iron support columns, weathered by centuries, tower above like ghostly sentinels. The musty scent of damp earth permeates the air, mingling with a faint metallic undertone that lingers on the tongue. Echoes resonate softly from the worn-away original cobblestone floor beneath. Above, gas pipes hang precariously, leaking occasionally with hollow drips that echo ominously through the stillness. Exits lead in all directions, offering passage to other levels of this forgotten undercity."
+      "description": "In this chamber, remnants of the past merge with the ruins of time. Exposed rough-cut stone foundation stands firm amidst damaged brick walls, their efflorescence glimmering under dim light. Iron support columns, weathered by centuries, tower above like ghostly sentinels. The musty scent of damp earth permeates the air, mingling with a faint metallic undertone that lingers on the tongue. Echoes resonate softly from the worn-away original cobblestone floor beneath. Above, gas pipes hang precariously, leaking occasionally with hollow drips that echo ominously through the stillness. Exits lead in all directions, offering passage to other levels of this forgotten undercity.",
+      "imageOnDisk": "r101-x-9-y0-z-2.png"
     },
     {
       "id": "r102",
@@ -2407,7 +2412,8 @@
         "railway",
         "room"
       ],
-      "description": "The hub's brick walls, an intricate testament to a more meticulous era, stand stalwart amidst fallen debris. Iron beams crisscross the ceiling in disarray, their once gleaming surfaces now tarnished by time. Dust-laden gas pipes hiss softly in the dry air as they snake through the room. Cobblestone floors bear the worn marks of countless footsteps, while the faint scent of aged parchment lingers like a ghost from the past. A section of the ceiling lies collapsed below, casting eerie shadows across the Victorian scene under the feeble glow of dim gas lamps that flicker and dance with a haunting light."
+      "description": "The hub's brick walls, an intricate testament to a more meticulous era, stand stalwart amidst fallen debris. Iron beams crisscross the ceiling in disarray, their once gleaming surfaces now tarnished by time. Dust-laden gas pipes hiss softly in the dry air as they snake through the room. Cobblestone floors bear the worn marks of countless footsteps, while the faint scent of aged parchment lingers like a ghost from the past. A section of the ceiling lies collapsed below, casting eerie shadows across the Victorian scene under the feeble glow of dim gas lamps that flicker and dance with a haunting light.",
+      "imageOnDisk": "r102-x-17-y-1-z-2.png"
     },
     {
       "id": "r103",
