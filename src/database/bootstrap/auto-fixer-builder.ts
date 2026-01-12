@@ -95,22 +95,41 @@ export class AutoFixerBuilder implements Builder {
 
       console.log('[AutoFixer] Starting hourly tick...');
 
-      // Reset hourly counter
-      self.attemptedThisHour = 0;
+      // Reset counter only if more than 1 hour has passed
+      const now = Date.now();
+      const lastTick = self.lastTickTime ? new Date(self.lastTickTime).getTime() : 0;
+      const hourMs = 3600000; // 1 hour in milliseconds
+      if (now - lastTick >= hourMs) {
+        self.attemptedThisHour = 0;
+      }
       self.lastTickTime = new Date().toISOString();
 
       // Priority order (higher = more urgent)
       const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
-      const minPriorityLevel = priorityOrder[self.minPriority] ?? 1;
+      let minPriorityLevel = priorityOrder[self.minPriority];
+      if (minPriorityLevel === undefined) {
+        console.warn('[AutoFixer] Invalid minPriority: ' + self.minPriority + ', using high');
+        minPriorityLevel = 1; // Default to high
+      }
 
-      // Get open issues sorted by priority
+      // Get open issues
       const openIssues = await $issues.list({ status: 'open', limit: 20 });
 
-      // Filter by minimum priority
-      const eligibleIssues = openIssues.filter(issue => {
-        const issuePriority = priorityOrder[issue.priority] ?? 2;
-        return issuePriority <= minPriorityLevel;
-      });
+      // Filter by minimum priority and sort by priority (critical first)
+      const eligibleIssues = openIssues
+        .filter(issue => {
+          const issuePriority = priorityOrder[issue.priority];
+          if (issuePriority === undefined) {
+            console.warn('[AutoFixer] Issue #' + issue.id + ' has invalid priority: ' + issue.priority + ', skipping');
+            return false; // Skip issues with invalid priorities
+          }
+          return issuePriority <= minPriorityLevel;
+        })
+        .sort((a, b) => {
+          const aPriority = priorityOrder[a.priority] ?? 2;
+          const bPriority = priorityOrder[b.priority] ?? 2;
+          return aPriority - bPriority; // Lower number = higher priority
+        });
 
       console.log('[AutoFixer] Found ' + eligibleIssues.length + ' eligible issues (priority >= ' + self.minPriority + ')');
 
@@ -182,11 +201,6 @@ export class AutoFixerBuilder implements Builder {
       // Increment attempt counter
       self.attemptedThisHour = (self.attemptedThisHour || 0) + 1;
 
-      // Record attempt time for cooldown
-      const lastAttempts = { ...(self.lastAttempts || {}) };
-      lastAttempts[issueId] = new Date().toISOString();
-      self.lastAttempts = lastAttempts;
-
       // Get the full issue details
       const issue = await $issues.get(issueId);
       if (!issue) {
@@ -250,23 +264,45 @@ Please analyze this issue and attempt to fix it if possible. If you cannot fix i
         const { response } = await $aiQuery(systemPrompt, prompt);
         aiResponse = response;
         console.log('[AutoFixer] AI response received (' + response.length + ' chars)');
+
+        // Only set cooldown if AI call succeeded
+        const lastAttempts = { ...(self.lastAttempts || {}) };
+        lastAttempts[issueId] = new Date().toISOString();
+        self.lastAttempts = lastAttempts;
       } catch (err) {
         aiError = err.message || String(err);
         console.error('[AutoFixer] AI query failed:', aiError);
+        // Don't set cooldown for transient failures - allow retry
       }
 
       // Determine if fix was successful based on AI response
-      // Look for indicators in the response
-      const fixed = aiResponse.includes('fixed: true') ||
-                   aiResponse.includes('"fixed": true') ||
-                   aiResponse.includes('Status:** Fixed') ||
-                   aiResponse.includes('successfully fixed') ||
-                   aiResponse.includes('fix applied');
+      // Try to parse structured output first (looking for return statement)
+      let fixed = false;
+      let needsReview = false;
 
-      const needsReview = aiResponse.includes('needsReview: true') ||
-                         aiResponse.includes('"needsReview": true') ||
-                         aiResponse.includes('needs human review') ||
-                         aiResponse.includes('Needs human review');
+      // Look for return {...} block in response
+      const returnMatch = aiResponse.match(/return\\s*\\{([^}]+)\\}/s);
+      if (returnMatch) {
+        const returnBlock = returnMatch[1];
+        // Check for 'fixed: true' in the return block specifically
+        if (/fixed:\\s*true/i.test(returnBlock)) {
+          fixed = true;
+        }
+        if (/needsReview:\\s*true/i.test(returnBlock)) {
+          needsReview = true;
+        }
+      }
+
+      // Fallback: check for explicit result markers in the response
+      if (!fixed && !needsReview) {
+        // Use word boundaries to avoid false positives like "I couldn't fix this"
+        if (/\\bfixed:\\s*true\\b/i.test(aiResponse) || /"fixed":\\s*true/i.test(aiResponse)) {
+          fixed = true;
+        }
+        if (/\\bneedsReview:\\s*true\\b/i.test(aiResponse) || /"needsReview":\\s*true/i.test(aiResponse)) {
+          needsReview = true;
+        }
+      }
 
       // Build result summary
       let summary = '';
@@ -298,7 +334,7 @@ Please analyze this issue and attempt to fix it if possible. If you cannot fix i
       self.history = history;
 
       return {
-        success: true,
+        success: !aiError,  // false if AI query failed
         issueId: issueId,
         fixed: fixed,
         needsReview: needsReview,
