@@ -741,7 +741,7 @@ outdoor: false,     // Indoor/outdoor flag
 **Floor 2 Enhancements:**
 - Actual job terminal interactions
 - Assignment processing
-- Medical facilities
+- Clone backup facilities
 
 **Floor 3 Enhancements:**
 - CorpSec armory access

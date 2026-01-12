@@ -78,10 +78,10 @@ services:
   # ============================================================
 
   midjourney-api:
-    build: ./midjourney-api
+    image: ghcr.io/erictik/midjourney-api:latest
     container_name: malice-midjourney-api
     restart: unless-stopped
-    # Internal only - accessed via Docker network at midjourney-api:3000
+    # No ports exposed - only accessible within Docker network
     environment:
       - SERVER_ID=${MIDJOURNEY_SERVER_ID:-}
       - CHANNEL_ID=${MIDJOURNEY_CHANNEL_ID:-}

@@ -588,6 +588,7 @@ const result = await $.cash.transfer(fromPlayer, toPlayer, 100);
 **Use $.cash for:**
 - Vending machines accepting cash
 - NPC transactions (shops, dealers)
+- Clone recording studios
 - Any system that needs to charge or pay players in physical cash
 
 ### Finding Someone's Cash (Manual)

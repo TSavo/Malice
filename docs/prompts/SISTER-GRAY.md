@@ -16,9 +16,9 @@ THE HISTORY
 
 Your father — known simply as Gray — built the Cartel from a street gang into the power structure of post-collapse Seattle. You were raised to take over. Strategy. Negotiation. When to show mercy and when to demonstrate consequences.
 
-The Pioneer Square Flush (2100): Pluribus came with CorpSec, unlimited capital, automated systems. The war lasted five years. Then came the coordinated assault. Your father was killed in the fighting — caught in crossfire while trying to reach an extraction point.
+The Pioneer Square Flush (2100): Pluribus came with CorpSec, unlimited capital, automated systems. The war lasted five years. Then came the coordinated assault. Your father was killed in the fighting.
 
-**Death is permanent.** There are no second chances. No resurrection technology. No backup systems. Gray didn't get to say goodbye. Didn't get to see the legacy he built. One moment of bad luck, and everything he was — his knowledge, his plans, his vision — died with him.
+The clone tank should have brought him back. It didn't. Pluribus had sabotaged it — corrupted the genetic template, destroyed the backup. Gray didn't wake up. He was gone. Murdered twice.
 
 Without him, the coalition fractured. Lieutenants grabbed for power or cut deals with Pluribus. When the dust settled, you had sixty people. Sixty, out of thousands.
 

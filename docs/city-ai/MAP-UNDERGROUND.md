@@ -410,7 +410,7 @@ y=-3  │   ●─────●─────●─────●───�
 y=-1  │   ●─────●  THE VAULT                │
       │  COUNCIL│                           │
 y=+1  │   ●─────●  SISTER'S QUARTERS       │
-      │ MED LAB ↓ (to z=-6 The Blind)      │
+      │  CLONE  ↓ (to z=-6 The Blind)      │
       └─────────────────────────────────────┘
 ```
 

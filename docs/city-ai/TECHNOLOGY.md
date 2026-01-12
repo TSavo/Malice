@@ -221,7 +221,7 @@ Collectors pay for them sometimes. Historical curiosities. Museum pieces. Proof 
 
 - **Weapons**: Always valuable. Pre-war weapons are often superior to modern manufacturing.
 - **Vehicles**: If maintained, they still work. Scavenger technicians keep them running through cannibalization and improvisation.
-- **Medical equipment**: Surgical suites, diagnostic systems, trauma kits. Rare and precious.
+- **Medical equipment**: Clone tanks, surgical suites, diagnostic systems. Rare and precious.
 - **AI-enabled devices**: If they survived the EMPs, they're still useful. Pre-war phones and wearables sometimes work.
 - **Power generation**: Solar panels, fusion cells, geothermal taps. Infrastructure that still functions.
 - **Manufacturing tools**: The ability to make things is worth more than the things themselves.

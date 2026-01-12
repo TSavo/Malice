@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * Batch PNG compression script using sharp
+ * Batch PNG compression script using oxipng
  *
  * Usage:
  *   bun scripts/compress-images.ts              # Compress all images
@@ -11,9 +11,12 @@
  * State is saved to compress-state.json for restartability.
  */
 
-import sharp from 'sharp';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 import * as fs from 'fs';
 import * as path from 'path';
+
+const execFileAsync = promisify(execFile);
 
 const ASSETS_DIR = './assets/images';
 const STATE_FILE = './compress-state.json';
@@ -65,34 +68,25 @@ function saveState(state: CompressionState): void {
   fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
 }
 
-async function compressImage(filePath: string): Promise<{
+async function compressImage(filePath: string, oxipngPath: string): Promise<{
   originalSize: number;
   compressedSize: number;
   saved: boolean;
   reason?: 'larger' | 'no-improvement';
 }> {
-  const originalBuffer = fs.readFileSync(filePath);
-  const originalSize = originalBuffer.length;
+  const originalSize = fs.statSync(filePath).size;
 
-  const compressedBuffer = await sharp(originalBuffer)
-    .png({
-      compressionLevel: 9,  // Max lossless compression
-      effort: 10,           // Max optimization effort
-      palette: false,       // Keep full color (no quantization)
-    })
-    .toBuffer();
+  // oxipng -o4 --strip safe compresses in-place
+  await execFileAsync(oxipngPath, ['-o', '4', '--strip', 'safe', filePath]);
 
-  const compressedSize = compressedBuffer.length;
+  const compressedSize = fs.statSync(filePath).size;
 
-  // Only save if we actually reduced size
+  // oxipng won't make files larger, but check if there was improvement
   if (compressedSize < originalSize) {
-    fs.writeFileSync(filePath, compressedBuffer);
     return { originalSize, compressedSize, saved: true };
   }
 
-  // Track whether compression made it larger vs no improvement
-  const reason = compressedSize > originalSize ? 'larger' : 'no-improvement';
-  return { originalSize, compressedSize: originalSize, saved: false, reason };
+  return { originalSize, compressedSize: originalSize, saved: false, reason: 'no-improvement' };
 }
 
 function formatBytes(bytes: number): string {
@@ -111,7 +105,11 @@ async function main() {
   const parallel = parallelIndex >= 0 ? parseInt(args[parallelIndex + 1]) || 2 : 2;
   const limit = limitIndex >= 0 ? parseInt(args[limitIndex + 1]) || Infinity : Infinity;
 
-  console.log(`PNG Compression Script (sharp)`);
+  // Get oxipng binary path
+  const { default: oxipngPath } = await import('oxipng-bin');
+
+  console.log(`PNG Compression Script (oxipng -o4)`);
+  console.log(`  oxipng: ${oxipngPath}`);
   console.log(`  Dry run: ${dryRun}`);
   console.log(`  Parallel: ${parallel}`);
   console.log(`  Limit: ${limit === Infinity ? 'none' : limit}`);
@@ -159,7 +157,7 @@ async function main() {
       batch.map(async (filename) => {
         const filePath = path.join(ASSETS_DIR, filename);
         try {
-          const result = await compressImage(filePath);
+          const result = await compressImage(filePath, oxipngPath);
           return { filename, ...result, error: null };
         } catch (err) {
           return {
@@ -198,10 +196,7 @@ async function main() {
           console.log(`✅ ${result.filename}: ${formatBytes(result.originalSize)} → ${formatBytes(result.compressedSize)} (-${ratio}%)`);
         } else {
           state.skippedCount++;
-          const reasonText = result.reason === 'larger'
-            ? `compressed size would be larger (${formatBytes(result.originalSize)})`
-            : `already optimal (${formatBytes(result.originalSize)})`;
-          console.log(`⏭️  ${result.filename}: ${reasonText}`);
+          console.log(`⏭️  ${result.filename}: already optimal (${formatBytes(result.originalSize)})`);
         }
       }
       processed++;
