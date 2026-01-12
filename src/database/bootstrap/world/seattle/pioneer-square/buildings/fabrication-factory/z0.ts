@@ -79,6 +79,7 @@ The air smells of machine oil and ozone. Through the loading door, you can see t
       x: -20,
       y: 11,
       z: 0,
+      imageOnDisk: 'fabrication-factory-loading-bay-x-20-y11-z0.png',
       exits: {
         west: {
           to: 'waterfront/y11.ts',

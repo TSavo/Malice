@@ -662,10 +662,14 @@ async function scanBuildingRooms(results: RoomFile[]): Promise<void> {
         const module = await import(pathToFileURL(filePath).href);
 
         // Buildings export { building: { rooms: { '%0': {...}, '%1': {...} } } }
+        // Note: rooms object contains rooms, doors, and locks - filter to only rooms by checking prototype
         if (module.building?.rooms) {
           for (const [placeholder, roomDef] of Object.entries(module.building.rooms)) {
-            const room = roomDef as RoomDef;
-            if (room && room.name && room.description && !room.imageOnDisk) {
+            const room = roomDef as RoomDef & { prototype?: string };
+            // Skip non-rooms (doors, locks, etc.) - rooms either have no prototype or prototype='room'
+            const proto = room.prototype as string | undefined;
+            const isRoom = !proto || proto === 'room';
+            if (isRoom && room && room.name && room.description && !room.imageOnDisk) {
               results.push({
                 filePath,
                 relativePath: `${path.relative(process.cwd(), filePath)}:${placeholder}`,
