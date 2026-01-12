@@ -489,11 +489,25 @@ export class ContinuumDomainBuilder implements Builder {
         if (fs.existsSync(exactPath)) {
           filePath = exactPath;
         } else {
-          // Try uppercase version
-          const upperPath = './docs/' + baseName.toUpperCase();
-          if (fs.existsSync(upperPath)) {
-            filePath = upperPath;
+          // Try uppercase filename but preserve directory case
+          const pathParts = baseName.split('/');
+          if (pathParts.length > 1) {
+            // Has subdirectory - preserve dir case, uppercase filename
+            const dirs = pathParts.slice(0, -1).join('/');
+            const file = pathParts[pathParts.length - 1].toUpperCase();
+            const upperPath = './docs/' + dirs + '/' + file;
+            if (fs.existsSync(upperPath)) {
+              filePath = upperPath;
+            }
           } else {
+            // No subdirectory - uppercase the whole thing
+            const upperPath = './docs/' + baseName.toUpperCase();
+            if (fs.existsSync(upperPath)) {
+              filePath = upperPath;
+            }
+          }
+
+          if (!filePath) {
             // Search in all subdirectories for the filename
             const fileName = baseName.split('/').pop();
             const searchDirs = ['guides', 'reference', 'lore', 'internal', 'moo', 'city-ai', 'greeter', 'prompts'];

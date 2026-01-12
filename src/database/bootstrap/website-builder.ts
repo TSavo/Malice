@@ -269,6 +269,19 @@ export class WebsiteBuilder implements Builder {
         filePath = filePath + '.md';
       }
 
+      // If file doesn't exist, search subdirectories for backward compatibility
+      if (!fs.existsSync(filePath)) {
+        const fileName = pathModule.basename(filePath);
+        const searchDirs = ['guides', 'reference', 'lore', 'internal', 'moo', 'city-ai', 'greeter', 'prompts'];
+        for (const dir of searchDirs) {
+          const candidatePath = pathModule.join('./docs', dir, fileName);
+          if (fs.existsSync(candidatePath)) {
+            filePath = candidatePath;
+            break;
+          }
+        }
+      }
+
       try {
         if (!fs.existsSync(filePath)) {
           return { status: 404, body: await self.render404(path) };

@@ -644,7 +644,7 @@ Two MCP servers are configured in `.mcp.json`:
 # Start SSH tunnel (maps prod:3010 → local:4010)
 ssh -L 4010:localhost:3010 -i ~/.ssh/malice-do root@malice.world
 
-# Or use SSH config (see docs/DEPLOYMENT.md)
+# Or use SSH config (see docs/guides/DEPLOYMENT.md)
 ssh malice-prod
 ```
 

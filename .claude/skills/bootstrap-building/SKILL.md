@@ -57,11 +57,11 @@ Before writing builder code, **READ** the appropriate documentation using `ReadM
 | When | Read This | URI |
 |------|-----------|-----|
 | **Always** | Bootstrap System | `moo://docs/moo/advanced/bootstrap` |
-| **Always** | Builders Guide | `moo://docs/builders-guide` |
+| **Always** | Builders Guide | `moo://docs/guides/builders-guide` |
 | Writing methods | Globals Reference | `moo://docs/moo/reference/globals` |
 | Writing methods | Anti-Patterns | `moo://docs/moo/reference/anti-patterns` |
 | Writing methods | Common Patterns | `moo://docs/moo/reference/patterns` |
-| MCP tools | MCP Tools | `moo://docs/mcp-tools` |
+| MCP tools | MCP Tools | `moo://docs/reference/mcp-tools` |
 
 ### Prototype-Specific Reads
 
@@ -102,7 +102,7 @@ Before writing builder code, **READ** the appropriate documentation using `ReadM
 
 | Task | Read This | URI |
 |------|-----------|-----|
-| Smith Tower building | Smith Tower Guide | `moo://docs/smith-tower-builders-guide` |
+| Smith Tower building | Smith Tower Guide | `moo://docs/guides/smith-tower-builders-guide` |
 | World building patterns | World Building | `moo://docs/moo/prototypes/world-building` |
 | AI NPC building | NPC Guide | `moo://docs/moo/npc-guide` |
 | AI integration | AI System | `moo://docs/moo/ai` |

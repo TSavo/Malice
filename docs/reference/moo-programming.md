@@ -1,6 +1,6 @@
 # MOO Programming Best Practices
 
-> **Abilities-First Architecture**: Malice uses abilities (prose physics) instead of procedural methods for game interactions. See `docs/ABILITIES-FIRST.md`.
+> **Abilities-First Architecture**: Malice uses abilities (prose physics) instead of procedural methods for game interactions. See `docs/guides/ABILITIES-FIRST.md`.
 
 This guide covers MOO code conventions and the utility objects available via `$*`.
 
