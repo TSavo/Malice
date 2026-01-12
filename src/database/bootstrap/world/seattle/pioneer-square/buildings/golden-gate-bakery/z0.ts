@@ -146,6 +146,7 @@ A set of narrow stairs leads up to what was probably storage, accessed from insi
       x: 5,
       y: -11,
       z: 0,
+      imageOnDisk: 'golden-gate-bakery-kitchen-x5-y-11-z0.png',
       population: 0,
       ambientNoise: 0,
       lighting: 30,

@@ -10,6 +10,7 @@ S. Main Street is visible to the south through gaps in the surrounding buildings
   x: -4,
   y: 1,
   z: 0,
+  imageOnDisk: 'occidental-park-x-4-y1-z0.png',
   // Environmental properties
 
   population: 0, // Empty (post-Event)
