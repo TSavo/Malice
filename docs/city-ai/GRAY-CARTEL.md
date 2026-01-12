@@ -28,7 +28,6 @@ Block by block, they grew. Absorbed rivals — sometimes through negotiation, of
 - **Supply lines:** Scavenged goods moved through Cartel-controlled channels. They took a cut of everything.
 - **Justice:** Disputes got settled by Cartel arbitration. Their word was law because they had the guns to enforce it.
 - **Territory:** Most of the livable zones in Seattle answered to them, directly or indirectly.
-- **Continuity:** Gray had clone tanks. He planned for the long term. Death wasn't the end — it was a setback.
 
 They weren't good. They weren't fair. They ran protection rackets. They executed troublemakers. They exploited the desperate. But they were **stable**. For twenty-five years, they kept Seattle's survivors alive. Not gently. Not kindly. But alive.
 
@@ -106,11 +105,9 @@ Every tactic worked exactly once. Then the machine adapted and it never worked a
 
 The end came in spring. Coordinated strikes across all remaining Cartel positions. CorpSec teams hit simultaneously from multiple vectors. Drone support provided real-time tactical data. Escape routes were pre-blocked.
 
-Gray died in the fighting. Not heroically — he was caught in a crossfire while trying to reach an extraction point. Just another body.
+Gray died in the fighting. Not heroically — he was caught in a crossfire while trying to reach an extraction point. Just another body in a war that had already claimed thousands.
 
-His clone tank was found corrupted. Genetic template scrambled. Consciousness data deleted. Continuum claims the tank was damaged during a Cartel raid on a Continuum facility months earlier. The Cartel knows this is a lie — they never successfully raided a Continuum facility.
-
-**The machine murdered him twice.** Killed his body, then killed his continuity. Made sure he was *gone* — not just dead, but erased.
+**Death is permanent.** There are no second chances. No backups. No resurrection. When Gray fell, everything he was — his knowledge, his plans, his vision for what the Cartel could become — died with him. Twenty-five years of leadership, gone in a moment of bad luck and worse timing.
 
 The survivors numbered sixty. Out of thousands.
 

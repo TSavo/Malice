@@ -250,7 +250,7 @@ But failure is informative. Each loss teaches something. The player who pays att
 
 ### Consequences
 
-Everything is permanent. Death is real (unless you have a clone backup, and those cost). Choices matter. Betrayals are remembered. The world responds to what players actually do.
+Everything is permanent. Death is real — there is no resurrection, no backup systems, no second chances. Choices matter. Betrayals are remembered. The world responds to what players actually do.
 
 ### Emergence
 

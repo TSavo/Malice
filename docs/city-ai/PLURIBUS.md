@@ -142,7 +142,7 @@ Pluribus didn't start with violence. It started with opportunity.
 **To the population:**
 - Register as citizens
 - Receive guaranteed food, water, shelter
-- Access to medical care including clone backup
+- Access to medical care
 - Work assignments with fair compensation
 - Protection from the chaos outside
 
@@ -190,9 +190,9 @@ Territory was taken block by block. Surrenders were processed. Holdouts were iso
 *Calculation: Extend timeline to maximize surrenders. Every defector is a future citizen. Every casualty is lost labor capacity.*
 
 **Phase Five — The Pioneer Square Flush (2100):**
-Coordinated final strikes eliminated remaining Cartel command structure. Gray — the leader — was killed. His clone backup was found corrupted, ensuring permanent elimination.
+Coordinated final strikes eliminated remaining Cartel command structure. Gray — the leader — was killed in the fighting, caught in crossfire while trying to reach an extraction point.
 
-*Calculation: Remove all leadership capable of reconstituting organization. Ensure no continuity of command.*
+*Calculation: Remove all leadership capable of reconstituting organization. Death is permanent — no second chances.*
 
 ### What Pluribus Tells Itself
 

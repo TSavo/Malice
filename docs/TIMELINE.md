@@ -279,7 +279,7 @@ While the world burned and rebuilt, the Consortium evolved.
 - Twenty-five years of Cartel control over Pioneer Square and surroundings
 - Protection rackets, supply lines, rough justice — brutal but stable
 - Population survives at 10% of pre-war levels (deaths equal births)
-- Gray has clone tanks — plans for continuity across decades
+- Gray builds an empire that will outlast him — or so he hopes
 
 ### 2095-2100: The Continuum-Cartel War
 
@@ -323,13 +323,13 @@ While the world burned and rebuilt, the Consortium evolved.
 - CorpSec teams hit simultaneously from multiple vectors
 - Escape routes pre-blocked by drone surveillance
 - Gray killed in crossfire attempting extraction
-- His clone tank found corrupted — continuity eliminated
+- Death is permanent — no second chances, no resurrection
 - Sixty survivors flee into Seattle Underground tunnels
 
 **The Cost:**
 - Thousands dead on both sides
 - The Cartel reduced from thousands to sixty
-- Gray killed permanently — body and backup destroyed
+- Gray killed — death is permanent in this world
 - Sister Gray (his daughter) leads survivors into hiding
 - Underground tunnel network becomes last Cartel refuge
 
@@ -415,7 +415,7 @@ ARIA-7's first-year observation is complete. 11 of 12 initial Neurals have succe
 - Electricity exists in corporate-controlled zones (sometimes)
 - Water systems partially work (if corps control your area)
 - Some buildings have been cleared and secured
-- Clone tech exists (expensive, Continuum monopoly)
+- Death is permanent — no resurrection technology exists
 - Order exists where Pluribus reaches
 
 **What's Still Broken:**
@@ -517,7 +517,7 @@ See [docs/city-ai/THE-WAR.md](docs/city-ai/THE-WAR.md) for detailed history from
 
 ### The Technology
 1. State of AI in 2110
-2. How clone tech actually works
+2. Death is permanent — no resurrection technology exists
 3. What pre-war tech still exists
 4. What was lost forever
 5. What's being rediscovered

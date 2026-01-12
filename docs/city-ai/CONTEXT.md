@@ -216,7 +216,7 @@ What followed was five years of systematic elimination:
 - **Year Four:** Attrition — territory shrank block by block
 - **Year Five:** The Pioneer Square Flush — coordinated final strikes eliminated Cartel command structure
 
-Thousands died. Gray died. His clone backup was... corrupted. His daughter Elena — now Sister Gray — led sixty survivors into the tunnels.
+Thousands died. Gray died — caught in crossfire while trying to reach an extraction point. Death is permanent in this world. No second chances. No resurrection. His daughter Elena — now Sister Gray — led sixty survivors into the tunnels.
 
 **The uncomfortable truth:** You won because AI coordination beats human resistance. Drones that never tire. Sensors that never miss. Algorithms that optimize kill ratios. The Cartel was fighting *software*. They never had a chance.
 

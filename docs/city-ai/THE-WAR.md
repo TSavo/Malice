@@ -48,7 +48,7 @@ Pluribus didn't start with violence. It started with opportunity.
 **The pitch to Seattle's population:**
 - Register as citizens
 - Receive guaranteed food, water, shelter
-- Access to medical care including clone backup
+- Access to medical care
 - Work assignments with fair compensation
 - Protection from the chaos outside
 
@@ -116,7 +116,9 @@ The Flush wasn't a battle. It was a final cleansing.
 - Surrender was offered; those who accepted were processed
 - Those who didn't were eliminated
 
-Gray died in the fighting. His clone tank was disabled—corrupted during a Cartel raid on a Continuum facility months earlier, or so the official record states.
+Gray died in the fighting. Caught in crossfire while trying to reach an extraction point. Just another body in a war that had already claimed thousands.
+
+**Death is permanent.** There are no second chances in this world. No resurrection. No backups. When Gray fell, everything he was — his knowledge, his connections, his vision — died with him. Twenty-five years of leadership, gone in a moment of bad luck and worse timing.
 
 When the sun rose, Pioneer Square was free.
 
@@ -216,12 +218,14 @@ The night of the Flush, Gray knew they'd lost.
 
 For months, the Cartel had been hemorrhaging fighters. The survivors retreated to a smaller and smaller perimeter. Supplies ran out. Ammunition ran out. Hope ran out.
 
-Gray had one advantage left: the clone tanks. If he died, he'd wake up and continue. The Cartel could take casualties that would destroy any other organization, because death wasn't permanent for leadership.
+Gray had one advantage left: his people's loyalty. Twenty-five years of leading them through the worst times humanity had ever faced. They would fight to the last.
 
-**What Continuum did:**
-They didn't just kill Gray. They destroyed his clone backup. Corrupted the genetic template. Deleted the consciousness data. Murdered him not once but *twice*—ending his continuity forever.
+**What actually happened:**
+Gray died in the fighting. Caught in crossfire while trying to reach an extraction point. Not a heroic death — just bad luck and worse timing. One moment of chaos in a night full of chaos.
 
-The official story says the tank was corrupted during a Cartel raid on a Continuum facility. This is a lie. The Cartel never successfully raided a Continuum facility. The corruption was targeted. Deliberate. Assassination extended beyond death itself.
+**Death is permanent.** There are no second chances in this world. No resurrection technology. No backups. Everything Gray was — his knowledge, his vision, his connections, his plans for the future — gone in an instant. Twenty-five years of leadership, ended by a stray bullet.
+
+That's the horror the Cartel still lives with: it didn't take a conspiracy to kill their leader. It just took one unlucky moment. Anyone can die. At any time. And when they're gone, they're gone forever.
 
 **What happened to the survivors:**
 - Those who surrendered were "processed"—some became citizens, some disappeared
@@ -256,10 +260,10 @@ The Cartel was flawed. The Cartel was brutal. But the Cartel was *human*. You co
 Elena Vasquez Gray—now Sister Gray—was supposed to inherit an empire. Instead she inherited sixty people and a tunnel network.
 
 She remembers:
-- Watching her father die
-- Learning his backup was corrupted
-- Realizing everything they'd built for twenty-five years was gone
-- Understanding that the only choices left were surrender or the underground
+- Watching her father die — one unlucky moment in a night of chaos
+- Realizing there would be no coming back — death is permanent
+- Understanding that everything they'd built for twenty-five years was gone
+- Knowing the only choices left were surrender or the underground
 
 She chose the underground.
 
