@@ -345,6 +345,8 @@ import './notes-builder';
 import './combat-builder';
 import './greeter-builder';
 import './news-builder';
+import './docs-builder';
+import './issues-builder';
 
 // AI systems (ai depends on aiPrompts)
 import './ai-prompts-builder';
