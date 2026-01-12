@@ -90,33 +90,32 @@ jobs:
             PR NUMBER: ${{ steps.pr-number.outputs.number }}
             REVIEW ITERATION: ${{ steps.check-iterations.outputs.review_count }}
 
-            You are a CODE REVIEWER. Your job is to review the code and report any issues you find.
+            You are a CODE REVIEWER. Your job is to review the CURRENT code state and report any issues.
 
-            ## Step 1: Read Existing Comments
+            ## Step 1: Read Existing Comments to Understand History
 
             ```bash
-            # Get ALL PR comments (from bots and humans)
-            gh pr view ${{ steps.pr-number.outputs.number }} --json comments,reviews \
-              --jq '.comments[].body, .reviews[].body'
-
-            # Get ALL inline code review comments (line-specific feedback)
-            gh api repos/${{ github.repository }}/pulls/${{ steps.pr-number.outputs.number }}/comments \
-              --jq '.[] | {author: .user.login, path: .path, line: .line, body: .body}'
+            # Get ALL PR comments to see what was previously reported
+            gh pr view ${{ steps.pr-number.outputs.number }} --json comments \
+              --jq '.comments[] | select(.body | test("CLAUDE_REVIEW_MARKER|CLAUDE_FIXER_MARKER")) | .body'
             ```
 
-            ## Step 2: Review the Code
+            ## Step 2: VERIFY Previously Reported Issues Are Actually Fixed
 
-            1. Review the PR diff for issues others may have missed
-            2. Check for: bugs, security issues, performance problems, code quality, test coverage
+            CRITICAL: For EACH issue mentioned in previous reviews, you MUST:
+            1. Use the Read tool to check the CURRENT file contents
+            2. Verify whether the issue still exists in the current code
+            3. Do NOT report an issue as outstanding if it has been fixed
+
+            Example: If a previous review said "line 654 has the 's' flag", READ the file and check if line 654 still has that issue.
+
+            ## Step 3: Review the PR Diff for NEW Issues
+
+            1. Use `gh pr diff` to see what changed
+            2. Check for: bugs, security issues, performance problems, code quality
             3. Use CLAUDE.md for project conventions
-            4. For world/building files (src/database/bootstrap/world/**), verify:
-               - Room coordinates (x, y, z) fall within declared building footprint
-               - Building footprint formula: x ∈ [x - width + 1, x], y ∈ [y - height + 1, y]
-               - Exit bi-directionality: if room A exits north to room B, room B must exit south to room A
-               - Stair exits: stairs going up (z+1) must have corresponding stairs down (z-1)
-               - Street exits: rooms at z=0 with street exits must connect to valid street coordinates
 
-            ## Step 3: Post Your Review
+            ## Step 4: Post Your Review
 
             Use `gh pr comment` to post your findings.
 
@@ -126,22 +125,24 @@ jobs:
             Then include a heading: "## 🔍 Code Review"
 
             Structure:
-            1. **Issues Found** - List any issues with file paths and line numbers
-            2. **Suggestions** - Optional improvements (clearly marked as non-blocking)
+            1. **Previously Reported Issues** - For each issue from prior reviews, state whether it's FIXED or STILL PRESENT (with evidence from reading the file)
+            2. **New Issues Found** - Any NEW issues not previously reported
+            3. **Suggestions** - Optional improvements (clearly marked as non-blocking)
 
-            If you find NO issues, simply say "No issues found in this review."
+            If ALL previously reported issues are fixed AND no new issues found, say:
+            "No issues found. All previously reported issues have been addressed."
 
             DO NOT give a verdict (LGTM/Changes Requested). The verdict bot handles that separately.
 
             ## Important
 
+            - ALWAYS READ THE ACTUAL FILES before reporting an issue still exists
+            - Do NOT just repeat issues from previous comments without verifying
             - Be specific with file paths and line numbers
-            - Only flag real issues, not style preferences
-            - If this is iteration 2+, focus only on NEW issues (previous ones should be fixed)
 
             Use `gh pr comment ${{ steps.pr-number.outputs.number }} --body "YOUR_REVIEW"` to post.
 
-          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(gh api:*)"'
+          claude_args: '--allowed-tools "Read,Glob,Grep,Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(gh api:*)"'
 
       - name: Trigger LGTM verdict workflow
         if: steps.check-iterations.outputs.skip != 'true'
