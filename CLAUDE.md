@@ -884,7 +884,7 @@ const mooTree = await $docs.tree('moo');
 
 // Get top-level categories
 const categories = await $docs.getCategories();
-// ['city-ai', 'greeter', 'moo', 'prompts', ...]
+// ['city-ai', 'greeter', 'guides', 'internal', 'lore', 'moo', 'prompts', 'reference']
 ```
 
 ### Searching Documentation
