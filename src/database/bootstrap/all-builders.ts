@@ -351,6 +351,7 @@ import './issues-builder';
 // AI systems (ai depends on aiPrompts)
 import './ai-prompts-builder';
 import './ai-builder';
+import './auto-fixer-builder';
 
 // Game systems
 import './cash-builder';

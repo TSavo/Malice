@@ -857,6 +857,92 @@ const status = await $scheduler.describe();
 - `pluribusWake` - Wakes Pluribus AI every hour (on the hour)
 - `sisterGrayWake` - Wakes Sister Gray AI every hour (on the half-hour)
 - `greeterPoolMaintenance` - Replenishes greeter NPC pools every 5 minutes
+- `autoFixerTick` - Runs auto-fixer AI every hour (on the quarter-hour)
+
+## Auto-Fixer System ($autoFixer)
+
+The `$autoFixer` singleton automatically attempts to fix open issues from `$issues` using AI. It runs hourly via `$scheduler` and uses `$aiQuery` with a specialized prompt to analyze and fix bugs.
+
+### Configuration
+
+```typescript
+// Check current configuration
+const stats = await $autoFixer.getStats();
+// {
+//   enabled: true,
+//   minPriority: 'high',
+//   maxAttemptsPerHour: 3,
+//   cooldownHours: 24,
+//   totalAttempts: 42,
+//   totalFixed: 15,
+//   successRate: '35%'
+// }
+
+// Enable/disable the auto-fixer
+await $autoFixer.setEnabled(false);
+
+// Set minimum priority level (only attempt issues of this priority or higher)
+await $autoFixer.setMinPriority('medium');  // 'low', 'medium', 'high', 'critical'
+
+// Properties are also directly configurable:
+$autoFixer.maxAttemptsPerHour = 5;  // Rate limit
+$autoFixer.cooldownHours = 48;      // Don't re-attempt same issue for 48h
+```
+
+### Manual Operation
+
+```typescript
+// Run tick manually (same as scheduler job)
+await $autoFixer.tick();
+
+// Attempt fix on a specific issue (bypasses cooldown check)
+const result = await $autoFixer.attemptFix(42);
+// { success: true, issueId: 42, fixed: true, summary: '...' }
+
+// Clear cooldown for an issue to allow re-attempt
+await $autoFixer.clearCooldown(42);
+
+// Clear all cooldowns (for testing)
+await $autoFixer.clearAllCooldowns();
+```
+
+### Viewing History
+
+```typescript
+// Get recent fix attempts
+const history = await $autoFixer.getFixHistory(10);
+// [
+//   { issueId: 42, timestamp: '2026-01-10T12:15:00Z', success: true, summary: '...' },
+//   { issueId: 38, timestamp: '2026-01-10T12:15:00Z', success: false, needsReview: true, summary: '...' },
+//   ...
+// ]
+
+// Human-readable status
+const description = await $autoFixer.describe();
+// "Auto-Fixer System
+//  Status: ENABLED
+//  Min Priority: high
+//  Rate Limit: 3/hour
+//  ..."
+```
+
+### How It Works
+
+1. **Hourly Tick**: Scheduler calls `$autoFixer.tick()` every hour at :15 past the hour
+2. **Issue Selection**: Gets open issues filtered by `minPriority`, sorted by priority
+3. **Rate Limiting**: Maximum `maxAttemptsPerHour` attempts per tick (default: 3)
+4. **Cooldown**: Won't re-attempt the same issue for `cooldownHours` (default: 24h)
+5. **AI Analysis**: Uses `$aiQuery` with `$aiPrompts.autoFixer` prompt
+6. **Documentation**: AI adds comments to issues about what it tried
+7. **Resolution**: If fix is verified, AI resolves the issue
+
+### Safety Features
+
+- Rate limited to prevent runaway fixes
+- Per-issue cooldown prevents infinite retry loops
+- Priority filter ensures only important issues are attempted
+- AI is instructed to be conservative and document thoroughly
+- History tracking for auditing all attempts
 
 ## Documentation System ($docs)
 
