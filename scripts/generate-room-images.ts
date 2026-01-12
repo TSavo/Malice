@@ -485,6 +485,7 @@ async function main() {
   let skipped = 0;
   let consecutiveTokenErrors = 0;
   let batchIndex = 0;
+  const retryQueue: RoomFile[] = []; // Queue for rate-limited rooms
 
   for (let i = 0; i < toGenerate.length; i += PARALLEL_COUNT) {
     batchIndex++;
@@ -522,11 +523,9 @@ async function main() {
     // Handle errors
     for (const err of errs) {
       if (err.isRateLimit) {
-        console.log(`    ⏳ Rate limited on ${err.roomFile.room.name} - will retry after delay`);
-        // Re-add to end of queue by not counting as processed
-        // Note: In immutable approach, we'd need to restructure for retry queue
-        // For now, just wait and continue
-        await sleep(60000);
+        console.log(`    ⏳ Rate limited on ${err.roomFile.room.name} - added to retry queue`);
+        retryQueue.push(err.roomFile);
+        errors--; // Don't count as error since we'll retry
       } else if (err.isTokenError) {
         consecutiveTokenErrors++;
         console.error(`    ⚠️  Token error on ${err.roomFile.room.name} (${consecutiveTokenErrors} consecutive)`);
@@ -555,6 +554,58 @@ async function main() {
       const delay = getDelay();
       console.log(`\n⏱️  Batch complete. Waiting ${(delay / 1000).toFixed(0)}s before next batch...`);
       await sleep(delay);
+    }
+  }
+
+  // Process retry queue (rate-limited rooms)
+  if (retryQueue.length > 0) {
+    console.log(`\n🔄 Processing ${retryQueue.length} rate-limited rooms from retry queue...`);
+    console.log('⏳ Waiting 60s before retrying...');
+    await sleep(60000);
+
+    let retryAttempt = 0;
+    const maxRetries = 3;
+
+    while (retryQueue.length > 0 && retryAttempt < maxRetries) {
+      retryAttempt++;
+      console.log(`\n🔄 Retry attempt ${retryAttempt}/${maxRetries} (${retryQueue.length} rooms remaining)`);
+
+      const currentRetryBatch = retryQueue.splice(0, PARALLEL_COUNT);
+      const retryResults = await Promise.all(
+        currentRetryBatch.map((roomFile, idx) => processRoom(roomFile, idx, currentRetryBatch.length))
+      );
+
+      const retrySuccesses = retryResults.filter((r): r is ProcessingSuccess => r.status === 'success');
+      const retryErrs = retryResults.filter((r): r is ProcessingError => r.status === 'error');
+
+      if (retrySuccesses.length > 0) {
+        await writeResultsToDisk(retrySuccesses);
+        generated += retrySuccesses.length;
+        console.log(`    ✅ Retry succeeded for ${retrySuccesses.length} rooms`);
+      }
+
+      for (const err of retryErrs) {
+        if (err.isRateLimit) {
+          retryQueue.push(err.roomFile); // Re-add to queue
+          console.log(`    ⏳ Still rate limited: ${err.roomFile.room.name}`);
+        } else {
+          errors++;
+          console.log(`    ❌ Retry failed: ${err.roomFile.room.name} - ${err.error}`);
+        }
+      }
+
+      if (retryQueue.length > 0) {
+        console.log('⏳ Waiting 60s before next retry...');
+        await sleep(60000);
+      }
+    }
+
+    if (retryQueue.length > 0) {
+      console.log(`\n⚠️  ${retryQueue.length} rooms failed after ${maxRetries} retry attempts:`);
+      for (const rf of retryQueue) {
+        console.log(`    - ${rf.room.name} (${rf.filePath})`);
+      }
+      errors += retryQueue.length;
     }
   }
 
@@ -651,7 +702,7 @@ async function addImageOnDiskToFile(filePath: string, imageFilename: string, roo
 
     // Find the room object by its placeholder key and add imageOnDisk after z coordinate
     // Pattern: 'placeholder': { ... z: N, ... }
-    const roomKeyPattern = new RegExp(`('${placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}':\\s*\\{[^}]*?)(z:\\s*-?\\d+,?)`, 's');
+    const roomKeyPattern = new RegExp(`('${placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}':\\s*\\{[^}]*?)(z:\\s*-?\\d+,?)`);
     const match = content.match(roomKeyPattern);
 
     if (match) {
