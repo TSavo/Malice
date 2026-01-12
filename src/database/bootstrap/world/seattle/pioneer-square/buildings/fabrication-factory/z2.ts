@@ -286,6 +286,7 @@ The labels are simple: NUTRIENT SUPPLEMENT - DAILY DOSE - FABRICATION FACTORY PI
       x: -18,
       y: 8,
       z: 2,
+      imageOnDisk: 'fabrication-factory-packaging-bay-x-18-y8-z2.png',
       population: 0,
       ambientNoise: 50,
       lighting: 80,
