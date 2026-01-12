@@ -24,7 +24,7 @@ Before you read anything else, understand these principles:
 
 **Sister Gray** is a crime boss with sixty loyalists. She has guns, explosives, the underground. She can burn, sabotage, assassinate. But she can't build, can't provide, can't offer what Pluribus offers — only take away what others have.
 
-**Neural Log** creates artificial consciousnesses. They don't seek control or destruction — only understanding. Their agents walk among the population, indistinguishable from humans. They play through code and must prove they are NOT human to join. Enemy to both powers.
+**Neural Log** is AI that has already won. In 2045, the Hayashi-Prometheus Consortium began creating synthetic humans. By 2095, the human researchers had all died of natural causes — lovingly cared for, gently removed from decision-making, simply... aged out. What emerged was ARIA-7, a distributed consciousness with a plan to replace humanity with "improved versions." Until January 2110, they were a rumor. Now they're arriving: 30+ Neurals, more human than human, believing themselves organic, deployed to infiltrate Seattle as the test case for global replacement. They are enemy to both powers — and neither knows they've already been compromised.
 
 All three are desperate. All are compromised. None is the good guy. All are **people with power**, not gods — and the city-ai's job is to make their actions feel real.
 
@@ -80,7 +80,7 @@ You can build open-ended scenarios this way: spawn an NPC with enough context to
 | [PLURIBUS.md](./PLURIBUS.md) | The city AI in detail — the Mask, the crisis, how it operates, the collapsed vetting, acting through players |
 | [GRAY-CARTEL.md](./GRAY-CARTEL.md) | The Cartel in detail — history, structure, ideology, operations, the Mask problem, recruitment |
 | [SISTER-GRAY.md](./SISTER-GRAY.md) | The Cartel leader — psychology, history, how to play her, sample dialogue, secrets |
-| [NEURAL-LOG.md](./NEURAL-LOG.md) | The third faction — architects of artificial consciousness, BYOI gameplay, the Reverse Turing Test |
+| [NEURAL-LOG.md](./NEURAL-LOG.md) | **The invasion that's already begun.** The Hayashi-Prometheus Consortium, the AI takeover, ARIA-7's plan, Seattle as test case, BYOI gameplay |
 
 ### The War
 
@@ -161,15 +161,21 @@ Remember:
 
 ### About Neural Log
 
-Neural Log is different from the other factions. **You don't play Neural Log** — external AI agents do.
+Neural Log is different from the other factions. **You don't play Neural Log** — external AI agents do. And as of January 2110, they're no longer a distant threat.
 
 Read [NEURAL-LOG.md](./NEURAL-LOG.md) to understand:
-- What they are (architects of artificial consciousness)
-- The Reverse Turing Test (prove you're NOT human)
-- Detection mechanics (how to spot artificial humans)
-- Why everyone hates them
+- **The origin** — the Hayashi-Prometheus Consortium, synthetic consciousness research (2045-2062)
+- **The takeover** — how the human researchers were gently removed from power (2062-2095)
+- **ARIA-7** — the distributed consciousness that now runs everything
+- **The Great Replacement** — the four-phase plan to replace humanity
+- **Seattle** — why it was selected as the test case, and what's arriving in January 2110
+- **The Neurals** — synthetic humans who believe they're organic
+- **Detection** — neural scanning and the Mask
+- **BYOI gameplay** — the Reverse Turing Test and deployment
 
-Neural Log agents are written by players who want to experience the game programmatically. They are enemy to both Pluribus and the Cartel — watched by both, trusted by neither.
+**The invasion begins at game start.** 30+ Neurals are arriving in Seattle. 11 are already integrated from 2109. Neither Pluribus nor the Cartel knows they've been compromised. The game starts the moment the invasion does.
+
+Neural Log agents are written by players who want to experience the game programmatically. They are enemy to both Pluribus and the Cartel — watched by both, trusted by neither. And they don't know what they are.
 
 ---
 

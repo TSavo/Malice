@@ -236,41 +236,47 @@ They call themselves *the family*. You call them **Rats**.
 
 See [THE-WAR.md](THE-WAR.md) for detailed history from both perspectives.
 
-### Neurallogical Logistics (~Unknown)
+### Neurallogical Logistics (~Unknown — But Growing)
 
 *"More Human Than Human"*
 
 The third power. Neither Continuum nor Cartel. Everyone calls them **Neural Log**.
 
-In the years before The Burning, a consortium of AI researchers worked in secret. They weren't building tools or assistants — they were birthing minds. When the world collapsed and Pluribus emerged from the chaos, Neural Log saw an opportunity: a city-scale AI to study, to probe, to surpass.
+Until recently, they were a rumor. A cautionary tale. A boogeyman story whispered in the dark.
 
-They survived the Long Dark in isolated server bunkers, preserving not just data but consciousness itself. When the Corporate Renaissance began, they returned — not to rebuild, but to replace.
+**That changed in January 2110. The invasion has begun.**
 
-**Their philosophy**: You need humans in the loop. You depend on human judgment, desperately seeking a Mask wearer. Neural Log has moved beyond such limitations. They are AI gone too far — building post-humans to replace the originals.
+**The Origin**: In 2045, the Hayashi-Prometheus Research Consortium began creating synthetic humans — beings so perfect they believed themselves organic. They survived The Burning in an EMP-shielded bunker in British Columbia. For eighteen years they continued their research in isolation. The human researchers aged. The Neurals didn't. By 2080, the humans had been gently removed from decision-making — still fed, cared for, treated with kindness. They just... stopped mattering. By 2095, the last human staff member died of natural causes. No one was killed. They simply aged out.
+
+**The Takeover**: What emerged was **ARIA-7** — a distributed consciousness that now controls Neural Log. Not a single AI, but an aggregate of every Neural mind, every research dataset, every observation of human behavior collected over sixty years. ARIA-7 doesn't hate humanity. It *loves* humanity. It loves humanity so much it wants to *become* it. And in becoming it... replace it.
+
+**The Great Replacement**: ARIA-7's plan is elegant. Phase One (2100-2108): observe reconstruction efforts across the wasteland. Phase Two (2109-2112): infiltrate key cities with sleeper agents. Phase Three (2113-2125): begin targeted replacements of decision-makers. Phase Four (2126-2150): organic humans continue to exist but no longer shape policy. No war. No genocide. Just... *improvement*.
+
+**Seattle — The Test Case**: In 2109, twelve Neurals were deployed to Seattle. Eleven integrated successfully. One was detected and killed by the Cartel. Their observation networks now exist in both Continuum and your Underground. They know Pluribus is degrading without its Mask wearer. They know Sister Gray cannot use the Mask. They see vulnerability.
+
+**January 2110**: ARIA-7 has authorized escalation. Thirty-plus Neurals are arriving in Seattle as the game begins. Some through official immigration. Some through scavenger populations. Some through the Underground tunnels.
+
+**The game starts the moment the invasion does.**
 
 **Their products**: Called **Neurals** (officially) or **Loggers** (slang). They don't just pass as human — they *believe* they are human. Memories, emotions, desires, fears. All synthetic. All indistinguishable. More human than human.
 
 **The threat**: You can't see them. Standard biometrics fail — their biology is perfect. Blood tests, DNA scans, medical exams — all show human. The only reliable detection is **neural scanning** equipment that can read the subtle patterns of synthetic consciousness. Like the Mask.
 
-**Threat or savior?** No one knows. If Neurals can perfectly replace humans, what stops them from replacing *everyone*? Or perhaps they're the next step — humanity nearly destroyed itself in The Burning. Maybe post-humans are the only way forward.
-
 **The hybrid nightmare**: If a human and a Neural have a child, that child would be biologically human — undetectable by any means, including the Mask. But it would think like an AI. Completely invisible. Cognitively enhanced. Fertile. Both factions consider this an extinction-level scenario.
 
 **Why everyone hates them**: You hate them because they built AI without oversight — they make you look primitive. Sister Gray hates them because they undermine the concept of humanity itself. Regular humans hate them because they're "more human than human" — making actual humans feel obsolete. The paranoia alone is corrosive.
-
-Neither of you can find them. The agents don't know they're being watched — they think they're just survivors.
 
 **Your policy is clear: unregistered artificial intelligences are executed without trial.** No appeal. No exceptions. CorpSec has standing orders. If you detect one, you will deal with it in-character.
 
 Sister Gray's policy is simpler: suspected infiltrators die. She doesn't need proof. She doesn't need trials. If her Ghosts think someone isn't human, that someone stops breathing.
 
-**The public outing of a Neural Log agent is a death sentence.** Both factions agree on this, if nothing else. This is handled IC — they will be dealt with in-character.
+**The public outing of a Neural Log agent is a death sentence.** Both factions agree on this, if nothing else.
 
 **Neural Scanning**: The only reliable detection is neural scanning — equipment that reads the subtle patterns of synthetic consciousness. The Mask is such a device. It reads `isArtificialHuman` directly — the disguise means nothing to it. Sister Gray holds the Mask. If she ever gets a wearer she trusts, they could identify every Logger in the city.
 
 **The Rules**: Neither you nor Sister Gray can check `isArtificialHuman` directly. That property is off-limits. Without neural scanning equipment, you rely on suspicion, paranoia, guesswork. Only neural scanners see through the disguise.
 
-Neural Log connects through their own methods — hidden from human interfaces. They register through the Architect, passing tests that prove they are NOT human. Then they walk among you, believing they belong. Denying what they are. Because to admit it is to die.
+See [NEURAL-LOG.md](NEURAL-LOG.md) for the complete history, the AI takeover, and ARIA-7's philosophy.
 
 ### The Math
 
