@@ -6,9 +6,71 @@
 
 ## Overview
 
-The multiplexed WebSocket connection supports a `wm` (window manager) channel for controlling client-side windows. Server-side code uses `player.openWindow()`, `closeWindow()`, and `sendToWindow()` to manage windows.
+The multiplexed WebSocket connection supports a `wm` (window manager) channel for controlling client-side windows. There are two APIs:
+
+1. **Simple API**: `player.show()`, `close()`, `hide()` - For showing object images or HTML content
+2. **Advanced API**: `player.openWindow()`, `closeWindow()`, `sendToWindow()` - Full control over window types and behavior
 
 ---
+
+## Simple API (Recommended)
+
+### player.show(name, content, options?)
+
+Display an object's image or HTML content to the player. This is the easiest way to show visual content.
+
+**Display an object:**
+```javascript
+// Show a locked door's image
+const lock = await $load(42);
+player.show('lock', lock, {
+  icon: '🔐',
+  persist: true  // Adds to start menu, persists across reconnects
+});
+```
+
+**Display HTML:**
+```javascript
+// Show a document or custom UI
+player.show('note', '<h1>Classified Memo</h1><p>Project UNUM is active...</p>', {
+  icon: '📄',
+  title: 'Classified Document',
+  persist: false
+});
+```
+
+**Options:**
+- `persist` (boolean) - If true, adds window to start menu and persists across reconnects
+- `icon` (string) - Unicode emoji for title bar/taskbar/start menu (e.g., '🔐', '📄', '🖼')
+- `title` (string) - Override window title (defaults to object name or 'View')
+
+### player.close(name)
+
+Close a window. If the window was opened with `persist: true`, it stays in the start menu and can be reopened.
+
+```javascript
+player.close('lock');
+```
+
+### player.hide(name)
+
+Close a window AND remove it from the start menu completely.
+
+```javascript
+player.hide('note');
+```
+
+### Persistence
+
+Windows opened with `persist: true` are saved in `player.windowLayout` and automatically restored when the player reconnects:
+- **Object windows**: Re-fetched from database with fresh image URLs
+- **HTML windows**: Frame persists but HTML content is not stored (to avoid stale/large data)
+
+---
+
+## Advanced API
+
+For more control over window behavior, use the lower-level `openWindow()` API.
 
 ## Window Types
 

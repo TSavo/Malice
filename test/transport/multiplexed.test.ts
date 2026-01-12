@@ -410,3 +410,52 @@ describe('Multiplexed vs Raw Transport', () => {
     ws.close();
   });
 });
+
+describe('Window Manager Channel (wm)', () => {
+  let client: MuxTestClient;
+
+  beforeEach(() => {
+    if (!serverAvailable) return;
+    client = new MuxTestClient();
+  });
+
+  afterEach(() => {
+    if (!serverAvailable) return;
+    client.close();
+  });
+
+  it('should accept messages on wm channel', async () => {
+    if (!serverAvailable) return;
+    await client.connect();
+
+    // Send a window manager message
+    client.send('wm', { type: 'openWindow', windowId: 'test-window' });
+
+    // Wait a bit to ensure message is processed
+    await new Promise((r) => setTimeout(r, 100));
+
+    // Connection should still be alive (message accepted)
+    expect(client.isConnected).toBe(true);
+  });
+
+  it('should handle various wm message types', async () => {
+    if (!serverAvailable) return;
+    await client.connect();
+
+    // Test different message types
+    const testMessages = [
+      { type: 'openWindow', windowId: 'location' },
+      { type: 'closeWindow', windowId: 'speaker' },
+      { type: 'focusWindow', windowId: 'show' },
+      { type: 'updateState', data: { foo: 'bar' } },
+    ];
+
+    for (const msg of testMessages) {
+      client.send('wm', msg);
+      await new Promise((r) => setTimeout(r, 50));
+    }
+
+    // Connection should still be alive after all messages
+    expect(client.isConnected).toBe(true);
+  });
+});

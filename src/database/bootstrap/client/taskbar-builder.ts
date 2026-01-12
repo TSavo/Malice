@@ -54,19 +54,46 @@ export class Taskbar {
     this.buttons = new Map();  // windowId -> button element
     this.menuOpen = false;
 
+    // Dynamic menu entries - registered by client when state is received
+    // Map of windowId -> { icon, label, windowType, stateType, data }
+    this.availableWindows = new Map();
+
     this.render();
+  }
+
+  /**
+   * Register an available window type for the start menu.
+   * Called by MaliceClient when relevant state is received.
+   */
+  registerAvailableWindow(windowId, config) {
+    this.availableWindows.set(windowId, {
+      icon: config.icon || '📄',
+      label: config.label || windowId,
+      windowType: config.windowType || 'html',
+      stateType: config.stateType || null,
+      data: config.data || null,
+      openFn: config.openFn || null
+    });
+  }
+
+  /**
+   * Unregister an available window type.
+   */
+  unregisterAvailableWindow(windowId) {
+    this.availableWindows.delete(windowId);
   }
 
   render() {
     this.container.innerHTML = '';
     this.container.style.cssText = \\\`
-      height: 40px;
-      background: #141414;
-      border-top: 1px solid #333;
+      height: 44px;
+      background: linear-gradient(180deg, #1a1a1a 0%, #141414 100%);
+      border-top: 1px solid #2a2a2a;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
       display: flex;
       align-items: center;
-      padding: 0 8px;
-      gap: 4px;
+      padding: 0 10px;
+      gap: 6px;
       position: relative;
     \\\`;
 
@@ -74,27 +101,34 @@ export class Taskbar {
     this.startBtn = document.createElement('button');
     this.startBtn.innerHTML = '&#9776;'; // Hamburger menu icon
     this.startBtn.style.cssText = \\\`
-      width: 32px;
-      height: 32px;
-      background: #1a1a1a;
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(180deg, #222 0%, #1a1a1a 100%);
       border: 1px solid #333;
-      border-radius: 4px;
+      border-top-color: #404040;
+      border-left-color: #3a3a3a;
+      border-radius: 6px;
       color: #00ff88;
-      font-size: 16px;
+      font-size: 18px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: all 0.1s ease;
     \\\`;
     this.startBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       this.toggleMenu();
     });
     this.startBtn.addEventListener('mouseenter', () => {
-      this.startBtn.style.background = '#252525';
+      this.startBtn.style.background = 'linear-gradient(180deg, #2a2a2a 0%, #222 100%)';
+      this.startBtn.style.borderTopColor = '#4a4a4a';
     });
     this.startBtn.addEventListener('mouseleave', () => {
-      if (!this.menuOpen) this.startBtn.style.background = '#1a1a1a';
+      if (!this.menuOpen) {
+        this.startBtn.style.background = 'linear-gradient(180deg, #222 0%, #1a1a1a 100%)';
+        this.startBtn.style.borderTopColor = '#404040';
+      }
     });
     this.container.appendChild(this.startBtn);
 
@@ -102,15 +136,17 @@ export class Taskbar {
     this.menu = document.createElement('div');
     this.menu.style.cssText = \\\`
       position: absolute;
-      bottom: 44px;
-      left: 8px;
-      background: #1a1a1a;
-      border: 1px solid #333;
+      bottom: 48px;
+      left: 10px;
+      background: linear-gradient(180deg, #1e1e1e 0%, #181818 100%);
+      border: 2px solid #2a2a2a;
+      border-top-color: #3a3a3a;
+      border-left-color: #353535;
       border-radius: 8px;
       padding: 8px 0;
-      min-width: 180px;
+      min-width: 200px;
       display: none;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.03);
       z-index: 10000;
     \\\`;
     this._buildMenu();
@@ -150,11 +186,13 @@ export class Taskbar {
     this.soundBtn.id = 'taskbar-sound-btn';
     this.soundBtn.innerHTML = '🔊';
     this.soundBtn.style.cssText = \\\`
-      width: 28px;
-      height: 28px;
-      background: #1a1a1a;
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(180deg, #222 0%, #1a1a1a 100%);
       border: 1px solid #333;
-      border-radius: 4px;
+      border-top-color: #404040;
+      border-left-color: #3a3a3a;
+      border-radius: 6px;
       color: #888;
       font-size: 14px;
       cursor: pointer;
@@ -162,6 +200,7 @@ export class Taskbar {
       align-items: center;
       justify-content: center;
       margin-left: 8px;
+      transition: all 0.1s ease;
     \\\`;
     this.soundBtn.title = 'Sound Settings';
     this.soundBtn.addEventListener('click', (e) => {
@@ -171,10 +210,10 @@ export class Taskbar {
       }
     });
     this.soundBtn.addEventListener('mouseenter', () => {
-      this.soundBtn.style.background = '#252525';
+      this.soundBtn.style.background = 'linear-gradient(180deg, #2a2a2a 0%, #222 100%)';
     });
     this.soundBtn.addEventListener('mouseleave', () => {
-      this.soundBtn.style.background = '#1a1a1a';
+      this.soundBtn.style.background = 'linear-gradient(180deg, #222 0%, #1a1a1a 100%)';
     });
     this.container.appendChild(this.soundBtn);
 
@@ -209,20 +248,23 @@ export class Taskbar {
   addWindow(windowId, title, icon = '□') {
     const btn = document.createElement('button');
     btn.style.cssText = \\\`
-      padding: 4px 12px;
-      background: #1a1a1a;
+      padding: 6px 14px;
+      background: linear-gradient(180deg, #222 0%, #1a1a1a 100%);
       border: 1px solid #333;
-      border-radius: 4px;
+      border-top-color: #404040;
+      border-left-color: #3a3a3a;
+      border-radius: 6px;
       color: #888;
       font-family: system-ui, -apple-system, sans-serif;
       font-size: 12px;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
       white-space: nowrap;
-      max-width: 160px;
+      max-width: 180px;
       overflow: hidden;
+      transition: all 0.1s ease;
     \\\`;
 
     const iconSpan = document.createElement('span');
@@ -245,17 +287,17 @@ export class Taskbar {
 
     btn.addEventListener('mouseenter', () => {
       if (!btn.classList.contains('active')) {
-        btn.style.background = '#252525';
+        btn.style.background = 'linear-gradient(180deg, #2a2a2a 0%, #222 100%)';
       }
     });
 
     btn.addEventListener('mouseleave', () => {
       if (!btn.classList.contains('active')) {
-        btn.style.background = '#1a1a1a';
+        btn.style.background = 'linear-gradient(180deg, #222 0%, #1a1a1a 100%)';
       }
     });
 
-    this.buttons.set(windowId, { button: btn, titleSpan });
+    this.buttons.set(windowId, { button: btn, iconSpan, titleSpan });
     this.buttonsArea.appendChild(btn);
   }
 
@@ -271,18 +313,24 @@ export class Taskbar {
     // Remove active from all
     for (const [id, entry] of this.buttons) {
       entry.button.classList.remove('active');
-      entry.button.style.background = '#1a1a1a';
+      entry.button.style.background = 'linear-gradient(180deg, #222 0%, #1a1a1a 100%)';
       entry.button.style.borderColor = '#333';
+      entry.button.style.borderTopColor = '#404040';
+      entry.button.style.borderLeftColor = '#3a3a3a';
       entry.button.style.color = '#888';
+      entry.button.style.boxShadow = 'none';
     }
 
     // Set active
     const entry = this.buttons.get(windowId);
     if (entry) {
       entry.button.classList.add('active');
-      entry.button.style.background = '#252525';
-      entry.button.style.borderColor = '#00ff88';
+      entry.button.style.background = 'linear-gradient(180deg, #2a2a2a 0%, #222 100%)';
+      entry.button.style.borderColor = '#00cc6a';
+      entry.button.style.borderTopColor = '#00ff88';
+      entry.button.style.borderLeftColor = '#00dd77';
       entry.button.style.color = '#e0e0e0';
+      entry.button.style.boxShadow = '0 0 8px rgba(0,255,136,0.2)';
     }
   }
 
@@ -304,6 +352,13 @@ export class Taskbar {
     }
   }
 
+  updateButtonIcon(windowId, icon) {
+    const entry = this.buttons.get(windowId);
+    if (entry && entry.iconSpan) {
+      entry.iconSpan.textContent = icon || '□';
+    }
+  }
+
   setStatus(state) {
     const colors = {
       connecting: '#ffcc00',
@@ -315,11 +370,35 @@ export class Taskbar {
   }
 
   _buildMenu() {
+    // Clear existing menu items
+    this.menu.innerHTML = '';
+
+    // Build items list dynamically
     const items = [
-      { icon: '🖥', label: 'Terminal', action: () => this.wm?.openTerminal() },
-      { type: 'separator' },
-      { icon: '🔌', label: 'Disconnect', action: () => this.wm?.disconnect(), danger: true }
+      { icon: '>', label: 'Terminal', action: () => this.wm?.openTerminal() },
     ];
+
+    // Add dynamic window entries from availableWindows
+    for (const [windowId, config] of this.availableWindows) {
+      const isOpen = this.wm?.windows?.has(windowId);
+      items.push({
+        icon: config.icon,
+        label: config.label + (isOpen ? ' ✓' : ''),
+        action: () => {
+          if (isOpen) {
+            // Focus existing window
+            this.wm?.focusWindow(windowId);
+          } else if (config.openFn) {
+            // Use custom open function
+            config.openFn();
+          }
+        }
+      });
+    }
+
+    // Add separator and disconnect
+    items.push({ type: 'separator' });
+    items.push({ icon: '🔌', label: 'Disconnect', action: () => this.wm?.disconnect(), danger: true });
 
     for (const item of items) {
       if (item.type === 'separator') {
@@ -372,17 +451,25 @@ export class Taskbar {
   }
 
   openMenu() {
+    // Rebuild menu each time to reflect current state
+    this._buildMenu();
     this.menu.style.display = 'block';
     this.menuOpen = true;
-    this.startBtn.style.background = '#252525';
-    this.startBtn.style.borderColor = '#00ff88';
+    this.startBtn.style.background = 'linear-gradient(180deg, #2a2a2a 0%, #222 100%)';
+    this.startBtn.style.borderColor = '#00cc6a';
+    this.startBtn.style.borderTopColor = '#00ff88';
+    this.startBtn.style.borderLeftColor = '#00dd77';
+    this.startBtn.style.boxShadow = '0 0 8px rgba(0,255,136,0.2)';
   }
 
   closeMenu() {
     this.menu.style.display = 'none';
     this.menuOpen = false;
-    this.startBtn.style.background = '#1a1a1a';
+    this.startBtn.style.background = 'linear-gradient(180deg, #222 0%, #1a1a1a 100%)';
     this.startBtn.style.borderColor = '#333';
+    this.startBtn.style.borderTopColor = '#404040';
+    this.startBtn.style.borderLeftColor = '#3a3a3a';
+    this.startBtn.style.boxShadow = 'none';
   }
 }
 

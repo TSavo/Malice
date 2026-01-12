@@ -78,6 +78,12 @@ export class AudioManager {
     // Callback for mute state changes (taskbar icon updates)
     this.onMuteChange = null;
 
+    // Callbacks for speaker start/end (for speaker window)
+    // Called with (speakerId, speakerName, segment) when speaker starts
+    this.onSpeakerStart = null;
+    // Called with (speakerId) when speaker ends (or null if queue empty)
+    this.onSpeakerEnd = null;
+
     // Load saved settings from localStorage
     this.loadSettings();
 
@@ -245,7 +251,7 @@ export class AudioManager {
       // Request TTS audio from server
       const audio = await this.fetchTTS(segment);
       if (audio) {
-        await this.playAudio(audio, segment.speaker);
+        await this.playAudio(audio, segment.speaker, segment);
       }
     } catch (e) {
       console.warn('[AudioManager] TTS error:', e);
@@ -297,7 +303,7 @@ export class AudioManager {
   /**
    * Play audio buffer
    */
-  async playAudio(arrayBuffer, speakerId) {
+  async playAudio(arrayBuffer, speakerId, segment) {
     return new Promise((resolve, reject) => {
       // Calculate effective volume
       const speakerSettings = this.objectVolumes.get(speakerId);
@@ -317,11 +323,22 @@ export class AudioManager {
       audio.volume = effectiveVolume;
       this.currentAudio = audio;
       this.currentSpeakerId = speakerId;
+      this.currentSegment = segment;
+
+      // Emit speaker start event
+      if (this.onSpeakerStart) {
+        this.onSpeakerStart(speakerId, segment?.speakerName || speakerSettings?.name, segment);
+      }
 
       audio.onended = () => {
         URL.revokeObjectURL(audioUrl);
         this.currentAudio = null;
         this.currentSpeakerId = null;
+        this.currentSegment = null;
+        // Emit speaker end event
+        if (this.onSpeakerEnd) {
+          this.onSpeakerEnd(speakerId);
+        }
         resolve();
       };
 
@@ -329,6 +346,11 @@ export class AudioManager {
         URL.revokeObjectURL(audioUrl);
         this.currentAudio = null;
         this.currentSpeakerId = null;
+        this.currentSegment = null;
+        // Emit speaker end event on error too
+        if (this.onSpeakerEnd) {
+          this.onSpeakerEnd(speakerId);
+        }
         reject(e);
       };
 

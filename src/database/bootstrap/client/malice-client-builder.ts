@@ -70,6 +70,16 @@ export class MaliceClient {
     this.on('wm', (data) => this.onWmMessage(data));
     this.on('audio', (data) => this.onAudioMessage(data));
     this.on('error', (data) => this.onErrorMessage(data));
+
+    // Wire up audio manager callbacks for speaker window
+    if (this.audio) {
+      this.audio.onSpeakerStart = (speakerId, speakerName, segment) => {
+        this._handleSpeakerStart(speakerId, speakerName, segment);
+      };
+      this.audio.onSpeakerEnd = (speakerId) => {
+        this._handleSpeakerEnd(speakerId);
+      };
+    }
   }
 
   connect() {
@@ -211,10 +221,285 @@ export class MaliceClient {
       this.state[msg.type] = msg.data;
     }
 
+    // Handle location state - open/update location window
+    if (msg.type === 'location' && msg.data && this.wm) {
+      this._handleLocationState(msg.data);
+    }
+
+    // Handle show - open/update a show window
+    if (msg.type === 'show' && msg.data && this.wm) {
+      this._handleShowState(msg.data);
+    }
+
+    // Handle close - close a show window
+    if (msg.type === 'close' && msg.data && this.wm) {
+      this._handleCloseState(msg.data);
+    }
+
+    // Handle hide - close and remove from start menu
+    if (msg.type === 'hide' && msg.data && this.wm) {
+      this._handleHideState(msg.data);
+    }
+
     // Emit event for UI components
     document.dispatchEvent(new CustomEvent('moo-state', { detail: msg }));
 
     console.log('[MaliceClient] State:', msg.type, msg.data);
+  }
+
+  async _handleLocationState(locationData) {
+    const windowId = 'location';
+
+    // Register this window type with the taskbar for the start menu
+    // Use arrow function that references this.state.location for latest data
+    const client = this;
+    this.wm?.taskbar?.registerAvailableWindow(windowId, {
+      icon: '📍',
+      label: 'Location',
+      windowType: 'location',
+      stateType: 'location',
+      openFn: () => client._openLocationWindow()
+    });
+
+    // Check if location window already exists
+    let win = this.wm.getWindow(windowId);
+
+    if (!win) {
+      await this._openLocationWindow();
+      win = this.wm.getWindow(windowId);
+    }
+
+    // Update the location window with new data
+    if (win && win.setLocation) {
+      win.setLocation(locationData);
+    }
+  }
+
+  async _openLocationWindow() {
+    const windowId = 'location';
+    const area = this.wm.getWindowArea();
+    const winWidth = 320;
+    const winHeight = 400;
+
+    await this.wm.openWindow({
+      windowId: windowId,
+      windowType: 'location',
+      title: 'Location',
+      channel: 'win:location',
+      config: {
+        x: area.width - winWidth - 20,
+        y: 20,
+        width: winWidth,
+        height: winHeight,
+        minimized: false,
+        maximized: false,
+        resizable: true,
+        closable: true,
+        minimizable: true
+      }
+    });
+
+    // Use latest location data from state
+    const win = this.wm.getWindow(windowId);
+    const locationData = this.state.location;
+    if (win && win.setLocation && locationData) {
+      win.setLocation(locationData);
+    }
+  }
+
+  async _handleSpeakerStart(speakerId, speakerName, segment) {
+    const windowId = 'speaker';
+
+    // Register this window type with the taskbar for the start menu
+    const client = this;
+    this.wm?.taskbar?.registerAvailableWindow(windowId, {
+      icon: '🔊',
+      label: 'Speaker',
+      windowType: 'speaker',
+      stateType: 'speaker',
+      openFn: () => client._openSpeakerWindow()
+    });
+
+    // Check if speaker window already exists
+    let win = this.wm?.getWindow(windowId);
+
+    if (!win) {
+      await this._openSpeakerWindow();
+      win = this.wm?.getWindow(windowId);
+    }
+
+    // Update the speaker window with current speaker
+    if (win && win.setSpeaker) {
+      const imageUrl = segment?.imageUrl || null;
+      win.setSpeaker(speakerId, speakerName, imageUrl);
+    }
+  }
+
+  _handleSpeakerEnd(speakerId) {
+    const windowId = 'speaker';
+    const win = this.wm?.getWindow(windowId);
+
+    if (win && win.clearSpeaker) {
+      win.clearSpeaker();
+    }
+  }
+
+  async _openSpeakerWindow() {
+    const windowId = 'speaker';
+    const area = this.wm.getWindowArea();
+    const winWidth = 280;
+    const winHeight = 360;
+
+    await this.wm.openWindow({
+      windowId: windowId,
+      windowType: 'speaker',
+      title: 'Speaker',
+      channel: 'win:speaker',
+      config: {
+        x: area.width - winWidth - 20,
+        y: 440,  // Below location window
+        width: winWidth,
+        height: winHeight,
+        minimized: false,
+        maximized: false,
+        resizable: true,
+        closable: true,
+        minimizable: true
+      }
+    });
+  }
+
+  async _handleShowState(data) {
+    const windowId = 'show:' + data.window;
+    const icon = data.icon || '👁';
+
+    // Track show windows for state management
+    if (!this.showWindows) {
+      this.showWindows = new Map();  // windowName -> data
+    }
+    this.showWindows.set(data.window, data);
+
+    // If persist flag, register with taskbar
+    if (data.persist) {
+      const client = this;
+      this.wm?.taskbar?.registerAvailableWindow(windowId, {
+        icon: icon,
+        label: data.title || data.window,
+        windowType: 'show',
+        stateType: 'show:' + data.window,
+        openFn: () => client._openShowWindow(data.window)
+      });
+    }
+
+    // Check if window already exists
+    let win = this.wm.getWindow(windowId);
+
+    if (!win) {
+      await this._openShowWindow(data.window, data);
+      win = this.wm.getWindow(windowId);
+    }
+
+    // Update the window with content
+    if (win && win.setContent) {
+      win.setContent(data);
+    }
+
+    // Update title and icon if provided
+    if (win) {
+      if (data.title) win.setTitle(data.title);
+      if (data.icon) win.setIcon(data.icon);
+    }
+  }
+
+  _handleCloseState(data) {
+    const windowId = 'show:' + data.window;
+    const win = this.wm?.getWindow(windowId);
+
+    if (win) {
+      this.wm.closeWindow(windowId);
+    }
+  }
+
+  _handleHideState(data) {
+    const windowId = 'show:' + data.window;
+
+    // Close the window
+    const win = this.wm?.getWindow(windowId);
+    if (win) {
+      this.wm.closeWindow(windowId);
+    }
+
+    // Remove from taskbar
+    this.wm?.taskbar?.unregisterAvailableWindow(windowId);
+
+    // Clean up stored data
+    if (this.showWindows) {
+      this.showWindows.delete(data.window);
+    }
+  }
+
+  async _openShowWindow(windowName, data) {
+    const windowId = 'show:' + windowName;
+    const area = this.wm.getWindowArea();
+    const winWidth = 320;
+    const winHeight = 420;
+
+    // Cascade position for multiple show windows
+    const existingShowWindows = Array.from(this.wm.windows.keys()).filter(id => id.startsWith('show:'));
+    const offset = (existingShowWindows.length * 30) % 150;
+
+    // Get icon from data or stored showWindows
+    let icon = data?.icon;
+    if (!icon && this.showWindows) {
+      const stored = this.showWindows.get(windowName);
+      icon = stored?.icon;
+    }
+    icon = icon || '👁';
+
+    const windowConfig = {
+      windowId: windowId,
+      windowType: 'show',
+      title: data?.title || windowName,
+      icon: icon,
+      channel: 'win:' + windowId,
+      config: {
+        x: 100 + offset,
+        y: 100 + offset,
+        width: winWidth,
+        height: winHeight,
+        minimized: false,
+        maximized: false,
+        resizable: true,
+        closable: true,
+        minimizable: true
+      }
+    };
+
+    await this.wm.openWindow(windowConfig);
+
+    // Notify server about the new window (for persistence)
+    this.send('wm', {
+      action: 'open',
+      ...windowConfig,
+      // Include show-specific data for restore
+      showData: data ? {
+        window: data.window,
+        type: data.type,
+        persist: data.persist,
+        icon: data.icon,
+        title: data.title,
+        id: data.id,  // Object ID for restore (only for object type)
+        // Don't include large data like html or imageUrl - those come from server
+      } : null
+    });
+
+    // Set content if data provided
+    if (data) {
+      const win = this.wm.getWindow(windowId);
+      if (win && win.setContent) {
+        win.setContent(data);
+      }
+    }
   }
 
   onWmMessage(msg) {

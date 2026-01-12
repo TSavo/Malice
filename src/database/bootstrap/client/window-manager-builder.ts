@@ -46,6 +46,9 @@ import { Window } from '/js/window';
 import { TerminalWindow } from '/js/terminal-window';
 import { HtmlWindow } from '/js/html-window';
 import { IframeWindow } from '/js/iframe-window';
+import { LocationWindow } from '/js/location-window';
+import { SpeakerWindow } from '/js/speaker-window';
+import { ShowWindow } from '/js/show-window';
 import { Taskbar } from '/js/taskbar';
 
 /**
@@ -436,6 +439,15 @@ export class WindowManager {
       case 'iframe':
         win = new IframeWindow(this, config);
         break;
+      case 'location':
+        win = new LocationWindow(this, config);
+        break;
+      case 'speaker':
+        win = new SpeakerWindow(this, config);
+        break;
+      case 'show':
+        win = new ShowWindow(this, config);
+        break;
       default:
         win = new Window(this, config);
     }
@@ -451,8 +463,8 @@ export class WindowManager {
     this.windows.set(config.windowId, win);
     this.zOrder.push(config.windowId);
 
-    // Add to taskbar
-    const icon = this._getWindowIcon(windowType);
+    // Add to taskbar - use provided icon or derive from type
+    const icon = config.icon || this._getWindowIcon(windowType);
     this.taskbar.addWindow(config.windowId, config.title, icon);
 
     // Initialize window based on type
@@ -487,6 +499,9 @@ export class WindowManager {
       case 'html': return '📄';
       case 'iframe': return '🌐';
       case 'map': return '🗺';
+      case 'location': return '📍';
+      case 'speaker': return '🔊';
+      case 'show': return '👁';
       default: return '□';
     }
   }

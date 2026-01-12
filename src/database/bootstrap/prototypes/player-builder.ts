@@ -221,8 +221,34 @@ export class PlayerBuilder implements Builder {
       // Sync window layout for multiplexed web clients
       await self.syncWindowLayout();
 
+      // Send initial location state (room image/info) to client
+      await self.sendLocationState();
+
       // Show prompt (system - uses tell)
           `,
+    );
+
+    // Hook: called after arriving at new location
+    // Override parent to send location state to client
+    obj.setMethod(
+      'onArrived',
+      `
+      /** Called when this player arrives at a new location.
+       *  Sends location state to client for the location window.
+       */
+      const dest = args[0];
+      const source = args[1];
+      const mover = args[2];
+
+      // Call parent's onArrived first (handles verb registration etc)
+      await pass(dest, source, mover);
+
+      // Send location state to client if connected
+      // Only send if destination is a room (has coordinates or isRoom flag)
+      if (dest && (dest.x !== undefined || dest.isRoom)) {
+        await self.sendLocationState();
+      }
+    `,
     );
 
     obj.setMethod(
@@ -372,11 +398,61 @@ export class PlayerBuilder implements Builder {
       'syncWindowLayout',
       `
       const layout = self.windowLayout || { windows: [], taskbarOrder: [] };
-      return self.channel('wm', {
+
+      // Send basic layout sync for standard windows
+      self.channel('wm', {
         action: 'sync',
         windows: layout.windows || [],
         taskbarOrder: layout.taskbarOrder || []
       });
+
+      // Restore show windows by re-sending their state
+      // This triggers the client-side handlers to open them properly
+      for (const win of (layout.windows || [])) {
+        if (win.windowType === 'show' && win.showData) {
+          const showData = win.showData;
+          // For show windows, we need to re-fetch content from the object
+          // if it was an object-type window (we stored id but not full content)
+          if (showData.type === 'object' && showData.id) {
+            const obj = await $load(showData.id);
+            if (obj) {
+              // Re-send show state with fresh content
+              const data = {
+                window: showData.window,
+                persist: showData.persist || false,
+                icon: showData.icon || win.icon || null,
+                title: showData.title || win.title || null,
+                type: 'object',
+                id: obj.id,
+                name: obj.name || 'Unknown',
+                description: obj.description || '',
+                imageUrl: null
+              };
+
+              // Get image URL
+              const images = obj.images || {};
+              const blobKey = images['9:16'] || images['portrait'] || images['1:1'] || images['square'] || Object.values(images)[0];
+              if (blobKey) {
+                data.imageUrl = '/blob/' + blobKey;
+              }
+
+              self.state('show', data);
+            }
+          } else if (showData.type === 'html') {
+            // For HTML windows, we can't restore the content without storing it
+            // For now, just restore the window frame - AI can re-populate if needed
+            // This is intentional: HTML content could be stale/large
+            self.state('show', {
+              window: showData.window,
+              persist: showData.persist || false,
+              icon: showData.icon || win.icon || null,
+              title: showData.title || win.title || 'View',
+              type: 'html',
+              html: '<p style="color:#666;text-align:center;padding:20px;">Content expired. The AI can refresh this window.</p>'
+            });
+          }
+        }
+      }
     `,
     );
 
@@ -482,6 +558,35 @@ export class PlayerBuilder implements Builder {
       if (!msg || typeof msg !== 'object') return;
 
       switch (msg.action) {
+        case 'open':
+          // Client opened a window - store in layout
+          {
+            const layout = self.windowLayout || { windows: [], taskbarOrder: [], lastUpdated: null };
+            const windowConfig = {
+              windowId: msg.windowId,
+              windowType: msg.windowType,
+              title: msg.title,
+              icon: msg.icon || null,
+              channel: msg.channel,
+              config: msg.config || {},
+              showData: msg.showData || null  // For show windows: { window, type, persist, icon, title }
+            };
+
+            // Update or add window
+            const existingIdx = layout.windows.findIndex(w => w.windowId === msg.windowId);
+            if (existingIdx >= 0) {
+              layout.windows[existingIdx] = windowConfig;
+            } else {
+              layout.windows.push(windowConfig);
+              if (!layout.taskbarOrder.includes(msg.windowId)) {
+                layout.taskbarOrder.push(msg.windowId);
+              }
+            }
+            layout.lastUpdated = new Date().toISOString();
+            self.windowLayout = layout;
+          }
+          break;
+
         case 'geometry':
           // Client moved/resized a window
           await self.updateWindowGeometry(msg.windowId, {
@@ -503,11 +608,13 @@ export class PlayerBuilder implements Builder {
 
         case 'close':
           // Client closed a window - update layout
-          const layout = self.windowLayout || { windows: [], taskbarOrder: [], lastUpdated: null };
-          layout.windows = layout.windows.filter(w => w.windowId !== msg.windowId);
-          layout.taskbarOrder = layout.taskbarOrder.filter(id => id !== msg.windowId);
-          layout.lastUpdated = new Date().toISOString();
-          self.windowLayout = layout;
+          {
+            const layout = self.windowLayout || { windows: [], taskbarOrder: [], lastUpdated: null };
+            layout.windows = layout.windows.filter(w => w.windowId !== msg.windowId);
+            layout.taskbarOrder = layout.taskbarOrder.filter(id => id !== msg.windowId);
+            layout.lastUpdated = new Date().toISOString();
+            self.windowLayout = layout;
+          }
           break;
 
         case 'reorder':
@@ -530,6 +637,152 @@ export class PlayerBuilder implements Builder {
       const windowId = args[0];
       const content = args[1];
       return self.channel('win:' + windowId, content);
+    `,
+    );
+
+    // Send current location state to client (room image, name, description, exits)
+    obj.setMethod(
+      'sendLocationState',
+      `
+      /** Send current room state to the client's location window.
+       *  Called automatically when player moves to a new room.
+       *  Includes room image URL, name, description, and exits.
+       */
+      const room = self.location;
+      if (!room) return false;
+
+      // Check if this is actually a room (has coordinate properties or is a $room descendant)
+      if (room.x === undefined && room.y === undefined && !room.isRoom) return false;
+
+      // Build room state
+      const roomState = {
+        id: room.id,
+        name: room.name || 'Unknown Location',
+        description: room.description || '',
+        exits: {},
+        imageUrl: null,
+        coordinates: null
+      };
+
+      // Add coordinates if present
+      if (room.x !== undefined && room.y !== undefined) {
+        roomState.coordinates = {
+          x: room.x,
+          y: room.y,
+          z: room.z ?? 0
+        };
+      }
+
+      // Add exits
+      if (room.exits && typeof room.exits === 'object') {
+        for (const [dir, dest] of Object.entries(room.exits)) {
+          if (dest) {
+            // dest could be an ID or an object
+            const destId = typeof dest === 'object' ? dest.id : dest;
+            roomState.exits[dir] = destId;
+          }
+        }
+      }
+
+      // Get image URL if room has one cached
+      const images = room.images || {};
+      // Prefer 16:9 landscape for location window
+      const blobKey = images['16:9'] || images['landscape'] || Object.values(images)[0];
+      if (blobKey) {
+        // Generate URL - use player's faction domain if available
+        const faction = self.faction;
+        const domain = faction?.domain || 'malice.world';
+        roomState.imageUrl = '/blob/' + blobKey;
+      }
+
+      // Send to state channel with type 'location'
+      return self.state('location', roomState);
+    `,
+    );
+
+    // Show a window to the player with object or HTML content
+    obj.setMethod(
+      'show',
+      `
+      /** Show a window to the player.
+       *  @param name - Window identifier (e.g., 'lock', 'item', 'note')
+       *  @param content - RuntimeObject (shows image/name/desc) or string (HTML content)
+       *  @param options - { persist?: boolean, icon?: string, title?: string }
+       *    persist: if true, adds to start menu so player can reopen
+       *    icon: unicode character for title bar/taskbar/start menu (e.g., '🔐', '📜')
+       *    title: override the window title (defaults to object name or 'View')
+       */
+      const name = args[0];
+      const content = args[1];
+      const options = args[2] || {};
+
+      if (!name) return false;
+
+      const data = {
+        window: name,
+        persist: options.persist || false,
+        icon: options.icon || null,
+        title: options.title || null
+      };
+
+      // Detect content type
+      if (content && typeof content === 'object' && content.id !== undefined) {
+        // It's a RuntimeObject - extract image and info
+        data.type = 'object';
+        data.id = content.id;
+        data.name = content.name || 'Unknown';
+        data.description = content.description || '';
+        data.title = data.title || content.name || 'View';
+        // Default icon for objects
+        data.icon = data.icon || '🖼';
+
+        // Get image URL
+        const images = content.images || {};
+        const blobKey = images['9:16'] || images['portrait'] || images['1:1'] || images['square'] || Object.values(images)[0];
+        if (blobKey) {
+          data.imageUrl = '/blob/' + blobKey;
+        }
+      } else if (typeof content === 'string') {
+        // It's HTML content
+        data.type = 'html';
+        data.html = content;
+        data.title = data.title || 'View';
+        // Default icon for HTML
+        data.icon = data.icon || '📄';
+      } else {
+        return false;
+      }
+
+      return self.state('show', data);
+    `,
+    );
+
+    // Close a window (removes from screen, optionally keeps in start menu if persist was set)
+    obj.setMethod(
+      'close',
+      `
+      /** Close a shown window.
+       *  @param name - Window identifier to close
+       *  If the window was opened with persist:true, it stays in the start menu.
+       */
+      const name = args[0];
+      if (!name) return false;
+
+      return self.state('close', { window: name });
+    `,
+    );
+
+    // Hide a window (removes from screen AND start menu)
+    obj.setMethod(
+      'hide',
+      `
+      /** Hide a shown window completely (removes from start menu too).
+       *  @param name - Window identifier to hide
+       */
+      const name = args[0];
+      if (!name) return false;
+
+      return self.state('hide', { window: name });
     `,
     );
   }
