@@ -687,20 +687,26 @@ app.post("/generate", async (req: Request, res: Response) => {
     }
 
     let localPath: string | undefined;
+    let compressedContent: string | undefined;
 
-    // Step 4: Download (optional)
+    // Step 4: Download and compress (optional)
     if (download && upscaleSubtle.uri) {
       const filename = `${upscaleSubtle.hash || Date.now()}.png`;
       localPath = path.join(OUTPUT_DIR, filename);
       console.log(`[Generate] Step 4: Downloading to ${localPath}`);
       await downloadImage(upscaleSubtle.uri, localPath);
+
+      // Read the compressed file and return as base64
+      const compressedBuffer = fs.readFileSync(localPath);
+      compressedContent = compressedBuffer.toString('base64');
+      console.log(`[Generate] Returning compressed image (${(compressedBuffer.length/1024/1024).toFixed(2)}MB)`);
     }
 
     console.log("[Generate] Complete!");
     res.json({
       id: upscaleSubtle.id,
       hash: upscaleSubtle.hash,
-      content: upscaleSubtle.content,
+      content: compressedContent || upscaleSubtle.content,
       uri: upscaleSubtle.uri,
       proxy_url: upscaleSubtle.proxy_url,
       localPath,

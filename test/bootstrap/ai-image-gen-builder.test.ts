@@ -422,9 +422,10 @@ describe('AiImageGenBuilder', () => {
 
       // Mock the Midjourney API response
       const originalFetch = global.fetch;
+      const compressedImageData = Buffer.from('fake-png-data-compressed-by-oxipng').toString('base64');
       global.fetch = vi.fn(async (url: string) => {
         if (url.includes('/generate')) {
-          // Mock Midjourney API response (now returns compressed image from oxipng)
+          // Mock Midjourney API response with compressed content (download: true)
           return {
             ok: true,
             json: async () => ({
@@ -434,20 +435,11 @@ describe('AiImageGenBuilder', () => {
               width: 1024,
               height: 1024,
               flags: 0,
-              content: null,
+              content: compressedImageData, // Server returns compressed image when download: true
             }),
           } as Response;
-        } else if (url.includes('example.com/test-image.png')) {
-          // Mock CDN image fetch - return a simple PNG buffer (already compressed by oxipng)
-          const buffer = Buffer.from('fake-png-data-compressed-by-oxipng');
-          return {
-            ok: true,
-            arrayBuffer: async () => buffer.buffer,
-            headers: {
-              get: () => 'image/png',
-            },
-          } as any as Response;
         }
+        // Should not fetch from CDN since content is provided
         return { ok: false, status: 404 } as Response;
       }) as any;
 

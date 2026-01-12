@@ -299,7 +299,7 @@ The Midjourney API server (`midjourney-api` service) runs as a Docker container 
 The `$aiImageGen` MOO object uses this service internally. You don't need to call the API directly - just use `$aiImageGen.generate()` from MOO code.
 
 **Image Compression:**
-The server now uses oxipng for lossless PNG compression (~12% size reduction). All images returned by the API are automatically compressed before being served. This reduces storage costs and bandwidth without any quality loss.
+When the `download: true` parameter is used, the server downloads the Midjourney-generated image from Discord CDN, compresses it using oxipng (lossless PNG optimization achieving ~12% size reduction), and returns the compressed image data. This reduces storage costs and bandwidth without any quality loss. The MOO integration always uses `download: true` to ensure all stored images are compressed.
 
 See `midjourney-api/API.md` for full API documentation.
 
@@ -1442,7 +1442,7 @@ const health = await $tts.health();
 
 ### $aiImageGen - AI Image Generation Object
 
-Generate images using Midjourney and store them in `$blob`. All generated images are automatically compressed using lossless PNG optimization (oxipng) by the Midjourney API server before storage.
+Generate images using Midjourney and store them in `$blob`. The Midjourney API server downloads, compresses with oxipng (lossless PNG optimization, ~12% reduction), and returns the compressed image data, which is then stored in blob storage.
 
 ```typescript
 // Generate image and store in $blob

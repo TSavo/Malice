@@ -150,28 +150,37 @@ export class AiImageGenBuilder implements Builder {
 
         const data = await resp.json();
 
-        if (!data.uri) {
-          return { success: false, error: 'No image URI in response', data };
+        if (!data.uri && !data.content) {
+          return { success: false, error: 'No image URI or content in response', data };
         }
 
-        // Fetch the image from Discord CDN with timeout
-        const cdnController = new AbortController();
-        const cdnTimeoutId = setTimeout(() => cdnController.abort(), 60000); // 1 min timeout for CDN
-        let imageResp;
-        try {
-          imageResp = await fetch(data.uri, { signal: cdnController.signal });
-        } finally {
-          clearTimeout(cdnTimeoutId);
-        }
-        if (!imageResp.ok) {
-          return { success: false, error: 'Failed to fetch image from CDN: ' + imageResp.status };
+        let base64Data: string;
+        let mimeType = 'image/png';
+
+        // Use compressed content if available (download: true), otherwise fetch from CDN
+        if (data.content) {
+          // Server returned compressed image data directly
+          base64Data = data.content;
+        } else {
+          // Fetch the image from Discord CDN with timeout
+          const cdnController = new AbortController();
+          const cdnTimeoutId = setTimeout(() => cdnController.abort(), 60000); // 1 min timeout for CDN
+          let imageResp;
+          try {
+            imageResp = await fetch(data.uri, { signal: cdnController.signal });
+          } finally {
+            clearTimeout(cdnTimeoutId);
+          }
+          if (!imageResp.ok) {
+            return { success: false, error: 'Failed to fetch image from CDN: ' + imageResp.status };
+          }
+
+          const imageBuffer = await imageResp.arrayBuffer();
+          mimeType = imageResp.headers.get('content-type') || 'image/png';
+          base64Data = Buffer.from(imageBuffer).toString('base64');
         }
 
-        const imageBuffer = await imageResp.arrayBuffer();
-        const mimeType = imageResp.headers.get('content-type') || 'image/png';
-        const base64Data = Buffer.from(imageBuffer).toString('base64');
-
-        // Store in $blob (compression happens in midjourney-api via oxipng)
+        // Store in $blob (compression happens in midjourney-api via oxipng when download: true)
         const blob = $blob;
         if (!blob) {
           return { success: false, error: '$blob not available' };
@@ -317,26 +326,35 @@ export class AiImageGenBuilder implements Builder {
 
         const data = await resp.json();
 
-        if (!data.uri) {
-          return { success: false, error: 'No image URI in response', data };
+        if (!data.uri && !data.content) {
+          return { success: false, error: 'No image URI or content in response', data };
         }
 
-        // Fetch the image from Discord CDN with timeout
-        const cdnController = new AbortController();
-        const cdnTimeoutId = setTimeout(() => cdnController.abort(), 60000); // 1 min timeout for CDN
-        let imageResp;
-        try {
-          imageResp = await fetch(data.uri, { signal: cdnController.signal });
-        } finally {
-          clearTimeout(cdnTimeoutId);
-        }
-        if (!imageResp.ok) {
-          return { success: false, error: 'Failed to fetch image from CDN: ' + imageResp.status };
-        }
+        let base64Data: string;
+        let mimeType = 'image/png';
 
-        const imageBuffer = await imageResp.arrayBuffer();
-        const mimeType = imageResp.headers.get('content-type') || 'image/png';
-        const base64Data = Buffer.from(imageBuffer).toString('base64');
+        // Use compressed content if available (download: true), otherwise fetch from CDN
+        if (data.content) {
+          // Server returned compressed image data directly
+          base64Data = data.content;
+        } else {
+          // Fetch the image from Discord CDN with timeout
+          const cdnController = new AbortController();
+          const cdnTimeoutId = setTimeout(() => cdnController.abort(), 60000); // 1 min timeout for CDN
+          let imageResp;
+          try {
+            imageResp = await fetch(data.uri, { signal: cdnController.signal });
+          } finally {
+            clearTimeout(cdnTimeoutId);
+          }
+          if (!imageResp.ok) {
+            return { success: false, error: 'Failed to fetch image from CDN: ' + imageResp.status };
+          }
+
+          const imageBuffer = await imageResp.arrayBuffer();
+          mimeType = imageResp.headers.get('content-type') || 'image/png';
+          base64Data = Buffer.from(imageBuffer).toString('base64');
+        }
 
         return {
           success: true,
