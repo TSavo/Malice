@@ -69,6 +69,18 @@ Rooms are locations with spatial coordinates, exits, crowd mechanics, and enviro
 }
 ```
 
+#### Room Images
+```javascript
+{
+  imageOnDisk: 'room-name-x0-y0-z0.png',  // Pre-generated image filename in assets/images/
+  images: {}                               // Cached generated image blob keys by aspect ratio
+}
+```
+
+**imageOnDisk** - Optional property referencing a pre-generated room image stored in `assets/images/`. When set at bootstrap time, the room will use this static image instead of generating one via AI. The filename should follow the pattern: `{room-name}-x{x}-y{y}-z{z}.png`.
+
+**images** - Runtime cache of dynamically generated image blob keys, keyed by aspect ratio (e.g., `'16:9'`, `'9:16'`). Populated when `room.image()` is called. See [globals.md](../reference/globals.md) for image generation API.
+
 #### Sittable Furniture
 ```javascript
 {
@@ -431,6 +443,25 @@ const room = await $recycler.create($room, {
   outdoor: false
 });
 ```
+
+### Room with Pre-Generated Image
+
+```javascript
+const room = await $recycler.create($room, {
+  name: 'Coffee Shop',
+  description: 'A cozy coffee shop with the aroma of fresh brew.',
+  x: 5,
+  y: 0,
+  z: 0,
+  imageOnDisk: 'coffee-shop-x5-y0-z0.png',  // Use pre-generated image from assets/images/
+  population: 15,
+  ambientNoise: 20,
+  lighting: 80,
+  outdoor: false
+});
+```
+
+**Note:** The `imageOnDisk` property is typically set in bootstrap files for rooms that have pre-generated images. Images are stored in `assets/images/` and can be generated in bulk using `bun scripts/generate-room-images.ts`.
 
 ### Adding Exits
 
