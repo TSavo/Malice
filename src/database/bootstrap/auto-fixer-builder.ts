@@ -198,14 +198,14 @@ export class AutoFixerBuilder implements Builder {
         return { success: false, error: 'Issue ID required' };
       }
 
-      // Increment attempt counter
-      self.attemptedThisHour = (self.attemptedThisHour || 0) + 1;
-
       // Get the full issue details
       const issue = await $issues.get(issueId);
       if (!issue) {
         return { success: false, error: 'Issue not found' };
       }
+
+      // Increment attempt counter (only for valid issues)
+      self.attemptedThisHour = (self.attemptedThisHour || 0) + 1;
 
       console.log('[AutoFixer] Loading issue #' + issueId + ': ' + issue.title);
 
@@ -215,8 +215,8 @@ export class AutoFixerBuilder implements Builder {
         try {
           const relatedObj = await $load(issue.relatedObject);
           if (relatedObj) {
-            contextInfo = '\\n\\nRelated Object #' + relatedObj.id + ' (' + relatedObj.name + '):\\n';
-            contextInfo += '- Parent: ' + (relatedObj.parent?.name || 'unknown') + '\\n';
+            contextInfo = '\\n\\nRelated Object #' + relatedObj.id + ' (' + (relatedObj.name || 'unnamed') + '):\\n';
+            contextInfo += '- Parent: ' + (relatedObj.parent?.name || 'none') + '\\n';
             contextInfo += '- Description: ' + (relatedObj.description || 'none') + '\\n';
           }
         } catch (e) {
@@ -229,7 +229,7 @@ export class AutoFixerBuilder implements Builder {
       if (issue.comments && issue.comments.length > 0) {
         commentsInfo = '\\n\\nPrevious Comments:\\n';
         for (const c of issue.comments.slice(-5)) { // Last 5 comments
-          commentsInfo += '- ' + c.author + ': ' + c.text.substring(0, 200) + '\\n';
+          commentsInfo += '- ' + c.author + ': ' + (c.text || '').substring(0, 200) + '\\n';
         }
       }
 
@@ -252,7 +252,12 @@ Please analyze this issue and attempt to fix it if possible. If you cannot fix i
       // Get the auto-fixer prompt
       const systemPrompt = $aiPrompts.autoFixer;
       if (!systemPrompt) {
+        console.error('[AutoFixer] System prompt not available, skipping issue #' + issueId);
         await $issues.comment(issueId, 'Auto-fixer attempted but system prompt not loaded.', 'AutoFixer');
+        // Set cooldown to prevent repeated attempts and comment spam
+        const lastAttempts = { ...(self.lastAttempts || {}) };
+        lastAttempts[issueId] = new Date().toISOString();
+        self.lastAttempts = lastAttempts;
         return { success: false, error: 'System prompt not available' };
       }
 

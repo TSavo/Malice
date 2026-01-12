@@ -577,7 +577,7 @@ describe('$autoFixer - Auto-Fixer System', () => {
       // Mock successful fix response
       const originalAiQuery = $.aiQuery;
       $.aiQuery = vi.fn().mockResolvedValue({
-        response: 'Analysis complete. Status:** Fixed. The issue has been successfully fixed.'
+        response: 'Analysis complete. return { fixed: true, summary: "The issue has been successfully fixed." }'
       });
 
       try {
@@ -603,7 +603,7 @@ describe('$autoFixer - Auto-Fixer System', () => {
       // Mock needs review response
       const originalAiQuery = $.aiQuery;
       $.aiQuery = vi.fn().mockResolvedValue({
-        response: 'Analysis: This issue needs human review due to security concerns.'
+        response: 'Analysis: This issue needs human review due to security concerns. return { fixed: false, needsReview: true, reviewReason: "Security concerns require human review" }'
       });
 
       try {
@@ -633,7 +633,7 @@ describe('$autoFixer - Auto-Fixer System', () => {
       try {
         const result = await $autoFixer.attemptFix(issue.id);
 
-        expect(result.success).toBe(true); // Method succeeds even if AI fails
+        expect(result.success).toBe(false); // success is false when AI query fails
         expect(result.aiError).toBeTruthy();
         expect(result.aiError).toContain('AI service unavailable');
       } finally {
