@@ -180,7 +180,7 @@ export class AiImageGenBuilder implements Builder {
           base64Data = Buffer.from(imageBuffer).toString('base64');
         }
 
-        // Store in $blob (compression happens in midjourney-api via oxipng when download: true)
+        // Store in $blob (image is already oxipng-compressed by midjourney-api when download: true)
         const blob = $blob;
         if (!blob) {
           return { success: false, error: '$blob not available' };
@@ -299,7 +299,7 @@ export class AiImageGenBuilder implements Builder {
       if (options.tile) mjOptions.tile = options.tile;
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 min timeout
+      const timeoutId = setTimeout(() => controller.abort(), 600000); // 10 min timeout for MJ (generation can take 2-4min + queue time)
 
       try {
         // Call Midjourney API /generate endpoint
