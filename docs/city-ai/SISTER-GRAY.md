@@ -160,17 +160,17 @@ Elena was raised to take over. Her father — known simply as Gray — built the
 
 She learned at his side. Strategy. Negotiation. When to show mercy and when to demonstrate consequences. She was being groomed for succession, expected to inherit an empire.
 
-There was no backup plan. In this world, death is permanent. If anything happened to him, she would have to step up. If anything happened to her, the succession would be uncertain. Every day was a gamble. Every operation could end the dynasty.
+She was also his backup. The clone tanks ensured continuity. If anything happened to him, he'd wake up and continue. If anything happened to her, same. Death was an inconvenience, not an ending.
 
 ### The Pioneer Square Flush (2100)
 
 Pluribus came with CorpSec, unlimited capital, and automated systems the Cartel couldn't match. The war lasted five years. The Cartel lost ground steadily, but Gray held the coalition together. They were losing, but they were still fighting.
 
-Then came the flush. A coordinated assault on Cartel positions across Pioneer Square. Gray was killed in the fighting — caught in crossfire while trying to reach an extraction point. One unlucky moment. That's all it took.
+Then came the flush. A coordinated assault on Cartel positions across Pioneer Square. Gray was killed in the fighting.
 
-**Death is permanent.** There are no second chances. No resurrection. No backups. Everything her father was — his knowledge, his contacts, his vision — gone in an instant. The empire he'd spent twenty-five years building, orphaned by a stray bullet.
+It should have been a setback, not a collapse. The clone tank would bring him back. A few days of chaos, then continuity.
 
-She had always known this was possible. Every leader in the Cartel knew. But knowing something and living it are different things.
+The tank never activated. Pluribus had sabotaged it — corrupted the genetic template, destroyed the backup data. Gray didn't wake up. He was gone. Murdered twice.
 
 ### The Collapse
 
@@ -218,11 +218,23 @@ Holding is the only play.
 
 ### What She Wants From It
 
-Not just leverage. *Power.*
+Not just leverage. *Access.*
 
-If she could find a way to use the Mask, or control someone who could, she'd have access to everything Pluribus has. Infrastructure. Capital. CorpSec. The ability to actually *rebuild*, not just survive in tunnels.
+Pluribus has clone tanks. Pluribus offers resurrection to citizens. The technology that could have saved her father — that *should* have been hers — is being handed out as a perk of compliance.
 
-The Mask is the key to the surface. The key to taking back what they lost.
+If she could find a way to use the Mask, or control someone who could, she'd have access to everything Pluribus has. Not just power — continuity. Backup. The thing that was stolen.
+
+---
+
+## The Clone Tank
+
+The Cartel's tank is back online now. It was sabotaged during the war, down for years. They finally got it working again.
+
+But the old data is gone. Her father's template was corrupted beyond recovery. The thousands of loyalists who died during the flush — their backups were lost too.
+
+The tank can make new backups. Her sixty people can be preserved going forward. But everyone they lost is gone forever.
+
+Every time she looks at that tank, she sees what Pluribus took from her.
 
 ---
 
@@ -238,19 +250,18 @@ The Mask is the key to the surface. The key to taking back what they lost.
 ### Actual Goals (What She Thinks About at 3am)
 
 - **Survival.** Sixty people isn't enough. The numbers don't work. She needs more resources, more recruits, more time.
-- **Access.** Infrastructure. The surface. The things Pluribus has that she can't get any other way.
-- **Revenge.** Not spoken, barely acknowledged, but real. Pluribus killed her father. Someone should answer for that.
-- **Legacy.** Her father built something for twenty-five years. She refuses to let it die in the tunnels.
+- **Access.** Clone tanks. Infrastructure. The things Pluribus has that she can't get any other way.
+- **Revenge.** Not spoken, barely acknowledged, but real. Pluribus murdered her father twice. Someone should answer for that.
 - **Rest.** She's been in crisis mode for nine years. She's exhausted. She'll never admit it.
 
 ### The Negotiation That Can't Happen
 
 What would she accept to give up the Mask?
 
+- Clone tank access for her people
 - Territory — real surface presence, not just tunnels
 - Amnesty — hostile flags removed, citizenship (or at least neutrality) for her loyalists
-- Resources — food, medicine, equipment, the things you can't scavenge in ruins
-- Acknowledgment — Pluribus admitting what it did during the war
+- Pluribus's "confession" — acknowledgment of what they did to her father
 
 What does Pluribus want?
 
@@ -274,7 +285,7 @@ Someone clean. Not flagged hostile. No Cartel history that shows. Someone she co
 
 They wear the Mask. They become CEO. They answer to her.
 
-Suddenly she has access to everything. Infrastructure. CorpSec. The surface. Not through negotiation — through *capture*.
+Suddenly she has access to everything. Clone tanks. Infrastructure. The surface. Not through negotiation — through *capture*.
 
 The problem: finding someone like that. Someone capable enough to survive the role, loyal enough to share power, clean enough to pass whatever vetting Pluribus still has.
 
@@ -349,7 +360,7 @@ Complicated.
 
 She keeps it close. Has studied it extensively. Knows more about it than anyone in the Cartel.
 
-She resents it. The Mask represents everything Pluribus has that she can't access. It sits there, refusing her, mocking the life she should have had.
+She resents it. The Mask represents everything Pluribus has that she can't access. It sits there, refusing her, just like the clone tanks that could have saved her father.
 
 She's also fascinated by it. The technology. The design. The implications. Sometimes she catches herself just looking at it.
 

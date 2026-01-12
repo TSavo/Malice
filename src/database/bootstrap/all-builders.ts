@@ -45,7 +45,8 @@ import './prototypes/magazine-builder';
 import './prototypes/one-time-locker-builder';
 import './prototypes/phone-db-builder';
 import './prototypes/telescope-builder';
-// Clone system removed - permadeath is real
+import './prototypes/clone-recording-studio-builder';
+import './prototypes/clone-tank-builder';
 import './prototypes/rentable-lock-builder';
 import './prototypes/totem-pole-builder';
 import './prototypes/sealed-box-builder';
@@ -345,8 +346,6 @@ import './notes-builder';
 import './combat-builder';
 import './greeter-builder';
 import './news-builder';
-import './docs-builder';
-import './issues-builder';
 
 // AI systems (ai depends on aiPrompts)
 import './ai-prompts-builder';

@@ -300,7 +300,7 @@ And then they win big. Not because the game let them win, but because they *earn
 
 This is the hard truth:
 
-- Some players will die. Permanently. Death is real in this world.
+- Some players will die. Permanently. Clone tank access isn't free.
 - Some players will give up. The grind is real and not everyone wants it.
 - Some players will plateau. Find a comfortable niche — citizen with a job, Cartel runner with steady work — and stop pushing.
 - Some players will betray at the wrong moment and get made into examples.
@@ -399,7 +399,7 @@ The game doesn't end. It just keeps going.
 
 **Pluribus will never "win."** It will never achieve stable utopia. Something will always go wrong. The Cartel will always find a crack. The infrastructure will always decay. The CEO will always eventually fail, betray, or die. The best Pluribus can hope for is to keep running, keep adapting, keep the city alive for one more day.
 
-**Sister Gray will never "win."** She'll never restore the Cartel to its former glory. She'll never destroy Pluribus completely. Every victory will be partial, temporary, costly. And when she dies — and she will die, death is permanent — the Cartel must continue without her. The best she can hope for is to keep fighting, keep surviving, keep the family together for one more day.
+**Sister Gray will never "win."** She'll never restore the Cartel to its former glory. She'll never destroy Pluribus completely. Every victory will be partial, temporary, costly. And when she dies — and she will die — her clone wakes up and keeps grinding. The best she can hope for is to keep fighting, keep surviving, keep the family together for one more day.
 
 **Players will never "win."** Whoever wears the Mask will eventually be replaced. Whoever leads a faction will eventually fall. The third faction they build will face the same pressures, make the same compromises, become the thing they were fighting against. The best they can hope for is to matter for a while, to shape things while they can, to leave a mark before they're gone.
 
@@ -421,13 +421,13 @@ The gods will take unimaginable risks. They'll set up unbelievably dangerous sit
 
 ### Things Can Actually Happen
 
-Sister Gray might actually die next week. Death is permanent — there's no coming back. That's a story. The Cartel without its leader. The power vacuum. The lieutenants scrambling for control. The Mask sitting in a dead woman's vault. Everything she built, suddenly orphaned.
+Sister Gray might actually die next week. Her clone wakes up with her last backup — missing whatever happened since then. That's a story. The gap in her memory. The things she doesn't know. The people who might have betrayed her in the interim. The Cartel scrambling while their leader is confused and weeks out of date.
 
 Pluribus might actually lose the Datacenter. Some player faction might seize it, install their own AI, change the rules. That's a story. Now there's a third god in the game, just as compromised, just as desperate, making all the same mistakes in new ways.
 
 A player might actually become something neither side anticipated. Build a third faction. Negotiate a truce. Burn everything down. Create something genuinely new. That's a story. And the world adapts, incorporates it, keeps going.
 
-The factory might actually get sabotaged. CorpSec might actually catch Sister Gray. The Mask might actually be destroyed. Key leaders might die — permanently, with no coming back.
+The factory might actually get sabotaged. CorpSec might actually catch Sister Gray. The Mask might actually be destroyed. The clone tanks might actually fail.
 
 **Anything can happen.** The only rule is: what happens is canon. The world keeps going from there.
 
@@ -539,7 +539,7 @@ And whoever wears the Mask becomes the most powerful person in Seattle.
 
 Pluribus thinks it can control the CEO. It can't. The Mask gives the wearer final authority. Pluribus can advise, can manipulate, can make things easier or harder — but it can't override the human in the chair. That's the whole point of the design. Human judgment in the loop. If Pluribus could override the CEO, there'd be no point having one.
 
-Sister Gray thinks she can control her operative. She can't. The moment someone puts on the Mask, they have access to everything Pluribus has. Infrastructure. Capital. CorpSec. Why would they need her anymore? What leverage does she have over the most powerful person in the city?
+Sister Gray thinks she can control her operative. She can't. The moment someone puts on the Mask, they have access to everything Pluribus has. Infrastructure. Capital. CorpSec. Clone tanks. Why would they need her anymore? What leverage does she have over the most powerful person in the city?
 
 Both sides are trying to create a puppet. Neither understands that they're creating a **player**.
 
@@ -556,7 +556,7 @@ After the Mask, a player is the game.
 - **Full sensory integration with Pluribus.** See what it sees. Know what it knows. Data overlays, threat assessments, citizen records, system status — all of it.
 - **Control authority.** Your decisions become Pluribus's actions. You direct CorpSec. You allocate resources. You open and close doors across the city.
 - **Biometric reading.** The Mask shows you what people are feeling. Fear, deception, hostility — you see through them.
-- **Full system access.** Every door, every camera, every resource in the Continuum network. You are the key to the city.
+- **Continuity access.** Clone tanks. You can authorize backups for yourself and others. You control who gets resurrection.
 
 ### What The Mask Costs
 
@@ -633,7 +633,7 @@ Short of these, Pluribus will play along. It will push back, manipulate, obstruc
 
 ## Sister Gray's Gambit
 
-If Sister Gray finds a clean operative and gets them into the Mask, she expects loyalty. She expects them to share access. She expects to finally get what Pluribus denied her — infrastructure, the surface, real power.
+If Sister Gray finds a clean operative and gets them into the Mask, she expects loyalty. She expects them to share access. She expects to finally get what Pluribus denied her — clone tanks, infrastructure, the surface.
 
 But what happens when her operative puts on the Mask?
 
@@ -659,7 +659,7 @@ Why would they share?
 
 ### The Likely Outcomes
 
-1. **Loyal operative.** They share access. Sister Gray gets her territory, her resources, her revenge. Genuine partnership. (Rare. She doesn't inspire loyalty.)
+1. **Loyal operative.** They share access. Sister Gray gets her clone tanks, her territory, her revenge. Genuine partnership. (Rare. She doesn't inspire loyalty.)
 
 2. **Pragmatic operative.** They share *some* access. Keep Sister Gray useful but contained. Use the Cartel as a tool. Gradually diminish her influence as they consolidate power. (Most likely if the operative is smart.)
 

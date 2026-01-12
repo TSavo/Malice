@@ -1288,8 +1288,8 @@ A passage continues downward, narrow and steep, descending toward depths that th
       ]
     },
 
-    '%ML': {
-      name: 'Medical Lab',
+    '%CL': {
+      name: 'Clone Lab',
       description: `The chamber hums with the sound of maintained systems, the white noise of processes that continue whether or not anyone observes them. The walls show the infrastructure of biological work—climate control more precise than elsewhere, power conduits that suggest significant draw, ventilation designed for sterility rather than mere comfort.
 
 The construction is professional, clinical, the surfaces finished to standards that exceed the utilitarian passages. The room was built for work that requires cleanliness, precision, conditions that approximate the medical rather than the industrial. The investment suggests value, importance, necessity.
@@ -1300,7 +1300,7 @@ The lighting is bright but diffuse, designed to eliminate shadows without creati
       x: -16,
       y: 1,
       z: -5,
-      imageOnDisk: 'medical-lab-x-16-y1-z-5.png',
+      imageOnDisk: 'clone-lab-x-16-y1-z-5.png',
       population: 0,
       ambientNoise: 25,
       lighting: 45,
