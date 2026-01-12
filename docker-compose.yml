@@ -78,7 +78,7 @@ services:
   # ============================================================
 
   midjourney-api:
-    image: ghcr.io/erictik/midjourney-api:latest
+    build: ./midjourney-api
     container_name: malice-midjourney-api
     restart: unless-stopped
     # No ports exposed - only accessible within Docker network

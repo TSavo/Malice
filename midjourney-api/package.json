@@ -1,0 +1,65 @@
+{
+  "name": "midjourney",
+  "version": "4.0.0",
+  "description": "Node.js client for the unofficial MidJourney API.",
+  "main": "libs/index.js",
+  "types": "libs/index.d.ts",
+  "source": "./src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "start": "node libs/server.js",
+    "dev": "tsx src/server.ts",
+    "prettier": "prettier --write .",
+    "prettier:check": "prettier --check .",
+    "example:imagine": "tsx ./examples/imagine-ws.ts"
+  },
+  "files": [
+    "libs/*",
+    "src/*",
+    "*.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/erictik/midjourney-client.git"
+  },
+  "keywords": [
+    "midjourney-client",
+    "midjourney"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "author": "Eric Yang <yanghao@10d.xin>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/erictik/midjourney-client/issues"
+  },
+  "homepage": "https://github.com/erictik/midjourney-client#readme",
+  "devDependencies": {
+    "@types/async": "^3.2.20",
+    "@types/express": "^5.0.6",
+    "@types/node": "^18.16.0",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
+    "@types/ws": "^8.5.4",
+    "prettier": "^2.8.8",
+    "ts-node": "^10.9.1",
+    "tsx": "^3.12.6",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "@huggingface/inference": "^2.5.0",
+    "async": "^3.2.4",
+    "dotenv": "^16.0.3",
+    "express": "^5.2.1",
+    "isomorphic-ws": "^5.0.0",
+    "semiver": "^1.1.0",
+    "snowyflake": "^2.0.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "tslib": "^2.5.0",
+    "ws": "^8.13.0",
+    "oxipng-bin": "^1.0.0"
+  }
+}
