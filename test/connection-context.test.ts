@@ -809,4 +809,138 @@ describe('ConnectionContext', () => {
       expect(name).toBe('Conan');
     });
   });
+
+  describe('window manager messages (wm channel)', () => {
+    it('should call handler onWmMessage when wm message received from multiplexed transport', async () => {
+      // Import MultiplexedTransport for testing
+      const { MultiplexedTransport } = await import(
+        '../src/transport/multiplexed/multiplexed-transport.js'
+      );
+      const { EventEmitter } = await import('events');
+
+      // Create mock WebSocket
+      const mockWs = new EventEmitter() as any;
+      mockWs.readyState = 1; // OPEN
+      mockWs.send = vi.fn();
+      mockWs.close = vi.fn();
+      mockWs.terminate = vi.fn();
+
+      // Create multiplexed transport
+      const muxTransport = new MultiplexedTransport(mockWs, 'test-wm');
+      const muxConnection = new Connection(muxTransport);
+      const muxContext = new ConnectionContext(muxConnection, manager as any);
+
+      // Create handler with onWmMessage method
+      const handler = new MockRuntimeObject(1);
+      const wmCalls: unknown[] = [];
+
+      handler.setCallHandler(async (method, ...args) => {
+        if (method === 'onWmMessage') {
+          wmCalls.push(args[0]);
+        }
+      });
+
+      muxContext.setHandler(handler);
+
+      // Simulate wm channel message via the transport's wm$ observable
+      const testMessage = { type: 'openWindow', windowId: 'test' };
+      (muxTransport as any).wmSubject.next(testMessage);
+
+      // Wait for async processing
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      // Handler should have received the wm message
+      expect(wmCalls).toHaveLength(1);
+      expect(wmCalls[0]).toEqual(testMessage);
+
+      muxTransport.destroy();
+    });
+
+    it('should not call onWmMessage if handler does not have the method', async () => {
+      const { MultiplexedTransport } = await import(
+        '../src/transport/multiplexed/multiplexed-transport.js'
+      );
+      const { EventEmitter } = await import('events');
+
+      const mockWs = new EventEmitter() as any;
+      mockWs.readyState = 1;
+      mockWs.send = vi.fn();
+      mockWs.close = vi.fn();
+      mockWs.terminate = vi.fn();
+
+      const muxTransport = new MultiplexedTransport(mockWs, 'test-wm-2');
+      const muxConnection = new Connection(muxTransport);
+      const muxContext = new ConnectionContext(muxConnection, manager as any);
+
+      // Create handler WITHOUT onWmMessage method
+      const handler = new MockRuntimeObject(1);
+      const calls: Array<{ method: string; args: unknown[] }> = [];
+
+      handler.setCallHandler(async (method, ...args) => {
+        calls.push({ method, args });
+      });
+
+      // Override hasMethod to return false for onWmMessage
+      handler.hasMethod = (method: string) => method !== 'onWmMessage';
+
+      muxContext.setHandler(handler);
+
+      // Send wm message
+      (muxTransport as any).wmSubject.next({ type: 'test' });
+
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      // Should not have called onWmMessage
+      expect(calls.filter((c) => c.method === 'onWmMessage')).toHaveLength(0);
+
+      muxTransport.destroy();
+    });
+
+    it('should handle errors in onWmMessage gracefully', async () => {
+      const { MultiplexedTransport } = await import(
+        '../src/transport/multiplexed/multiplexed-transport.js'
+      );
+      const { EventEmitter } = await import('events');
+
+      const mockWs = new EventEmitter() as any;
+      mockWs.readyState = 1;
+      mockWs.send = vi.fn();
+      mockWs.close = vi.fn();
+      mockWs.terminate = vi.fn();
+
+      const muxTransport = new MultiplexedTransport(mockWs, 'test-wm-3');
+      const muxConnection = new Connection(muxTransport);
+      const muxContext = new ConnectionContext(muxConnection, manager as any);
+
+      const handler = new MockRuntimeObject(1);
+      handler.setCallHandler(async (method) => {
+        if (method === 'onWmMessage') {
+          throw new Error('Handler error in onWmMessage');
+        }
+      });
+
+      muxContext.setHandler(handler);
+
+      // Send wm message that will trigger error
+      const consoleError = console.error;
+      const errorLogs: unknown[] = [];
+      console.error = (...args: unknown[]) => errorLogs.push(args);
+
+      (muxTransport as any).wmSubject.next({ type: 'test' });
+
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      console.error = consoleError;
+
+      // Should have logged error
+      expect(errorLogs.length).toBeGreaterThan(0);
+      expect(
+        errorLogs.some((log) =>
+          JSON.stringify(log).includes('onWmMessage'),
+        ),
+      ).toBe(true);
+
+      muxTransport.destroy();
+    });
+  });
 });
