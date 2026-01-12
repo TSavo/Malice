@@ -169,36 +169,15 @@ export class AiImageGenBuilder implements Builder {
 
         const imageBuffer = await imageResp.arrayBuffer();
         const mimeType = imageResp.headers.get('content-type') || 'image/png';
+        const base64Data = Buffer.from(imageBuffer).toString('base64');
 
-        // Lossless PNG compression using sharp
-        let compressedBase64;
-        let originalSize = imageBuffer.byteLength;
-        let compressedSize = originalSize;
-        try {
-          const sharp = (await import('sharp')).default;
-          const compressedBuffer = await sharp(Buffer.from(imageBuffer))
-            .png({
-              compressionLevel: 9,  // Max lossless compression
-              effort: 10,           // Max optimization effort
-              palette: false,       // Keep full color (no quantization)
-            })
-            .toBuffer();
-          compressedBase64 = compressedBuffer.toString('base64');
-          compressedSize = compressedBuffer.length;
-        } catch (compressErr) {
-          // If compression fails, fall back to original
-          console.warn('PNG compression failed, using original:', compressErr.message);
-          compressedBase64 = Buffer.from(imageBuffer).toString('base64');
-        }
-
-        // Store in $blob
+        // Store in $blob (compression happens in midjourney-api via oxipng)
         const blob = $blob;
         if (!blob) {
           return { success: false, error: '$blob not available' };
         }
 
         const filename = (options.filename || 'mj_image_' + Date.now()) + '.png';
-        const compressionRatio = originalSize > 0 ? ((originalSize - compressedSize) / originalSize * 100).toFixed(1) : '0';
         const metadata = {
           contentType: mimeType,
           filename: filename,
@@ -207,15 +186,12 @@ export class AiImageGenBuilder implements Builder {
           midjourneyId: data.id,
           midjourneyHash: data.hash,
           generatedAt: new Date().toISOString(),
-          originalSize: originalSize,
-          compressedSize: compressedSize,
-          compressionRatio: compressionRatio + '%',
           ...(options.metadata || {}),
         };
 
         let blobKey;
         try {
-          blobKey = await blob.write(compressedBase64, metadata);
+          blobKey = await blob.write(base64Data, metadata);
         } catch (blobErr) {
           return {
             success: false,
@@ -232,9 +208,6 @@ export class AiImageGenBuilder implements Builder {
           uri: data.uri,
           width: data.width,
           height: data.height,
-          originalSize: originalSize,
-          compressedSize: compressedSize,
-          compressionRatio: compressionRatio + '%',
         };
       } catch (err) {
         clearTimeout(timeoutId);
@@ -363,42 +336,17 @@ export class AiImageGenBuilder implements Builder {
 
         const imageBuffer = await imageResp.arrayBuffer();
         const mimeType = imageResp.headers.get('content-type') || 'image/png';
-
-        // Lossless PNG compression using sharp
-        let compressedBase64;
-        let originalSize = imageBuffer.byteLength;
-        let compressedSize = originalSize;
-        try {
-          const sharp = (await import('sharp')).default;
-          const compressedBuffer = await sharp(Buffer.from(imageBuffer))
-            .png({
-              compressionLevel: 9,  // Max lossless compression
-              effort: 10,           // Max optimization effort
-              palette: false,       // Keep full color (no quantization)
-            })
-            .toBuffer();
-          compressedBase64 = compressedBuffer.toString('base64');
-          compressedSize = compressedBuffer.length;
-        } catch (compressErr) {
-          // If compression fails, fall back to original
-          console.warn('PNG compression failed, using original:', compressErr.message);
-          compressedBase64 = Buffer.from(imageBuffer).toString('base64');
-        }
-
-        const compressionRatio = originalSize > 0 ? ((originalSize - compressedSize) / originalSize * 100).toFixed(1) : '0';
+        const base64Data = Buffer.from(imageBuffer).toString('base64');
 
         return {
           success: true,
-          data: compressedBase64,
+          data: base64Data,
           contentType: mimeType,
           prompt: prompt,
           aspectRatio: aspectRatio,
           uri: data.uri,
           width: data.width,
           height: data.height,
-          originalSize: originalSize,
-          compressedSize: compressedSize,
-          compressionRatio: compressionRatio + '%',
         };
       } catch (err) {
         clearTimeout(timeoutId);
