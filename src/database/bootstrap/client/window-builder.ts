@@ -434,12 +434,16 @@ export class Window {
           if (h.dirs.right) newW = Math.max(200, origW + dx);
           if (h.dirs.bottom) newH = Math.max(100, origH + dy);
           if (h.dirs.left) {
-            newW = Math.max(200, origW - dx);
-            if (newW !== origW - dx + 200) newX = origX + (origW - newW);
+            const requestedW = origW - dx;
+            newW = Math.max(200, requestedW);
+            // Adjust X position by the difference between original and new width
+            newX = origX + (origW - newW);
           }
           if (h.dirs.top) {
-            newH = Math.max(100, origH - dy);
-            if (newH !== origH - dy + 100) newY = origY + (origH - newH);
+            const requestedH = origH - dy;
+            newH = Math.max(100, requestedH);
+            // Adjust Y position by the difference between original and new height
+            newY = origY + (origH - newH);
           }
 
           this.x = newX;
