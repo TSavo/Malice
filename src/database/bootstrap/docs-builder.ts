@@ -464,7 +464,7 @@ export class DocsBuilder implements Builder {
       doc.content = newContent;
 
       // Re-extract title from new content
-      const titleMatch = newContent.match(/^#\\\\s+(.+)$/m);
+      const titleMatch = newContent.match(/^#\\\\\\\\s+(.+)$/m);
       if (titleMatch) {
         doc.title = titleMatch[1].trim();
       } else {
@@ -500,6 +500,14 @@ export class DocsBuilder implements Builder {
         return { success: false, error: 'Content must be a string' };
       }
 
+      // Validate path format
+      if (!docPath.trim()) {
+        return { success: false, error: 'Path cannot be empty or whitespace' };
+      }
+      if (docPath.startsWith('/') || docPath.endsWith('/') || docPath.includes('//')) {
+        return { success: false, error: 'Path must not have leading/trailing slashes or consecutive slashes' };
+      }
+
       const registry = self.registry || {};
 
       // Check if doc already exists
@@ -513,7 +521,7 @@ export class DocsBuilder implements Builder {
       const category = parts[0] || 'root';
 
       // Extract title from content
-      const titleMatch = content.match(/^#\\\\s+(.+)$/m);
+      const titleMatch = content.match(/^#\\\\\\\\s+(.+)$/m);
       const title = options.title || (titleMatch ? titleMatch[1].trim() : name);
 
       // Create the document object
@@ -531,9 +539,11 @@ export class DocsBuilder implements Builder {
         },
       });
 
-      // Update registry
-      registry[docPath] = doc.id;
-      self.registry = registry;
+      // Update registry (NOTE: race condition possible with concurrent create/delete/rename)
+      // Re-read registry to minimize risk of overwriting concurrent changes
+      const currentRegistry = self.registry || {};
+      currentRegistry[docPath] = doc.id;
+      self.registry = currentRegistry;
 
       // Update folders if new category
       const folders = self.folders || [];
@@ -575,9 +585,11 @@ export class DocsBuilder implements Builder {
         await $recycler.recycle(doc);
       }
 
-      // Remove from registry
-      delete registry[docPath];
-      self.registry = registry;
+      // Remove from registry (NOTE: race condition possible with concurrent create/delete/rename)
+      // Re-read registry to minimize risk of overwriting concurrent changes
+      const currentRegistry = self.registry || {};
+      delete currentRegistry[docPath];
+      self.registry = currentRegistry;
 
       return {
         success: true,
@@ -596,6 +608,14 @@ export class DocsBuilder implements Builder {
 
       if (!oldPath || !newPath) {
         return { success: false, error: 'Both oldPath and newPath are required' };
+      }
+
+      // Validate newPath format
+      if (!newPath.trim()) {
+        return { success: false, error: 'New path cannot be empty or whitespace' };
+      }
+      if (newPath.startsWith('/') || newPath.endsWith('/') || newPath.includes('//')) {
+        return { success: false, error: 'New path must not have leading/trailing slashes or consecutive slashes' };
       }
 
       const registry = self.registry || {};
@@ -626,10 +646,12 @@ export class DocsBuilder implements Builder {
       doc.source = 'in-game';
       doc.editedAt = new Date().toISOString();
 
-      // Update registry
-      delete registry[oldPath];
-      registry[newPath] = docId;
-      self.registry = registry;
+      // Update registry (NOTE: race condition possible with concurrent create/delete/rename)
+      // Re-read registry to minimize risk of overwriting concurrent changes
+      const currentRegistry = self.registry || {};
+      delete currentRegistry[oldPath];
+      currentRegistry[newPath] = docId;
+      self.registry = currentRegistry;
 
       // Update folders if new category
       const folders = self.folders || [];
