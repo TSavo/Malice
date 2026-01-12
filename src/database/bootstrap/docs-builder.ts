@@ -100,6 +100,22 @@ export class DocsBuilder implements Builder {
       'filename',
       'Original filename with extension',
     );
+    this.doc.setPropertyDescription(
+      'source',
+      'Where doc came from: "disk" (imported) or "in-game" (created/edited)',
+    );
+    this.doc.setPropertyDescription(
+      'importedAt',
+      'ISO timestamp when doc was first imported from disk',
+    );
+    this.doc.setPropertyDescription(
+      'createdAt',
+      'ISO timestamp when doc was created in-game',
+    );
+    this.doc.setPropertyDescription(
+      'editedAt',
+      'ISO timestamp of last in-game edit',
+    );
 
     // format() - Return formatted content for display
     this.doc.setMethod(
@@ -403,15 +419,307 @@ export class DocsBuilder implements Builder {
     `,
     );
 
-    // reload() - Reload documents from disk (admin only)
+    // reload() - Note about reloading from disk
     this.docs.setMethod(
       'reload',
       `
-      // This is a placeholder - actual reload requires TypeScript execution
-      // The bootstrap process handles loading; this notes when it was done
+      // Documents are now editable in-game. Reloading from disk would overwrite edits.
+      // To force-import a specific doc from disk, use syncFromDisk(path).
       return {
         success: false,
-        error: 'Reload requires server restart or bootstrap:apply',
+        error: 'Documents are stored in MOO and editable in-game. Use set() to edit, create() to add new docs, or syncFromDisk(path) to re-import from disk.',
+        loadedAt: self.loadedAt,
+        docCount: Object.keys(self.registry || {}).length,
+      };
+    `,
+    );
+
+    // set(path, content) - Update a document's content
+    this.docs.setMethod(
+      'set',
+      `
+      const docPath = args[0];
+      const newContent = args[1];
+
+      if (!docPath) {
+        return { success: false, error: 'Path is required' };
+      }
+      if (typeof newContent !== 'string') {
+        return { success: false, error: 'Content must be a string' };
+      }
+
+      const registry = self.registry || {};
+      const docId = registry[docPath];
+
+      if (!docId) {
+        return { success: false, error: 'Document not found: ' + docPath };
+      }
+
+      const doc = await $load(docId);
+      if (!doc) {
+        return { success: false, error: 'Document object not found: ' + docId };
+      }
+
+      // Update content
+      doc.content = newContent;
+
+      // Re-extract title from new content
+      const titleMatch = newContent.match(/^#\\\\s+(.+)$/m);
+      if (titleMatch) {
+        doc.title = titleMatch[1].trim();
+      }
+      // Note: If no heading found, leave title unchanged (don't overwrite with name)
+
+      // Track edit
+      doc.source = 'in-game';
+      doc.editedAt = new Date().toISOString();
+
+      return {
+        success: true,
+        path: docPath,
+        title: doc.title,
+        contentLength: newContent.length,
+      };
+    `,
+    );
+
+    // create(path, content, options?) - Create a new document
+    this.docs.setMethod(
+      'create',
+      `
+      const docPath = args[0];
+      const content = args[1];
+      const options = args[2] || {};
+
+      if (!docPath) {
+        return { success: false, error: 'Path is required' };
+      }
+      if (typeof content !== 'string') {
+        return { success: false, error: 'Content must be a string' };
+      }
+
+      // Validate path format
+      if (!docPath.trim()) {
+        return { success: false, error: 'Path cannot be empty or whitespace' };
+      }
+      if (docPath.startsWith('/') || docPath.endsWith('/') || docPath.includes('//')) {
+        return { success: false, error: 'Path must not have leading/trailing slashes or consecutive slashes' };
+      }
+
+      const registry = self.registry || {};
+
+      // Check if doc already exists
+      if (registry[docPath]) {
+        return { success: false, error: 'Document already exists: ' + docPath + '. Use set() to update.' };
+      }
+
+      // Parse path to get name, category
+      const parts = docPath.split('/');
+      const name = parts[parts.length - 1];
+      if (!name || !name.trim()) {
+        return { success: false, error: 'Invalid path: document name cannot be empty' };
+      }
+      const category = parts[0] || 'root';
+
+      // Extract title from content
+      const titleMatch = content.match(/^#\\\\s+(.+)$/m);
+      const title = options.title || (titleMatch ? titleMatch[1].trim() : name);
+
+      // Create the document object
+      const doc = await $create({
+        parent: $doc,
+        properties: {
+          name,
+          path: docPath,
+          category,
+          content,
+          title,
+          filename: name + '.md',
+          source: 'in-game',
+          createdAt: new Date().toISOString(),
+        },
+      });
+
+      // Update registry (NOTE: race condition possible with concurrent create/delete/rename)
+      // Re-read registry to minimize risk of overwriting concurrent changes
+      const currentRegistry = self.registry || {};
+      currentRegistry[docPath] = doc.id;
+      self.registry = currentRegistry;
+
+      // Update folders if new category
+      const folders = self.folders || [];
+      if (!folders.includes(category)) {
+        folders.push(category);
+        folders.sort();
+        self.folders = folders;
+      }
+
+      return {
+        success: true,
+        id: doc.id,
+        path: docPath,
+        title,
+      };
+    `,
+    );
+
+    // delete(path) - Delete a document
+    this.docs.setMethod(
+      'delete',
+      `
+      const docPath = args[0];
+
+      if (!docPath) {
+        return { success: false, error: 'Path is required' };
+      }
+
+      const registry = self.registry || {};
+      const docId = registry[docPath];
+
+      if (!docId) {
+        return { success: false, error: 'Document not found: ' + docPath };
+      }
+
+      const doc = await $load(docId);
+      if (doc) {
+        // Recycle the document object
+        await $recycler.recycle(doc);
+      }
+
+      // Remove from registry (NOTE: race condition possible with concurrent create/delete/rename)
+      // Re-read registry to minimize risk of overwriting concurrent changes
+      const currentRegistry = self.registry || {};
+      delete currentRegistry[docPath];
+      self.registry = currentRegistry;
+
+      return {
+        success: true,
+        path: docPath,
+        deletedId: docId,
+      };
+    `,
+    );
+
+    // rename(oldPath, newPath) - Rename/move a document
+    this.docs.setMethod(
+      'rename',
+      `
+      const oldPath = args[0];
+      const newPath = args[1];
+
+      if (!oldPath || !newPath) {
+        return { success: false, error: 'Both oldPath and newPath are required' };
+      }
+
+      // Validate newPath format
+      if (!newPath.trim()) {
+        return { success: false, error: 'New path cannot be empty or whitespace' };
+      }
+      if (newPath.startsWith('/') || newPath.endsWith('/') || newPath.includes('//')) {
+        return { success: false, error: 'New path must not have leading/trailing slashes or consecutive slashes' };
+      }
+
+      const registry = self.registry || {};
+
+      if (!registry[oldPath]) {
+        return { success: false, error: 'Document not found: ' + oldPath };
+      }
+      if (registry[newPath]) {
+        return { success: false, error: 'Document already exists at: ' + newPath };
+      }
+
+      const docId = registry[oldPath];
+      const doc = await $load(docId);
+
+      if (!doc) {
+        return { success: false, error: 'Document object not found' };
+      }
+
+      // Update document properties
+      const parts = newPath.split('/');
+      const name = parts[parts.length - 1];
+      const category = parts[0] || 'root';
+
+      doc.name = name;
+      doc.path = newPath;
+      doc.category = category;
+      doc.filename = name + '.md';
+      doc.source = 'in-game';
+      doc.editedAt = new Date().toISOString();
+
+      // Update registry (NOTE: race condition possible with concurrent create/delete/rename)
+      // Re-read registry to minimize risk of overwriting concurrent changes
+      const currentRegistry = self.registry || {};
+      delete currentRegistry[oldPath];
+      currentRegistry[newPath] = docId;
+      self.registry = currentRegistry;
+
+      // Update folders if new category
+      const folders = self.folders || [];
+      if (!folders.includes(category)) {
+        folders.push(category);
+        folders.sort();
+        self.folders = folders;
+      }
+
+      return {
+        success: true,
+        oldPath,
+        newPath,
+        id: docId,
+      };
+    `,
+    );
+
+    // syncFromDisk(path) - Re-import a specific doc from disk (overwrites in-game version)
+    this.docs.setMethod(
+      'syncFromDisk',
+      `
+      // This is a placeholder - actual disk access requires TypeScript
+      // Use bootstrap:apply to re-import all docs, or manually update via set()
+      return {
+        success: false,
+        error: 'Disk access not available from MOO code. To re-import docs from disk, delete the doc first, then run bootstrap:apply.',
+      };
+    `,
+    );
+
+    // stats() - Get documentation statistics
+    this.docs.setMethod(
+      'stats',
+      `
+      const registry = self.registry || {};
+      const folders = self.folders || [];
+      const paths = Object.keys(registry);
+
+      const byCategory = {};
+      let totalLength = 0;
+      let inGameCount = 0;
+      let diskCount = 0;
+
+      for (const docPath of paths) {
+        const doc = await $load(registry[docPath]);
+        if (!doc) continue;
+
+        const cat = doc.category || 'root';
+        byCategory[cat] = (byCategory[cat] || 0) + 1;
+        totalLength += (doc.content || '').length;
+
+        if (doc.source === 'in-game') {
+          inGameCount++;
+        } else {
+          diskCount++;
+        }
+      }
+
+      return {
+        total: paths.length,
+        categories: folders.length,
+        byCategory,
+        totalContentLength: totalLength,
+        averageLength: paths.length > 0 ? Math.round(totalLength / paths.length) : 0,
+        inGameCreated: inGameCount,
+        importedFromDisk: diskCount,
         loadedAt: self.loadedAt,
       };
     `,
@@ -427,9 +735,12 @@ export class DocsBuilder implements Builder {
       return;
     }
 
-    const registry: Record<string, number> = {};
+    const registry: Record<string, number> =
+      (this.docs.get('registry') as Record<string, number>) || {};
     const folders = new Set<string>();
     const loadedPaths = new Set<string>();
+    let created = 0;
+    let skipped = 0;
 
     // Recursively find all markdown files
     const loadDir = async (dir: string, relativePath: string = '') => {
@@ -464,6 +775,19 @@ export class DocsBuilder implements Builder {
           const docPath = relativePath ? `${relativePath}/${name}` : name;
           const category = relativePath.split('/')[0] || 'root';
 
+          // Check if doc already exists - if so, SKIP (preserve in-game edits)
+          const existingId = registry[docPath];
+          if (existingId) {
+            const existingDoc = await this.manager.load(existingId);
+            if (existingDoc) {
+              // Doc exists, preserve it (don't overwrite in-game edits)
+              loadedPaths.add(docPath);
+              this.docObjects.push(existingDoc);
+              skipped++;
+              continue;
+            }
+          }
+
           // Check file size before reading (10MB limit)
           const stats = fs.statSync(fullPath);
           if (stats.size > 10 * 1024 * 1024) {
@@ -473,72 +797,66 @@ export class DocsBuilder implements Builder {
             continue;
           }
 
-          // Read content
+          // Read content from disk (only for NEW docs)
           const content = fs.readFileSync(fullPath, 'utf-8');
 
           // Extract title from first # heading
           const titleMatch = content.match(/^#\s+(.+)$/m);
           const title = titleMatch ? titleMatch[1].trim() : name;
 
-          // Check if doc already exists by path
-          const existingId = (
-            this.docs!.get('registry') as Record<string, number>
-          )?.[docPath];
-          let docObj: RuntimeObject | null = null;
-
-          if (existingId) {
-            docObj = await this.manager.load(existingId);
-          }
-
-          if (!docObj) {
-            // Create new document object
-            docObj = await this.manager.create({
-              parent: this.doc!,
-              properties: {
-                name,
-                path: docPath,
-                category,
-                content,
-                title,
-                filename,
-              },
-              methods: {},
-            });
-          } else {
-            // Update existing doc (sync all fields in case file was moved/renamed)
-            docObj.set('name', name);
-            docObj.set('path', docPath);
-            docObj.set('category', category);
-            docObj.set('content', content);
-            docObj.set('title', title);
-            docObj.set('filename', filename);
-          }
+          // Create new document object
+          const docObj = await this.manager.create({
+            parent: this.doc!,
+            properties: {
+              name,
+              path: docPath,
+              category,
+              content,
+              title,
+              filename,
+              // Track source for debugging
+              source: 'disk',
+              importedAt: new Date().toISOString(),
+            },
+            methods: {},
+          });
 
           registry[docPath] = docObj.id as number;
           loadedPaths.add(docPath);
           this.docObjects.push(docObj);
+          created++;
         }
       }
     };
 
     await loadDir(docsDir);
 
-    // Clean up stale entries (documents that were deleted from disk)
+    // Update folder list (merge with existing in case docs were created in-game)
+    const existingFolders = (this.docs.get('folders') as string[]) || [];
+    for (const f of existingFolders) {
+      folders.add(f);
+    }
+
+    // Preserve in-game created docs that don't have disk files
+    // The registry already contains all existing docs (line 711-712)
+    // We've only updated entries for docs we processed from disk (via loadedPaths)
+    // Any docs NOT in loadedPaths but in the old registry are in-game-only and must be preserved
     const oldRegistry =
       (this.docs.get('registry') as Record<string, number>) || {};
-    for (const oldPath of Object.keys(oldRegistry)) {
-      if (!loadedPaths.has(oldPath)) {
-        console.log(`[DocsBuilder] Removed stale entry: ${oldPath}`);
+    for (const [path, docId] of Object.entries(oldRegistry)) {
+      if (!loadedPaths.has(path)) {
+        // This doc was created in-game and has no disk file - preserve it
+        registry[path] = docId;
       }
     }
 
-    // Update manager registry
+    // Update manager registry and folders
     this.docs.set('registry', registry);
     this.docs.set('folders', Array.from(folders).sort());
     this.docs.set('loadedAt', new Date().toISOString());
 
     console.log(
-      `[DocsBuilder] Loaded ${Object.keys(registry).length} documents from ${folders.size} folders`,
+      `[DocsBuilder] ${created} new docs imported, ${skipped} existing docs preserved (${Object.keys(registry).length} total)`,
     );
   }
 

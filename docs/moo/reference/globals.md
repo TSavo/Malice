@@ -752,9 +752,33 @@ const id = await $[0].getAlias('myUtil');
 
 ### $docs - Documentation System
 
-Browse and search documentation loaded from `docs/` at startup.
+Manage documentation stored as editable MOO objects. Documents are initially imported from `docs/` at first startup, then stored permanently in MongoDB. All edits are made in-game.
 
 ```javascript
+// EDITING (primary use)
+// Update an existing document
+await $docs.set('moo/utilities/docs', `# Updated Title
+
+New content here...
+`);
+
+// Create a new document
+await $docs.create('guides/my-new-guide', `# My Guide
+
+Guide content...
+`);
+
+// Delete a document
+await $docs.delete('guides/outdated-guide');
+
+// Rename/move a document
+await $docs.rename('guides/old-name', 'guides/new-name');
+
+// Get statistics
+const stats = await $docs.stats();
+// { total: 85, inGameCreated: 5, importedFromDisk: 80, ... }
+
+// READING
 // List all documents
 const allDocs = await $docs.list();
 
@@ -781,7 +805,9 @@ const categories = await $docs.getCategories();
 // ['city-ai', 'greeter', 'guides', 'moo', ...]
 ```
 
-**Document properties:** `name`, `path`, `category`, `title`, `content`, `filename`
+**Document properties:** `name`, `path`, `category`, `title`, `content`, `filename`, `source`, `editedAt`
+
+**Re-importing from disk:** Bootstrap preserves existing docs. To re-import: `await $docs.delete(path)` then run `bootstrap:apply`.
 
 See [$docs utility documentation](../utilities/docs.md) for full API reference.
 

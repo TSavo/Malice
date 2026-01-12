@@ -946,7 +946,33 @@ const description = await $autoFixer.describe();
 
 ## Documentation System ($docs)
 
-The `$docs` singleton loads all markdown documentation from `docs/` into MOO objects at startup. Each document becomes a queryable object with content, path, and category.
+The `$docs` singleton manages documentation as **editable MOO objects**. Documents are initially imported from `docs/` at first startup, then stored permanently in MongoDB. All subsequent edits are made in-game.
+
+### Editing Documentation (Primary Use)
+
+```typescript
+// Update an existing document
+await $docs.set('moo/utilities/docs', `# Updated Title
+
+New content here...
+`);
+
+// Create a new document
+await $docs.create('guides/my-new-guide', `# My Guide
+
+Guide content...
+`);
+
+// Delete a document
+await $docs.delete('guides/outdated-guide');
+
+// Rename/move a document
+await $docs.rename('guides/old-name', 'guides/new-name');
+
+// Get statistics
+const stats = await $docs.stats();
+// { total: 85, inGameCreated: 5, importedFromDisk: 80, ... }
+```
 
 ### Browsing Documentation
 
@@ -995,6 +1021,17 @@ Each `$doc` object has:
 - `title` - Extracted from first `#` heading
 - `content` - Full markdown content
 - `filename` - Original filename with extension
+- `source` - Origin: `"disk"` (imported) or `"in-game"` (created/edited)
+- `editedAt` - ISO timestamp of last in-game edit
+
+### Re-importing from Disk
+
+Bootstrap preserves existing docs. To re-import from disk:
+```typescript
+// Delete the in-game version first
+await $docs.delete('guides/BUILDERS-GUIDE');
+// Then run: npm run bootstrap:apply
+```
 
 ## Issue Tracker ($issues)
 

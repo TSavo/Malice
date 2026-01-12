@@ -1,42 +1,182 @@
 # $docs - Documentation System
 
-Use `$docs` to browse, search, and query documentation loaded from `docs/` at startup.
+Use `$docs` to browse, search, create, and edit documentation stored as MOO objects.
 
 ## Purpose
 
-The `$docs` singleton loads all markdown documentation from the `docs/` directory into MOO objects. Each document becomes a queryable `$doc` object with content, path, and category metadata.
+The `$docs` singleton manages documentation as editable MOO objects. Documents are initially imported from the `docs/` directory at first startup, then stored permanently in the MOO database. **All edits are made in-game** - the disk files are only used for initial import.
 
-## Why Use This?
+## Key Concept: In-Game Editing
 
-**Bad: Hardcoded documentation paths**
+Documents live in the MOO database, not on disk. This means:
+- **Edits persist** - changes are saved to MongoDB immediately
+- **No file access needed** - edit docs via MOO code or MCP
+- **Bootstrap preserves edits** - existing docs are never overwritten
+- **Create new docs anytime** - no need to touch the filesystem
+
+## Quick Start
+
 ```javascript
-// Reading docs manually
-const fs = require('fs');
-const content = fs.readFileSync('docs/moo/prototypes/agents.md');
-// No search, no structure, no runtime access
-```
+// Edit an existing document
+await $docs.set('moo/utilities/docs', '# New Content\n\nUpdated documentation...');
 
-**Good: Queryable documentation**
-```javascript
-// Search all docs
+// Create a new document
+await $docs.create('guides/my-guide', '# My Guide\n\nGuide content here...');
+
+// Search and browse
 const results = await $docs.search('bootstrap');
-
-// Browse by category
-const mooTree = await $docs.tree('moo');
-
-// Get specific doc
-const agentDoc = await $docs.get('agents');
+const guide = await $docs.get('BUILDERS-GUIDE');
 ```
 
 ## What $docs Handles
 
-- ✅ Loading all markdown files from `docs/` at startup
-- ✅ Organizing by folder/category
+- ✅ **Editing** documents in-game via `set()`
+- ✅ **Creating** new documents via `create()`
+- ✅ **Deleting** and **renaming** documents
 - ✅ Full-text search across all documents
 - ✅ Path-based and name-based retrieval
 - ✅ Category and folder browsing
+- ✅ Automatic persistence to MongoDB
 
 ## API Reference
+
+### Editing API
+
+#### set() - Update Document Content
+
+```javascript
+await $docs.set(path, content)
+```
+
+Updates an existing document's content.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `path` | string | Document path (e.g., "moo/utilities/docs") |
+| `content` | string | New markdown content |
+
+**Returns:** `{ success: true, path, title, contentLength }` or `{ success: false, error }`
+
+**Examples:**
+```javascript
+// Update a document
+const result = await $docs.set('guides/BUILDERS-GUIDE', `# Builders Guide
+
+Updated content here...
+`);
+
+// Check result
+if (result.success) {
+  console.log(`Updated ${result.path}, new length: ${result.contentLength}`);
+}
+```
+
+#### create() - Create New Document
+
+```javascript
+await $docs.create(path, content, options?)
+```
+
+Creates a new document at the specified path.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `path` | string | Document path (e.g., "guides/my-new-guide") |
+| `content` | string | Markdown content |
+| `options.title` | string | Optional title override (otherwise extracted from `# heading`) |
+
+**Returns:** `{ success: true, id, path, title }` or `{ success: false, error }`
+
+**Examples:**
+```javascript
+// Create a new guide
+await $docs.create('guides/quick-start', `# Quick Start Guide
+
+Get started with Malice in 5 minutes.
+
+## Installation
+...
+`);
+
+// Create with explicit title
+await $docs.create('internal/notes', 'Some notes...', {
+  title: 'Developer Notes'
+});
+```
+
+#### delete() - Delete Document
+
+```javascript
+await $docs.delete(path)
+```
+
+Permanently deletes a document.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `path` | string | Document path to delete |
+
+**Returns:** `{ success: true, path, deletedId }` or `{ success: false, error }`
+
+**Examples:**
+```javascript
+// Delete a document
+await $docs.delete('guides/outdated-guide');
+
+// To re-import from disk after deletion, run bootstrap:apply
+```
+
+#### rename() - Rename/Move Document
+
+```javascript
+await $docs.rename(oldPath, newPath)
+```
+
+Moves a document to a new path.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `oldPath` | string | Current document path |
+| `newPath` | string | New document path |
+
+**Returns:** `{ success: true, oldPath, newPath, id }` or `{ success: false, error }`
+
+**Examples:**
+```javascript
+// Rename a document
+await $docs.rename('guides/old-name', 'guides/new-name');
+
+// Move to different category
+await $docs.rename('internal/api-notes', 'reference/api-notes');
+```
+
+#### stats() - Get Statistics
+
+```javascript
+await $docs.stats()
+```
+
+Returns documentation statistics.
+
+**Returns:**
+```javascript
+{
+  total: 85,                    // Total documents
+  categories: 8,                // Number of categories
+  byCategory: {                 // Count per category
+    moo: 25,
+    guides: 10,
+    ...
+  },
+  totalContentLength: 250000,   // Total chars across all docs
+  averageLength: 2941,          // Average doc length
+  inGameCreated: 5,             // Docs created in-game
+  importedFromDisk: 80,         // Docs imported from disk
+  loadedAt: '2025-01-10...'     // Last bootstrap time
+}
+```
+
+### Reading API
 
 ### list() - List Documents
 
@@ -202,17 +342,22 @@ Each document is represented as a `$doc` object with these properties:
 | `title` | string | Title extracted from first `#` heading |
 | `content` | string | Full markdown content |
 | `filename` | string | Original filename with extension |
+| `source` | string | Origin: `"disk"` (imported) or `"in-game"` (created/edited) |
+| `importedAt` | string | ISO timestamp when imported from disk |
+| `createdAt` | string | ISO timestamp when created in-game |
+| `editedAt` | string | ISO timestamp of last in-game edit |
 
 **Example:**
 ```javascript
 const doc = await $docs.getByPath('moo/prototypes/agents');
 
-console.log(doc.name);      // 'agents'
-console.log(doc.path);      // 'moo/prototypes/agents'
-console.log(doc.category);  // 'moo'
-console.log(doc.title);     // 'Agents & NPCs'
-console.log(doc.filename);  // 'agents.md'
-console.log(doc.content);   // '# Agents & NPCs\n\n...'
+console.log(doc.name);       // 'agents'
+console.log(doc.path);       // 'moo/prototypes/agents'
+console.log(doc.category);   // 'moo'
+console.log(doc.title);      // 'Agents & NPCs'
+console.log(doc.content);    // '# Agents & NPCs\n\n...'
+console.log(doc.source);     // 'disk' or 'in-game'
+console.log(doc.editedAt);   // '2025-01-10T12:00:00Z' (if edited)
 ```
 
 ## MCP Resources
@@ -302,22 +447,42 @@ async function buildDocIndex() {
 }
 ```
 
-## How Documents Are Loaded
+## How Documents Work
 
-1. At server startup, `$docs` scans the `docs/` directory recursively
-2. Each `.md` file becomes a `$doc` object
+### Initial Import (First Startup)
+
+1. At first server startup, `$docs` scans the `docs/` directory recursively
+2. Each `.md` file becomes a `$doc` MOO object stored in MongoDB
 3. The first `#` heading is extracted as the `title`
 4. Path structure determines `category` (top-level folder)
 5. Documents are indexed by both `name` and `path`
 
+### Subsequent Startups (Preserves Edits)
+
+1. Bootstrap checks if each doc path already exists in the registry
+2. **Existing docs are SKIPPED** - in-game edits are preserved
+3. Only NEW files (not in registry) are imported from disk
+4. To re-import a doc from disk: delete it first, then run `bootstrap:apply`
+
+### Re-importing from Disk
+
+If you need to reset a doc to its disk version:
+```javascript
+// Delete the in-game version
+await $docs.delete('guides/BUILDERS-GUIDE');
+
+// Then run bootstrap:apply to re-import from docs/guides/BUILDERS-GUIDE.md
+```
+
 ## Tips & Best Practices
 
-1. **Use paths for precision** - `getByPath()` when you know exact location
-2. **Use names for convenience** - `get()` when filename is unique
-3. **Search with categories** - Narrow search scope for better results
-4. **Cache results** - Document content doesn't change during runtime
-5. **Use tree() for navigation** - Show users available documentation
-6. **Check for null** - `get()` and `getByPath()` return `null` if not found
+1. **Edit in-game** - Use `$docs.set()` to update docs, changes persist immediately
+2. **Use paths for precision** - `getByPath()` when you know exact location
+3. **Use names for convenience** - `get()` when filename is unique
+4. **Search with categories** - Narrow search scope for better results
+5. **Check for null** - `get()` and `getByPath()` return `null` if not found
+6. **Track changes** - Check `doc.editedAt` to see when a doc was last modified
+7. **Create new categories** - Just use a new path prefix like `await $docs.create('newcat/doc', '...')`
 
 ## Document Organization
 
