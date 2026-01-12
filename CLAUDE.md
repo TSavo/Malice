@@ -263,7 +263,7 @@ Each faction gets its own isolated network infrastructure. Ports are calculated 
 Factions are created dynamically via `$factionManager.create()` - see Faction System below.
 
 **AI Services:**
-- **3020** - Midjourney API server (Discord bot proxy, exposed for debugging/direct access)
+- **Midjourney API** - Discord bot proxy (internal only, accessed via Docker network at midjourney-api:3000)
 
 ### Midjourney API Server
 
