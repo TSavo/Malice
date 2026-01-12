@@ -27,7 +27,7 @@ jobs:
       pull-requests: write
       issues: read
       id-token: write
-      actions: read
+      actions: write
 
     steps:
       - name: Get PR details for workflow_dispatch
@@ -142,3 +142,13 @@ jobs:
             Use `gh pr comment ${{ steps.pr-number.outputs.number }} --body "YOUR_REVIEW"` to post.
 
           claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(gh api:*)"'
+
+      - name: Trigger LGTM verdict workflow
+        if: steps.check-iterations.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🔄 Triggering LGTM verdict workflow for PR #${{ steps.pr-number.outputs.number }}"
+          gh workflow run claude-lgtm.yml \
+            --repo ${{ github.repository }} \
+            --field pr_number=${{ steps.pr-number.outputs.number }}

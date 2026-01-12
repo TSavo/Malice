@@ -1,9 +1,7 @@
 name: Claude LGTM Verdict
 
 on:
-  pull_request:
-    types: [opened, synchronize]
-  # Allow fixer to re-trigger verdict after pushing fixes
+  # Only triggered by other workflows (code review, fixer)
   workflow_dispatch:
     inputs:
       pr_number:
@@ -13,14 +11,11 @@ on:
 
 # Prevent multiple verdict checks from running simultaneously
 concurrency:
-  group: claude-lgtm-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+  group: claude-lgtm-${{ github.event.inputs.pr_number }}
   cancel-in-progress: false
 
 jobs:
   claude-lgtm:
-    # Skip if PR title indicates it was already fixed (only for pull_request events)
-    if: github.event_name == 'workflow_dispatch' || !contains(github.event.pull_request.title, '[claude-fixed]')
-
     runs-on: [self-hosted, malice]
     permissions:
       contents: read
@@ -30,26 +25,14 @@ jobs:
       actions: read
 
     steps:
-      - name: Get PR details for workflow_dispatch
-        id: pr-info
-        if: github.event_name == 'workflow_dispatch'
+      - name: Get PR details
+        id: pr-number
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR_DATA=$(gh pr view ${{ github.event.inputs.pr_number }} --repo ${{ github.repository }} --json headRefName)
           echo "branch=$(echo $PR_DATA | jq -r '.headRefName')" >> $GITHUB_OUTPUT
-          echo "pr_number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
-
-      - name: Set PR number
-        id: pr-number
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
-            echo "branch=${{ steps.pr-info.outputs.branch }}" >> $GITHUB_OUTPUT
-          else
-            echo "number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
-            echo "branch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
-          fi
+          echo "number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
 
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -58,33 +41,9 @@ jobs:
           ref: ${{ steps.pr-number.outputs.branch }}
           lfs: false
 
-      - name: Wait for Claude Code Review to complete
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Wait for other reviewers to complete
         run: |
-          echo "⏳ Waiting for Claude Code Review workflow to complete..."
-          PR_NUMBER=${{ steps.pr-number.outputs.number }}
-
-          # Wait up to 15 minutes for the review workflow to complete
-          for i in {1..30}; do
-            # Check if there's a CLAUDE_REVIEW_MARKER comment from the current commit
-            CURRENT_SHA=$(gh pr view $PR_NUMBER --json headRefOid --jq '.headRefOid')
-
-            # Look for review marker in recent comments
-            REVIEW_FOUND=$(gh pr view $PR_NUMBER --json comments \
-              --jq '[.comments[] | select(.body | contains("<!-- CLAUDE_REVIEW_MARKER -->"))] | length')
-
-            if [ "$REVIEW_FOUND" -gt 0 ]; then
-              echo "✅ Claude Code Review has posted (found $REVIEW_FOUND review comment(s))"
-              break
-            fi
-
-            echo "  Waiting... (attempt $i/30)"
-            sleep 30
-          done
-
-          echo ""
-          echo "⏳ Now waiting 6 minutes for other review bots to complete..."
+          echo "⏳ Waiting 6 minutes for other review bots to complete..."
           sleep 360
           echo "✅ Proceeding with verdict"
 
