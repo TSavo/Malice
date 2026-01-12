@@ -5,6 +5,7 @@ import { getGameLogger } from '../database/game-logger';
 import type { ObjectManager } from '../database/object-manager';
 import { MultiplexedTransport } from '../transport/multiplexed/multiplexed-transport';
 import type { IChannelMux } from '../transport/multiplexed/types';
+import { takeUntil } from 'rxjs';
 
 /**
  * Connection context - bridges transport layer with object system
@@ -30,21 +31,25 @@ export class ConnectionContext {
       );
     }
 
-    // Forward input to current handler
-    this.connection.input$.subscribe((data) => {
-      if (this.currentHandler) {
-        this.handleInput(data);
-      }
-    });
-
-    // Forward wm channel messages to handler if multiplexed
-    const transport = this.connection.transport;
-    if (transport instanceof MultiplexedTransport) {
-      transport.wm$.subscribe((msg) => {
+    // Forward input to current handler (cleaned up on disconnect)
+    this.connection.input$
+      .pipe(takeUntil(this.connection.transport.closed$))
+      .subscribe((data) => {
         if (this.currentHandler) {
-          this.handleWmMessage(msg);
+          this.handleInput(data);
         }
       });
+
+    // Forward wm channel messages to handler if multiplexed (cleaned up on disconnect)
+    const transport = this.connection.transport;
+    if (transport instanceof MultiplexedTransport) {
+      transport.wm$
+        .pipe(takeUntil(transport.closed$))
+        .subscribe((msg) => {
+          if (this.currentHandler) {
+            this.handleWmMessage(msg);
+          }
+        });
     }
 
     // Log disconnect when closed
