@@ -2153,7 +2153,8 @@
         "room",
         "railway"
       ],
-      "description": "The hub room stands as an echo of 1889, a testament to its brick and iron foundations that have weathered the ravages of time. Brick arches stretch high above, water stains tracing paths like memories down their worn faces. Hexagonal floor tiles, many cracked or missing, litter the ground underfoot. The air carries a musty scent, the remnants of countless years trapped within these walls. A distant clank echoes through the depths below street level, the phantom sound of ancient machinery reverberating off worn walls.\n\nTo the west lies a damaged hub room, cobblestones jutting from the floor in jagged fragments. In the distance, a charred chimney base looms silent and imposing. The air is heavy with the scent of damp earth and decaying mortar, while echoes of whispers whisper stories only time can tell.\n\nTo the east lies the railway, its ancient iron tracks preserved in all their glory. To the north and below, more railways stretch out, their silence broken by occasional clanks that resonate like phantom trains. The depths beckon through a weathered doorway that leads to a room shrouded in darkness, echoing the grim reality of a world long past its prime."
+      "description": "The hub room stands as an echo of 1889, a testament to its brick and iron foundations that have weathered the ravages of time. Brick arches stretch high above, water stains tracing paths like memories down their worn faces. Hexagonal floor tiles, many cracked or missing, litter the ground underfoot. The air carries a musty scent, the remnants of countless years trapped within these walls. A distant clank echoes through the depths below street level, the phantom sound of ancient machinery reverberating off worn walls.\n\nTo the west lies a damaged hub room, cobblestones jutting from the floor in jagged fragments. In the distance, a charred chimney base looms silent and imposing. The air is heavy with the scent of damp earth and decaying mortar, while echoes of whispers whisper stories only time can tell.\n\nTo the east lies the railway, its ancient iron tracks preserved in all their glory. To the north and below, more railways stretch out, their silence broken by occasional clanks that resonate like phantom trains. The depths beckon through a weathered doorway that leads to a room shrouded in darkness, echoing the grim reality of a world long past its prime.",
+      "imageOnDisk": "r95-x-11-y-3-z-2.png"
     },
     {
       "id": "r96",
@@ -2188,7 +2189,8 @@
         "room",
         "railway"
       ],
-      "description": "Concrete pillars, weathered by time, tower high above. Rust-streaked iron railings crisscross the cavernous space, their shadows dancing on the damp stone floor. A dead gauge cluster looms over an open sump pit, its dial still pointing to mystery destinations never reached. The air hums with a distant echo of clattering wheels long silenced, while the scent of wet earth and rusted steel lingers in the cold, dank atmosphere. In the distance, water drips into the dark abyss below, a melancholic soundtrack to this forgotten railway hub buried beneath Seattle's 1889 streets."
+      "description": "Concrete pillars, weathered by time, tower high above. Rust-streaked iron railings crisscross the cavernous space, their shadows dancing on the damp stone floor. A dead gauge cluster looms over an open sump pit, its dial still pointing to mystery destinations never reached. The air hums with a distant echo of clattering wheels long silenced, while the scent of wet earth and rusted steel lingers in the cold, dank atmosphere. In the distance, water drips into the dark abyss below, a melancholic soundtrack to this forgotten railway hub buried beneath Seattle's 1889 streets.",
+      "imageOnDisk": "r96-x-15-y-3-z-3.png"
     },
     {
       "id": "r97",
