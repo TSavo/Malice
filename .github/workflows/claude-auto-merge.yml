@@ -8,11 +8,11 @@ jobs:
   claude-merge:
     # Only run if:
     # 1. Comment is on a PR
-    # 2. Comment has the review marker
+    # 2. Comment has the verdict marker (from claude-lgtm.yml)
     # 3. Comment contains LGTM (approved)
     if: |
       github.event.issue.pull_request &&
-      contains(github.event.comment.body, '<!-- CLAUDE_REVIEW_MARKER -->') &&
+      contains(github.event.comment.body, '<!-- CLAUDE_VERDICT_MARKER -->') &&
       contains(github.event.comment.body, 'LGTM')
 
     runs-on: [self-hosted, malice]
