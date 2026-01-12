@@ -11,7 +11,7 @@
  */
 
 import { existsSync, readFileSync } from 'node:fs';
-import { readdir, readFile } from 'node:fs/promises';
+import { access, readdir, readFile } from 'node:fs/promises';
 import {
   createServer,
   type IncomingMessage,
@@ -1181,17 +1181,32 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const name = match[1];
           const docsDir = join(process.cwd(), 'docs');
 
-          // Support both direct filename and paths (e.g., city-ai/combat)
+          // Support both paths (e.g., guides/builders-guide) and filename search
           let filePath: string;
           if (name.includes('/')) {
-            // Path like city-ai/combat -> docs/city-ai/COMBAT.md
+            // Path like guides/builders-guide -> docs/guides/BUILDERS-GUIDE.md
             const parts = name.split('/');
             const fileName = `${parts[parts.length - 1].toUpperCase()}.md`;
             const dirPath = parts.slice(0, -1).join('/');
             filePath = join(docsDir, dirPath, fileName);
           } else {
-            // Direct filename like builders-guide -> docs/BUILDERS-GUIDE.md
-            filePath = join(docsDir, `${name.toUpperCase()}.md`);
+            // No path - search in all subdirectories for the filename
+            const searchDirs = ['guides', 'reference', 'lore', 'internal', 'moo', 'city-ai', 'greeter', 'prompts'];
+            const fileName = `${name.toUpperCase()}.md`;
+            let found = false;
+            filePath = join(docsDir, fileName); // Default to root (won't exist but provides error context)
+
+            for (const dir of searchDirs) {
+              const candidatePath = join(docsDir, dir, fileName);
+              try {
+                await access(candidatePath);
+                filePath = candidatePath;
+                found = true;
+                break;
+              } catch {
+                // File doesn't exist in this directory, continue searching
+              }
+            }
           }
 
           const content = await readFile(filePath, 'utf-8');

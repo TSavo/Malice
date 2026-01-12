@@ -171,12 +171,12 @@ World Knowledge (moo://city-ai/*):
 - moo://city-ai/tools      - Available MCP tools reference
 
 Technical Reference (moo://docs/*):
-- moo://docs/mcp-tools     - Complete MCP tools and resources reference
-- moo://docs/plot-jobs     - Plot/job system detailed documentation
-- moo://docs/builders-guide - Creating objects and prototypes
-- moo://docs/moo-programming - MOO programming reference
-- moo://docs/npc-agent     - NPC agent documentation
-- moo://docs/timeline      - World timeline/history
+- moo://docs/reference/mcp-tools     - Complete MCP tools and resources reference
+- moo://docs/reference/plot-jobs     - Plot/job system detailed documentation
+- moo://docs/guides/builders-guide   - Creating objects and prototypes
+- moo://docs/reference/moo-programming - MOO programming reference
+- moo://docs/internal/npc-agent      - NPC agent documentation
+- moo://docs/lore/timeline           - World timeline/history
 
 Greeter/Onboarding Docs (moo://docs/greeter/*):
 - moo://docs/greeter/00-overview        - Two paths overview, pacing, how to detect path

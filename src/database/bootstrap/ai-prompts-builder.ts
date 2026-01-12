@@ -8,10 +8,11 @@ import { type Builder, registerBuilder } from './builder-registry';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DOCS_DIR = join(__dirname, '../../../docs');
 const PROMPTS_DIR = join(DOCS_DIR, 'prompts');
+const INTERNAL_DIR = join(DOCS_DIR, 'internal');
 
 /** Prompt file definitions: property name -> filename */
 const PROMPT_FILES: Record<string, string> = {
-  narrator: 'NARRATOR-PROMPT.md', // In docs/ root
+  narrator: 'NARRATOR-PROMPT.md', // In docs/internal/
   pluribus: 'PLURIBUS.md',
   sisterGray: 'SISTER-GRAY.md',
   tailor: 'TAILOR.md',
@@ -46,8 +47,8 @@ export class AiPromptsBuilder implements Builder {
   private loadPrompt(name: string, filename: string): string {
     const fallback = `# ${name} Prompt\n\nFailed to load from disk.`;
     try {
-      // narrator is in docs/, others are in docs/prompts/
-      const dir = name === 'narrator' ? DOCS_DIR : PROMPTS_DIR;
+      // narrator is in docs/internal/, others are in docs/prompts/
+      const dir = name === 'narrator' ? INTERNAL_DIR : PROMPTS_DIR;
       const content = readFileSync(join(dir, filename), 'utf-8');
       console.log(
         `[AiPromptsBuilder] Loaded ${filename} (${content.length} chars)`,

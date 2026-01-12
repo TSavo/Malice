@@ -97,7 +97,7 @@ Before writing methods, **READ** the appropriate documentation using `ReadMcpRes
 | **Always** | Anti-Patterns | `moo://docs/moo/reference/anti-patterns` |
 | Writing methods | Globals Reference | `moo://docs/moo/reference/globals` |
 | Writing methods | Common Patterns | `moo://docs/moo/reference/patterns` |
-| MCP tools reference | MCP Tools | `moo://docs/mcp-tools` |
+| MCP tools reference | MCP Tools | `moo://docs/reference/mcp-tools` |
 
 ### Prototype-Specific Reads
 

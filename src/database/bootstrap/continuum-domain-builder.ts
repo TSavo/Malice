@@ -406,7 +406,7 @@ export class ContinuumDomainBuilder implements Builder {
       const meta = args[0] || {};
       const fs = await import('fs');
 
-      const filePath = './docs/WHAT-IS-MALICE.md';
+      const filePath = './docs/lore/WHAT-IS-MALICE.md';
 
       try {
         if (!fs.existsSync(filePath)) {
@@ -477,25 +477,57 @@ export class ContinuumDomainBuilder implements Builder {
       const fs = await import('fs');
       const path = await import('path');
 
-      // Map URL to file path (case-insensitive)
+      // Map URL to file path (case-insensitive, search all subfolders)
       let filePath = '';
       if (!docName || docName === '') {
-        filePath = './docs/WHAT-IS-MALICE.md';
+        filePath = './docs/lore/WHAT-IS-MALICE.md';
       } else {
-        // Try exact match first, then uppercase
+        // Try exact match first (docName may include subdirectory like "guides/BUILDERS-GUIDE")
         const baseName = docName.endsWith('.md') ? docName : docName + '.md';
         const exactPath = './docs/' + baseName;
-        const upperPath = './docs/' + baseName.toUpperCase();
-        
+
         if (fs.existsSync(exactPath)) {
           filePath = exactPath;
-        } else if (fs.existsSync(upperPath)) {
-          filePath = upperPath;
         } else {
-          // Try to find case-insensitively
-          const docsDir = fs.readdirSync('./docs');
-          const match = docsDir.find(f => f.toLowerCase() === baseName.toLowerCase());
-          filePath = match ? './docs/' + match : exactPath;
+          // Try uppercase filename but preserve directory case
+          const pathParts = baseName.split('/');
+          if (pathParts.length > 1) {
+            // Has subdirectory - preserve dir case, uppercase filename
+            const dirs = pathParts.slice(0, -1).join('/');
+            const file = pathParts[pathParts.length - 1].toUpperCase();
+            const upperPath = './docs/' + dirs + '/' + file;
+            if (fs.existsSync(upperPath)) {
+              filePath = upperPath;
+            }
+          } else {
+            // No subdirectory - uppercase the whole thing
+            const upperPath = './docs/' + baseName.toUpperCase();
+            if (fs.existsSync(upperPath)) {
+              filePath = upperPath;
+            }
+          }
+
+          if (!filePath) {
+            // Search in all subdirectories for the filename
+            const fileName = baseName.split('/').pop();
+            const searchDirs = ['guides', 'reference', 'lore', 'internal', 'moo', 'city-ai', 'greeter', 'prompts'];
+            let found = false;
+            for (const dir of searchDirs) {
+              const dirPath = './docs/' + dir;
+              if (fs.existsSync(dirPath)) {
+                const files = fs.readdirSync(dirPath);
+                const match = files.find(f => f.toLowerCase() === fileName.toLowerCase());
+                if (match) {
+                  filePath = dirPath + '/' + match;
+                  found = true;
+                  break;
+                }
+              }
+            }
+            if (!found) {
+              filePath = exactPath;
+            }
+          }
         }
       }
 

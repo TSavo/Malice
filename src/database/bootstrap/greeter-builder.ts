@@ -189,7 +189,7 @@ CLEANUP: despawnGreeter(greeterId) removes a greeter NPC.`,
 
 FIRST: EXPLORE THE SYSTEM
 Before spawning, understand what's available:
-1. Read moo://docs/builders-guide for how the world works
+1. Read moo://docs/guides/builders-guide for how the world works
 2. Call $immigrationServices.describeForAI() to see the starting location
 3. Check $ai.describeForAI() to see spawn/do/remember methods
 4. Check $greeter.describeForAI() for orientation tracking
@@ -290,7 +290,7 @@ CRITICAL RULES:
 
 FIRST: EXPLORE THE SYSTEM
 Before spawning, understand what's available:
-1. Read moo://docs/builders-guide for how the world works
+1. Read moo://docs/guides/builders-guide for how the world works
 2. Call $runnersDen.describeForAI() to see the starting location
 3. Check $ai.describeForAI() to see spawn/do/remember methods
 4. Check $greeter.describeForAI() for orientation tracking

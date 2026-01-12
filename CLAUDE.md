@@ -120,7 +120,7 @@ See `docs/moo/reference/types-vs-objects.md` for full documentation.
 
 ### Abilities-First Architecture
 
-**IMPORTANT**: Malice uses an abilities-first paradigm. See `docs/ABILITIES-FIRST.md` for full details.
+**IMPORTANT**: Malice uses an abilities-first paradigm. See `docs/guides/ABILITIES-FIRST.md` for full details.
 
 **The core idea**: Instead of procedural methods, objects have:
 - **Property descriptions** - explain what each property MEANS
@@ -644,7 +644,7 @@ Two MCP servers are configured in `.mcp.json`:
 # Start SSH tunnel (maps prod:3010 → local:4010)
 ssh -L 4010:localhost:3010 -i ~/.ssh/malice-do root@malice.world
 
-# Or use SSH config (see docs/DEPLOYMENT.md)
+# Or use SSH config (see docs/guides/DEPLOYMENT.md)
 ssh malice-prod
 ```
 
@@ -810,7 +810,7 @@ The MCP server provides moo:// resources for querying game state:
 **Individual MCP tools** (legacy, avoid):
 - `mcp__malice__*` tools are available but not recommended
 - They're just wrappers around MOO code - use the MOO code directly instead
-- See `docs/MCP-TOOLS.md` if you need the tool reference
+- See `docs/reference/MCP-TOOLS.md` if you need the tool reference
 
 ## Scheduler
 
@@ -884,7 +884,7 @@ const mooTree = await $docs.tree('moo');
 
 // Get top-level categories
 const categories = await $docs.getCategories();
-// ['city-ai', 'greeter', 'moo', 'prompts', ...]
+// ['city-ai', 'greeter', 'guides', 'internal', 'lore', 'moo', 'prompts', 'reference']
 ```
 
 ### Searching Documentation

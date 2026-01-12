@@ -376,7 +376,7 @@ The server provides `moo://` resources for querying game state:
 - `moo://docs/{name}` - Documentation files
 - `moo://city-ai/{name}` - City AI documentation
 
-See `docs/MCP-TOOLS.md` for complete reference.
+See `docs/reference/MCP-TOOLS.md` for complete reference.
 
 ## Core Objects
 

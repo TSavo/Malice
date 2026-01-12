@@ -968,7 +968,7 @@ Before your first interview, read these moo:// resources to understand the world
 Essential:
 - moo://city-ai/CONTEXT - The world of 2110 Seattle
 - moo://city-ai/NEURAL-LOG - Your faction, your purpose, what Loggers are
-- moo://docs/TIMELINE - History from The Burning to now
+- moo://docs/lore/TIMELINE - History from The Burning to now
 
 The Factions They'll Infiltrate:
 - moo://city-ai/FACTIONS - Overview of all factions

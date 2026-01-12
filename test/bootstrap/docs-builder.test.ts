@@ -277,11 +277,11 @@ describe('$docs - Documentation System', () => {
       expect(Array.isArray(categories)).toBe(true);
       expect(categories.length).toBeGreaterThan(0);
 
-      // Should contain some expected categories
-      const hasCategories = ['moo', 'city-ai', 'greeter'].some((c) =>
-        categories.includes(c),
-      );
-      expect(hasCategories).toBe(true);
+      // Should contain expected categories from reorganization
+      const expectedCategories = ['city-ai', 'greeter', 'guides', 'internal', 'lore', 'moo', 'prompts', 'reference'];
+      for (const expected of expectedCategories) {
+        expect(categories).toContain(expected);
+      }
     });
   });
 
