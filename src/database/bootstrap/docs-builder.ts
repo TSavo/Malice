@@ -406,11 +406,19 @@ export class DocsBuilder implements Builder {
       return;
     }
 
-    const registry: Record<string, number | string> = {};
+    const registry: Record<string, number> = {};
     const folders = new Set<string>();
+    const loadedPaths = new Set<string>();
 
     // Recursively find all markdown files
     const loadDir = async (dir: string, relativePath: string = '') => {
+      // Validate that dir is within docsDir to prevent path traversal
+      const resolvedDir = path.resolve(dir);
+      const resolvedDocsDir = path.resolve(docsDir);
+      if (!resolvedDir.startsWith(resolvedDocsDir)) {
+        throw new Error('Path traversal attempt detected');
+      }
+
       const entries = fs.readdirSync(dir, { withFileTypes: true });
 
       for (const entry of entries) {
@@ -431,6 +439,13 @@ export class DocsBuilder implements Builder {
           const name = filename.replace(/\.md$/, '');
           const docPath = relativePath ? `${relativePath}/${name}` : name;
           const category = relativePath.split('/')[0] || 'root';
+
+          // Check file size before reading (10MB limit)
+          const stats = fs.statSync(fullPath);
+          if (stats.size > 10 * 1024 * 1024) {
+            console.warn(`[DocsBuilder] Skipping ${fullPath}: file too large (${stats.size} bytes)`);
+            continue;
+          }
 
           // Read content
           const content = fs.readFileSync(fullPath, 'utf-8');
@@ -462,18 +477,31 @@ export class DocsBuilder implements Builder {
               methods: {},
             });
           } else {
-            // Update existing doc
+            // Update existing doc (sync all fields in case file was moved/renamed)
+            docObj.set('name', name);
+            docObj.set('path', docPath);
+            docObj.set('category', category);
             docObj.set('content', content);
             docObj.set('title', title);
+            docObj.set('filename', filename);
           }
 
-          registry[docPath] = docObj.id;
+          registry[docPath] = docObj.id as number;
+          loadedPaths.add(docPath);
           this.docObjects.push(docObj);
         }
       }
     };
 
     await loadDir(docsDir);
+
+    // Clean up stale entries (documents that were deleted from disk)
+    const oldRegistry = (this.docs.get('registry') as Record<string, number>) || {};
+    for (const oldPath of Object.keys(oldRegistry)) {
+      if (!loadedPaths.has(oldPath)) {
+        console.log(`[DocsBuilder] Removed stale entry: ${oldPath}`);
+      }
+    }
 
     // Update manager registry
     this.docs.set('registry', registry);

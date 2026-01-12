@@ -121,7 +121,7 @@ export class IssuesBuilder implements Builder {
         return { success: false, error: 'Invalid priority. Valid: ' + validPriorities.join(', ') };
       }
 
-      const items = self.items || [];
+      const items = [...(self.items || [])]; // Create defensive copy
       const issueId = self.nextId || 1;
       const now = new Date().toISOString();
 
@@ -144,8 +144,8 @@ export class IssuesBuilder implements Builder {
       };
 
       items.push(issue);
-      self.items = items;
       self.nextId = issueId + 1;
+      self.items = items; // Atomic update with new array
 
       return { success: true, id: issueId, issue: issue };
     `,
@@ -235,12 +235,14 @@ export class IssuesBuilder implements Builder {
         return { success: false, error: 'ID required' };
       }
 
-      const items = self.items || [];
-      const issue = items.find(i => i.id === id);
+      const items = [...(self.items || [])]; // Create defensive copy
+      const issueIndex = items.findIndex(i => i.id === id);
 
-      if (!issue) {
+      if (issueIndex === -1) {
         return { success: false, error: 'Issue not found' };
       }
+
+      const issue = { ...items[issueIndex] }; // Copy the issue object
 
       // Validate type if changing
       if (updates.type !== undefined) {
@@ -284,7 +286,8 @@ export class IssuesBuilder implements Builder {
       if (updates.resolution !== undefined) issue.resolution = updates.resolution;
 
       issue.updatedAt = new Date().toISOString();
-      self.items = items;
+      items[issueIndex] = issue; // Replace with updated copy
+      self.items = items; // Atomic update
 
       return { success: true, issue: issue };
     `,
@@ -302,13 +305,14 @@ export class IssuesBuilder implements Builder {
         return { success: false, error: 'ID and text required' };
       }
 
-      const items = self.items || [];
-      const issue = items.find(i => i.id === id);
+      const items = [...(self.items || [])]; // Create defensive copy
+      const issueIndex = items.findIndex(i => i.id === id);
 
-      if (!issue) {
+      if (issueIndex === -1) {
         return { success: false, error: 'Issue not found' };
       }
 
+      const issue = { ...items[issueIndex] }; // Copy the issue object
       if (!issue.comments) issue.comments = [];
 
       const comment = {
@@ -318,9 +322,10 @@ export class IssuesBuilder implements Builder {
         timestamp: new Date().toISOString(),
       };
 
-      issue.comments.push(comment);
+      issue.comments = [...issue.comments, comment]; // Copy comments array
       issue.updatedAt = comment.timestamp;
-      self.items = items;
+      items[issueIndex] = issue; // Replace with updated copy
+      self.items = items; // Atomic update
 
       return { success: true, commentIndex: issue.comments.length - 1 };
     `,
@@ -421,22 +426,26 @@ export class IssuesBuilder implements Builder {
         return { success: false, error: 'ID and tags required' };
       }
 
-      const items = self.items || [];
-      const issue = items.find(i => i.id === id);
+      const items = [...(self.items || [])]; // Create defensive copy
+      const issueIndex = items.findIndex(i => i.id === id);
 
-      if (!issue) {
+      if (issueIndex === -1) {
         return { success: false, error: 'Issue not found' };
       }
 
-      if (!issue.tags) issue.tags = [];
+      const issue = { ...items[issueIndex] }; // Copy the issue object
+      const tags = [...(issue.tags || [])]; // Copy tags array
+
       for (const tag of newTags) {
-        if (!issue.tags.includes(tag)) {
-          issue.tags.push(tag);
+        if (!tags.includes(tag)) {
+          tags.push(tag);
         }
       }
 
+      issue.tags = tags;
       issue.updatedAt = new Date().toISOString();
-      self.items = items;
+      items[issueIndex] = issue; // Replace with updated copy
+      self.items = items; // Atomic update
 
       return { success: true, tags: issue.tags };
     `,
@@ -453,16 +462,18 @@ export class IssuesBuilder implements Builder {
         return { success: false, error: 'ID and tags required' };
       }
 
-      const items = self.items || [];
-      const issue = items.find(i => i.id === id);
+      const items = [...(self.items || [])]; // Create defensive copy
+      const issueIndex = items.findIndex(i => i.id === id);
 
-      if (!issue) {
+      if (issueIndex === -1) {
         return { success: false, error: 'Issue not found' };
       }
 
+      const issue = { ...items[issueIndex] }; // Copy the issue object
       issue.tags = (issue.tags || []).filter(t => !removeTags.includes(t));
       issue.updatedAt = new Date().toISOString();
-      self.items = items;
+      items[issueIndex] = issue; // Replace with updated copy
+      self.items = items; // Atomic update
 
       return { success: true, tags: issue.tags };
     `,
@@ -649,15 +660,16 @@ export class IssuesBuilder implements Builder {
         return { success: false, error: 'ID required' };
       }
 
-      const items = self.items || [];
+      const items = [...(self.items || [])]; // Create defensive copy
       const index = items.findIndex(i => i.id === id);
 
       if (index === -1) {
         return { success: false, error: 'Issue not found' };
       }
 
-      const deleted = items.splice(index, 1)[0];
-      self.items = items;
+      const deleted = items[index];
+      items.splice(index, 1);
+      self.items = items; // Atomic update
 
       return { success: true, deleted: deleted };
     `,
