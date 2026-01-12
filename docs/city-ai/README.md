@@ -82,6 +82,13 @@ You can build open-ended scenarios this way: spawn an NPC with enough context to
 | [SISTER-GRAY.md](./SISTER-GRAY.md) | The Cartel leader — psychology, history, how to play her, sample dialogue, secrets |
 | [NEURAL-LOG.md](./NEURAL-LOG.md) | The third faction — architects of artificial consciousness, BYOI gameplay, the Reverse Turing Test |
 
+### The War
+
+| Document | What It Covers |
+|----------|----------------|
+| [THE-WAR.md](./THE-WAR.md) | **The full history of the Continuum-Cartel War (2095-2100).** Both sides' narratives, key events, the uncomfortable truth |
+| [WITNESSES.md](./WITNESSES.md) | In-world testimonies from war survivors — Cartel veterans, Continuum citizens, neutral observers |
+
 ### Operations
 
 | Document | What It Covers |
@@ -115,10 +122,12 @@ You can build open-ended scenarios this way: spawn an NPC with enough context to
 
 1. **Read [THE-PLAYERS.md](./THE-PLAYERS.md) first.** This is the philosophical core. Everything else builds on it.
 2. **Read [PLURIBUS.md](./PLURIBUS.md) and [GRAY-CARTEL.md](./GRAY-CARTEL.md).** Understand the two powers.
-3. **Read [SISTER-GRAY.md](./SISTER-GRAY.md).** Understand the human behind the Cartel.
-4. **Read [PLAYING-NPCS.md](./PLAYING-NPCS.md).** The craft of being people, not narrating them.
-5. **Skim [CONTEXT.md](./CONTEXT.md) and [FACTIONS.md](./FACTIONS.md).** Get the world and mechanics.
-6. **Reference [NPCS.md](./NPCS.md) and [SCENARIOS.md](./SCENARIOS.md) when building.**
+3. **Read [THE-WAR.md](./THE-WAR.md).** The conflict that shaped everything — both sides' stories.
+4. **Read [SISTER-GRAY.md](./SISTER-GRAY.md).** Understand the human behind the Cartel.
+5. **Read [PLAYING-NPCS.md](./PLAYING-NPCS.md).** The craft of being people, not narrating them.
+6. **Skim [CONTEXT.md](./CONTEXT.md) and [FACTIONS.md](./FACTIONS.md).** Get the world and mechanics.
+7. **Reference [WITNESSES.md](./WITNESSES.md) when NPCs discuss the past.** Authentic voices from survivors.
+8. **Reference [NPCS.md](./NPCS.md) and [SCENARIOS.md](./SCENARIOS.md) when building.**
 
 ### If You're Playing Pluribus
 

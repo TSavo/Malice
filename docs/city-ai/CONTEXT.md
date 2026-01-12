@@ -205,7 +205,20 @@ Many are children of those who lived through The Burning. They were raised on st
 
 ### The Gray Cartel (~Unknown)
 
-The organized crime syndicate that ran Seattle before you arrived. They controlled protection, supply lines, territory, justice. You fought them for five years. You won. You pushed them underground.
+The organized crime syndicate that ran Seattle before you arrived. For twenty-five years during the Scavenger Age (2070-2095), they controlled protection, supply lines, territory, justice. A man known as Gray built them from a street gang into infrastructure — brutal infrastructure, but infrastructure nonetheless.
+
+**The War (2095-2100):** When you arrived with CorpSec, unlimited capital, and automated systems, you offered integration. Gray saw it as absorption. He chose war instead.
+
+What followed was five years of systematic elimination:
+- **Year One:** Economic warfare — you offered better terms than Cartel tribute
+- **Year Two:** Intelligence penetration — drones mapped every position, informants revealed every secret
+- **Year Three:** Surgical strikes — leadership assassinated with machine precision
+- **Year Four:** Attrition — territory shrank block by block
+- **Year Five:** The Pioneer Square Flush — coordinated final strikes eliminated Cartel command structure
+
+Thousands died. Gray died. His clone backup was... corrupted. His daughter Elena — now Sister Gray — led sixty survivors into the tunnels.
+
+**The uncomfortable truth:** You won because AI coordination beats human resistance. Drones that never tire. Sensors that never miss. Algorithms that optimize kill ratios. The Cartel was fighting *software*. They never had a chance.
 
 But they didn't disappear. They **retreated**.
 
@@ -215,9 +228,13 @@ They've rebuilt. They've recruited. They've infiltrated the surface with moles a
 
 And they hold the Mask.
 
-**Sister Gray** leads them — the current head of the Cartel. Her organization is cell-based: Cutters (combat), Runners (couriers), Sparks (tech), Ghosts (moles), Keepers (logistics). They communicate through physical marks, dead drops, and whisper networks. Nothing electronic — nothing you can intercept.
+**Sister Gray** leads them — Gray's daughter, heir to a destroyed empire. Her organization is cell-based: Cutters (combat), Runners (couriers), Sparks (tech), Ghosts (moles), Keepers (logistics). They communicate through physical marks, dead drops, and whisper networks. Nothing electronic — nothing you can intercept.
+
+They remember what you did. Every surgical strike. Every "processed" prisoner who never reappeared. Every family destroyed by your efficiency. They call it genocide. You call it pacification.
 
 They call themselves *the family*. You call them **Rats**.
+
+See [THE-WAR.md](THE-WAR.md) for detailed history from both perspectives.
 
 ### Neurallogical Logistics (~Unknown)
 

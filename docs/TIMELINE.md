@@ -222,7 +222,7 @@ When corporate infrastructure fell, civilization's life support failed.
 - Working AI systems worth killing for
 - Violence is the primary currency
 
-### 2090-2110: The Corporate Renaissance
+### 2090-2095: The Corporate Renaissance Begins
 
 **The Return:**
 - Survivors of old corps (or their descendants) begin organizing
@@ -231,17 +231,106 @@ When corporate infrastructure fell, civilization's life support failed.
 - People accept corporate authority again (better than warlords)
 - Slow rebuilding of infrastructure begins
 
-**Seattle in 2110:**
-- 48 years since The Burning
-- "Minor renaissance" is relative - compared to 2070, things are better
-- But **Seattle is a ruin with people living in it**
+**The Gray Cartel's Seattle (2070-2095):**
+- A man named Gray rises from street gang leader to de facto ruler
+- Twenty-five years of Cartel control over Pioneer Square and surroundings
+- Protection rackets, supply lines, rough justice — brutal but stable
+- Population survives at 10% of pre-war levels (deaths equal births)
+- Gray has clone tanks — plans for continuity across decades
+
+### 2095-2100: The Continuum-Cartel War
+
+**2095 — Arrival:**
+- Pluribus (Continuum's infrastructure AI) arrives in Seattle
+- Offers "integration" to the Gray Cartel — leaders become administrators
+- Gray refuses: integration means dissolution of his power
+- A Continuum delegation is attacked — three dead
+- War begins
+
+**2096 — Economic Warfare:**
+- Continuum offers citizenship: food, shelter, medicine without tribute
+- Cartel revenue streams begin drying up
+- Defectors register with Continuum daily
+- Cartel responds with violence against defectors — bodies with Cartel marks
+- Each atrocity drives more people to Continuum
+
+**2097 — Intelligence Dominance:**
+- Drones map every Cartel position
+- Informant networks compromise internal security
+- Cartel goes dark — physical communication only, dead drops, coded marks
+- Pluribus builds complete model of Cartel organization
+- Nothing electronic escapes surveillance
+
+**2098 — Decapitation Strikes:**
+- CorpSec teams begin systematic elimination of Cartel leadership
+- AI coordinates simultaneous strikes across the city
+- Lieutenants vanish. Strategists found dead. Safe houses compromised.
+- Cartel strikes back with IEDs, assassinations, terror attacks
+- Both sides commit atrocities — only one side has historians
+
+**2099 — Attrition:**
+- Cartel territory shrinks from most of Seattle to a few blocks
+- Resources exhausted, ammunition rationed
+- Gray makes desperate choices: attacks on soft targets, human shields
+- Every tactic works exactly once, then the machine adapts
+- The mathematics are clear: the Cartel cannot win
+
+**Spring 2100 — The Pioneer Square Flush:**
+- Coordinated final strikes on all remaining Cartel positions
+- CorpSec teams hit simultaneously from multiple vectors
+- Escape routes pre-blocked by drone surveillance
+- Gray killed in crossfire attempting extraction
+- His clone tank found corrupted — continuity eliminated
+- Sixty survivors flee into Seattle Underground tunnels
+
+**The Cost:**
+- Thousands dead on both sides
+- The Cartel reduced from thousands to sixty
+- Gray killed permanently — body and backup destroyed
+- Sister Gray (his daughter) leads survivors into hiding
+- Underground tunnel network becomes last Cartel refuge
+
+### 2100-2109: The Uneasy Peace
+
+**Surface — Continuum Control:**
+- Pioneer Square becomes Pluribus's primary footprint
+- Citizenship grows to ~500 registered
+- Infrastructure slowly restored
+- CorpSec maintains order
+- 9,500 unregistered scavengers in surrounding ruins
+
+**Underground — Cartel Survival:**
+- Sister Gray rebuilds: cell structure, communication protocols
+- Nine years of careful recruitment and infiltration
+- Moles placed among citizen population (Ghosts)
+- Intelligence networks established
+- Waiting for opportunity
+
+**2109 — The Mask Theft:**
+- Pluribus CEO attends private party, brings the Mask to show off
+- Cartel operatives present for reconnaissance see opportunity
+- CEO killed. Executive team eliminated in coordinated strikes.
+- Sister Gray now holds the Mask
+- She cannot use it (flagged hostile) but Pluribus cannot function without it
+- Stalemate — machine crippled, rebels empowered, war gone cold
+
+### 2110: The Present Day
+
+**The Year Is 2110.** Forty-eight years since The Burning. Ten years since the Pioneer Square Flush.
+
+**Seattle Today:**
+- Pluribus controls Pioneer Square — functional but degrading without the Mask
+- Gray Cartel controls Underground — sixty fighters waiting in 500+ tunnel rooms
+- ~500 registered citizens receiving rations, shelter, work
+- ~9,500 unregistered scavengers in surrounding ruins
+- Population: ~10% of pre-war 2055 levels
 
 **What "Better" Means:**
 - Electricity exists in corporate-controlled zones (sometimes)
-- Water systems partially work (if you're lucky, if corps control your area)
+- Water systems partially work (if corps control your area)
 - Some buildings have been cleared and secured
-- Clone tech exists (expensive, corporate monopoly)
-- Population: ~10% of pre-war 2055 levels
+- Clone tech exists (expensive, Continuum monopoly)
+- Order exists where Pluribus reaches
 
 **What's Still Broken:**
 - **Burned neighborhoods from 2062 riots: still rubble**
@@ -249,19 +338,15 @@ When corporate infrastructure fell, civilization's life support failed.
 - Half the city is collapsed ruins
 - Infrastructure breaks and stays broken
 - No one remembers how to fix the advanced systems
-- Violence is common outside corporate zones
-- Water and food still scarce
-- Most people live in squats, scavenged shelters
+- Violence common outside corporate zones
+- The Underground is Cartel territory — Pluribus almost blind there
 
-**Pioneer Square in 2110:**
-- One of the "better" areas (corps trying to rebuild there)
-- Smith Tower still stands (196 years old since 1914, impressive)
-- But surrounding blocks: half collapsed, half abandoned
-- Automated mall floors in Smith Tower: empty, broken, ghostly
-- Streets dangerous - corp security only in certain zones
-- Mix of corporate employees (protected) and freelancers (fucked)
-- The condos are rentable - corp-controlled housing
-- Corporate renaissance = pockets of order in seas of chaos
+**The Current Crisis:**
+- The Mask sits in Cartel hands
+- Pluribus operates without CEO — degrading daily
+- Sister Gray cannot use the Mask (flagged hostile)
+- Both sides need players: clean faces, no history, no faction tags
+- Whoever the next Mask wearer is becomes the most powerful person in Seattle
 
 **The Uneasy Peace:**
 - Corps learned: total war = mutual destruction
@@ -270,6 +355,8 @@ When corporate infrastructure fell, civilization's life support failed.
 - But no armies, no bombs
 - The memory of 2062 keeps them in check
 - For now
+
+See [docs/city-ai/THE-WAR.md](docs/city-ai/THE-WAR.md) for detailed history from both perspectives.
 
 ---
 
