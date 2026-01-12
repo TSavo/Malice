@@ -509,4 +509,68 @@ describe('$docs - Editing API', () => {
       expect(desc).toContain('edited');
     });
   });
+
+  describe('Bootstrap Preservation', () => {
+    it('should preserve in-game created docs after bootstrap', async () => {
+      // Create an in-game doc that doesn't exist on disk
+      const testPath = 'test/bootstrap-preservation-test';
+      const testContent = '# Bootstrap Test\n\nThis doc was created in-game.';
+
+      const createResult = await $docs.create(testPath, testContent);
+      expect(createResult.success).toBe(true);
+
+      const createdDocId = createResult.id;
+
+      // Verify doc exists before bootstrap
+      const docBefore = await $docs.getByPath(testPath);
+      expect(docBefore).toBeDefined();
+      expect(docBefore.content).toBe(testContent);
+      expect(docBefore.source).toBe('in-game');
+
+      // Re-run bootstrap (simulating server restart)
+      const bootstrap2 = new GameBootstrap(manager, { _testMode: true });
+      await bootstrap2.bootstrap();
+
+      // Verify doc still exists after bootstrap
+      const docAfter = await $docs.getByPath(testPath);
+      expect(docAfter).toBeDefined();
+      expect(docAfter.id).toBe(createdDocId);
+      expect(docAfter.content).toBe(testContent);
+      expect(docAfter.source).toBe('in-game');
+
+      // Cleanup: delete the test doc
+      await $docs.delete(testPath);
+    });
+
+    it('should preserve in-game edited docs after bootstrap', async () => {
+      // Get a disk-based doc and edit it
+      const allDocs = await $docs.list();
+      const diskDoc = allDocs.find((d: any) => d.source === 'disk');
+      if (!diskDoc) {
+        console.log('No disk docs available, skipping test');
+        return;
+      }
+
+      const originalContent = diskDoc.content;
+      const editedContent =
+        '# Edited Title\n\nThis content was edited in-game.';
+
+      // Edit the doc
+      const setResult = await $docs.set(diskDoc.path, editedContent);
+      expect(setResult.success).toBe(true);
+
+      // Re-run bootstrap
+      const bootstrap2 = new GameBootstrap(manager, { _testMode: true });
+      await bootstrap2.bootstrap();
+
+      // Verify edit was preserved (not overwritten from disk)
+      const docAfter = await $docs.getByPath(diskDoc.path);
+      expect(docAfter).toBeDefined();
+      expect(docAfter.content).toBe(editedContent);
+      expect(docAfter.source).toBe('in-game');
+
+      // Restore original content
+      await $docs.set(diskDoc.path, originalContent);
+    });
+  });
 });

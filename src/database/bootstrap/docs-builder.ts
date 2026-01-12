@@ -464,9 +464,12 @@ export class DocsBuilder implements Builder {
       doc.content = newContent;
 
       // Re-extract title from new content
-      const titleMatch = newContent.match(/^#\\s+(.+)$/m);
+      const titleMatch = newContent.match(/^#\\\\s+(.+)$/m);
       if (titleMatch) {
         doc.title = titleMatch[1].trim();
+      } else {
+        // Fallback to document name if no heading found
+        doc.title = doc.name;
       }
 
       // Track edit
@@ -510,7 +513,7 @@ export class DocsBuilder implements Builder {
       const category = parts[0] || 'root';
 
       // Extract title from content
-      const titleMatch = content.match(/^#\\s+(.+)$/m);
+      const titleMatch = content.match(/^#\\\\s+(.+)$/m);
       const title = options.title || (titleMatch ? titleMatch[1].trim() : name);
 
       // Create the document object
@@ -620,6 +623,7 @@ export class DocsBuilder implements Builder {
       doc.path = newPath;
       doc.category = category;
       doc.filename = name + '.md';
+      doc.source = 'in-game';
       doc.editedAt = new Date().toISOString();
 
       // Update registry
@@ -808,6 +812,19 @@ export class DocsBuilder implements Builder {
     const existingFolders = (this.docs.get('folders') as string[]) || [];
     for (const f of existingFolders) {
       folders.add(f);
+    }
+
+    // Preserve in-game created docs that don't have disk files
+    // The registry already contains all existing docs (line 711-712)
+    // We've only updated entries for docs we processed from disk (via loadedPaths)
+    // Any docs NOT in loadedPaths but in the old registry are in-game-only and must be preserved
+    const oldRegistry =
+      (this.docs.get('registry') as Record<string, number>) || {};
+    for (const [path, docId] of Object.entries(oldRegistry)) {
+      if (!loadedPaths.has(path)) {
+        // This doc was created in-game and has no disk file - preserve it
+        registry[path] = docId;
+      }
     }
 
     // Update manager registry and folders
