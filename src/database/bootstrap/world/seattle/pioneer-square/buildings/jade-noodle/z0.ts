@@ -26,7 +26,7 @@ export const building = {
       prototype: 'door',
       name: 'Restaurant Door',
       description:
-        'A glass door with a jade-green frame, the color matching the restaurant\'s name. A paper sign in the window still reads OPEN in Chinese and English, the hours listed below: 11AM-10PM.',
+        "A glass door with a jade-green frame, the color matching the restaurant's name. A paper sign in the window still reads OPEN in Chinese and English, the hours listed below: 11AM-10PM.",
       locked: false,
       open: true,
       locks: ['%FRONT_LOCK'],

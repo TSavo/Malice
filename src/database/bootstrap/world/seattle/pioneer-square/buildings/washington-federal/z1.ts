@@ -21,7 +21,11 @@ export const building = {
       description:
         'A keycard reader beside the frosted glass doors. The LED is dark, the battery backup exhausted.',
       scanners: [
-        { type: 'keycard', part: 'hand', message: 'Executive access required.' },
+        {
+          type: 'keycard',
+          part: 'hand',
+          message: 'Executive access required.',
+        },
       ],
       authorizedUsers: {},
     },
@@ -29,7 +33,7 @@ export const building = {
       prototype: 'door',
       name: 'Executive Suite Doors',
       description:
-        'Frosted glass double doors etched with the bank\'s logo. The electronic lock is dead, but the doors are wedged shut from inside.',
+        "Frosted glass double doors etched with the bank's logo. The electronic lock is dead, but the doors are wedged shut from inside.",
       locked: true,
       open: false,
       locks: ['%EXEC_SUITE_LOCK'],
@@ -259,7 +263,7 @@ The desk is obsessively clean, every item aligned, every surface dust-free. Patr
           name: 'executive chair',
           capacity: 1,
           emptyMsg:
-            'A Herman Miller Aeron chair sits behind the desk, adjusted to Patricia Chen\'s specifications.',
+            "A Herman Miller Aeron chair sits behind the desk, adjusted to Patricia Chen's specifications.",
           occupiedMsg: '%s in the executive chair',
         },
         {
@@ -281,7 +285,7 @@ The desk is obsessively clean, every item aligned, every surface dust-free. Patr
         {
           prototype: 'desk',
           name: 'executive desk',
-          aliases: ['desk', 'patricia\'s desk'],
+          aliases: ['desk', "patricia's desk"],
           description: `A sleek modern desk, all glass and chrome, positioned for maximum intimidation. A slim laptop sits closed on the surface. A brass nameplate reads "PATRICIA CHEN." The desk is immaculately organized—pen holder, inbox, outbox, everything at right angles. The inbox is empty. The outbox holds documents that will never be sent.`,
         },
         {

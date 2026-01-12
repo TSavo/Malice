@@ -107,7 +107,7 @@ A shared bathroom occupies a corner, its door marked GENDER NEUTRAL before that 
         west: { room: '%LOFT_3', door: '%DOOR_3', locks: ['%LOCK_3'] },
         down: '%STUDIO_LOBBY',
         up: '%ROOF_ACCESS',
-        'in': '%E',
+        in: '%E',
       },
       sittables: [
         {
@@ -180,7 +180,8 @@ A wood stove provides heat, its chimney jury-rigged through the window frame.`,
         {
           name: 'a sagging couch',
           capacity: 3,
-          emptyMsg: 'A deeply sagging couch faces the windows, covered in blankets.',
+          emptyMsg:
+            'A deeply sagging couch faces the windows, covered in blankets.',
           occupiedMsg: '%s sunk into the couch',
         },
         {
@@ -192,7 +193,8 @@ A wood stove provides heat, its chimney jury-rigged through the window frame.`,
         {
           name: 'a sleeping loft',
           capacity: 2,
-          emptyMsg: 'A mattress on the sleeping loft is visible through the rebar railing.',
+          emptyMsg:
+            'A mattress on the sleeping loft is visible through the rebar railing.',
           occupiedMsg: '%s in the sleeping loft',
         },
       ],
@@ -264,7 +266,8 @@ A bathroom off the kitchen is larger than the other units—a clawfoot tub, a se
         {
           name: 'the communal table',
           capacity: 8,
-          emptyMsg: 'A long dining table surrounded by mismatched chairs dominates the space.',
+          emptyMsg:
+            'A long dining table surrounded by mismatched chairs dominates the space.',
           occupiedMsg: '%s seated at the communal table',
         },
         {

@@ -80,7 +80,8 @@ export const building = {
 
     '%A1_z29': {
       name: 'Smith Tower - 29th Floor - North Suite - Living Room',
-      description: 'A corner unit with tall windows and warm terracotta tile floors. A kitchenette with hand-painted Majolica tiles occupies one wall. Built-in archway alcoves hold blue and white Greek pottery, dried lavender, and sun-bleached books.',
+      description:
+        'A corner unit with tall windows and warm terracotta tile floors. A kitchenette with hand-painted Majolica tiles occupies one wall. Built-in archway alcoves hold blue and white Greek pottery, dried lavender, and sun-bleached books.',
       x: -3,
       y: 11,
       z: 29,
@@ -96,9 +97,27 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'table', name: 'a mosaic-topped coffee table', description: 'A low coffee table features an intricate mosaic of blue, white, and gold tiles depicting a Mediterranean seascape. The grout is cracked but the tiny tesserae remain firmly set.', boltedDown: false },
-        { prototype: 'furniture', name: 'a Majolica-tiled kitchenette', description: 'A built-in kitchenette runs along one wall, its backsplash covered in hand-painted Italian Majolica tiles depicting lemons and olive branches. The small sink is bone dry.', boltedDown: true },
-        { prototype: 'furniture', name: 'archway alcoves', description: 'Rounded archway alcoves are built into the walls, displaying blue and white Greek amphorae, a dried lavender bundle, and dust-covered books on Mediterranean history.', boltedDown: true },
+        {
+          prototype: 'table',
+          name: 'a mosaic-topped coffee table',
+          description:
+            'A low coffee table features an intricate mosaic of blue, white, and gold tiles depicting a Mediterranean seascape. The grout is cracked but the tiny tesserae remain firmly set.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a Majolica-tiled kitchenette',
+          description:
+            'A built-in kitchenette runs along one wall, its backsplash covered in hand-painted Italian Majolica tiles depicting lemons and olive branches. The small sink is bone dry.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'archway alcoves',
+          description:
+            'Rounded archway alcoves are built into the walls, displaying blue and white Greek amphorae, a dried lavender bundle, and dust-covered books on Mediterranean history.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -134,9 +153,27 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a wrought iron bed', description: 'A queen-sized bed with an ornate wrought iron frame featuring scrollwork vines and grape leaves. The linens are sun-faded but crisp with age.', quality: 'nice' },
-        { prototype: 'furniture', name: 'a painted Tuscan armoire', description: 'A tall armoire painted with faded scenes of cypress trees and rolling Tuscan hills. Its wooden doors creak when opened, revealing empty shelves and a lingering scent of cedar.', boltedDown: false },
-        { prototype: 'table', name: 'an olive wood nightstand', description: 'A small nightstand carved from olive wood sits beside the bed, its surface marked by the grain of the ancient tree. A ceramic oil lamp with a dusty wick rests atop it.', boltedDown: false },
+        {
+          prototype: 'bed',
+          name: 'a wrought iron bed',
+          description:
+            'A queen-sized bed with an ornate wrought iron frame featuring scrollwork vines and grape leaves. The linens are sun-faded but crisp with age.',
+          quality: 'nice',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a painted Tuscan armoire',
+          description:
+            'A tall armoire painted with faded scenes of cypress trees and rolling Tuscan hills. Its wooden doors creak when opened, revealing empty shelves and a lingering scent of cedar.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'table',
+          name: 'an olive wood nightstand',
+          description:
+            'A small nightstand carved from olive wood sits beside the bed, its surface marked by the grain of the ancient tree. A ceramic oil lamp with a dusty wick rests atop it.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -168,9 +205,27 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a tiled galley kitchen', description: 'A narrow galley kitchen runs along one wall, its surfaces covered in hand-painted tiles depicting fish and waves. The copper faucet is green with patina.', boltedDown: true },
-        { prototype: 'table', name: 'a rustic pine table', description: 'A simple pine table serves as both workspace and dining surface. The wood is bleached pale from years of scrubbing, its surface marked with knife scars.', boltedDown: false },
-        { prototype: 'furniture', name: 'fishing net decorations', description: 'Old fishing nets are draped across the ceiling beams, tangled with glass floats in sea-green and amber. Dried starfish and shells are caught in the netting.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a tiled galley kitchen',
+          description:
+            'A narrow galley kitchen runs along one wall, its surfaces covered in hand-painted tiles depicting fish and waves. The copper faucet is green with patina.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a rustic pine table',
+          description:
+            'A simple pine table serves as both workspace and dining surface. The wood is bleached pale from years of scrubbing, its surface marked with knife scars.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'fishing net decorations',
+          description:
+            'Old fishing nets are draped across the ceiling beams, tangled with glass floats in sea-green and amber. Dried starfish and shells are caught in the netting.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -209,10 +264,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a weathered ladder', description: 'A sturdy wooden ladder is bolted to the mezzanine edge, its rungs worn smooth and pale from decades of bare feet ascending to the loft.', boltedDown: true },
-        { prototype: 'bed', name: 'a loft mattress on rope frame', description: 'A narrow mattress rests on a traditional rope-strung frame in the mezzanine. The ropes have stretched with age but still hold.', quality: 'cheap' },
-        { prototype: 'furniture', name: 'a wicker settee', description: 'A large wicker settee with faded floral cushions sits beneath the mezzanine. The wicker creaks pleasantly when sat upon.', boltedDown: false },
-        { prototype: 'table', name: 'a tile-topped side table', description: 'A small iron table with a colorful tile mosaic top sits beside the settee, holding a terracotta oil lamp and a dried sprig of rosemary.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'a weathered ladder',
+          description:
+            'A sturdy wooden ladder is bolted to the mezzanine edge, its rungs worn smooth and pale from decades of bare feet ascending to the loft.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'bed',
+          name: 'a loft mattress on rope frame',
+          description:
+            'A narrow mattress rests on a traditional rope-strung frame in the mezzanine. The ropes have stretched with age but still hold.',
+          quality: 'cheap',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a wicker settee',
+          description:
+            'A large wicker settee with faded floral cushions sits beneath the mezzanine. The wicker creaks pleasantly when sat upon.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'table',
+          name: 'a tile-topped side table',
+          description:
+            'A small iron table with a colorful tile mosaic top sits beside the settee, holding a terracotta oil lamp and a dried sprig of rosemary.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -251,9 +330,27 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a narrow iron daybed', description: 'A narrow daybed with a simple wrought iron frame is wedged into the Moorish archway alcove. A thin wool blanket in faded stripes covers the mattress.', quality: 'cheap' },
-        { prototype: 'furniture', name: 'iron wall hooks', description: 'Ornate wrought iron hooks shaped like olive branches are mounted on the wall, designed for hanging bags and clothing.', boltedDown: true },
-        { prototype: 'furniture', name: 'a carved wall niche', description: 'A small arched niche is carved into the plaster wall, holding a blue glass evil eye amulet and a stub of candle in a brass holder.', boltedDown: true },
+        {
+          prototype: 'bed',
+          name: 'a narrow iron daybed',
+          description:
+            'A narrow daybed with a simple wrought iron frame is wedged into the Moorish archway alcove. A thin wool blanket in faded stripes covers the mattress.',
+          quality: 'cheap',
+        },
+        {
+          prototype: 'furniture',
+          name: 'iron wall hooks',
+          description:
+            'Ornate wrought iron hooks shaped like olive branches are mounted on the wall, designed for hanging bags and clothing.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a carved wall niche',
+          description:
+            'A small arched niche is carved into the plaster wall, holding a blue glass evil eye amulet and a stub of candle in a brass holder.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -290,10 +387,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a curved sectional in linen', description: 'A large curved sectional upholstered in natural linen dominates the room, its cushions bleached by years of sunlight to a pale cream.', boltedDown: false },
-        { prototype: 'table', name: 'a hammered copper table', description: 'A round coffee table with a hammered copper top sits before the sectional, its surface dented and patinated to a warm bronze.', boltedDown: false },
-        { prototype: 'furniture', name: 'wrought iron wall sconces', description: 'Ornate wrought iron sconces flank the windows, their candle holders empty but still dramatic against the white walls.', boltedDown: true },
-        { prototype: 'furniture', name: 'a terracotta pot stand', description: 'A built-in corner shelf holds large terracotta pots, their contents long since dried to dust. Traces of olive trees that once grew here.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a curved sectional in linen',
+          description:
+            'A large curved sectional upholstered in natural linen dominates the room, its cushions bleached by years of sunlight to a pale cream.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'table',
+          name: 'a hammered copper table',
+          description:
+            'A round coffee table with a hammered copper top sits before the sectional, its surface dented and patinated to a warm bronze.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'wrought iron wall sconces',
+          description:
+            'Ornate wrought iron sconces flank the windows, their candle holders empty but still dramatic against the white walls.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a terracotta pot stand',
+          description:
+            'A built-in corner shelf holds large terracotta pots, their contents long since dried to dust. Traces of olive trees that once grew here.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -325,17 +446,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'Aegean blue bookshelves', description: 'Floor-to-ceiling bookshelves painted in faded Aegean blue line the walls, holding leather-bound classics, pottery shards displayed as art, and small amphora replicas.', boltedDown: true },
-        { prototype: 'table', name: 'an olive wood writing desk', description: 'A writing desk carved from a single piece of olive wood sits in the window bay, its surface swirled with the distinctive grain. An inkwell and quill pen remain, dried out.', boltedDown: false },
-        { prototype: 'chair', name: 'a leather X-frame chair', description: 'A Savonarola chair with crossed wooden legs and worn leather seat and back sits at the desk. The Renaissance design feels timeless.', boltedDown: false },
-        { prototype: 'furniture', name: 'a Greek amphora', description: 'A large terracotta amphora stands in the corner, its surface painted with faded black figures depicting a mythological scene.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'Aegean blue bookshelves',
+          description:
+            'Floor-to-ceiling bookshelves painted in faded Aegean blue line the walls, holding leather-bound classics, pottery shards displayed as art, and small amphora replicas.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'an olive wood writing desk',
+          description:
+            'A writing desk carved from a single piece of olive wood sits in the window bay, its surface swirled with the distinctive grain. An inkwell and quill pen remain, dried out.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'chair',
+          name: 'a leather X-frame chair',
+          description:
+            'A Savonarola chair with crossed wooden legs and worn leather seat and back sits at the desk. The Renaissance design feels timeless.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a Greek amphora',
+          description:
+            'A large terracotta amphora stands in the corner, its surface painted with faded black figures depicting a mythological scene.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
           name: 'the Savonarola chair',
           capacity: 1,
           emptyMsg:
-            'The leather X-frame chair waits at the desk, a Renaissance scholar\'s seat.',
+            "The leather X-frame chair waits at the desk, a Renaissance scholar's seat.",
           occupiedMsg: '%s seated in the Savonarola chair.',
         },
         {
@@ -350,7 +495,8 @@ export const building = {
 
     '%C2_z29': {
       name: 'Smith Tower - 29th Floor - South Suite - Living Room',
-      description: 'A corner unit with western exposure and warm terracotta floor tiles. The afternoon sun has bleached the linen curtains to cream and highlighted the blue painted trim around doors and windows.',
+      description:
+        'A corner unit with western exposure and warm terracotta floor tiles. The afternoon sun has bleached the linen curtains to cream and highlighted the blue painted trim around doors and windows.',
       x: -3,
       y: 9,
       z: 29,
@@ -366,10 +512,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a cane-back loveseat', description: 'A compact loveseat with a cane back and arms faces the window. The cushion is covered in faded blue and white fabric with a Greek key pattern.', boltedDown: false },
-        { prototype: 'table', name: 'a mosaic side table', description: 'A small round table features a mosaic top of broken pottery pieces set in cement, creating an abstract pattern of blue, white, and terracotta.', boltedDown: false },
-        { prototype: 'furniture', name: 'a decorative radiator grate', description: 'An old steam radiator is hidden behind an ornate iron grate with a geometric Mediterranean pattern. The metal is warm to the touch.', boltedDown: true },
-        { prototype: 'furniture', name: 'blue-painted window frames', description: 'The window frames are painted in traditional Greek blue, the color faded but still striking against the white walls. Sheer linen curtains hang from iron rods.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a cane-back loveseat',
+          description:
+            'A compact loveseat with a cane back and arms faces the window. The cushion is covered in faded blue and white fabric with a Greek key pattern.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'table',
+          name: 'a mosaic side table',
+          description:
+            'A small round table features a mosaic top of broken pottery pieces set in cement, creating an abstract pattern of blue, white, and terracotta.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a decorative radiator grate',
+          description:
+            'An old steam radiator is hidden behind an ornate iron grate with a geometric Mediterranean pattern. The metal is warm to the touch.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'blue-painted window frames',
+          description:
+            'The window frames are painted in traditional Greek blue, the color faded but still striking against the white walls. Sheer linen curtains hang from iron rods.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -405,10 +575,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'an olive branch tile border', description: 'Hand-painted ceramic tiles frame the doorway, depicting intertwined olive branches with silvery-green leaves and black olives. Several tiles are cracked but still beautiful.', boltedDown: true },
-        { prototype: 'furniture', name: 'a wall-mounted coat rack', description: 'A wrought iron coat rack with scrollwork hooks is mounted beside the door. A faded straw sun hat still hangs from one hook.', boltedDown: true },
-        { prototype: 'table', name: 'a narrow console with mirror', description: 'A narrow wooden console table stands against the wall, its surface inlaid with a compass rose pattern. An age-spotted mirror in an iron frame hangs above it.', boltedDown: false },
-        { prototype: 'furniture', name: 'a terracotta umbrella stand', description: 'A tall terracotta cylinder decorated with painted grape vines serves as an umbrella stand. A weathered walking stick leans inside.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'an olive branch tile border',
+          description:
+            'Hand-painted ceramic tiles frame the doorway, depicting intertwined olive branches with silvery-green leaves and black olives. Several tiles are cracked but still beautiful.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a wall-mounted coat rack',
+          description:
+            'A wrought iron coat rack with scrollwork hooks is mounted beside the door. A faded straw sun hat still hangs from one hook.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a narrow console with mirror',
+          description:
+            'A narrow wooden console table stands against the wall, its surface inlaid with a compass rose pattern. An age-spotted mirror in an iron frame hangs above it.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a terracotta umbrella stand',
+          description:
+            'A tall terracotta cylinder decorated with painted grape vines serves as an umbrella stand. A weathered walking stick leans inside.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -440,10 +634,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'an alcove bed with iron frame', description: 'A bed with an ornate wrought iron headboard fills the recessed Moorish archway. Sheer white curtains hang from the arch, half-concealing the sleeping space.', quality: 'nice' },
-        { prototype: 'furniture', name: 'a painted wooden wardrobe', description: 'A tall wardrobe painted in faded Aegean blue stands against one wall, its doors decorated with hand-painted pomegranates and fig leaves.', boltedDown: false },
-        { prototype: 'furniture', name: 'a wall-mounted oil lamp', description: 'A brass oil lamp in the Moroccan style is mounted on the wall, its glass chimney dusty but intact. The wick is dry.', boltedDown: true },
-        { prototype: 'table', name: 'a carved cedar chest', description: 'A cedar chest with carved geometric patterns serves as both storage and nightstand beside the bed. The wood still faintly smells of cedar.', boltedDown: false },
+        {
+          prototype: 'bed',
+          name: 'an alcove bed with iron frame',
+          description:
+            'A bed with an ornate wrought iron headboard fills the recessed Moorish archway. Sheer white curtains hang from the arch, half-concealing the sleeping space.',
+          quality: 'nice',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a painted wooden wardrobe',
+          description:
+            'A tall wardrobe painted in faded Aegean blue stands against one wall, its doors decorated with hand-painted pomegranates and fig leaves.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a wall-mounted oil lamp',
+          description:
+            'A brass oil lamp in the Moroccan style is mounted on the wall, its glass chimney dusty but intact. The wick is dry.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a carved cedar chest',
+          description:
+            'A cedar chest with carved geometric patterns serves as both storage and nightstand beside the bed. The wood still faintly smells of cedar.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -475,19 +693,49 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a fold-down captain\'s bed', description: 'A fold-down bed in the captain\'s style is hinged to the wall, its frame painted blue with white trim. The mechanism still works despite years of neglect.', quality: 'standard' },
-        { prototype: 'furniture', name: 'a blue captain\'s bed cabinet', description: 'When raised, the bed folds into a cabinet painted with a nautical compass rose and sea creatures in the Greek black-figure style.', boltedDown: true },
-        { prototype: 'furniture', name: 'terracotta display shelves', description: 'Built-in shelves painted in warm terracotta line the walls, holding sea glass in blue and green, small amphora reproductions, and sun-bleached books.', boltedDown: true },
-        { prototype: 'table', name: 'a fold-down writing shelf', description: 'A fold-down shelf is hinged below the window, serving as a compact desk when lowered. The surface is painted with faded maritime charts.', boltedDown: true },
-        { prototype: 'furniture', name: 'a narrow pine dresser', description: 'A narrow dresser of weathered pine is wedged into the corner, its brass handles tarnished green. Fishing floats in glass sit atop it.', boltedDown: false },
+        {
+          prototype: 'bed',
+          name: "a fold-down captain's bed",
+          description:
+            "A fold-down bed in the captain's style is hinged to the wall, its frame painted blue with white trim. The mechanism still works despite years of neglect.",
+          quality: 'standard',
+        },
+        {
+          prototype: 'furniture',
+          name: "a blue captain's bed cabinet",
+          description:
+            'When raised, the bed folds into a cabinet painted with a nautical compass rose and sea creatures in the Greek black-figure style.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'terracotta display shelves',
+          description:
+            'Built-in shelves painted in warm terracotta line the walls, holding sea glass in blue and green, small amphora reproductions, and sun-bleached books.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a fold-down writing shelf',
+          description:
+            'A fold-down shelf is hinged below the window, serving as a compact desk when lowered. The surface is painted with faded maritime charts.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a narrow pine dresser',
+          description:
+            'A narrow dresser of weathered pine is wedged into the corner, its brass handles tarnished green. Fishing floats in glass sit atop it.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
-          name: 'the captain\'s bed',
+          name: "the captain's bed",
           capacity: 2,
           emptyMsg:
-            'The fold-down captain\'s bed is lowered, its blue and white frame cheerful against the terracotta walls.',
-          occupiedMsg: '%s stretched out on the captain\'s bed.',
+            "The fold-down captain's bed is lowered, its blue and white frame cheerful against the terracotta walls.",
+          occupiedMsg: "%s stretched out on the captain's bed.",
         },
       ],
     },

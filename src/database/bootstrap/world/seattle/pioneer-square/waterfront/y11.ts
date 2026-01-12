@@ -28,7 +28,8 @@ Yesler Way intersection lies just ahead to the north—the crossing point to dow
       allowedFaction: 'Citizen',
       denyMessage:
         'A security scanner beside the loading door flashes red. "Authorized personnel only."',
-      description: 'A massive roll-up door leads into the Fabrication Factory loading bay',
+      description:
+        'A massive roll-up door leads into the Fabrication Factory loading bay',
     },
   },
 };

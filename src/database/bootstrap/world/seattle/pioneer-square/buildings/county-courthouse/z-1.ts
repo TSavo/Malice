@@ -20,8 +20,16 @@ export const building = {
       description:
         'A biometric lock requiring both keycard and fingerprint. The LED is dark.',
       scanners: [
-        { type: 'keycard', part: 'hand', message: 'Evidence access restricted.' },
-        { type: 'fingerprint', part: 'hand', message: 'Biometric verification required.' },
+        {
+          type: 'keycard',
+          part: 'hand',
+          message: 'Evidence access restricted.',
+        },
+        {
+          type: 'fingerprint',
+          part: 'hand',
+          message: 'Biometric verification required.',
+        },
       ],
       authorizedUsers: {},
       difficulty: 7,

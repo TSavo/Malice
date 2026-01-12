@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { MinimalBootstrap } from '../../src/database/bootstrap/minimal-bootstrap.js';
 import { AiImageGenBuilder } from '../../src/database/bootstrap/ai-image-gen-builder.js';
+import { MinimalBootstrap } from '../../src/database/bootstrap/minimal-bootstrap.js';
 import { ObjectDatabase } from '../../src/database/object-db.js';
 import { ObjectManager } from '../../src/database/object-manager.js';
 
@@ -117,10 +117,7 @@ describe('AiImageGenBuilder', () => {
       await builder.build();
 
       const aiImageGen = await manager.load('aiImageGen');
-      const result = await aiImageGen?.call(
-        'setDefaultModel',
-        '6.1',
-      );
+      const result = await aiImageGen?.call('setDefaultModel', '6.1');
 
       expect(result?.success).toBe(true);
       expect(result?.model).toBe('6.1');
@@ -648,8 +645,8 @@ describe('AiImageGenBuilder', () => {
       const aiImageGen = await manager.load('aiImageGen');
       const blob = await manager.load('blob');
 
-      let capturedBlobData = '';
-      let capturedMetadata: any = {};
+      const _capturedBlobData = '';
+      const _capturedMetadata: any = {};
 
       // Override blob.write to capture what's being stored
       blob?.setMethod(

@@ -43,7 +43,13 @@ The air is damp here, the moisture increasing as the passage extends east toward
         east: '%DEEP_W2',
       },
       objects: [
-        { prototype: 'sign', name: 'old pick marks', description: 'The walls show the rhythmic marks of hand excavation—pickaxe strikes that predate power tools. Someone dug this by lantern light.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'old pick marks',
+          description:
+            'The walls show the rhythmic marks of hand excavation—pickaxe strikes that predate power tools. Someone dug this by lantern light.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -89,8 +95,20 @@ Routes branch north and east, the passages showing different construction styles
         north: '%DEEP_CAVERN_N',
       },
       objects: [
-        { prototype: 'furniture', name: 'a dripping formation', description: 'Water drips from a stalactite-like formation, the minerals building slowly over decades. The drip is constant, the sound rhythmic.', boltedDown: true },
-        { prototype: 'sign', name: 'fire scars', description: 'The rock is blackened in places where fires were built—camps, perhaps, or signals. The scars are old, layers of soot over decades.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a dripping formation',
+          description:
+            'Water drips from a stalactite-like formation, the minerals building slowly over decades. The drip is constant, the sound rhythmic.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'fire scars',
+          description:
+            'The rock is blackened in places where fires were built—camps, perhaps, or signals. The scars are old, layers of soot over decades.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -118,7 +136,13 @@ This section connects upward to the transitional network, a shaft rising through
         },
       },
       objects: [
-        { prototype: 'sign', name: 'rope fragments', description: 'Frayed rope hangs from pitons driven into the rock—evidence of climbs made and abandoned. The equipment is old, the rope rotted.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'rope fragments',
+          description:
+            'Frayed rope hangs from pitons driven into the rock—evidence of climbs made and abandoned. The equipment is old, the rope rotted.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -168,8 +192,20 @@ A walkway runs around the cistern's edge, the path narrow but passable. The walk
         north: '%CISTERN_N_PASSAGE',
       },
       objects: [
-        { prototype: 'furniture', name: 'a cistern walkway', description: 'A narrow brick walkway circles the cistern edge, just wide enough for single-file passage. The bricks are worn smooth by water and time.', boltedDown: true },
-        { prototype: 'sign', name: 'construction date', description: 'A stone lintel above the eastern passage is carved: "SEATTLE WATER CO. 1887". Two years before the fire. This survived.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a cistern walkway',
+          description:
+            'A narrow brick walkway circles the cistern edge, just wide enough for single-file passage. The bricks are worn smooth by water and time.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'construction date',
+          description:
+            'A stone lintel above the eastern passage is carved: "SEATTLE WATER CO. 1887". Two years before the fire. This survived.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -220,8 +256,20 @@ Passages radiate from the central chamber like spokes from a hub—the cistern n
         south: '%CISTERN_DEEP',
       },
       objects: [
-        { prototype: 'furniture', name: 'a central column', description: 'A brick column rises from the water to support the dome above. The column is wrapped in iron bands, the reinforcement added when the original construction proved inadequate.', boltedDown: true },
-        { prototype: 'sign', name: 'water level marks', description: 'Painted marks on the column indicate water levels: numbers in faded paint documenting decades of measurement. The highest mark is alarming. The lowest is reassuring. The current level is between them.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a central column',
+          description:
+            'A brick column rises from the water to support the dome above. The column is wrapped in iron bands, the reinforcement added when the original construction proved inadequate.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'water level marks',
+          description:
+            'Painted marks on the column indicate water levels: numbers in faded paint documenting decades of measurement. The highest mark is alarming. The lowest is reassuring. The current level is between them.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -248,7 +296,13 @@ A ladder is bolted to one wall, the rungs iron, some missing, all corroded. The 
         },
       },
       objects: [
-        { prototype: 'furniture', name: 'an iron ladder', description: 'A corroded iron ladder climbs the shaft wall, bolted to the brick at intervals. Several rungs are missing. The remaining rungs are slick with condensation.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'an iron ladder',
+          description:
+            'A corroded iron ladder climbs the shaft wall, bolted to the brick at intervals. Several rungs are missing. The remaining rungs are slick with condensation.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -276,7 +330,13 @@ The deep chambers are partially flooded year-round, accessible only to those wil
         },
       },
       objects: [
-        { prototype: 'sign', name: 'a depth marker', description: 'A pole is driven into the passage floor, marked with measurements. The current water level reads three feet. The highest mark reads seven.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'a depth marker',
+          description:
+            'A pole is driven into the passage floor, marked with measurements. The current water level reads three feet. The highest mark reads seven.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -299,7 +359,13 @@ The water level is lower here, the chamber draining through cracks that the patc
         east: '%DEEP_CENTER_E',
       },
       objects: [
-        { prototype: 'sign', name: 'patched cracks', description: 'Concrete patches cover sections of the brick walls—repairs made with whatever materials were available. Some patches are holding. Others are failing.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'patched cracks',
+          description:
+            'Concrete patches cover sections of the brick walls—repairs made with whatever materials were available. Some patches are holding. Others are failing.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -347,7 +413,13 @@ Routes branch north toward the industrial underground and east toward the floode
         north: '%INDUSTRIAL_DEEP',
       },
       objects: [
-        { prototype: 'sign', name: 'a warning sign', description: 'A rusted metal sign reads: "DANGER - COMBINED SEWER OVERFLOW - DO NOT ENTER DURING RAIN". The sign is official but ancient.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'a warning sign',
+          description:
+            'A rusted metal sign reads: "DANGER - COMBINED SEWER OVERFLOW - DO NOT ENTER DURING RAIN". The sign is official but ancient.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -372,7 +444,13 @@ This route is occasionally used by utility workers, the passage showing signs of
         },
       },
       objects: [
-        { prototype: 'crate', name: 'utility equipment', description: 'Coiled cables and pipe fittings are stacked against the wall, left by workers who will return for them. The equipment is modern.', boltedDown: false },
+        {
+          prototype: 'crate',
+          name: 'utility equipment',
+          description:
+            'Coiled cables and pipe fittings are stacked against the wall, left by workers who will return for them. The equipment is modern.',
+          boltedDown: false,
+        },
       ],
     },
 
@@ -401,7 +479,13 @@ This is the eastern extent of the deep connector—beyond lies the flooded sewer
         },
       },
       objects: [
-        { prototype: 'sign', name: 'a flow gauge', description: 'A mechanical gauge is mounted on the wall, measuring water flow through the passage. The needle sits at LOW in dry weather. The red zone is labeled OVERFLOW.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'a flow gauge',
+          description:
+            'A mechanical gauge is mounted on the wall, measuring water flow through the passage. The needle sits at LOW in dry weather. The red zone is labeled OVERFLOW.',
+          boltedDown: true,
+        },
       ],
     },
   },

@@ -123,7 +123,7 @@ The map is out of date, borders that have shifted, countries that have renamed t
     },
 
     '%IMPORT_DIRECTOR': {
-      name: 'Seattle Import/Export - Director\'s Office',
+      name: "Seattle Import/Export - Director's Office",
       description: `The director's office, a corner space filled with the accumulated artifacts of decades in the import/export trade. The desk is buried under ledgers and shipping documents, but the walls are what draw the eye—covered floor to ceiling with photographs, certificates, and memorabilia from a lifetime of global commerce.
 
 A ship's wheel is mounted on one wall, brass fittings gleaming, the wheel of a vessel the director must have sailed. Photographs show the same wheel on the bridge of a freighter, the director younger and harder, squinting against Pacific sun. The photographs trace a career: ports in Japan, markets in Singapore, warehouses in Rotterdam.
@@ -143,17 +143,17 @@ A globe stands on a wooden pedestal, its surface worn smooth along the trade rou
       },
       sittables: [
         {
-          name: 'the director\'s chair',
+          name: "the director's chair",
           capacity: 1,
           emptyMsg:
             'A leather chair sits behind the cluttered desk, angled to face both the door and the window.',
-          occupiedMsg: '%s sitting in the director\'s chair',
+          occupiedMsg: "%s sitting in the director's chair",
         },
       ],
       objects: [
         {
           prototype: 'describable',
-          name: 'ship\'s wheel',
+          name: "ship's wheel",
           aliases: ['wheel', 'helm'],
           description: `A ship's wheel mounted on the wall, perhaps three feet across, its brass fittings polished bright. The wheel is real, not decorative—worn smooth by years of hands steering through weather. A brass plaque beneath it reads: M/V SEATTLE MARU, 1962-1989. The ship is gone, scrapped or sunk. The wheel remains, spinning freely when turned, connected to nothing.`,
         },
@@ -238,11 +238,11 @@ A currency conversion chart is pinned to the wall, its exchange rates long obsol
       },
       sittables: [
         {
-          name: 'an accountant\'s desk',
+          name: "an accountant's desk",
           capacity: 3,
           emptyMsg:
             'Desks cluttered with adding machines and ledgers fill the room.',
-          occupiedMsg: '%s sitting at an accountant\'s desk',
+          occupiedMsg: "%s sitting at an accountant's desk",
         },
       ],
       objects: [

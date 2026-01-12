@@ -137,7 +137,7 @@ A trophy case displays awards: BEST TIMBER, OUTSTANDING SUSTAINABILITY (the iron
     },
 
     '%TIMBER_PRESIDENT': {
-      name: 'Northwest Timber - President\'s Office',
+      name: "Northwest Timber - President's Office",
       description: `The corner office of Northwest Timber's president, paneled floor to ceiling in old-growth cedar. The room smells of wood even now, the cedar releasing its oils into air that hasn't changed in years. A massive desk dominates the space, carved from a single piece of timber, its surface cluttered with forestry reports and timber surveys.
 
 The windows look north and west, toward the distant mountains where the company's holdings lie. On clear days, the peaks are visible, white with snow, their slopes still green with the timber that made fortunes.
@@ -157,11 +157,10 @@ A mounted salmon hangs on one wall—a chinook, perhaps forty pounds, caught by 
       },
       sittables: [
         {
-          name: 'the president\'s chair',
+          name: "the president's chair",
           capacity: 1,
-          emptyMsg:
-            'A leather chair sits behind the massive timber desk.',
-          occupiedMsg: '%s sitting in the timber president\'s chair',
+          emptyMsg: 'A leather chair sits behind the massive timber desk.',
+          occupiedMsg: "%s sitting in the timber president's chair",
         },
       ],
       objects: [
@@ -203,8 +202,7 @@ Technical manuals fill a bookshelf—maintenance guides for equipment that may s
         {
           name: 'a drafting stool',
           capacity: 3,
-          emptyMsg:
-            'Wooden drafting stools sit at the angled tables.',
+          emptyMsg: 'Wooden drafting stools sit at the angled tables.',
           occupiedMsg: '%s sitting at one of the drafting tables',
         },
       ],
@@ -252,11 +250,11 @@ A small safe sits in the corner, its door closed but not locked, its combination
       },
       sittables: [
         {
-          name: 'an accountant\'s desk',
+          name: "an accountant's desk",
           capacity: 4,
           emptyMsg:
             'Wooden desks fill the room, each with an adding machine and stacks of invoices.',
-          occupiedMsg: '%s sitting at an accountant\'s desk',
+          occupiedMsg: "%s sitting at an accountant's desk",
         },
       ],
       objects: [

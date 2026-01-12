@@ -28,7 +28,8 @@ describe('generate-room-images script', () => {
     it('should parse --limit flag with value', () => {
       const args = ['--limit', '10'];
       const limitArgIdx = args.indexOf('--limit');
-      const overrideLimit = limitArgIdx >= 0 ? parseInt(args[limitArgIdx + 1], 10) : null;
+      const overrideLimit =
+        limitArgIdx >= 0 ? parseInt(args[limitArgIdx + 1], 10) : null;
       expect(overrideLimit).toBe(10);
     });
 
@@ -59,14 +60,16 @@ describe('generate-room-images script', () => {
     it('should parse --mcp-url flag with value', () => {
       const args = ['--mcp-url', 'http://custom:3010'];
       const mcpUrlIdx = args.indexOf('--mcp-url');
-      const mcpUrl = mcpUrlIdx >= 0 ? args[mcpUrlIdx + 1] : 'http://localhost:3010';
+      const mcpUrl =
+        mcpUrlIdx >= 0 ? args[mcpUrlIdx + 1] : 'http://localhost:3010';
       expect(mcpUrl).toBe('http://custom:3010');
     });
 
     it('should default mcp-url to localhost:3010', () => {
       const args: string[] = [];
       const mcpUrlIdx = args.indexOf('--mcp-url');
-      const mcpUrl = mcpUrlIdx >= 0 ? args[mcpUrlIdx + 1] : 'http://localhost:3010';
+      const mcpUrl =
+        mcpUrlIdx >= 0 ? args[mcpUrlIdx + 1] : 'http://localhost:3010';
       expect(mcpUrl).toBe('http://localhost:3010');
     });
 
@@ -86,7 +89,10 @@ describe('generate-room-images script', () => {
 
       function getDelay(): number {
         if (DELAY_MS > 0) return DELAY_MS;
-        return Math.floor(Math.random() * (MAX_DELAY_MS - MIN_DELAY_MS + 1)) + MIN_DELAY_MS;
+        return (
+          Math.floor(Math.random() * (MAX_DELAY_MS - MIN_DELAY_MS + 1)) +
+          MIN_DELAY_MS
+        );
       }
 
       const delay = getDelay();
@@ -100,7 +106,10 @@ describe('generate-room-images script', () => {
 
       function getDelay(): number {
         if (DELAY_MS > 0) return DELAY_MS;
-        return Math.floor(Math.random() * (MAX_DELAY_MS - MIN_DELAY_MS + 1)) + MIN_DELAY_MS;
+        return (
+          Math.floor(Math.random() * (MAX_DELAY_MS - MIN_DELAY_MS + 1)) +
+          MIN_DELAY_MS
+        );
       }
 
       const delay = getDelay();
@@ -123,7 +132,8 @@ describe('generate-room-images script', () => {
         return {
           ok: true,
           headers: new Map([['mcp-session-id', 'test-session-123']]),
-          get: (key: string) => (key === 'mcp-session-id' ? 'test-session-123' : null),
+          get: (key: string) =>
+            key === 'mcp-session-id' ? 'test-session-123' : null,
         } as any;
       }) as any;
 
@@ -156,7 +166,9 @@ describe('generate-room-images script', () => {
       const sessionId = await initMcpSession('http://localhost:3010');
 
       expect(capturedRequest.body.method).toBe('initialize');
-      expect(capturedRequest.body.params.clientInfo.name).toBe('generate-room-images');
+      expect(capturedRequest.body.params.clientInfo.name).toBe(
+        'generate-room-images',
+      );
       expect(capturedRequest.headers['Content-Type']).toBe('application/json');
       expect(sessionId).toBe('test-session-123');
     });
@@ -285,8 +297,7 @@ describe('generate-room-images script', () => {
       global.fetch = vi.fn(async () => {
         return {
           ok: true,
-          text: async () =>
-            'data: {"error":{"message":"Room not found"}}\n\n',
+          text: async () => 'data: {"error":{"message":"Room not found"}}\n\n',
         } as any;
       }) as any;
 
@@ -369,7 +380,9 @@ describe('generate-room-images script', () => {
         });
 
         if (!response.ok) {
-          throw new Error(`MCP request failed: ${response.status} ${response.statusText}`);
+          throw new Error(
+            `MCP request failed: ${response.status} ${response.statusText}`,
+          );
         }
 
         return {};
@@ -398,7 +411,9 @@ describe('generate-room-images script', () => {
       ];
 
       const undergroundOnly = true;
-      const filtered = rooms.filter((r) => !undergroundOnly || (r.z !== undefined && r.z < 0));
+      const filtered = rooms.filter(
+        (r) => !undergroundOnly || (r.z !== undefined && r.z < 0),
+      );
 
       expect(filtered).toHaveLength(2);
       expect(filtered[0].name).toBe('Underground Room');
@@ -413,7 +428,9 @@ describe('generate-room-images script', () => {
       ];
 
       const surfaceOnly = true;
-      const filtered = rooms.filter((r) => !surfaceOnly || (r.z !== undefined && r.z >= 0));
+      const filtered = rooms.filter(
+        (r) => !surfaceOnly || (r.z !== undefined && r.z >= 0),
+      );
 
       expect(filtered).toHaveLength(2);
       expect(filtered[0].name).toBe('Surface Room');
@@ -424,7 +441,13 @@ describe('generate-room-images script', () => {
       const rooms: RoomDef[] = [
         { name: 'Room Without Image', x: 0, y: 0, z: 0 },
         { name: 'Room With Image', x: 0, y: 0, z: 0, imageOnDisk: 'image.png' },
-        { name: 'Room With Image Object', x: 0, y: 0, z: 0, imageOnDisk: { path: 'img.png' } },
+        {
+          name: 'Room With Image Object',
+          x: 0,
+          y: 0,
+          z: 0,
+          imageOnDisk: { path: 'img.png' },
+        },
       ];
 
       const needsImage = rooms.filter((r) => !r.imageOnDisk);
@@ -436,7 +459,12 @@ describe('generate-room-images script', () => {
 
   describe('Filename generation', () => {
     it('should generate correct filename format', () => {
-      function generateFilename(name: string, x: number, y: number, z: number): string {
+      function generateFilename(
+        name: string,
+        x: number,
+        y: number,
+        z: number,
+      ): string {
         const sanitized = name
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, '-')
@@ -449,7 +477,12 @@ describe('generate-room-images script', () => {
     });
 
     it('should handle special characters in room names', () => {
-      function generateFilename(name: string, x: number, y: number, z: number): string {
+      function generateFilename(
+        name: string,
+        x: number,
+        y: number,
+        z: number,
+      ): string {
         const sanitized = name
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, '-')
@@ -462,7 +495,12 @@ describe('generate-room-images script', () => {
     });
 
     it('should handle negative coordinates', () => {
-      function generateFilename(name: string, x: number, y: number, z: number): string {
+      function generateFilename(
+        name: string,
+        x: number,
+        y: number,
+        z: number,
+      ): string {
         const sanitized = name
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, '-')
@@ -493,21 +531,27 @@ describe('generate-room-images script', () => {
   describe('Health check logic', () => {
     it('should return true when API is healthy', () => {
       const healthResponse = { status: 'healthy', connected: true };
-      const isHealthy = healthResponse.status === 'healthy' || healthResponse.connected === true;
+      const isHealthy =
+        healthResponse.status === 'healthy' ||
+        healthResponse.connected === true;
 
       expect(isHealthy).toBe(true);
     });
 
     it('should return true when connected is true even if status is not healthy', () => {
       const healthResponse = { status: 'warning', connected: true };
-      const isHealthy = healthResponse.status === 'healthy' || healthResponse.connected === true;
+      const isHealthy =
+        healthResponse.status === 'healthy' ||
+        healthResponse.connected === true;
 
       expect(isHealthy).toBe(true);
     });
 
     it('should return false when API is unhealthy', () => {
       const healthResponse = { status: 'error', connected: false };
-      const isHealthy = healthResponse.status === 'healthy' || healthResponse.connected === true;
+      const isHealthy =
+        healthResponse.status === 'healthy' ||
+        healthResponse.connected === true;
 
       expect(isHealthy).toBe(false);
     });
@@ -532,7 +576,7 @@ describe('generate-room-images script', () => {
         { status: 'error', error: 'Another error' },
       ];
 
-      const errorCount = errors.filter(e => !e.isRateLimit).length;
+      const errorCount = errors.filter((e) => !e.isRateLimit).length;
 
       expect(errorCount).toBe(2);
     });
@@ -544,7 +588,7 @@ describe('generate-room-images script', () => {
         { status: 'error', isRateLimit: false, error: 'Error 3' },
       ];
 
-      const errorCount = errors.filter(e => !e.isRateLimit).length;
+      const errorCount = errors.filter((e) => !e.isRateLimit).length;
 
       expect(errorCount).toBe(3);
     });
@@ -555,7 +599,7 @@ describe('generate-room-images script', () => {
         { status: 'error', isRateLimit: true, error: 'Rate limited 2' },
       ];
 
-      const errorCount = errors.filter(e => !e.isRateLimit).length;
+      const errorCount = errors.filter((e) => !e.isRateLimit).length;
 
       expect(errorCount).toBe(0);
     });
@@ -563,7 +607,7 @@ describe('generate-room-images script', () => {
     it('should return zero when errors array is empty', () => {
       const errors: ProcessingError[] = [];
 
-      const errorCount = errors.filter(e => !e.isRateLimit).length;
+      const errorCount = errors.filter((e) => !e.isRateLimit).length;
 
       expect(errorCount).toBe(0);
     });
@@ -572,11 +616,16 @@ describe('generate-room-images script', () => {
       const errors: ProcessingError[] = [
         { status: 'error', isRateLimit: true, error: 'Rate limited' },
         { status: 'error', isTokenError: true, error: 'Token error' },
-        { status: 'error', isRateLimit: false, isTokenError: false, error: 'Generic error' },
+        {
+          status: 'error',
+          isRateLimit: false,
+          isTokenError: false,
+          error: 'Generic error',
+        },
       ];
 
       // Rate-limited errors should not be counted, but token errors should
-      const errorCount = errors.filter(e => !e.isRateLimit).length;
+      const errorCount = errors.filter((e) => !e.isRateLimit).length;
 
       expect(errorCount).toBe(2);
     });

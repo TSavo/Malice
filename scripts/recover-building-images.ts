@@ -10,7 +10,10 @@ import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const ASSETS_DIR = path.join(process.cwd(), 'assets/images');
-const BUILDINGS_DIR = path.join(process.cwd(), 'src/database/bootstrap/world/seattle/pioneer-square/buildings');
+const BUILDINGS_DIR = path.join(
+  process.cwd(),
+  'src/database/bootstrap/world/seattle/pioneer-square/buildings',
+);
 
 interface BuildingRoom {
   name: string;
@@ -30,13 +33,14 @@ async function main() {
 
   // Load all building files and their rooms
   const buildingFiles: BuildingFile[] = [];
-  const buildings = fs.readdirSync(BUILDINGS_DIR, { withFileTypes: true })
-    .filter(d => d.isDirectory())
-    .map(d => d.name);
+  const buildings = fs
+    .readdirSync(BUILDINGS_DIR, { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .map((d) => d.name);
 
   for (const building of buildings) {
     const buildingDir = path.join(BUILDINGS_DIR, building);
-    const files = fs.readdirSync(buildingDir).filter(f => f.endsWith('.ts'));
+    const files = fs.readdirSync(buildingDir).filter((f) => f.endsWith('.ts'));
 
     for (const file of files) {
       const filePath = path.join(buildingDir, file);
@@ -44,7 +48,9 @@ async function main() {
         const module = await import(pathToFileURL(filePath).href);
         if (module.building?.rooms) {
           const rooms = new Map<string, BuildingRoom>();
-          for (const [placeholder, roomDef] of Object.entries(module.building.rooms)) {
+          for (const [placeholder, roomDef] of Object.entries(
+            module.building.rooms,
+          )) {
             const room = roomDef as BuildingRoom;
             rooms.set(placeholder, room);
           }
@@ -59,7 +65,9 @@ async function main() {
   console.log(`📁 Found ${buildingFiles.length} building files`);
 
   // Scan existing images
-  const imageFiles = fs.readdirSync(ASSETS_DIR).filter(f => f.endsWith('.png'));
+  const imageFiles = fs
+    .readdirSync(ASSETS_DIR)
+    .filter((f) => f.endsWith('.png'));
   console.log(`🖼️  Found ${imageFiles.length} images`);
 
   // Build a map of coordinates -> image filename
@@ -100,8 +108,14 @@ async function main() {
 
       // Add imageOnDisk to this room in the file
       // Pattern: 'placeholder': { ... z: N, ... }
-      const escapedPlaceholder = placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const roomKeyPattern = new RegExp(`('${escapedPlaceholder}':\\s*\\{[^}]*?)(z:\\s*-?\\d+,?)`, 's');
+      const escapedPlaceholder = placeholder.replace(
+        /[.*+?^${}()|[\]\\]/g,
+        '\\$&',
+      );
+      const roomKeyPattern = new RegExp(
+        `('${escapedPlaceholder}':\\s*\\{[^}]*?)(z:\\s*-?\\d+,?)`,
+        's',
+      );
       const match = content.match(roomKeyPattern);
 
       if (match) {
@@ -126,7 +140,7 @@ async function main() {
   console.log(`❌ No image: ${noImage}`);
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error('Fatal error:', err);
   process.exit(1);
 });

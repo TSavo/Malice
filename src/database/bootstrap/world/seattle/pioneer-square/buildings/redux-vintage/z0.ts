@@ -146,7 +146,11 @@ A battered couch sits against one wall, the kind employees use for breaks. The u
       exits: {
         east: '%SHOWROOM',
         north: '%STORAGE',
-        down: { room: '%CELLAR_STAIRS', door: '%BASEMENT_TRAPDOOR', locks: ['%BASEMENT_LOCK'] },
+        down: {
+          room: '%CELLAR_STAIRS',
+          door: '%BASEMENT_TRAPDOOR',
+          locks: ['%BASEMENT_LOCK'],
+        },
       },
       sittables: [
         {

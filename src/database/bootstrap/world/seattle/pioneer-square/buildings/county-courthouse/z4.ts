@@ -75,7 +75,7 @@ A shared kitchen at the end of the hall has the abandoned remains of the last ju
     },
 
     '%CHAMBERS_1': {
-      name: 'King County Courthouse - Judge Martinez\'s Chambers',
+      name: "King County Courthouse - Judge Martinez's Chambers",
       description: `The private chambers of Judge Robert Martinez, senior jurist of the criminal division. The room reflects thirty years on the bench: photographs with governors and senators, awards for judicial excellence, a gavel collection from colleagues around the country.
 
 The desk is mahogany, massive, covered in case files the judge was reviewing. Notes in judicial handwriting show the analysis: facts, law, considerations, the reasoned process that led to decisions. The last case remains unresolved, the notes ending mid-thought.
@@ -99,7 +99,7 @@ A window offers a view of the city—the rooftops of Pioneer Square, downtown in
           capacity: 1,
           emptyMsg:
             'A high-backed leather chair behind the desk, shaped by years of careful sitting.',
-          occupiedMsg: '%s in the judge\'s chair',
+          occupiedMsg: "%s in the judge's chair",
         },
       ],
       objects: [
@@ -126,7 +126,7 @@ A window offers a view of the city—the rooftops of Pioneer Square, downtown in
     },
 
     '%CHAMBERS_2': {
-      name: 'King County Courthouse - Judge Chen\'s Chambers',
+      name: "King County Courthouse - Judge Chen's Chambers",
       description: `Judge Jennifer Chen's chambers, smaller than the senior jurist's but equally personal. The decoration tends toward minimalism—a single orchid (now dead), a ink brush painting, books arranged with architectural precision.
 
 The desk is organized with the same precision: inbox, outbox, reference materials, the spatial logic of someone who processed work efficiently. The efficiency remains visible in the arrangement. The work has stopped.

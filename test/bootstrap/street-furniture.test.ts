@@ -34,7 +34,7 @@ describe('Street Furniture and Sittables', () => {
     it('should create bench type with correct properties', async () => {
       // Need to create furniture parent first
       const describableType = await manager.load('describable');
-      const furnitureType = await manager.define(
+      const _furnitureType = await manager.define(
         'furniture',
         describableType!,
         {
@@ -61,7 +61,7 @@ describe('Street Furniture and Sittables', () => {
 
     it('should be idempotent when built multiple times', async () => {
       const describableType = await manager.load('describable');
-      const furnitureType = await manager.define(
+      const _furnitureType = await manager.define(
         'furniture',
         describableType!,
         {
@@ -253,7 +253,7 @@ describe('Street Furniture and Sittables', () => {
       const parkLamp = await manager.load('parkLamp');
 
       // Should have damage method from parent
-      const result = await parkLamp?.executeMethod('damage', [50]);
+      const _result = await parkLamp?.executeMethod('damage', [50]);
       expect(parkLamp?.get('durability')).toBe(50);
     });
   });
@@ -262,7 +262,7 @@ describe('Street Furniture and Sittables', () => {
     it('should create street sign type with sign properties', async () => {
       // Need to create sign parent first
       const describableType = await manager.load('describable');
-      const signType = await manager.define('sign', describableType!, {
+      const _signType = await manager.define('sign', describableType!, {
         properties: { name: 'Sign', description: 'A sign', text: '' },
       });
 
@@ -281,7 +281,7 @@ describe('Street Furniture and Sittables', () => {
 
     it('should read street name correctly', async () => {
       const describableType = await manager.load('describable');
-      const signType = await manager.define('sign', describableType!, {
+      const _signType = await manager.define('sign', describableType!, {
         properties: { name: 'Sign', description: 'A sign', text: '' },
       });
 
@@ -301,7 +301,7 @@ describe('Street Furniture and Sittables', () => {
 
     it('should handle graffiti vandalism', async () => {
       const describableType = await manager.load('describable');
-      const signType = await manager.define('sign', describableType!, {
+      const _signType = await manager.define('sign', describableType!, {
         properties: { name: 'Sign', description: 'A sign', text: '' },
       });
 
@@ -322,7 +322,7 @@ describe('Street Furniture and Sittables', () => {
 
     it('should become illegible after too many bullet holes', async () => {
       const describableType = await manager.load('describable');
-      const signType = await manager.define('sign', describableType!, {
+      const _signType = await manager.define('sign', describableType!, {
         properties: { name: 'Sign', description: 'A sign', text: '' },
       });
 
@@ -342,7 +342,7 @@ describe('Street Furniture and Sittables', () => {
 
     it('should repair damaged signs', async () => {
       const describableType = await manager.load('describable');
-      const signType = await manager.define('sign', describableType!, {
+      const _signType = await manager.define('sign', describableType!, {
         properties: { name: 'Sign', description: 'A sign', text: '' },
       });
 

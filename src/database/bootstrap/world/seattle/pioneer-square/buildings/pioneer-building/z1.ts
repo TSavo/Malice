@@ -118,7 +118,7 @@ A waiting area offers leather chairs and maritime magazines from years past. The
     },
 
     '%MARITIME_PRESIDENT': {
-      name: 'Pacific Maritime Insurance - President\'s Office',
+      name: "Pacific Maritime Insurance - President's Office",
       description: `The corner office, reserved for the company president—a space designed to intimidate and impress. Floor-to-ceiling windows on two walls offer views of Pioneer Square and, on clear days, the distant mountains. A massive mahogany desk sits before the windows, its leather chair turned to face the door.
 
 The walls are lined with nautical charts and photographs of ships—vessels the company insured, disasters it survived, the visual history of a century of maritime commerce. A brass telescope on a tripod stands near the window, pointed at Elliott Bay as if still watching for ships.
@@ -138,11 +138,12 @@ A safe the size of a small refrigerator squats in the corner, its door hanging o
       },
       sittables: [
         {
-          name: 'the president\'s chair',
+          name: "the president's chair",
           capacity: 1,
           emptyMsg:
             'A massive leather chair sits behind the desk, its back to the windows.',
-          occupiedMsg: '%s sitting in the president\'s chair, surveying the office',
+          occupiedMsg:
+            "%s sitting in the president's chair, surveying the office",
         },
       ],
       objects: [
@@ -189,11 +190,11 @@ A water cooler stands in the corner, its bottle empty, its drain tray crusted wi
       },
       sittables: [
         {
-          name: 'a clerk\'s desk',
+          name: "a clerk's desk",
           capacity: 4,
           emptyMsg:
             'Rows of wooden desks fill the room, each with a typewriter and a green-shaded lamp.',
-          occupiedMsg: '%s sitting at one of the clerk\'s desks',
+          occupiedMsg: "%s sitting at one of the clerk's desks",
         },
       ],
       objects: [

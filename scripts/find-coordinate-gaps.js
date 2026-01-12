@@ -17,8 +17,8 @@ const DB_NAME = 'malice';
 
 // Parse args
 const args = process.argv.slice(2);
-const zFilter = args.find(a => a.startsWith('--z='))?.split('=')[1];
-const fixMode = args.includes('--fix');
+const zFilter = args.find((a) => a.startsWith('--z='))?.split('=')[1];
+const _fixMode = args.includes('--fix');
 
 async function main() {
   const client = new MongoClient(MONGO_URI);
@@ -30,15 +30,18 @@ async function main() {
     console.log('Finding coordinate gaps in underground rooms...\n');
 
     // Get all rooms with z coordinates
-    const rooms = await db.collection('objects').find({
-      'properties.z.value': { $exists: true, $lt: 0 }
-    }).toArray();
+    const rooms = await db
+      .collection('objects')
+      .find({
+        'properties.z.value': { $exists: true, $lt: 0 },
+      })
+      .toArray();
 
     console.log(`Found ${rooms.length} underground rooms\n`);
 
     // Build coordinate map
     const coordMap = new Map(); // "x,y,z" -> room
-    const roomMap = new Map();  // id -> room
+    const roomMap = new Map(); // id -> room
 
     for (const room of rooms) {
       const x = room.properties.x?.value;
@@ -46,7 +49,7 @@ async function main() {
       const z = room.properties.z?.value;
 
       if (x === undefined || y === undefined || z === undefined) continue;
-      if (zFilter && z !== parseInt(zFilter)) continue;
+      if (zFilter && z !== parseInt(zFilter, 10)) continue;
 
       const key = `${x},${y},${z}`;
       coordMap.set(key, room);
@@ -66,10 +69,10 @@ async function main() {
     };
 
     const gaps = [];
-    const orphans = [];
+    const _orphans = [];
 
     // Check each room's exits
-    for (const [key, room] of coordMap) {
+    for (const [_key, room] of coordMap) {
       const x = room.properties.x.value;
       const y = room.properties.y.value;
       const z = room.properties.z.value;
@@ -87,14 +90,17 @@ async function main() {
         if (!exit) continue;
 
         const exitName = exit.properties.name?.value;
-        const destId = exit.properties.destRoom?.id || exit.properties.destRoom?.value;
+        const destId =
+          exit.properties.destRoom?.id || exit.properties.destRoom?.value;
         if (!exitName || !destId) continue;
 
         const dir = directions[exitName];
         if (!dir) continue; // Skip non-cardinal exits
 
         // Get destination room
-        const destRoom = await db.collection('objects').findOne({ _id: destId });
+        const destRoom = await db
+          .collection('objects')
+          .findOne({ _id: destId });
         if (!destRoom) continue;
 
         const destX = destRoom.properties.x?.value;
@@ -102,15 +108,17 @@ async function main() {
         const destZ = destRoom.properties.z?.value;
         const destName = destRoom.properties.name?.value || `#${destId}`;
 
-        if (destX === undefined || destY === undefined || destZ === undefined) continue;
+        if (destX === undefined || destY === undefined || destZ === undefined)
+          continue;
 
         // Check if exit skips coordinates
-        const expectedX = x + dir.dx;
-        const expectedY = y + dir.dy;
-        const expectedZ = z + dir.dz;
+        const _expectedX = x + dir.dx;
+        const _expectedY = y + dir.dy;
+        const _expectedZ = z + dir.dz;
 
         // Calculate distance
-        const dist = Math.abs(destX - x) + Math.abs(destY - y) + Math.abs(destZ - z);
+        const dist =
+          Math.abs(destX - x) + Math.abs(destY - y) + Math.abs(destZ - z);
 
         if (dist > 1) {
           // Find all missing coordinates along the path
@@ -119,7 +127,11 @@ async function main() {
           // Only check along the exit direction axis
           if (dir.dy !== 0 && destY !== y) {
             const step = destY > y ? 1 : -1;
-            for (let cy = y + step; cy !== destY && Math.abs(cy - y) < 50; cy += step) {
+            for (
+              let cy = y + step;
+              cy !== destY && Math.abs(cy - y) < 50;
+              cy += step
+            ) {
               const mKey = `${x},${cy},${z}`;
               if (!coordMap.has(mKey)) {
                 missing.push({ x, y: cy, z });
@@ -128,7 +140,11 @@ async function main() {
           }
           if (dir.dx !== 0 && destX !== x) {
             const step = destX > x ? 1 : -1;
-            for (let cx = x + step; cx !== destX && Math.abs(cx - x) < 50; cx += step) {
+            for (
+              let cx = x + step;
+              cx !== destX && Math.abs(cx - x) < 50;
+              cx += step
+            ) {
               const mKey = `${cx},${y},${z}`;
               if (!coordMap.has(mKey)) {
                 missing.push({ x: cx, y, z });
@@ -137,7 +153,11 @@ async function main() {
           }
           if (dir.dz !== 0 && destZ !== z) {
             const step = destZ > z ? 1 : -1;
-            for (let cz = z + step; cz !== destZ && Math.abs(cz - z) < 50; cz += step) {
+            for (
+              let cz = z + step;
+              cz !== destZ && Math.abs(cz - z) < 50;
+              cz += step
+            ) {
               const mKey = `${x},${y},${cz}`;
               if (!coordMap.has(mKey)) {
                 missing.push({ x, y, z: cz });
@@ -174,8 +194,12 @@ async function main() {
       for (const [z, zGaps] of [...byZ.entries()].sort((a, b) => b[0] - a[0])) {
         console.log(`=== z=${z} ===`);
         for (const gap of zGaps) {
-          console.log(`  ${gap.from.name} (${gap.from.x},${gap.from.y}) --${gap.direction}--> ${gap.to.name} (${gap.to.x},${gap.to.y})`);
-          console.log(`    Missing: ${gap.missing.map(m => `(${m.x},${m.y},${m.z})`).join(', ')}`);
+          console.log(
+            `  ${gap.from.name} (${gap.from.x},${gap.from.y}) --${gap.direction}--> ${gap.to.name} (${gap.to.x},${gap.to.y})`,
+          );
+          console.log(
+            `    Missing: ${gap.missing.map((m) => `(${m.x},${m.y},${m.z})`).join(', ')}`,
+          );
         }
         console.log('');
       }
@@ -189,10 +213,11 @@ async function main() {
       if (z === undefined) continue;
       countByZ.set(z, (countByZ.get(z) || 0) + 1);
     }
-    for (const [z, count] of [...countByZ.entries()].sort((a, b) => b[0] - a[0])) {
+    for (const [z, count] of [...countByZ.entries()].sort(
+      (a, b) => b[0] - a[0],
+    )) {
       console.log(`  z=${z}: ${count} rooms`);
     }
-
   } finally {
     await client.close();
   }

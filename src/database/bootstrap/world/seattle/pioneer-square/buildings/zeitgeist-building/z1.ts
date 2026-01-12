@@ -46,7 +46,7 @@ A freight elevator gate stands to the south, its iron lattice incongruous agains
         west: '%GALLERY_WEST',
         down: '%LOBBY',
         up: '%STUDIO_LOBBY',
-        'in': '%E',
+        in: '%E',
       },
       sittables: [
         {
@@ -121,7 +121,8 @@ A visitors' book sits on a pedestal near the entrance. The last entry is from th
         {
           name: 'a viewing bench',
           capacity: 3,
-          emptyMsg: 'A long bench centered in the gallery invites prolonged viewing.',
+          emptyMsg:
+            'A long bench centered in the gallery invites prolonged viewing.',
           occupiedMsg: '%s contemplating the exhibition',
         },
       ],
@@ -172,7 +173,8 @@ The lighting here is warmer, less clinical than the main gallery. Someone unders
         {
           name: 'a corner chair',
           capacity: 1,
-          emptyMsg: 'A vintage armchair sits in the corner, positioned for viewing.',
+          emptyMsg:
+            'A vintage armchair sits in the corner, positioned for viewing.',
           occupiedMsg: '%s seated in the corner chair',
         },
       ],
@@ -201,7 +203,8 @@ The lighting here is theatrical, spots and shadows creating drama. A viewing pla
         {
           name: 'a viewing platform',
           capacity: 4,
-          emptyMsg: 'A raised viewing platform offers perspective on the installation pieces.',
+          emptyMsg:
+            'A raised viewing platform offers perspective on the installation pieces.',
           occupiedMsg: '%s observing from the platform',
         },
       ],

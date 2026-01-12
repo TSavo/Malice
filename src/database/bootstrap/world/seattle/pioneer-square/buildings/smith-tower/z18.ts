@@ -80,7 +80,8 @@ export const building = {
 
     '%A1_z18': {
       name: 'Smith Tower - 18th Floor - North Suite - Living Room',
-      description: 'A corner unit with tall windows and pale wood floors. A kitchenette occupies one wall, its appliances dark and silent. Built-in shelving holds the remnants of someone\'s life—books, decorative objects, a dead potted plant.',
+      description:
+        "A corner unit with tall windows and pale wood floors. A kitchenette occupies one wall, its appliances dark and silent. Built-in shelving holds the remnants of someone's life—books, decorative objects, a dead potted plant.",
       x: -3,
       y: 11,
       z: 18,
@@ -96,10 +97,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'table', name: 'a ping pong table', description: 'A ping pong table dominates the center of the room, its green surface faded and warped. One paddle lies on the table, its rubber peeling. The net sags in defeat.', boltedDown: false },
-        { prototype: 'furniture', name: 'a snack bar kitchenette', description: 'A built-in kitchenette has been repurposed as a snack bar. Empty Red Bull cans and kombucha bottles line the counter. A dusty espresso machine sits silent.', boltedDown: true },
-        { prototype: 'furniture', name: 'a wall of whiteboards', description: 'Floor-to-ceiling whiteboards cover one wall, still marked with faded sprint planning notes, user flow diagrams, and the words "SHIP IT!" in multiple colors.', boltedDown: true },
-        { prototype: 'furniture', name: 'tangled ethernet cables', description: 'A rat\'s nest of ethernet cables spills from a hole in the ceiling, hanging like technological vines. Some still connect to nothing.', boltedDown: true },
+        {
+          prototype: 'table',
+          name: 'a ping pong table',
+          description:
+            'A ping pong table dominates the center of the room, its green surface faded and warped. One paddle lies on the table, its rubber peeling. The net sags in defeat.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a snack bar kitchenette',
+          description:
+            'A built-in kitchenette has been repurposed as a snack bar. Empty Red Bull cans and kombucha bottles line the counter. A dusty espresso machine sits silent.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a wall of whiteboards',
+          description:
+            'Floor-to-ceiling whiteboards cover one wall, still marked with faded sprint planning notes, user flow diagrams, and the words "SHIP IT!" in multiple colors.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'tangled ethernet cables',
+          description:
+            "A rat's nest of ethernet cables spills from a hole in the ceiling, hanging like technological vines. Some still connect to nothing.",
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -142,17 +167,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a nap pod', description: 'A futuristic nap pod sits in the corner, its curved white shell designed for power naps between coding sprints. The mattress inside is surprisingly comfortable.', quality: 'nice' },
-        { prototype: 'furniture', name: 'a smart closet', description: 'A built-in closet has been converted to "smart storage" with QR-coded bins and a faded label reading "Swag Inventory." The bins are mostly empty.', boltedDown: true },
-        { prototype: 'table', name: 'a charging station nightstand', description: 'A nightstand bristles with dead charging cables—micro-USB, Lightning, USB-C, proprietary connectors for devices long obsolete.', boltedDown: false },
-        { prototype: 'furniture', name: 'a motivational poster', description: 'A framed poster on the wall reads "MOVE FAST AND BREAK THINGS" in bold sans-serif. The glass is cracked.', boltedDown: true },
+        {
+          prototype: 'bed',
+          name: 'a nap pod',
+          description:
+            'A futuristic nap pod sits in the corner, its curved white shell designed for power naps between coding sprints. The mattress inside is surprisingly comfortable.',
+          quality: 'nice',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a smart closet',
+          description:
+            'A built-in closet has been converted to "smart storage" with QR-coded bins and a faded label reading "Swag Inventory." The bins are mostly empty.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a charging station nightstand',
+          description:
+            'A nightstand bristles with dead charging cables—micro-USB, Lightning, USB-C, proprietary connectors for devices long obsolete.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a motivational poster',
+          description:
+            'A framed poster on the wall reads "MOVE FAST AND BREAK THINGS" in bold sans-serif. The glass is cracked.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
           name: 'the nap pod',
           capacity: 1,
           emptyMsg:
-            'The nap pod\'s shell is raised, revealing its cushioned interior.',
+            "The nap pod's shell is raised, revealing its cushioned interior.",
           occupiedMsg: '%s curled up in the nap pod.',
         },
       ],
@@ -177,10 +226,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a micro-kitchen', description: 'A cramped kitchen area holds a cold-brew coffee station, an unplugged mini-fridge covered in startup stickers, and a microwave optimized for reheating takeout.', boltedDown: true },
-        { prototype: 'table', name: 'a standing desk', description: 'An adjustable standing desk is frozen at standing height, its motorized base long dead. Dual monitor arms hold nothing but dust.', boltedDown: false },
-        { prototype: 'furniture', name: 'a treadmill desk', description: 'A treadmill desk sits in the corner, the belt cracked and immobile. A laptop stand is mounted on the console.', boltedDown: true },
-        { prototype: 'furniture', name: 'a server rack', description: 'A small server rack hums silently—wait, no. It\'s been dead for decades. Blinking LED lights are just a memory.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a micro-kitchen',
+          description:
+            'A cramped kitchen area holds a cold-brew coffee station, an unplugged mini-fridge covered in startup stickers, and a microwave optimized for reheating takeout.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a standing desk',
+          description:
+            'An adjustable standing desk is frozen at standing height, its motorized base long dead. Dual monitor arms hold nothing but dust.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a treadmill desk',
+          description:
+            'A treadmill desk sits in the corner, the belt cracked and immobile. A laptop stand is mounted on the console.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a server rack',
+          description:
+            "A small server rack hums silently—wait, no. It's been dead for decades. Blinking LED lights are just a memory.",
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -219,10 +292,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a climbing wall', description: 'A small indoor climbing wall is bolted to the mezzanine, its colorful holds faded but still grippable. The startup believed in "disrupting fitness."', boltedDown: true },
-        { prototype: 'bed', name: 'a hammock bed', description: 'A hammock is strung across the loft space, its fabric sun-bleached but holding. Someone really committed to the startup lifestyle.', quality: 'standard' },
-        { prototype: 'furniture', name: 'a meditation cushion pile', description: 'A pile of meditation cushions and yoga mats sits beneath the loft, remnants of mandatory mindfulness sessions.', boltedDown: false },
-        { prototype: 'table', name: 'a bamboo shelf', description: 'A sustainable bamboo bookshelf holds copies of "The Lean Startup," "Zero to One," and several dust-covered copies of the company\'s own unread memoir.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'a climbing wall',
+          description:
+            'A small indoor climbing wall is bolted to the mezzanine, its colorful holds faded but still grippable. The startup believed in "disrupting fitness."',
+          boltedDown: true,
+        },
+        {
+          prototype: 'bed',
+          name: 'a hammock bed',
+          description:
+            'A hammock is strung across the loft space, its fabric sun-bleached but holding. Someone really committed to the startup lifestyle.',
+          quality: 'standard',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a meditation cushion pile',
+          description:
+            'A pile of meditation cushions and yoga mats sits beneath the loft, remnants of mandatory mindfulness sessions.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'table',
+          name: 'a bamboo shelf',
+          description:
+            'A sustainable bamboo bookshelf holds copies of "The Lean Startup," "Zero to One," and several dust-covered copies of the company\'s own unread memoir.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -235,8 +332,7 @@ export const building = {
         {
           name: 'the hammock bed',
           capacity: 1,
-          emptyMsg:
-            'The hammock sways gently in a draft from the window.',
+          emptyMsg: 'The hammock sways gently in a draft from the window.',
           occupiedMsg: '%s swaying in the hammock bed.',
         },
       ],
@@ -261,10 +357,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a sleeping bag', description: 'A high-end sleeping bag rated for Arctic conditions is spread on a camping pad. Apparently someone took "living the startup life" literally.', quality: 'standard' },
-        { prototype: 'furniture', name: 'a pegboard wall', description: 'A pegboard organizer covers one wall, its hooks holding headphones, stress balls, and fidget spinners. Everything is branded.', boltedDown: true },
-        { prototype: 'furniture', name: 'a wall-mounted monitor', description: 'A large flat-screen monitor is mounted at eye level, its screen dark. A faded sticky note on the bezel reads "Analytics Dashboard."', boltedDown: true },
-        { prototype: 'table', name: 'a floating shelf desk', description: 'A minimalist floating shelf serves as a desk, barely wide enough for a laptop. A dead MacBook Pro sits there still.', boltedDown: true },
+        {
+          prototype: 'bed',
+          name: 'a sleeping bag',
+          description:
+            'A high-end sleeping bag rated for Arctic conditions is spread on a camping pad. Apparently someone took "living the startup life" literally.',
+          quality: 'standard',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a pegboard wall',
+          description:
+            'A pegboard organizer covers one wall, its hooks holding headphones, stress balls, and fidget spinners. Everything is branded.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a wall-mounted monitor',
+          description:
+            'A large flat-screen monitor is mounted at eye level, its screen dark. A faded sticky note on the bezel reads "Analytics Dashboard."',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a floating shelf desk',
+          description:
+            'A minimalist floating shelf serves as a desk, barely wide enough for a laptop. A dead MacBook Pro sits there still.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -301,10 +421,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'modular lounge pods', description: 'A cluster of modular lounge pods in primary colors can be rearranged into different configurations. Someone left them in "collaboration mode."', boltedDown: false },
-        { prototype: 'table', name: 'a foosball table', description: 'A professional-grade foosball table occupies the center of the room. The little players are frozen mid-kick, their paint chipped.', boltedDown: false },
-        { prototype: 'furniture', name: 'a media wall', description: 'A wall-mounted array of screens was meant for presentations and Slack channels. Now they\'re all dark, reflecting the empty room.', boltedDown: true },
-        { prototype: 'furniture', name: 'a swag closet', description: 'A built-in closet is packed with branded hoodies, t-shirts, and tote bags. The company name nobody remembers is printed on everything.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'modular lounge pods',
+          description:
+            'A cluster of modular lounge pods in primary colors can be rearranged into different configurations. Someone left them in "collaboration mode."',
+          boltedDown: false,
+        },
+        {
+          prototype: 'table',
+          name: 'a foosball table',
+          description:
+            'A professional-grade foosball table occupies the center of the room. The little players are frozen mid-kick, their paint chipped.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a media wall',
+          description:
+            "A wall-mounted array of screens was meant for presentations and Slack channels. Now they're all dark, reflecting the empty room.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a swag closet',
+          description:
+            'A built-in closet is packed with branded hoodies, t-shirts, and tote bags. The company name nobody remembers is printed on everything.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -336,10 +480,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a patent wall', description: 'Framed patent certificates and startup award plaques cover one wall—"Most Innovative Disruption 2019," "Best Pivot 2020." The achievements mean nothing now.', boltedDown: true },
-        { prototype: 'table', name: 'a hot desk cluster', description: 'Three narrow desks are pushed together in a cluster, designed for hot-desking. Headphone hooks and monitor arms remain, monitors long gone.', boltedDown: false },
-        { prototype: 'furniture', name: 'a phone booth pod', description: 'A soundproof phone booth pod stands in the corner for private calls. The acoustic foam inside is dusty but intact.', boltedDown: false },
-        { prototype: 'furniture', name: 'a idea board', description: 'A corkboard labeled "THE IDEA WALL" holds faded sticky notes with illegible product ideas and a few dead Post-its curled at the edges.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a patent wall',
+          description:
+            'Framed patent certificates and startup award plaques cover one wall—"Most Innovative Disruption 2019," "Best Pivot 2020." The achievements mean nothing now.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a hot desk cluster',
+          description:
+            'Three narrow desks are pushed together in a cluster, designed for hot-desking. Headphone hooks and monitor arms remain, monitors long gone.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a phone booth pod',
+          description:
+            'A soundproof phone booth pod stands in the corner for private calls. The acoustic foam inside is dusty but intact.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a idea board',
+          description:
+            'A corkboard labeled "THE IDEA WALL" holds faded sticky notes with illegible product ideas and a few dead Post-its curled at the edges.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -361,7 +529,8 @@ export const building = {
 
     '%C2_z18': {
       name: 'Smith Tower - 18th Floor - South Suite - Living Room',
-      description: 'A corner unit with western exposure and aged carpeting. The afternoon sun has bleached everything near the windows to a uniform pale.',
+      description:
+        'A corner unit with western exposure and aged carpeting. The afternoon sun has bleached everything near the windows to a uniform pale.',
       x: -3,
       y: 9,
       z: 18,
@@ -377,10 +546,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a kombucha bar', description: 'A small bar area holds a kombucha brewing station with several glass jars. The SCOBYs inside have long since died, leaving murky liquid.', boltedDown: true },
-        { prototype: 'table', name: 'a reclaimed wood table', description: 'A communal table made from reclaimed barnwood and industrial pipe legs seats six. Someone carved "HUSTLE" into the edge.', boltedDown: false },
-        { prototype: 'furniture', name: 'a smart radiator', description: 'The old steam radiator has been fitted with a "smart" thermostat cover that no longer connects to anything.', boltedDown: true },
-        { prototype: 'furniture', name: 'macrame plant hangers', description: 'Macrame plant hangers dangle from ceiling hooks, their pots holding only dust and desiccated succulents.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a kombucha bar',
+          description:
+            'A small bar area holds a kombucha brewing station with several glass jars. The SCOBYs inside have long since died, leaving murky liquid.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a reclaimed wood table',
+          description:
+            'A communal table made from reclaimed barnwood and industrial pipe legs seats six. Someone carved "HUSTLE" into the edge.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a smart radiator',
+          description:
+            'The old steam radiator has been fitted with a "smart" thermostat cover that no longer connects to anything.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'macrame plant hangers',
+          description:
+            'Macrame plant hangers dangle from ceiling hooks, their pots holding only dust and desiccated succulents.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -423,10 +616,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a welcome wall', description: 'A neon sign reading "WELCOME TO THE FUTURE" hangs dead on the entry wall. Below it, a row of hooks holds forgotten lanyards and conference badges.', boltedDown: true },
-        { prototype: 'furniture', name: 'a scooter rack', description: 'A wall-mounted rack designed for Razor scooters holds two dusty models. Apparently walking was too slow for this startup.', boltedDown: true },
-        { prototype: 'furniture', name: 'a bike repair station', description: 'A bike repair station with tools and a pump is mounted on one wall. A single flat tire leans against it.', boltedDown: true },
-        { prototype: 'table', name: 'a standing meeting table', description: 'A tall, narrow standing meeting table is designed to keep meetings short. A few sticky notes are stuck to its surface.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'a welcome wall',
+          description:
+            'A neon sign reading "WELCOME TO THE FUTURE" hangs dead on the entry wall. Below it, a row of hooks holds forgotten lanyards and conference badges.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a scooter rack',
+          description:
+            'A wall-mounted rack designed for Razor scooters holds two dusty models. Apparently walking was too slow for this startup.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a bike repair station',
+          description:
+            'A bike repair station with tools and a pump is mounted on one wall. A single flat tire leans against it.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a standing meeting table',
+          description:
+            'A tall, narrow standing meeting table is designed to keep meetings short. A few sticky notes are stuck to its surface.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -458,17 +675,40 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a platform bed', description: 'A minimalist platform bed with built-in USB charging ports fills the alcove. The ports are dead, of course, but the memory foam mattress has held up.', quality: 'nice' },
-        { prototype: 'furniture', name: 'a capsule wardrobe rack', description: 'A minimal clothing rack holds exactly 33 items—someone took the capsule wardrobe trend seriously. The clothes are dated but well-chosen.', boltedDown: false },
-        { prototype: 'furniture', name: 'a smart mirror', description: 'A "smart" mirror is mounted on the wall, its display long dead. It was supposed to show weather and calendar. Now it just reflects.', boltedDown: true },
-        { prototype: 'table', name: 'a wireless charging pad nightstand', description: 'A nightstand with a built-in wireless charging surface holds nothing to charge. A dead Alexa sits there, eternally waiting.', boltedDown: false },
+        {
+          prototype: 'bed',
+          name: 'a platform bed',
+          description:
+            'A minimalist platform bed with built-in USB charging ports fills the alcove. The ports are dead, of course, but the memory foam mattress has held up.',
+          quality: 'nice',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a capsule wardrobe rack',
+          description:
+            'A minimal clothing rack holds exactly 33 items—someone took the capsule wardrobe trend seriously. The clothes are dated but well-chosen.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a smart mirror',
+          description:
+            'A "smart" mirror is mounted on the wall, its display long dead. It was supposed to show weather and calendar. Now it just reflects.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a wireless charging pad nightstand',
+          description:
+            'A nightstand with a built-in wireless charging surface holds nothing to charge. A dead Alexa sits there, eternally waiting.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
           name: 'the platform bed',
           capacity: 2,
-          emptyMsg:
-            'The platform bed sits low and modern in its alcove.',
+          emptyMsg: 'The platform bed sits low and modern in its alcove.',
           occupiedMsg: '%s lounging on the platform bed.',
         },
       ],
@@ -493,11 +733,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a convertible sofa bed', description: 'A space-saving sofa bed unfolds from the wall, its clever mechanism still working. The mattress is surprisingly supportive for a dual-purpose piece.', quality: 'standard' },
-        { prototype: 'furniture', name: 'a wall bed cabinet', description: 'The sofa bed folds into a sleek white cabinet with "ORI" branding—a robotic furniture startup that outlived its parent company.', boltedDown: true },
-        { prototype: 'furniture', name: 'modular wall storage', description: 'A modular shelving system holds books, a dead Bluetooth speaker, and several participation trophies from hackathons.', boltedDown: true },
-        { prototype: 'table', name: 'a motorized standing desk', description: 'A small motorized standing desk is stuck halfway between sitting and standing height, its motor burned out mid-adjustment.', boltedDown: false },
-        { prototype: 'furniture', name: 'a VR headset dock', description: 'A charging dock for VR headsets is mounted on the wall. One headset remains, its lenses cracked and straps deteriorated.', boltedDown: true },
+        {
+          prototype: 'bed',
+          name: 'a convertible sofa bed',
+          description:
+            'A space-saving sofa bed unfolds from the wall, its clever mechanism still working. The mattress is surprisingly supportive for a dual-purpose piece.',
+          quality: 'standard',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a wall bed cabinet',
+          description:
+            'The sofa bed folds into a sleek white cabinet with "ORI" branding—a robotic furniture startup that outlived its parent company.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'modular wall storage',
+          description:
+            'A modular shelving system holds books, a dead Bluetooth speaker, and several participation trophies from hackathons.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a motorized standing desk',
+          description:
+            'A small motorized standing desk is stuck halfway between sitting and standing height, its motor burned out mid-adjustment.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a VR headset dock',
+          description:
+            'A charging dock for VR headsets is mounted on the wall. One headset remains, its lenses cracked and straps deteriorated.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {

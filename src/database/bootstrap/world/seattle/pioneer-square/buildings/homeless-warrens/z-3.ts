@@ -36,8 +36,20 @@ This is the main entrance. The city above pretends not to notice the traffic.`,
         east: '%SUPPLY_TUNNEL',
       },
       objects: [
-        { prototype: 'sign', name: 'territorial markers', description: 'Spray-painted symbols mark territory boundaries. The meanings are known only to those who live here.', boltedDown: true },
-        { prototype: 'furniture', name: 'a rope ladder', description: 'A frayed rope ladder hangs from the shaft, supplementing the worn handholds. It sways with each climber.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'territorial markers',
+          description:
+            'Spray-painted symbols mark territory boundaries. The meanings are known only to those who live here.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a rope ladder',
+          description:
+            'A frayed rope ladder hangs from the shaft, supplementing the worn handholds. It sways with each climber.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -63,8 +75,20 @@ Water stains on the walls show how high floods have risen. The highest marks are
         south: '%RAT_BORDER',
       },
       objects: [
-        { prototype: 'sign', name: 'flood warnings', description: 'Hand-painted warnings in multiple languages: "WATCH SKY", "RUN WHEN WET", "NO SLEEP HERE".', boltedDown: true },
-        { prototype: 'furniture', name: 'a drainage grate', description: 'A heavy iron grate covers the upward drain. It can be lifted from below, but not from above.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'flood warnings',
+          description:
+            'Hand-painted warnings in multiple languages: "WATCH SKY", "RUN WHEN WET", "NO SLEEP HERE".',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a drainage grate',
+          description:
+            'A heavy iron grate covers the upward drain. It can be lifted from below, but not from above.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -92,9 +116,27 @@ A complex social order governs this place. Newcomers learn the rules or don't st
         west: '%FAMILY_SECTION',
       },
       objects: [
-        { prototype: 'furniture', name: 'a communal fire pit', description: 'A metal barrel serves as a fire pit, its sides cut with ventilation holes. The fire is kept burning by collective effort—letting it die is a serious offense.', boltedDown: true },
-        { prototype: 'furniture', name: 'the rules board', description: 'A piece of plywood lists camp rules: "NO STEALING", "NO VIOLENCE", "SHARE THE FIRE", "WATCH EACH OTHER\'S BACKS". Below: "BREAK THE RULES, LEAVE THE CAMP".', boltedDown: true },
-        { prototype: 'furniture', name: 'makeshift shelters', description: 'Tarps strung between pillars create semi-private spaces. Cardboard provides insulation. Sleeping bags and blankets pile in corners.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a communal fire pit',
+          description:
+            'A metal barrel serves as a fire pit, its sides cut with ventilation holes. The fire is kept burning by collective effort—letting it die is a serious offense.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'the rules board',
+          description:
+            'A piece of plywood lists camp rules: "NO STEALING", "NO VIOLENCE", "SHARE THE FIRE", "WATCH EACH OTHER\'S BACKS". Below: "BREAK THE RULES, LEAVE THE CAMP".',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'makeshift shelters',
+          description:
+            'Tarps strung between pillars create semi-private spaces. Cardboard provides insulation. Sleeping bags and blankets pile in corners.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -116,9 +158,27 @@ Children's drawings cover one wall. Someone has hung a string of battery-powered
         south: '%STORAGE_ALCOVE',
       },
       objects: [
-        { prototype: 'furniture', name: 'children\'s drawings', description: 'Crayon drawings cover the wall: houses with smoking chimneys, families holding hands, dogs and cats, a sun. The dreams of children who have never had those things.', boltedDown: true },
-        { prototype: 'furniture', name: 'a play corner', description: 'Salvaged toys occupy a corner: a one-armed doll, some plastic dinosaurs, a deflated basketball. The children share them.', boltedDown: true },
-        { prototype: 'furniture', name: 'a sleeping area', description: 'Mattresses salvaged from dumpsters are pushed together, covered with donated blankets. The families sleep here together for warmth and protection.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: "children's drawings",
+          description:
+            'Crayon drawings cover the wall: houses with smoking chimneys, families holding hands, dogs and cats, a sun. The dreams of children who have never had those things.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a play corner',
+          description:
+            'Salvaged toys occupy a corner: a one-armed doll, some plastic dinosaurs, a deflated basketball. The children share them.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a sleeping area',
+          description:
+            'Mattresses salvaged from dumpsters are pushed together, covered with donated blankets. The families sleep here together for warmth and protection.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -141,9 +201,27 @@ Those who control the market have power. That power is contested.`,
         south: '%SICK_BAY',
       },
       objects: [
-        { prototype: 'furniture', name: 'trading tables', description: 'Overturned crates serve as trading tables. Salvaged goods are laid out: clothing, canned food, batteries, phone chargers, cigarettes—the currencies of the underground.', boltedDown: true },
-        { prototype: 'sign', name: 'exchange rates', description: 'A chalkboard lists informal exchange rates: "1 PACK CIGS = 2 CANS FOOD", "PHONE CHARGE = 1 BLANKET HOUR", "INFO = NEGOTIABLE".', boltedDown: true },
-        { prototype: 'furniture', name: 'a lookout post', description: 'Someone always watches the market from a raised platform. Theft is dealt with harshly.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'trading tables',
+          description:
+            'Overturned crates serve as trading tables. Salvaged goods are laid out: clothing, canned food, batteries, phone chargers, cigarettes—the currencies of the underground.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'exchange rates',
+          description:
+            'A chalkboard lists informal exchange rates: "1 PACK CIGS = 2 CANS FOOD", "PHONE CHARGE = 1 BLANKET HOUR", "INFO = NEGOTIABLE".',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a lookout post',
+          description:
+            'Someone always watches the market from a raised platform. Theft is dealt with harshly.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -166,8 +244,20 @@ Those who control the market have power. That power is contested.`,
         },
       },
       objects: [
-        { prototype: 'furniture', name: 'a supply cache', description: 'Plastic bins line the walls, containing tonight\'s scavenged goods awaiting distribution: dented cans, day-old bread, discarded clothing.', boltedDown: true },
-        { prototype: 'sign', name: 'scavenger routes', description: 'A hand-drawn map shows the best dumpster routes, restaurant schedules, and "friendly" businesses. It\'s updated regularly.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a supply cache',
+          description:
+            "Plastic bins line the walls, containing tonight's scavenged goods awaiting distribution: dented cans, day-old bread, discarded clothing.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'scavenger routes',
+          description:
+            'A hand-drawn map shows the best dumpster routes, restaurant schedules, and "friendly" businesses. It\'s updated regularly.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -194,9 +284,27 @@ The smell of infection and disinfectant mingles in the air.`,
         south: '%QUARANTINE',
       },
       objects: [
-        { prototype: 'furniture', name: 'medical supplies', description: 'A salvaged cabinet holds what passes for medical supplies: bandages, antiseptic, expired antibiotics, a blood pressure cuff. Not enough. Never enough.', boltedDown: true },
-        { prototype: 'furniture', name: 'cots', description: 'Folding cots hold the sick and injured. A volunteer sits with each one when possible. Some recover. Some don\'t.', boltedDown: true },
-        { prototype: 'sign', name: 'a volunteer schedule', description: 'A chart shows who has medical training and when they\'re available. Most are self-taught. They do their best.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'medical supplies',
+          description:
+            'A salvaged cabinet holds what passes for medical supplies: bandages, antiseptic, expired antibiotics, a blood pressure cuff. Not enough. Never enough.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'cots',
+          description:
+            "Folding cots hold the sick and injured. A volunteer sits with each one when possible. Some recover. Some don't.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'a volunteer schedule',
+          description:
+            "A chart shows who has medical training and when they're available. Most are self-taught. They do their best.",
+          boltedDown: true,
+        },
       ],
     },
 
@@ -218,9 +326,27 @@ No one wants to end up here. Everyone fears it.`,
         south: '%RAT_BORDER',
       },
       objects: [
-        { prototype: 'furniture', name: 'a plastic barrier', description: 'Heavy plastic sheeting separates the quarantine from the rest of the warrens. It rustles in the air currents, an inadequate defense against contagion.', boltedDown: true },
-        { prototype: 'furniture', name: 'isolation cots', description: 'Cots are spaced far apart, each occupant wrapped in whatever blankets could be spared. Water bottles sit within reach. Some are empty.', boltedDown: true },
-        { prototype: 'sign', name: 'a death count', description: 'Tally marks scratched into the wall count those who didn\'t make it. The count is higher than anyone wants to acknowledge.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a plastic barrier',
+          description:
+            'Heavy plastic sheeting separates the quarantine from the rest of the warrens. It rustles in the air currents, an inadequate defense against contagion.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'isolation cots',
+          description:
+            'Cots are spaced far apart, each occupant wrapped in whatever blankets could be spared. Water bottles sit within reach. Some are empty.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'a death count',
+          description:
+            "Tally marks scratched into the wall count those who didn't make it. The count is higher than anyone wants to acknowledge.",
+          boltedDown: true,
+        },
       ],
     },
 
@@ -242,9 +368,27 @@ A rotation of volunteers guards the space around the clock.`,
         east: '%DEEPER_TUNNELS',
       },
       objects: [
-        { prototype: 'furniture', name: 'food reserves', description: 'Plastic bins hold the camp\'s food reserves: canned goods, dried rice, peanut butter. Enough for maybe two weeks if rationed carefully.', boltedDown: true },
-        { prototype: 'furniture', name: 'a blanket pile', description: 'Donated blankets are stacked in the driest corner, distributed when temperatures drop. The pile is smaller than it should be.', boltedDown: true },
-        { prototype: 'furniture', name: 'a guard post', description: 'A folding chair faces the entrance, occupied by whoever drew guard duty. The job is boring but essential.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'food reserves',
+          description:
+            "Plastic bins hold the camp's food reserves: canned goods, dried rice, peanut butter. Enough for maybe two weeks if rationed carefully.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a blanket pile',
+          description:
+            'Donated blankets are stacked in the driest corner, distributed when temperatures drop. The pile is smaller than it should be.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a guard post',
+          description:
+            'A folding chair faces the entrance, occupied by whoever drew guard duty. The job is boring but essential.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -271,8 +415,20 @@ A rotation of volunteers guards the space around the clock.`,
         down: '%FORGOTTEN_LEVEL',
       },
       objects: [
-        { prototype: 'sign', name: 'warning graffiti', description: 'Spray-painted on the wall: "ALONE = PREY". A reminder of the dangers beyond the camp\'s protection.', boltedDown: true },
-        { prototype: 'furniture', name: 'abandoned bedrolls', description: 'Scattered bedrolls mark where people once slept. Some left. Some were carried out. Some just disappeared.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'warning graffiti',
+          description:
+            'Spray-painted on the wall: "ALONE = PREY". A reminder of the dangers beyond the camp\'s protection.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'abandoned bedrolls',
+          description:
+            'Scattered bedrolls mark where people once slept. Some left. Some were carried out. Some just disappeared.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -294,9 +450,27 @@ The candles never go out. Someone always replaces them.`,
         east: '%RAT_BORDER',
       },
       objects: [
-        { prototype: 'furniture', name: 'a multi-faith altar', description: 'A makeshift altar holds religious items from many traditions—candles, prayer beads, small statues, handwritten prayers. All faiths are welcome here.', boltedDown: true },
-        { prototype: 'furniture', name: 'votive candles', description: 'Dozens of candles burn in salvaged containers, each one a prayer for someone above or below. The flames are the brightest light in the warrens.', boltedDown: true },
-        { prototype: 'sign', name: 'prayer notes', description: 'Scraps of paper are tucked into cracks in the wall—prayers, wishes, names of the lost. Some are legible. Some have been there for years.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a multi-faith altar',
+          description:
+            'A makeshift altar holds religious items from many traditions—candles, prayer beads, small statues, handwritten prayers. All faiths are welcome here.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'votive candles',
+          description:
+            'Dozens of candles burn in salvaged containers, each one a prayer for someone above or below. The flames are the brightest light in the warrens.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'prayer notes',
+          description:
+            'Scraps of paper are tucked into cracks in the wall—prayers, wishes, names of the lost. Some are legible. Some have been there for years.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -324,8 +498,20 @@ When the rains come, this passage becomes a death trap.`,
         },
       },
       objects: [
-        { prototype: 'sign', name: 'high water marks', description: 'Painted lines on the walls show flood levels from different storms. The highest is at chest height, dated three years ago.', boltedDown: true },
-        { prototype: 'furniture', name: 'debris piles', description: 'Flood debris accumulates against the walls: plastic bags, rotted wood, the occasional shoe. The waters bring strange things.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'high water marks',
+          description:
+            'Painted lines on the walls show flood levels from different storms. The highest is at chest height, dated three years ago.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'debris piles',
+          description:
+            'Flood debris accumulates against the walls: plastic bags, rotted wood, the occasional shoe. The waters bring strange things.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -353,9 +539,27 @@ The scratching beyond the barrier never stops.`,
         },
       },
       objects: [
-        { prototype: 'furniture', name: 'the barrier', description: 'A makeshift barrier of sheet metal and wire mesh marks the border with rat territory. It wouldn\'t stop a determined incursion, but it makes a statement.', boltedDown: true },
-        { prototype: 'sign', name: 'territorial warnings', description: 'Spray-painted on the barrier: "RAT TERRITORY - DO NOT ENTER" and below it, more ominously: "THEY BITE".', boltedDown: true },
-        { prototype: 'furniture', name: 'bait stations', description: 'Poison bait stations line the border—a futile effort to control the population. The rats seem to have learned to avoid them.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'the barrier',
+          description:
+            "A makeshift barrier of sheet metal and wire mesh marks the border with rat territory. It wouldn't stop a determined incursion, but it makes a statement.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'territorial warnings',
+          description:
+            'Spray-painted on the barrier: "RAT TERRITORY - DO NOT ENTER" and below it, more ominously: "THEY BITE".',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'bait stations',
+          description:
+            'Poison bait stations line the border—a futile effort to control the population. The rats seem to have learned to avoid them.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -387,8 +591,20 @@ The air here is bad. The walls weep moisture. Some say voices echo from deeper s
         },
       },
       objects: [
-        { prototype: 'furniture', name: 'a hermit\'s camp', description: 'A single bedroll occupies a dry corner, surrounded by candle stubs and empty cans. Someone lives here, away from everyone. They prefer it that way.', boltedDown: true },
-        { prototype: 'sign', name: 'old graffiti', description: 'Faded graffiti from decades past: names, dates, obscenities. The forgotten leaving their mark before being forgotten themselves.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: "a hermit's camp",
+          description:
+            'A single bedroll occupies a dry corner, surrounded by candle stubs and empty cans. Someone lives here, away from everyone. They prefer it that way.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'old graffiti',
+          description:
+            'Faded graffiti from decades past: names, dates, obscenities. The forgotten leaving their mark before being forgotten themselves.',
+          boltedDown: true,
+        },
       ],
     },
   },

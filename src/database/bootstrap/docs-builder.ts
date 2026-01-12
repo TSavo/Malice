@@ -1,5 +1,5 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import type { RuntimeObject } from '../../../types/object';
 import type { ObjectManager } from '../object-manager';
 import { type Builder, registerBuilder } from './builder-registry';
@@ -83,11 +83,23 @@ export class DocsBuilder implements Builder {
       methods: {},
     });
 
-    this.doc.setPropertyDescription('path', 'Path from docs root without extension');
-    this.doc.setPropertyDescription('category', 'Top-level folder (moo, city-ai, greeter, etc.)');
+    this.doc.setPropertyDescription(
+      'path',
+      'Path from docs root without extension',
+    );
+    this.doc.setPropertyDescription(
+      'category',
+      'Top-level folder (moo, city-ai, greeter, etc.)',
+    );
     this.doc.setPropertyDescription('content', 'Full markdown content');
-    this.doc.setPropertyDescription('title', 'Document title from first # heading');
-    this.doc.setPropertyDescription('filename', 'Original filename with extension');
+    this.doc.setPropertyDescription(
+      'title',
+      'Document title from first # heading',
+    );
+    this.doc.setPropertyDescription(
+      'filename',
+      'Original filename with extension',
+    );
 
     // format() - Return formatted content for display
     this.doc.setMethod(
@@ -151,9 +163,18 @@ export class DocsBuilder implements Builder {
       });
     }
 
-    this.docs.setPropertyDescription('registry', 'Map of path -> document object ID');
-    this.docs.setPropertyDescription('folders', 'Array of top-level folder names');
-    this.docs.setPropertyDescription('loadedAt', 'Timestamp of last document load');
+    this.docs.setPropertyDescription(
+      'registry',
+      'Map of path -> document object ID',
+    );
+    this.docs.setPropertyDescription(
+      'folders',
+      'Array of top-level folder names',
+    );
+    this.docs.setPropertyDescription(
+      'loadedAt',
+      'Timestamp of last document load',
+    );
 
     // Always rebuild methods
     this.buildDocsMethods();
@@ -433,7 +454,10 @@ export class DocsBuilder implements Builder {
             folders.add(entry.name);
           }
 
-          await loadDir(fullPath, relativePath ? `${relativePath}/${entry.name}` : entry.name);
+          await loadDir(
+            fullPath,
+            relativePath ? `${relativePath}/${entry.name}` : entry.name,
+          );
         } else if (entry.isFile() && entry.name.endsWith('.md')) {
           const filename = entry.name;
           const name = filename.replace(/\.md$/, '');
@@ -443,7 +467,9 @@ export class DocsBuilder implements Builder {
           // Check file size before reading (10MB limit)
           const stats = fs.statSync(fullPath);
           if (stats.size > 10 * 1024 * 1024) {
-            console.warn(`[DocsBuilder] Skipping ${fullPath}: file too large (${stats.size} bytes)`);
+            console.warn(
+              `[DocsBuilder] Skipping ${fullPath}: file too large (${stats.size} bytes)`,
+            );
             continue;
           }
 
@@ -455,7 +481,9 @@ export class DocsBuilder implements Builder {
           const title = titleMatch ? titleMatch[1].trim() : name;
 
           // Check if doc already exists by path
-          const existingId = (this.docs!.get('registry') as Record<string, number>)?.[docPath];
+          const existingId = (
+            this.docs!.get('registry') as Record<string, number>
+          )?.[docPath];
           let docObj: RuntimeObject | null = null;
 
           if (existingId) {
@@ -496,7 +524,8 @@ export class DocsBuilder implements Builder {
     await loadDir(docsDir);
 
     // Clean up stale entries (documents that were deleted from disk)
-    const oldRegistry = (this.docs.get('registry') as Record<string, number>) || {};
+    const oldRegistry =
+      (this.docs.get('registry') as Record<string, number>) || {};
     for (const oldPath of Object.keys(oldRegistry)) {
       if (!loadedPaths.has(oldPath)) {
         console.log(`[DocsBuilder] Removed stale entry: ${oldPath}`);

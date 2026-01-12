@@ -21132,10 +21132,10 @@
     const tooltipContent = document.getElementById('tooltip-content');
 
     function getLevelName(z) {
-      if (z < 0) return 'Underground Level ' + Math.abs(z);
+      if (z < 0) return `Underground Level ${Math.abs(z)}`;
       if (z === 0) return 'Surface';
-      if (z <= 5) return 'Ground Floor + ' + z;
-      return 'Floor ' + z;
+      if (z <= 5) return `Ground Floor + ${z}`;
+      return `Floor ${z}`;
     }
 
     function onMouseMove(event) {
@@ -21168,8 +21168,8 @@
           '<strong>Path:</strong> ' + room.path.replace(/\\/g, '/');
 
         tooltip.style.display = 'block';
-        tooltip.style.left = (event.clientX + 15) + 'px';
-        tooltip.style.top = (event.clientY + 15) + 'px';
+        tooltip.style.left = `${event.clientX + 15}px`;
+        tooltip.style.top = `${event.clientY + 15}px`;
       }
     }
 

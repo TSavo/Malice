@@ -323,9 +323,9 @@ describe('$autoFixer - Auto-Fixer System', () => {
       await $autoFixer.tick();
 
       expect($autoFixer.lastTickTime).toBeTruthy();
-      expect(new Date($autoFixer.lastTickTime).getTime()).toBeGreaterThanOrEqual(
-        new Date(beforeTick).getTime()
-      );
+      expect(
+        new Date($autoFixer.lastTickTime).getTime(),
+      ).toBeGreaterThanOrEqual(new Date(beforeTick).getTime());
     });
 
     it('should return tick results', async () => {
@@ -371,7 +371,7 @@ describe('$autoFixer - Auto-Fixer System', () => {
       // Mock $aiQuery to avoid actual AI calls
       const originalAiQuery = $.aiQuery;
       $.aiQuery = vi.fn().mockResolvedValue({
-        response: 'Mock response: could not fix automatically, needs review'
+        response: 'Mock response: could not fix automatically, needs review',
       });
 
       try {
@@ -451,7 +451,7 @@ describe('$autoFixer - Auto-Fixer System', () => {
       // Mock $aiQuery
       const originalAiQuery = $.aiQuery;
       $.aiQuery = vi.fn().mockResolvedValue({
-        response: 'Mock analysis complete'
+        response: 'Mock analysis complete',
       });
 
       try {
@@ -475,7 +475,7 @@ describe('$autoFixer - Auto-Fixer System', () => {
       // Mock $aiQuery
       const originalAiQuery = $.aiQuery;
       $.aiQuery = vi.fn().mockResolvedValue({
-        response: 'Mock analysis'
+        response: 'Mock analysis',
       });
 
       try {
@@ -508,7 +508,7 @@ describe('$autoFixer - Auto-Fixer System', () => {
       // Mock $aiQuery
       const originalAiQuery = $.aiQuery;
       $.aiQuery = vi.fn().mockResolvedValue({
-        response: 'Mock fix attempt'
+        response: 'Mock fix attempt',
       });
 
       try {
@@ -550,7 +550,7 @@ describe('$autoFixer - Auto-Fixer System', () => {
       // Mock $aiQuery
       const originalAiQuery = $.aiQuery;
       $.aiQuery = vi.fn().mockResolvedValue({
-        response: 'New entry'
+        response: 'New entry',
       });
 
       try {
@@ -577,7 +577,8 @@ describe('$autoFixer - Auto-Fixer System', () => {
       // Mock successful fix response
       const originalAiQuery = $.aiQuery;
       $.aiQuery = vi.fn().mockResolvedValue({
-        response: 'Analysis complete. return { fixed: true, summary: "The issue has been successfully fixed." }'
+        response:
+          'Analysis complete. return { fixed: true, summary: "The issue has been successfully fixed." }',
       });
 
       try {
@@ -603,7 +604,8 @@ describe('$autoFixer - Auto-Fixer System', () => {
       // Mock needs review response
       const originalAiQuery = $.aiQuery;
       $.aiQuery = vi.fn().mockResolvedValue({
-        response: 'Analysis: This issue needs human review due to security concerns. return { fixed: false, needsReview: true, reviewReason: "Security concerns require human review" }'
+        response:
+          'Analysis: This issue needs human review due to security concerns. return { fixed: false, needsReview: true, reviewReason: "Security concerns require human review" }',
       });
 
       try {
@@ -628,7 +630,9 @@ describe('$autoFixer - Auto-Fixer System', () => {
 
       // Mock AI failure
       const originalAiQuery = $.aiQuery;
-      $.aiQuery = vi.fn().mockRejectedValue(new Error('AI service unavailable'));
+      $.aiQuery = vi
+        .fn()
+        .mockRejectedValue(new Error('AI service unavailable'));
 
       try {
         const result = await $autoFixer.attemptFix(issue.id);
@@ -658,10 +662,12 @@ describe('$autoFixer - Auto-Fixer System', () => {
 
       let capturedPrompt = '';
       const originalAiQuery = $.aiQuery;
-      $.aiQuery = vi.fn().mockImplementation(async (system: string, prompt: string) => {
-        capturedPrompt = prompt;
-        return { response: 'Mock response' };
-      });
+      $.aiQuery = vi
+        .fn()
+        .mockImplementation(async (_system: string, prompt: string) => {
+          capturedPrompt = prompt;
+          return { response: 'Mock response' };
+        });
 
       try {
         await $autoFixer.attemptFix(issue.id);
@@ -685,10 +691,12 @@ describe('$autoFixer - Auto-Fixer System', () => {
 
       let capturedSystemPrompt = '';
       const originalAiQuery = $.aiQuery;
-      $.aiQuery = vi.fn().mockImplementation(async (system: string, prompt: string) => {
-        capturedSystemPrompt = system;
-        return { response: 'Mock response' };
-      });
+      $.aiQuery = vi
+        .fn()
+        .mockImplementation(async (system: string, _prompt: string) => {
+          capturedSystemPrompt = system;
+          return { response: 'Mock response' };
+        });
 
       try {
         await $autoFixer.attemptFix(issue.id);
@@ -739,7 +747,7 @@ describe('$autoFixer - Auto-Fixer System', () => {
       // Mock $aiQuery
       const originalAiQuery = $.aiQuery;
       $.aiQuery = vi.fn().mockResolvedValue({
-        response: 'Mock analysis'
+        response: 'Mock analysis',
       });
 
       try {

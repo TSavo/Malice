@@ -16,10 +16,10 @@ export const building = {
         {
           type: 'palm',
           part: 'hand',
-          message: 'Basement access restricted.'
+          message: 'Basement access restricted.',
         },
       ],
-      authorizedUsers: {}
+      authorizedUsers: {},
     },
     '%BASEMENT_DOOR': {
       prototype: 'door',
@@ -30,7 +30,7 @@ export const building = {
       open: false,
       locks: ['%BASEMENT_LOCK'],
       material: 'metal',
-      durability: 80
+      durability: 80,
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -58,9 +58,9 @@ Banks of fluorescent lights cast harsh shadows across the sorting floor. The air
           to: 'z0.ts#%RECEIVING',
           description: 'A reinforced door leads up to the receiving bay',
           door: '%BASEMENT_DOOR',
-          locks: ['%BASEMENT_LOCK']
+          locks: ['%BASEMENT_LOCK'],
         },
-        east: '%RESERVES'
+        east: '%RESERVES',
       },
       objects: [
         {
@@ -68,16 +68,16 @@ Banks of fluorescent lights cast harsh shadows across the sorting floor. The air
           name: 'conveyor system',
           aliases: ['conveyors', 'belts', 'machinery'],
           description:
-            'A network of conveyor belts channeled into the concrete floor, connecting intake chutes to sorting bins. The belts are worn but maintained—someone keeps the machinery running even if the volume has dropped. Sensors scan packages as they pass, routing them by destination code. The system is automatic, reliable, and utterly indifferent to what it moves.'
+            'A network of conveyor belts channeled into the concrete floor, connecting intake chutes to sorting bins. The belts are worn but maintained—someone keeps the machinery running even if the volume has dropped. Sensors scan packages as they pass, routing them by destination code. The system is automatic, reliable, and utterly indifferent to what it moves.',
         },
         {
           prototype: 'describable',
           name: 'sorting bins',
           aliases: ['bins', 'containers'],
           description:
-            'Large metal bins on wheeled bases, positioned at the ends of conveyor lines. Each bin is labeled with a destination code: PS-NORTH, PS-SOUTH, PS-CENTRAL, PRIORITY. The bins are half-empty now—demand has dropped, but the infrastructure remains sized for a larger population.'
+            'Large metal bins on wheeled bases, positioned at the ends of conveyor lines. Each bin is labeled with a destination code: PS-NORTH, PS-SOUTH, PS-CENTRAL, PRIORITY. The bins are half-empty now—demand has dropped, but the infrastructure remains sized for a larger population.',
         },
-      ]
+      ],
     },
 
     '%RESERVES': {
@@ -97,7 +97,7 @@ The room is colder than the sorting floor, the climate control more aggressive. 
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: '%SORTING'
+        west: '%SORTING',
       },
       objects: [
         {
@@ -105,23 +105,23 @@ The room is colder than the sorting floor, the climate control more aggressive. 
           name: 'emergency rations',
           aliases: ['rations', 'food', 'crates'],
           description:
-            'Stacks of sealed crates marked EMERGENCY RATIONS - CONTINUUM AUTHORIZED in stenciled letters. Each crate contains nutrient bars, water tablets, and vitamin supplements—enough to sustain one person for thirty days. The crates are dated, rotated regularly, the oldest stock cycled out before expiration. Someone takes the reserve seriously.'
+            'Stacks of sealed crates marked EMERGENCY RATIONS - CONTINUUM AUTHORIZED in stenciled letters. Each crate contains nutrient bars, water tablets, and vitamin supplements—enough to sustain one person for thirty days. The crates are dated, rotated regularly, the oldest stock cycled out before expiration. Someone takes the reserve seriously.',
         },
         {
           prototype: 'cabinet',
           name: 'medical supplies',
           aliases: ['medical', 'supplies', 'medicine'],
           description:
-            'Cases of medical supplies stacked against the wall: first aid kits, trauma supplies, broad-spectrum antibiotics, surgical tools still sealed in sterile packaging. The inventory suggests preparation for mass casualty events. The Continuum believes in being prepared.'
+            'Cases of medical supplies stacked against the wall: first aid kits, trauma supplies, broad-spectrum antibiotics, surgical tools still sealed in sterile packaging. The inventory suggests preparation for mass casualty events. The Continuum believes in being prepared.',
         },
         {
           prototype: 'describable',
           name: 'radiation equipment',
           aliases: ['radiation', 'detectors', 'gear'],
           description:
-            'A shelf of radiation detection and protection equipment: Geiger counters in padded cases, dosimeters in sealed packaging, potassium iodide tablets in bulk containers. The presence of this equipment suggests threats the Continuum acknowledges but doesn\'t discuss publicly. The seals are intact. The equipment has never been needed. So far.'
+            "A shelf of radiation detection and protection equipment: Geiger counters in padded cases, dosimeters in sealed packaging, potassium iodide tablets in bulk containers. The presence of this equipment suggests threats the Continuum acknowledges but doesn't discuss publicly. The seals are intact. The equipment has never been needed. So far.",
         },
-      ]
-    }
-  }
+      ],
+    },
+  },
 };

@@ -61,7 +61,11 @@ The waiting area offers leather chairs arranged around a coffee table stacked wi
         },
         west: '%OFFICE_MAIN',
         north: '%CONFERENCE',
-        down: { room: '%STAIRS', door: '%BASEMENT_DOOR', locks: ['%BASEMENT_LOCK'] },
+        down: {
+          room: '%STAIRS',
+          door: '%BASEMENT_DOOR',
+          locks: ['%BASEMENT_LOCK'],
+        },
       },
       sittables: [
         {
@@ -119,7 +123,8 @@ A model ship sits in a glass case on the credenza—a container vessel rendered 
           capacity: 1,
           emptyMsg:
             'A high-backed leather executive chair sits behind the mahogany desk, positioned for authority.',
-          occupiedMsg: '%s seated in the partner chair, behind the mahogany desk',
+          occupiedMsg:
+            '%s seated in the partner chair, behind the mahogany desk',
         },
         {
           name: 'the client chairs',

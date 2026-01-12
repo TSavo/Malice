@@ -1,7 +1,8 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
-const basePath = '/var/tmp/vibe-kanban/worktrees/603f-where-are-we-at/malice/src/database/bootstrap/world/seattle/pioneer-square/buildings';
+const basePath =
+  '/var/tmp/vibe-kanban/worktrees/603f-where-are-we-at/malice/src/database/bootstrap/world/seattle/pioneer-square/buildings';
 
 // Find all files with underground references
 function findFilesWithUnderground(dir: string): string[] {
@@ -14,9 +15,11 @@ function findFilesWithUnderground(dir: string): string[] {
       files.push(...findFilesWithUnderground(fullPath));
     } else if (entry.name.endsWith('.ts')) {
       const content = fs.readFileSync(fullPath, 'utf-8');
-      if (content.includes("underground/upper-tunnels") ||
-          content.includes("underground/transitional") ||
-          content.includes("underground/entries")) {
+      if (
+        content.includes('underground/upper-tunnels') ||
+        content.includes('underground/transitional') ||
+        content.includes('underground/entries')
+      ) {
         files.push(fullPath);
       }
     }
@@ -42,7 +45,7 @@ function processFile(filePath: string): boolean {
     if (matches) {
       for (const match of matches) {
         const preview = match.trim().substring(0, 60);
-        console.log('  Removing: ' + preview + '...');
+        console.log(`  Removing: ${preview}...`);
       }
       content = content.replace(pattern, '');
       modified = true;
@@ -61,15 +64,15 @@ function processFile(filePath: string): boolean {
 }
 
 const files = findFilesWithUnderground(basePath);
-console.log('Found ' + files.length + ' files with underground references\n');
+console.log(`Found ${files.length} files with underground references\n`);
 
 let fixedCount = 0;
 for (const file of files) {
   const relPath = path.relative(basePath, file);
-  console.log('Processing: ' + relPath);
+  console.log(`Processing: ${relPath}`);
   if (processFile(file)) {
     fixedCount++;
   }
 }
 
-console.log('\nFixed ' + fixedCount + ' files');
+console.log(`\nFixed ${fixedCount} files`);

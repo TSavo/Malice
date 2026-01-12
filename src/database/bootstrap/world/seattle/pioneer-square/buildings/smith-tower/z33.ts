@@ -80,7 +80,8 @@ export const building = {
 
     '%A1_z33': {
       name: 'Smith Tower - 33th Floor - North Suite - Living Room',
-      description: 'A corner unit with tall windows and pale wood floors. A kitchenette occupies one wall, its appliances dark and silent. Built-in shelving holds the remnants of someone\'s life—books, decorative objects, a dead potted plant.',
+      description:
+        "A corner unit with tall windows and pale wood floors. A kitchenette occupies one wall, its appliances dark and silent. Built-in shelving holds the remnants of someone's life—books, decorative objects, a dead potted plant.",
       x: -3,
       y: 11,
       z: 33,
@@ -96,10 +97,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a Steinway grand piano', description: 'A full concert grand piano in polished ebony dominates one corner, its lid propped open to reveal pristine ivory keys. Sheet music for Chopin nocturnes rests on the stand.', boltedDown: true },
-        { prototype: 'table', name: 'an onyx coffee table', description: 'A massive onyx coffee table with gold-leaf legs sits before the seating area. The stone surface reflects light like still water, its deep black veins mesmerizing.', boltedDown: false },
-        { prototype: 'furniture', name: 'a built-in bar with wine cellar', description: 'A custom bar with marble countertops spans one wall, backed by a temperature-controlled wine cellar visible through glass doors. Baccarat crystal decanters line the counter.', boltedDown: true },
-        { prototype: 'furniture', name: 'a gilt-framed oil painting', description: 'A large oil painting in an ornate gilt frame dominates the wall - a moody seascape by an old master, museum-quality and priceless.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a Steinway grand piano',
+          description:
+            'A full concert grand piano in polished ebony dominates one corner, its lid propped open to reveal pristine ivory keys. Sheet music for Chopin nocturnes rests on the stand.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'an onyx coffee table',
+          description:
+            'A massive onyx coffee table with gold-leaf legs sits before the seating area. The stone surface reflects light like still water, its deep black veins mesmerizing.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a built-in bar with wine cellar',
+          description:
+            'A custom bar with marble countertops spans one wall, backed by a temperature-controlled wine cellar visible through glass doors. Baccarat crystal decanters line the counter.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a gilt-framed oil painting',
+          description:
+            'A large oil painting in an ornate gilt frame dominates the wall - a moody seascape by an old master, museum-quality and priceless.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -142,10 +167,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a California king bed with silk canopy', description: 'An enormous California king bed draped in ivory silk canopy billows from a gilded corona mounted to the ceiling. Egyptian cotton sheets with a thread count in the thousands shimmer beneath.', quality: 'nice' },
-        { prototype: 'furniture', name: 'a walk-in closet with cedar paneling', description: 'Double doors open to a walk-in closet paneled in aromatic cedar, with built-in shoe racks, velvet-lined jewelry drawers, and a center island for folding.', boltedDown: true },
-        { prototype: 'table', name: 'a pair of Louis XVI nightstands', description: 'Matching Louis XVI nightstands in gilded wood flank the bed, their marble tops holding Lalique crystal lamps with silk shades.', boltedDown: false },
-        { prototype: 'furniture', name: 'a crystal chandelier', description: 'A Venetian crystal chandelier hangs from the ceiling, its hundreds of hand-cut prisms catching light and scattering rainbows across the walls.', boltedDown: true },
+        {
+          prototype: 'bed',
+          name: 'a California king bed with silk canopy',
+          description:
+            'An enormous California king bed draped in ivory silk canopy billows from a gilded corona mounted to the ceiling. Egyptian cotton sheets with a thread count in the thousands shimmer beneath.',
+          quality: 'nice',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a walk-in closet with cedar paneling',
+          description:
+            'Double doors open to a walk-in closet paneled in aromatic cedar, with built-in shoe racks, velvet-lined jewelry drawers, and a center island for folding.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a pair of Louis XVI nightstands',
+          description:
+            'Matching Louis XVI nightstands in gilded wood flank the bed, their marble tops holding Lalique crystal lamps with silk shades.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a crystal chandelier',
+          description:
+            'A Venetian crystal chandelier hangs from the ceiling, its hundreds of hand-cut prisms catching light and scattering rainbows across the walls.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -184,10 +233,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a gourmet kitchen with marble island', description: 'A chef-grade kitchen with Calacatta marble countertops and island, Sub-Zero refrigeration, and a La Cornue range in cobalt blue enamel. Copper pots hang from a ceiling rack.', boltedDown: true },
-        { prototype: 'table', name: 'a partners desk in burled walnut', description: 'An antique partners desk in burled walnut fills the study area, its leather writing surface embossed with gold. A Tiffany lamp casts warm amber light.', boltedDown: false },
-        { prototype: 'furniture', name: 'a hand-knotted Persian rug', description: 'A museum-quality Persian rug in deep burgundy and gold covers most of the floor, its silk threads gleaming. The pattern depicts hunting scenes from ancient Persia.', boltedDown: false },
-        { prototype: 'furniture', name: 'a bronze sculpture', description: 'A Rodin bronze sculpture of "The Thinker" stands on a marble pedestal, the patina rich and dark from a century of careful handling.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'a gourmet kitchen with marble island',
+          description:
+            'A chef-grade kitchen with Calacatta marble countertops and island, Sub-Zero refrigeration, and a La Cornue range in cobalt blue enamel. Copper pots hang from a ceiling rack.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a partners desk in burled walnut',
+          description:
+            'An antique partners desk in burled walnut fills the study area, its leather writing surface embossed with gold. A Tiffany lamp casts warm amber light.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a hand-knotted Persian rug',
+          description:
+            'A museum-quality Persian rug in deep burgundy and gold covers most of the floor, its silk threads gleaming. The pattern depicts hunting scenes from ancient Persia.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a bronze sculpture',
+          description:
+            'A Rodin bronze sculpture of "The Thinker" stands on a marble pedestal, the patina rich and dark from a century of careful handling.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -226,10 +299,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a spiral staircase in wrought iron', description: 'An elegant spiral staircase in hand-forged wrought iron with gold leaf accents ascends to the mezzanine level, each step topped with white marble.', boltedDown: true },
-        { prototype: 'bed', name: 'a loft bed with cashmere bedding', description: 'The mezzanine holds a platform bed dressed in Scottish cashmere blankets and Hungarian goose down pillows, a cocoon of impossible softness.', quality: 'nice' },
-        { prototype: 'furniture', name: 'a Murano glass chandelier', description: 'A spectacular Murano glass chandelier in coral and gold cascades from the vaulted ceiling, its organic forms resembling frozen flames.', boltedDown: true },
-        { prototype: 'table', name: 'a pietra dura side table', description: 'A Florentine pietra dura table displays intricate inlays of semi-precious stones forming flowers and birds against black marble.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'a spiral staircase in wrought iron',
+          description:
+            'An elegant spiral staircase in hand-forged wrought iron with gold leaf accents ascends to the mezzanine level, each step topped with white marble.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'bed',
+          name: 'a loft bed with cashmere bedding',
+          description:
+            'The mezzanine holds a platform bed dressed in Scottish cashmere blankets and Hungarian goose down pillows, a cocoon of impossible softness.',
+          quality: 'nice',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a Murano glass chandelier',
+          description:
+            'A spectacular Murano glass chandelier in coral and gold cascades from the vaulted ceiling, its organic forms resembling frozen flames.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a pietra dura side table',
+          description:
+            'A Florentine pietra dura table displays intricate inlays of semi-precious stones forming flowers and birds against black marble.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -268,10 +365,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a built-in sleeping niche', description: 'A sleeping niche is recessed into the wall, lined with padded silk in powder blue and fitted with a custom mattress. Gold trim frames the opening like a jewel box.', quality: 'nice' },
-        { prototype: 'furniture', name: 'a vanity with gilded mirror', description: 'A French vanity with a tri-fold gilded mirror is built into the opposite wall, its marble top holding crystal perfume bottles and silver brushes.', boltedDown: true },
-        { prototype: 'furniture', name: 'a collection of miniature portraits', description: 'A gallery of miniature portraits in oval gilt frames lines the wall - aristocratic faces from another century, each in a velvet-lined frame.', boltedDown: true },
-        { prototype: 'table', name: 'a marquetry jewelry cabinet', description: 'A delicate jewelry cabinet with intricate marquetry depicting pastoral scenes holds countless tiny drawers lined in burgundy velvet.', boltedDown: false },
+        {
+          prototype: 'bed',
+          name: 'a built-in sleeping niche',
+          description:
+            'A sleeping niche is recessed into the wall, lined with padded silk in powder blue and fitted with a custom mattress. Gold trim frames the opening like a jewel box.',
+          quality: 'nice',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a vanity with gilded mirror',
+          description:
+            'A French vanity with a tri-fold gilded mirror is built into the opposite wall, its marble top holding crystal perfume bottles and silver brushes.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a collection of miniature portraits',
+          description:
+            'A gallery of miniature portraits in oval gilt frames lines the wall - aristocratic faces from another century, each in a velvet-lined frame.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a marquetry jewelry cabinet',
+          description:
+            'A delicate jewelry cabinet with intricate marquetry depicting pastoral scenes holds countless tiny drawers lined in burgundy velvet.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -315,10 +436,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a tiered crystal chandelier', description: 'A magnificent three-tiered crystal chandelier dominates the ceiling, hundreds of hand-cut prisms cascading like frozen waterfalls. Even dormant, it catches and multiplies light.', boltedDown: true },
-        { prototype: 'table', name: 'a marble-topped console', description: 'A serpentine console table with a Portoro marble top holds a collection of Chinese export porcelain - famille rose vases and ginger jars from the Qing dynasty.', boltedDown: false },
-        { prototype: 'furniture', name: 'floor-to-ceiling silk drapes', description: 'Heavy silk drapes in champagne gold frame the windows, their fabric so fine it seems to glow. Gold tassels secure them to gilded holdbacks.', boltedDown: true },
-        { prototype: 'furniture', name: 'an Art Deco drinks cabinet', description: 'A shagreen-covered drinks cabinet in the Art Deco style opens to reveal mirrored interior shelves holding Lalique glasses and vintage spirits.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'a tiered crystal chandelier',
+          description:
+            'A magnificent three-tiered crystal chandelier dominates the ceiling, hundreds of hand-cut prisms cascading like frozen waterfalls. Even dormant, it catches and multiplies light.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a marble-topped console',
+          description:
+            'A serpentine console table with a Portoro marble top holds a collection of Chinese export porcelain - famille rose vases and ginger jars from the Qing dynasty.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'floor-to-ceiling silk drapes',
+          description:
+            'Heavy silk drapes in champagne gold frame the windows, their fabric so fine it seems to glow. Gold tassels secure them to gilded holdbacks.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'an Art Deco drinks cabinet',
+          description:
+            'A shagreen-covered drinks cabinet in the Art Deco style opens to reveal mirrored interior shelves holding Lalique glasses and vintage spirits.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -357,10 +502,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a library with rolling ladder', description: 'Built-in mahogany bookshelves line every wall, accessible via a brass rolling ladder. First editions and leather-bound volumes fill every shelf.', boltedDown: true },
-        { prototype: 'table', name: 'a Chippendale writing desk', description: 'An eighteenth-century Chippendale writing desk in flame mahogany holds an antique inkwell, quill pens, and blotter. The brass hardware gleams.', boltedDown: false },
-        { prototype: 'furniture', name: 'a globe bar', description: 'A vintage floor globe opens to reveal a hidden bar inside, its interior lined with quilted leather and fitted for bottles and glasses.', boltedDown: false },
-        { prototype: 'furniture', name: 'a pair of gilt-framed landscapes', description: 'Two Hudson River School landscapes in elaborate gilt frames flank the windows - pastoral American scenes rendered in luminous detail.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a library with rolling ladder',
+          description:
+            'Built-in mahogany bookshelves line every wall, accessible via a brass rolling ladder. First editions and leather-bound volumes fill every shelf.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a Chippendale writing desk',
+          description:
+            'An eighteenth-century Chippendale writing desk in flame mahogany holds an antique inkwell, quill pens, and blotter. The brass hardware gleams.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a globe bar',
+          description:
+            'A vintage floor globe opens to reveal a hidden bar inside, its interior lined with quilted leather and fitted for bottles and glasses.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a pair of gilt-framed landscapes',
+          description:
+            'Two Hudson River School landscapes in elaborate gilt frames flank the windows - pastoral American scenes rendered in luminous detail.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -382,7 +551,8 @@ export const building = {
 
     '%C2_z33': {
       name: 'Smith Tower - 33th Floor - South Suite - Living Room',
-      description: 'A corner unit with western exposure and aged carpeting. The afternoon sun has bleached everything near the windows to a uniform pale.',
+      description:
+        'A corner unit with western exposure and aged carpeting. The afternoon sun has bleached everything near the windows to a uniform pale.',
       x: -3,
       y: 9,
       z: 33,
@@ -398,10 +568,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'an Aubusson tapestry', description: 'A seventeenth-century Aubusson tapestry covers one wall, depicting a romantic garden scene with shepherdesses and peacocks. The colors remain remarkably vibrant.', boltedDown: true },
-        { prototype: 'table', name: 'a malachite-topped table', description: 'A Russian Empire side table with a malachite top gleams with veins of green - the stone was quarried from the Urals two centuries ago.', boltedDown: false },
-        { prototype: 'furniture', name: 'a chinoiserie secretary', description: 'A lacquered chinoiserie secretary in black and gold depicts scenes of pagodas and bridges. The fall-front opens to reveal countless small drawers and cubbyholes.', boltedDown: false },
-        { prototype: 'furniture', name: 'a rock crystal obelisk', description: 'A pair of rock crystal obelisks on gilt bronze bases flank the windows, their faceted surfaces splitting light into rainbows.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'an Aubusson tapestry',
+          description:
+            'A seventeenth-century Aubusson tapestry covers one wall, depicting a romantic garden scene with shepherdesses and peacocks. The colors remain remarkably vibrant.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a malachite-topped table',
+          description:
+            'A Russian Empire side table with a malachite top gleams with veins of green - the stone was quarried from the Urals two centuries ago.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a chinoiserie secretary',
+          description:
+            'A lacquered chinoiserie secretary in black and gold depicts scenes of pagodas and bridges. The fall-front opens to reveal countless small drawers and cubbyholes.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a rock crystal obelisk',
+          description:
+            'A pair of rock crystal obelisks on gilt bronze bases flank the windows, their faceted surfaces splitting light into rainbows.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -444,17 +638,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a Venetian etched mirror', description: 'An enormous Venetian mirror with an etched and beveled frame dominates the entry wall, its antique glass giving reflections a dreamlike quality.', boltedDown: true },
-        { prototype: 'table', name: 'a boulle console', description: 'A French boulle console in tortoiseshell and brass marquetry holds a Sevres porcelain bowl filled with silk flowers that look perpetually fresh.', boltedDown: false },
-        { prototype: 'furniture', name: 'a coat closet with cedar lining', description: 'A built-in coat closet lined with aromatic cedar holds velvet hangers and has a drawer for gloves. The brass hardware is original nineteenth century.', boltedDown: true },
-        { prototype: 'furniture', name: 'an ormolu wall sconce', description: 'A pair of French ormolu wall sconces with crystal drops flank the mirror, their candle forms now fitted for electricity.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a Venetian etched mirror',
+          description:
+            'An enormous Venetian mirror with an etched and beveled frame dominates the entry wall, its antique glass giving reflections a dreamlike quality.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a boulle console',
+          description:
+            'A French boulle console in tortoiseshell and brass marquetry holds a Sevres porcelain bowl filled with silk flowers that look perpetually fresh.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a coat closet with cedar lining',
+          description:
+            'A built-in coat closet lined with aromatic cedar holds velvet hangers and has a drawer for gloves. The brass hardware is original nineteenth century.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'an ormolu wall sconce',
+          description:
+            'A pair of French ormolu wall sconces with crystal drops flank the mirror, their candle forms now fitted for electricity.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
           name: 'an Empire bench',
           capacity: 2,
           emptyMsg:
-            'An Empire bench in mahogany with lion\'s paw feet and leopard print upholstery offers a place to sit while removing shoes.',
+            "An Empire bench in mahogany with lion's paw feet and leopard print upholstery offers a place to sit while removing shoes.",
           occupiedMsg: '%s seated on the Empire bench.',
         },
       ],
@@ -479,10 +697,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a four-poster bed with silk hangings', description: 'A magnificent four-poster bed in carved mahogany rises nearly to the ceiling, its posts wrapped in silk hangings of deep burgundy. The mattress is layered with down and the finest Irish linen.', quality: 'nice' },
-        { prototype: 'furniture', name: 'an armoire with inlaid panels', description: 'A massive armoire with doors inlaid in mother-of-pearl and ebony depicts birds among flowering branches. Inside, velvet-lined compartments await.', boltedDown: false },
-        { prototype: 'table', name: 'a dressing table with silver appointments', description: 'A kidney-shaped dressing table with a triple mirror holds a complete set of silver grooming appointments - brushes, mirrors, and crystal jars with silver lids.', boltedDown: false },
-        { prototype: 'furniture', name: 'a silk Kirman carpet', description: 'A palace-sized silk Kirman carpet in ivory and rose covers most of the floor, its million knots per square inch creating a surface like velvet.', boltedDown: false },
+        {
+          prototype: 'bed',
+          name: 'a four-poster bed with silk hangings',
+          description:
+            'A magnificent four-poster bed in carved mahogany rises nearly to the ceiling, its posts wrapped in silk hangings of deep burgundy. The mattress is layered with down and the finest Irish linen.',
+          quality: 'nice',
+        },
+        {
+          prototype: 'furniture',
+          name: 'an armoire with inlaid panels',
+          description:
+            'A massive armoire with doors inlaid in mother-of-pearl and ebony depicts birds among flowering branches. Inside, velvet-lined compartments await.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'table',
+          name: 'a dressing table with silver appointments',
+          description:
+            'A kidney-shaped dressing table with a triple mirror holds a complete set of silver grooming appointments - brushes, mirrors, and crystal jars with silver lids.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a silk Kirman carpet',
+          description:
+            'A palace-sized silk Kirman carpet in ivory and rose covers most of the floor, its million knots per square inch creating a surface like velvet.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -521,10 +763,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a sleigh bed in burl walnut', description: 'An Empire sleigh bed in burled walnut with ormolu mounts holds a mattress of the finest construction. Monogrammed linens in cream and gold complete the picture.', quality: 'nice' },
-        { prototype: 'furniture', name: 'a built-in wardrobe with beveled mirrors', description: 'A full wall of built-in wardrobes features beveled mirror panels and brass fittings. Inside, velvet-covered hangers and cedar-lined drawers await.', boltedDown: true },
-        { prototype: 'table', name: 'a marble-topped commode', description: 'A Louis XV commode with a rose marble top and elaborate bronze mounts serves as a nightstand. Its bombay front holds two drawers with original hardware.', boltedDown: false },
-        { prototype: 'furniture', name: 'a gilt-bronze cartel clock', description: 'An eighteenth-century cartel clock in gilt bronze hangs on the wall, its face painted with pastoral scenes. The mechanism still keeps perfect time.', boltedDown: true },
+        {
+          prototype: 'bed',
+          name: 'a sleigh bed in burl walnut',
+          description:
+            'An Empire sleigh bed in burled walnut with ormolu mounts holds a mattress of the finest construction. Monogrammed linens in cream and gold complete the picture.',
+          quality: 'nice',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a built-in wardrobe with beveled mirrors',
+          description:
+            'A full wall of built-in wardrobes features beveled mirror panels and brass fittings. Inside, velvet-covered hangers and cedar-lined drawers await.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a marble-topped commode',
+          description:
+            'A Louis XV commode with a rose marble top and elaborate bronze mounts serves as a nightstand. Its bombay front holds two drawers with original hardware.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a gilt-bronze cartel clock',
+          description:
+            'An eighteenth-century cartel clock in gilt bronze hangs on the wall, its face painted with pastoral scenes. The mechanism still keeps perfect time.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {

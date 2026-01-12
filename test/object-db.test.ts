@@ -203,7 +203,9 @@ describe('ObjectDatabase', () => {
 
       // All IDs should be sequential starting from 501
       const sortedIds = [...ids].sort((a, b) => a - b);
-      expect(sortedIds).toEqual([501, 502, 503, 504, 505, 506, 507, 508, 509, 510]);
+      expect(sortedIds).toEqual([
+        501, 502, 503, 504, 505, 506, 507, 508, 509, 510,
+      ]);
     });
   });
 

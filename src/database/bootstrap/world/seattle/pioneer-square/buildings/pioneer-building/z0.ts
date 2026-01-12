@@ -20,7 +20,7 @@ export const building = {
       name: 'Pioneer Building Main Lock',
       description:
         'A massive brass mortise lock, the original 1892 hardware restored and maintained for over a century.',
-      difficulty: 6
+      difficulty: 6,
     },
     '%MAIN_DOOR': {
       prototype: 'door',
@@ -31,7 +31,7 @@ export const building = {
       open: true,
       locks: ['%MAIN_LOCK'],
       material: 'wood',
-      durability: 90
+      durability: 90,
     },
 
     '%ARCADE_LOCK': {
@@ -39,7 +39,7 @@ export const building = {
       name: 'Arcade Gate Lock',
       description:
         'A simple padlock securing the accordion gate that closes off the arcade at night.',
-      difficulty: 3
+      difficulty: 3,
     },
 
     '%SERVICE_LOCK': {
@@ -50,7 +50,7 @@ export const building = {
       scanners: [
         { type: 'fingerprint', part: 'hand', message: 'Staff access only.' },
       ],
-      authorizedUsers: {}
+      authorizedUsers: {},
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -67,7 +67,7 @@ The car is paneled in dark wood, the ceiling fitted with a frosted glass light f
       y: 9,
       z: 0,
       exits: {
-        out: '%LOBBY'
+        out: '%LOBBY',
       },
       elevator: {
         floors: [0, 1, 2, 3, 4, 5],
@@ -79,9 +79,9 @@ The car is paneled in dark wood, the ceiling fitted with a frosted glass light f
           2: '%ELEV_LOBBY_Z2',
           3: '%ELEV_LOBBY_Z3',
           4: '%ELEV_LOBBY_Z4',
-          5: '%ELEV_LOBBY_Z5'
-        }
-      }
+          5: '%ELEV_LOBBY_Z5',
+        },
+      },
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -109,12 +109,12 @@ A vintage elevator with brass accordion gates occupies the southeast corner, its
         west: {
           to: '2nd-ave-s/y9.ts',
           description: 'The triple-arched portal leads to 2nd Ave S',
-          door: '%MAIN_DOOR'
+          door: '%MAIN_DOOR',
         },
         south: '%ARCADE_NORTH',
         east: '%OFFICES_GROUND',
         up: '%STAIR_Z1',
-        in: '%E'
+        in: '%E',
       },
       elevatorId: '%E',
       objects: [
@@ -130,7 +130,7 @@ FLOOR 4: SE TTLE IMPORT/EXP RT
 FLOOR 5: NORTHW ST TIMBER CO.
 FLOOR 6: EXEC TIVE OFFICES (RESTRICTED)
 
-The building had tenants until the end. No one removed their names. No one added the vacancy notices.`
+The building had tenants until the end. No one removed their names. No one added the vacancy notices.`,
         },
         {
           prototype: 'describable',
@@ -142,7 +142,7 @@ PIONEER BUILDING
 1892
 ELMER FISHER, ARCHITECT
 
-Fisher designed a third of Pioneer Square's post-fire buildings. This was his masterpiece. The building outlived him by a century and shows no sign of stopping.`
+Fisher designed a third of Pioneer Square's post-fire buildings. This was his masterpiece. The building outlived him by a century and shows no sign of stopping.`,
         },
       ],
       sittables: [
@@ -151,9 +151,9 @@ Fisher designed a third of Pioneer Square's post-fire buildings. This was his ma
           capacity: 3,
           emptyMsg:
             'A marble bench sits against the wall, cold and hard and designed more for appearance than comfort.',
-          occupiedMsg: '%s sitting on the marble bench in the lobby'
+          occupiedMsg: '%s sitting on the marble bench in the lobby',
         },
-      ]
+      ],
     },
 
     '%ARCADE_NORTH': {
@@ -176,17 +176,17 @@ The arcade floor is worn terrazzo, the pattern of brass and marble ground smooth
         east: '%ARCADE_EAST',
         south: {
           to: 's-washington/x2.ts',
-          description: 'An arched opening leads to S. Washington St'
-        }
+          description: 'An arched opening leads to S. Washington St',
+        },
       },
       objects: [
         {
           prototype: 'describable',
           name: 'antique shop window',
           aliases: ['antiques', 'window display'],
-          description: `The PIONEER ANTIQUES window is a maximalist fever dream—grandfather clocks and rolltop desks, oil paintings in gilded frames, a suit of decorative armor, crystal decanters, ceramic figurines, the accumulated flotsam of estate sales. A hand-lettered sign reads: "EVERYTHING MUST GO." The sign is yellowed. Nothing went.`
+          description: `The PIONEER ANTIQUES window is a maximalist fever dream—grandfather clocks and rolltop desks, oil paintings in gilded frames, a suit of decorative armor, crystal decanters, ceramic figurines, the accumulated flotsam of estate sales. A hand-lettered sign reads: "EVERYTHING MUST GO." The sign is yellowed. Nothing went.`,
         },
-      ]
+      ],
     },
 
     '%ARCADE_EAST': {
@@ -209,17 +209,17 @@ Through the eastern arches, the street is visible—Occidental Avenue and the bu
         north: '%OFFICES_GROUND',
         east: {
           to: 'occidental-ave-s/y8.ts',
-          description: 'Arched openings lead to Occidental Ave S'
-        }
+          description: 'Arched openings lead to Occidental Ave S',
+        },
       },
       objects: [
         {
           prototype: 'describable',
           name: 'coffee cart',
           aliases: ['cart', 'espresso cart'],
-          description: `A mobile espresso cart, the kind that fed caffeine addictions to office workers who couldn't wait for the coffee shop. The chrome is dulled, the steam wand crusted with old milk, but the equipment is intact—commercial grinder, dual-group espresso machine, a chalkboard menu offering drinks no one will order. "CORTADO $4" reads the last price written.`
+          description: `A mobile espresso cart, the kind that fed caffeine addictions to office workers who couldn't wait for the coffee shop. The chrome is dulled, the steam wand crusted with old milk, but the equipment is intact—commercial grinder, dual-group espresso machine, a chalkboard menu offering drinks no one will order. "CORTADO $4" reads the last price written.`,
         },
-      ]
+      ],
     },
 
     '%OFFICES_GROUND': {
@@ -240,16 +240,16 @@ A service corridor branches south, leading to the building's mechanical systems 
       exits: {
         west: '%LOBBY',
         south: '%ARCADE_EAST',
-        east: '%SERVICE_CORRIDOR'
+        east: '%SERVICE_CORRIDOR',
       },
       objects: [
         {
           prototype: 'describable',
           name: 'office doors',
           aliases: ['doors', 'suites'],
-          description: `Frosted glass doors with gold-leaf lettering, the names of businesses that closed at various points over the building's history. Some are recent—"PIONEER SQUARE PROPERTY MANAGEMENT." Some are antique—"YUKON GOLD ASSAY OFFICE." The building accumulated tenants over a century. The tenants accumulated dust.`
+          description: `Frosted glass doors with gold-leaf lettering, the names of businesses that closed at various points over the building's history. Some are recent—"PIONEER SQUARE PROPERTY MANAGEMENT." Some are antique—"YUKON GOLD ASSAY OFFICE." The building accumulated tenants over a century. The tenants accumulated dust.`,
         },
-      ]
+      ],
     },
 
     '%SERVICE_CORRIDOR': {
@@ -271,23 +271,23 @@ The building's age shows here more than in the public spaces—pipes wrapped in 
         west: '%OFFICES_GROUND',
         east: {
           to: '3rd-ave-s/y9.ts',
-          description: 'A service door leads out to 3rd Ave S'
+          description: 'A service door leads out to 3rd Ave S',
         },
         south: {
           to: 'alley/y8.ts',
           locks: ['%SERVICE_LOCK'],
-          description: 'A heavy door leads to the loading dock'
+          description: 'A heavy door leads to the loading dock',
         },
-        down: '%BASEMENT'
+        down: '%BASEMENT',
       },
       objects: [
         {
           prototype: 'describable',
           name: 'electrical panels',
           aliases: ['panels', 'electrical', 'breakers'],
-          description: `A wall of electrical panels spanning the building's history—the original knob-and-tube installation behind a locked cabinet, successive upgrades in grey steel boxes, the most recent panel digital and dark. The building's power history, preserved in hardware.`
+          description: `A wall of electrical panels spanning the building's history—the original knob-and-tube installation behind a locked cabinet, successive upgrades in grey steel boxes, the most recent panel digital and dark. The building's power history, preserved in hardware.`,
         },
-      ]
+      ],
     },
 
     '%BASEMENT': {
@@ -307,22 +307,22 @@ A door in the eastern wall leads to the Seattle Underground—the network of tun
       waterLevel: 0,
       outdoor: false,
       exits: {
-        up: '%SERVICE_CORRIDOR'
+        up: '%SERVICE_CORRIDOR',
       },
       objects: [
         {
           prototype: 'describable',
           name: 'coal furnace',
           aliases: ['furnace', 'boiler'],
-          description: `A massive cast-iron furnace, ten feet tall, its surface covered in gauges and valves and the fossilized coal dust that never quite washes away. The coal doors are welded shut—the conversion to gas happened fifty years ago—but the original infrastructure remains. The building was heated by coal for its first century. The furnace remembers.`
+          description: `A massive cast-iron furnace, ten feet tall, its surface covered in gauges and valves and the fossilized coal dust that never quite washes away. The coal doors are welded shut—the conversion to gas happened fifty years ago—but the original infrastructure remains. The building was heated by coal for its first century. The furnace remembers.`,
         },
         {
           prototype: 'describable',
           name: 'foundation stones',
           aliases: ['stones', 'foundation', 'walls'],
-          description: `The rough-cut stone foundation, laid in 1892 by workers who understood that buildings should last. The stones are massive, fitted together with mortar that has hardened to the strength of the stone itself. Water stains mark the height of various floods. The foundation has survived them all.`
+          description: `The rough-cut stone foundation, laid in 1892 by workers who understood that buildings should last. The stones are massive, fitted together with mortar that has hardened to the strength of the stone itself. Water stains mark the height of various floods. The foundation has survived them all.`,
         },
-      ]
-    }
-  }
+      ],
+    },
+  },
 };

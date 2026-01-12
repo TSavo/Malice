@@ -391,18 +391,19 @@ export class BuildingBuilder implements Builder {
 
         // Handle cross-floor reference format: 'z1.ts#ROOM_NAME' -> '%ROOM_NAME'
         if (
-          destPlaceholder &&
-          destPlaceholder.includes('.ts#') &&
+          destPlaceholder?.includes('.ts#') &&
           !destPlaceholder.startsWith('%')
         ) {
           const roomName = destPlaceholder.split('#')[1];
-          destPlaceholder = roomName.startsWith('%') ? roomName : `%${roomName}`;
+          destPlaceholder = roomName.startsWith('%')
+            ? roomName
+            : `%${roomName}`;
         }
 
         const destRoom = resolvePlaceholder(destPlaceholder);
         if (!destRoom) {
           // Defer cross-floor exits - placeholder might exist on a later floor
-          if (destPlaceholder && destPlaceholder.startsWith('%')) {
+          if (destPlaceholder?.startsWith('%')) {
             postProcessors.push(async () => {
               const deferredDest = sharedPlaceholders.get(destPlaceholder);
               if (!deferredDest) {
@@ -822,9 +823,7 @@ export class BuildingBuilder implements Builder {
           this.allPlaceholders.get(toPath) ||
           (await this.findPlaceholderObject(toPath));
         if (!destRoom) {
-          console.warn(
-            `    Warning: Room placeholder ${toPath} not found`,
-          );
+          console.warn(`    Warning: Room placeholder ${toPath} not found`);
           continue;
         }
       } else {
@@ -848,9 +847,7 @@ export class BuildingBuilder implements Builder {
 
       const worldRoom = destRoom;
       if (!worldRoom) {
-        console.warn(
-          `    Warning: No room found for path: ${toPath}`,
-        );
+        console.warn(`    Warning: No room found for path: ${toPath}`);
         continue;
       }
 
@@ -976,10 +973,7 @@ export class BuildingBuilder implements Builder {
       // Handle single room export (world streets)
       if (module.room) {
         const roomDef = module.room;
-        if (
-          typeof roomDef.x === 'number' &&
-          typeof roomDef.y === 'number'
-        ) {
+        if (typeof roomDef.x === 'number' && typeof roomDef.y === 'number') {
           return {
             x: roomDef.x,
             y: roomDef.y,
@@ -989,15 +983,12 @@ export class BuildingBuilder implements Builder {
       }
 
       // Handle building export (underground tunnels) - get first room's coords
-      if (module.building && module.building.rooms) {
+      if (module.building?.rooms) {
         const rooms = module.building.rooms;
         const firstRoomKey = Object.keys(rooms)[0];
         if (firstRoomKey) {
           const roomDef = rooms[firstRoomKey];
-          if (
-            typeof roomDef.x === 'number' &&
-            typeof roomDef.y === 'number'
-          ) {
+          if (typeof roomDef.x === 'number' && typeof roomDef.y === 'number') {
             return {
               x: roomDef.x,
               y: roomDef.y,

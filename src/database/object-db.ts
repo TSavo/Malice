@@ -79,7 +79,9 @@ export class ObjectDatabase {
     this.db = this.client.db(this.dbName);
     this.objects = this.db.collection<GameObject>('objects');
     this.types = this.db.collection<TypeObject>('types');
-    this.counters = this.db.collection<{ _id: string; seq: number }>('counters');
+    this.counters = this.db.collection<{ _id: string; seq: number }>(
+      'counters',
+    );
 
     // Ensure indexes (_id is unique by default, no need to specify)
     await this.objects.createIndex({ 'parent.id': 1 });

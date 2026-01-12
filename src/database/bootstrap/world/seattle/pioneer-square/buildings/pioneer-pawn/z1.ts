@@ -95,7 +95,7 @@ A narrow staircase continues up to a roof hatch, the emergency egress for a buil
     },
 
     '%LIVING_ROOM': {
-      name: 'Pawnbroker\'s Apartment - Living Room',
+      name: "Pawnbroker's Apartment - Living Room",
       description: `The living room of someone who spent their life surrounded by other people's possessions but kept few of their own. What furniture remains has rotted or been picked over by fifty-five years of scavengers: a recliner reduced to springs and frame, a television screen shattered and scavenged for components, a coffee table warped by decades of humidity.
 
 The walls show rectangles of less-faded paint where photographs once hung—taken, probably, by someone who thought family photos might still matter. The pawnbroker saw too many collections sold for cash to start one of his own. Whoever cleaned out this apartment agreed.
@@ -146,7 +146,7 @@ A window overlooks Yesler Way, its glass cracked, a decorative iron grating on t
     },
 
     '%KITCHEN': {
-      name: 'Pawnbroker\'s Apartment - Kitchen',
+      name: "Pawnbroker's Apartment - Kitchen",
       description: `A small galley kitchen, stripped by decades of scavengers. The refrigerator stands open and empty, its door hanging crooked, whatever was inside long since rotted and desiccated. The stove remains—cast iron survives neglect—but the oven door hangs open, mice having made nests inside years ago.
 
 Cabinets hang open or missing doors entirely, their contents looted or broken. Shards of ceramic on the floor suggest plates that didn't survive the Long Dark. A coffee maker sits on the counter, its carafe shattered, its heating element scavenged.
@@ -195,7 +195,7 @@ A small table by the window has collapsed on one leg, the wood warped by humidit
     },
 
     '%BEDROOM': {
-      name: 'Pawnbroker\'s Apartment - Bedroom',
+      name: "Pawnbroker's Apartment - Bedroom",
       description: `The bedroom has been stripped over fifty-five years of scavenging. The bed frame remains—metal, not worth carrying—but the mattress is a nest of rotted fabric and springs. A dresser with drawers hanging open, emptied long ago. The nightstand is overturned, its lamp missing.
 
 A small safe sits in the corner, its door standing open, its contents taken during the Long Dark when people still thought cash might matter. Whoever opened it was disappointed or dead before they could spend what they found.

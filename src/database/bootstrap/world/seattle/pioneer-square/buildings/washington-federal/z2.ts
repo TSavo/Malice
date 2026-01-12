@@ -219,7 +219,7 @@ A fire escape ladder is bolted to the parapet, providing emergency egress to the
           name: 'parapet wall',
           capacity: 2,
           emptyMsg:
-            'The low parapet wall at the roof\'s edge offers precarious seating.',
+            "The low parapet wall at the roof's edge offers precarious seating.",
           occupiedMsg: '%s perched on the parapet',
         },
       ],

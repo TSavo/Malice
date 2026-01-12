@@ -272,7 +272,8 @@ export class WorldBuilder implements Builder {
                 if (roomDef.exits) {
                   const filteredExits: Record<string, ExitData | string> = {};
                   for (const [dir, exit] of Object.entries(roomDef.exits)) {
-                    const exitData = typeof exit === 'string' ? { to: exit } : exit;
+                    const exitData =
+                      typeof exit === 'string' ? { to: exit } : exit;
                     // Keep only exits that don't reference buildings
                     if (!exitData.to?.startsWith('buildings/')) {
                       filteredExits[dir] = exit;

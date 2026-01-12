@@ -119,8 +119,10 @@ The window looks out on the fire escape, the view of brick walls and steel stair
           name: 'twin bed',
           aliases: ['bed', 'cot'],
           capacity: 1,
-          emptyMsg: 'A twin bed is made with military precision, the covers pulled tight.',
-          occupiedMsg: 'Someone lies on the narrow bed, disturbing covers that have been still for decades.',
+          emptyMsg:
+            'A twin bed is made with military precision, the covers pulled tight.',
+          occupiedMsg:
+            'Someone lies on the narrow bed, disturbing covers that have been still for decades.',
           description: `A twin bed pushed against the wall, made with the precision of someone who valued order. The bedspread is faded but clean—it was clean when the resident last left. A pillow still shows the indentation of a head, a memory of the last night's sleep. The mattress has compressed over decades, but the bed is still a bed. Someone could sleep here. Someone might.`,
         },
         {
@@ -176,8 +178,10 @@ The bedroom is visible through its open door: the double bed unmade, the crib be
           name: 'family couch',
           aliases: ['couch', 'sofa'],
           capacity: 3,
-          emptyMsg: 'A couch with compressed cushions shows the shapes of the family that used it.',
-          occupiedMsg: 'Someone sits on the family couch, adding their weight to the memory of those who sat here before.',
+          emptyMsg:
+            'A couch with compressed cushions shows the shapes of the family that used it.',
+          occupiedMsg:
+            'Someone sits on the family couch, adding their weight to the memory of those who sat here before.',
           description: `A couch facing where the TV used to be—the center of family evenings, the place where parents collapsed after work while children played on the floor. The cushions are compressed into permanent shapes: adult shapes on the ends, child-sized depressions in the middle. Crumbs are fossilized in the seams. A baby bottle lies wedged between cushions, its contents dried to residue decades ago.`,
         },
         {
@@ -233,8 +237,10 @@ The bedroom is through a doorway with no door, just a curtain that has rotted on
           name: 'formal dining set',
           aliases: ['dining', 'table', 'chairs'],
           capacity: 6,
-          emptyMsg: 'A formal dining set waits for a meal, the table set but unused.',
-          occupiedMsg: 'Someone sits at the formal dining table, joining a meal that was never served.',
+          emptyMsg:
+            'A formal dining set waits for a meal, the table set but unused.',
+          occupiedMsg:
+            'Someone sits at the formal dining table, joining a meal that was never served.',
           description: `A formal dining table of dark wood—rosewood, probably, the kind that Chinese families valued—surrounded by chairs with carved backs. The table is set for a meal: bowls, chopsticks, a serving dish in the center covered with a lid that hides whatever was beneath (nothing now, or dust, or the ghost of dinner). The meal was never served, or never cleared. Fifty-five years is too long to tell which.`,
         },
         {
@@ -266,8 +272,10 @@ The bedroom is through a doorway with no door, just a curtain that has rotted on
           name: 'armchair',
           aliases: ['chair', 'seat'],
           capacity: 1,
-          emptyMsg: 'A wing-backed armchair faces where the TV used to be, positioned for an evening routine.',
-          occupiedMsg: 'Someone sits in the armchair, claiming the seat of the man who watched TV here every evening.',
+          emptyMsg:
+            'A wing-backed armchair faces where the TV used to be, positioned for an evening routine.',
+          occupiedMsg:
+            'Someone sits in the armchair, claiming the seat of the man who watched TV here every evening.',
           description: `A wing-backed armchair upholstered in fabric that was expensive when new—brocade, perhaps, with a subtle pattern. The chair is positioned facing the empty TV cabinet, angled slightly toward the window for reading light. A side table holds a reading lamp (dead) and a pair of reading glasses (lenses dusty). This was someone's chair, the seat claimed by decades of evening routine. The indentation in the cushion still holds the shape of the man who sat here.`,
         },
       ],

@@ -36,7 +36,8 @@ export const building = {
     '%STAFF_LOCK': {
       prototype: 'lock',
       name: 'Staff Door Lock',
-      description: 'A simple key lock on the staff door, the mechanism stiff with age.',
+      description:
+        'A simple key lock on the staff door, the mechanism stiff with age.',
       difficulty: 3,
     },
     '%STAFF_DOOR': {

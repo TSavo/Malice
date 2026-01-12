@@ -42,7 +42,8 @@ A small bar occupies one corner, its selection more refined than upstairs—or i
         {
           name: 'the center banquette',
           capacity: 8,
-          emptyMsg: 'A curved leather banquette commands the center of the room.',
+          emptyMsg:
+            'A curved leather banquette commands the center of the room.',
           occupiedMsg: '%s in the VIP seating',
         },
         {

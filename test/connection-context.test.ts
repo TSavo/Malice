@@ -816,7 +816,7 @@ describe('ConnectionContext', () => {
       const { MultiplexedTransport } = await import(
         '../src/transport/multiplexed/multiplexed-transport.js'
       );
-      const { EventEmitter } = await import('events');
+      const { EventEmitter } = await import('node:events');
 
       // Create mock WebSocket
       const mockWs = new EventEmitter() as any;
@@ -860,7 +860,7 @@ describe('ConnectionContext', () => {
       const { MultiplexedTransport } = await import(
         '../src/transport/multiplexed/multiplexed-transport.js'
       );
-      const { EventEmitter } = await import('events');
+      const { EventEmitter } = await import('node:events');
 
       const mockWs = new EventEmitter() as any;
       mockWs.readyState = 1;
@@ -900,7 +900,7 @@ describe('ConnectionContext', () => {
       const { MultiplexedTransport } = await import(
         '../src/transport/multiplexed/multiplexed-transport.js'
       );
-      const { EventEmitter } = await import('events');
+      const { EventEmitter } = await import('node:events');
 
       const mockWs = new EventEmitter() as any;
       mockWs.readyState = 1;
@@ -935,9 +935,7 @@ describe('ConnectionContext', () => {
       // Should have logged error
       expect(errorLogs.length).toBeGreaterThan(0);
       expect(
-        errorLogs.some((log) =>
-          JSON.stringify(log).includes('onWmMessage'),
-        ),
+        errorLogs.some((log) => JSON.stringify(log).includes('onWmMessage')),
       ).toBe(true);
 
       muxTransport.destroy();

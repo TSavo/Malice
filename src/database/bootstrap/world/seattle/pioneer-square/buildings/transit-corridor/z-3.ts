@@ -36,13 +36,19 @@ The air carries the chemical scent of the workshop to the north—solder and hea
           to: 'buildings/underground-complex/z-4.ts',
           room: '%SW',
           description: 'A shaft rises toward the Spark Workshop',
-          hidden: true
+          hidden: true,
         },
-        east: '%TRANSIT_W2'
+        east: '%TRANSIT_W2',
       },
       objects: [
-        { prototype: 'sign', name: 'Cartel markers', description: 'Subtle grey chalk marks indicate Cartel territory. The marks are maintained, refreshed regularly.', boltedDown: true },
-      ]
+        {
+          prototype: 'sign',
+          name: 'Cartel markers',
+          description:
+            'Subtle grey chalk marks indicate Cartel territory. The marks are maintained, refreshed regularly.',
+          boltedDown: true,
+        },
+      ],
     },
 
     '%TRANSIT_W2': {
@@ -61,8 +67,8 @@ Sound carries strangely here, footsteps echoing in ways that make distance hard 
       outdoor: false,
       exits: {
         west: '%TRANSIT_W1',
-        east: '%TRANSIT_W3'
-      }
+        east: '%TRANSIT_W3',
+      },
     },
 
     '%TRANSIT_W3': {
@@ -81,11 +87,17 @@ Crates and containers line the walls, their contents unknown but their presence 
       outdoor: false,
       exits: {
         west: '%TRANSIT_W2',
-        east: '%TRANSIT_W4'
+        east: '%TRANSIT_W4',
       },
       objects: [
-        { prototype: 'crate', name: 'unmarked crates', description: 'Wooden crates without markings, their contents sealed and unknown. The crates show handling marks—moved frequently, stored briefly.', boltedDown: false },
-      ]
+        {
+          prototype: 'crate',
+          name: 'unmarked crates',
+          description:
+            'Wooden crates without markings, their contents sealed and unknown. The crates show handling marks—moved frequently, stored briefly.',
+          boltedDown: false,
+        },
+      ],
     },
 
     '%TRANSIT_W4': {
@@ -106,12 +118,18 @@ The junction shows heavier traffic than the corridor, the floor worn smooth by f
         west: '%TRANSIT_W3',
         east: '%TRANSIT_W5',
         north: {
-          description: 'A shaft rises toward the Yesler deep passage'
-        }
+          description: 'A shaft rises toward the Yesler deep passage',
+        },
       },
       objects: [
-        { prototype: 'sign', name: 'direction codes', description: 'Chalk symbols indicate routes: arrows with numbers, letters that mean something to someone. The code is maintained but not explained.', boltedDown: true },
-      ]
+        {
+          prototype: 'sign',
+          name: 'direction codes',
+          description:
+            'Chalk symbols indicate routes: arrows with numbers, letters that mean something to someone. The code is maintained but not explained.',
+          boltedDown: true,
+        },
+      ],
     },
 
     '%TRANSIT_W5': {
@@ -130,8 +148,8 @@ Water seeps through the walls at this depth, the moisture collected in channels 
       outdoor: false,
       exits: {
         west: '%TRANSIT_W4',
-        east: '%TRANSIT_CENTER'
-      }
+        east: '%TRANSIT_CENTER',
+      },
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -160,19 +178,37 @@ A notice board on one wall holds papers that flutter in the ventilation draft—
         north: {
           to: 'buildings/arterial-tunnel/z-3.ts',
           room: '%ARTERY_HUB',
-          description: 'A passage leads north to the arterial hub'
+          description: 'A passage leads north to the arterial hub',
         },
         south: {
           to: 'buildings/arterial-tunnel/z-3.ts',
           room: '%ARTERY_CENTER_S1',
-          description: 'A passage leads south along the arterial'
-        }
+          description: 'A passage leads south along the arterial',
+        },
       },
       objects: [
-        { prototype: 'sign', name: 'a notice board', description: 'A board covered with papers: messages, announcements, requests for trade. The papers are dated, removed when outdated. Someone curates this.', boltedDown: true },
-        { prototype: 'bench', name: 'a waiting bench', description: 'A rough wooden bench against the wall, worn smooth by travelers resting between routes.', boltedDown: true },
-        { prototype: 'sign', name: 'balanced territorial markers', description: 'Chalk marks on opposing walls: grey Cartel symbols, blue Continuum marks, neutral independent tags. The balance is deliberate, maintained.', boltedDown: true },
-      ]
+        {
+          prototype: 'sign',
+          name: 'a notice board',
+          description:
+            'A board covered with papers: messages, announcements, requests for trade. The papers are dated, removed when outdated. Someone curates this.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'bench',
+          name: 'a waiting bench',
+          description:
+            'A rough wooden bench against the wall, worn smooth by travelers resting between routes.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'balanced territorial markers',
+          description:
+            'Chalk marks on opposing walls: grey Cartel symbols, blue Continuum marks, neutral independent tags. The balance is deliberate, maintained.',
+          boltedDown: true,
+        },
+      ],
     },
 
     '%TRANSIT_E1': {
@@ -191,8 +227,8 @@ The traffic here is lighter than at the hub, the eastern routes less traveled th
       outdoor: false,
       exits: {
         west: '%TRANSIT_CENTER',
-        east: '%TRANSIT_E2'
-      }
+        east: '%TRANSIT_E2',
+      },
     },
 
     '%TRANSIT_E2': {
@@ -211,11 +247,17 @@ The utility crossing creates a natural landmark, a reference point in passages t
       outdoor: false,
       exits: {
         west: '%TRANSIT_E1',
-        east: '%TRANSIT_E3'
+        east: '%TRANSIT_E3',
       },
       objects: [
-        { prototype: 'furniture', name: 'utility crossing', description: 'Pipes and conduits cross the passage, emerging from one wall and entering the other. The infrastructure predates the tunnel—the tunnel was cut around it.', boltedDown: true },
-      ]
+        {
+          prototype: 'furniture',
+          name: 'utility crossing',
+          description:
+            'Pipes and conduits cross the passage, emerging from one wall and entering the other. The infrastructure predates the tunnel—the tunnel was cut around it.',
+          boltedDown: true,
+        },
+      ],
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -242,9 +284,9 @@ Routes lead east toward the commercial underground and south toward the Chinatow
         south: {
           to: 'buildings/underground-east/z-3.ts',
           room: '%CABLE_VAULT',
-          description: 'A passage leads south toward the cable vault'
-        }
-      }
+          description: 'A passage leads south toward the cable vault',
+        },
+      },
     },
 
     '%TRANSIT_E4': {
@@ -265,9 +307,9 @@ Routes lead east toward the commercial underground and south toward the Chinatow
         north: {
           to: 'buildings/arterial-tunnel/z-3.ts',
           room: '%ARTERY_CENTER_N2',
-          description: 'A passage connects to the arterial'
-        }
-      }
+          description: 'A passage connects to the arterial',
+        },
+      },
     },
 
     '%TRANSIT_E5': {
@@ -284,8 +326,8 @@ Routes lead east toward the commercial underground and south toward the Chinatow
       outdoor: false,
       exits: {
         west: '%TRANSIT_E4',
-        east: '%TRANSIT_TERMINUS'
-      }
+        east: '%TRANSIT_TERMINUS',
+      },
     },
 
     '%TRANSIT_TERMINUS': {
@@ -307,13 +349,25 @@ The construction here is newer than the transit corridor, added to connect the t
       exits: {
         west: '%TRANSIT_E5',
         up: {
-          description: 'A warm shaft rises toward the steam tunnels'
-        }
+          description: 'A warm shaft rises toward the steam tunnels',
+        },
       },
       objects: [
-        { prototype: 'sign', name: 'a connection plaque', description: 'A small metal plaque reads: "TRANSIT EXTENSION - COMPLETED 2019". Someone documented their work.', boltedDown: true },
-        { prototype: 'furniture', name: 'a steam vent', description: 'A vent in the wall releases warmth from the steam tunnels above. The heat makes this corner comfortable in winter.', boltedDown: true },
-      ]
-    }
-  }
+        {
+          prototype: 'sign',
+          name: 'a connection plaque',
+          description:
+            'A small metal plaque reads: "TRANSIT EXTENSION - COMPLETED 2019". Someone documented their work.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a steam vent',
+          description:
+            'A vent in the wall releases warmth from the steam tunnels above. The heat makes this corner comfortable in winter.',
+          boltedDown: true,
+        },
+      ],
+    },
+  },
 };

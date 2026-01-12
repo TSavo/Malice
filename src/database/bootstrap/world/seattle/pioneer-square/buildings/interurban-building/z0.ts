@@ -20,7 +20,7 @@ export const building = {
       name: 'Building Lock',
       description:
         'A modern deadbolt installed in an antique brass plate, the contrast of eras visible in the metal.',
-      difficulty: 4
+      difficulty: 4,
     },
     '%FRONT_DOOR': {
       prototype: 'door',
@@ -31,7 +31,7 @@ export const building = {
       open: true,
       locks: ['%FRONT_LOCK'],
       material: 'glass',
-      durability: 45
+      durability: 45,
     },
     '%STAIR_DOOR': {
       prototype: 'door',
@@ -42,7 +42,7 @@ export const building = {
       open: true,
       locks: [],
       material: 'metal',
-      durability: 75
+      durability: 75,
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -69,15 +69,15 @@ The elevator doors are brass, their surfaces tarnished to brown, their cage visi
         south: {
           to: '2nd-ave-s/y5.ts',
           description: 'The brass doors lead to 2nd Ave S',
-          door: '%FRONT_DOOR'
+          door: '%FRONT_DOOR',
         },
         north: '%RETAIL',
         west: '%MAIL_ROOM',
         up: {
           description: 'A stairwell door leads to the upper floors',
           door: '%STAIR_DOOR',
-          to: '%HALL_1'
-        }
+          to: '%HALL_1',
+        },
       },
       sittables: [
         {
@@ -85,7 +85,7 @@ The elevator doors are brass, their surfaces tarnished to brown, their cage visi
           capacity: 3,
           emptyMsg:
             'A marble bench sits against the wall, its surface cold and smooth, worn by generations of waiting.',
-          occupiedMsg: '%s sitting on the marble bench'
+          occupiedMsg: '%s sitting on the marble bench',
         },
       ],
       objects: [
@@ -93,21 +93,21 @@ The elevator doors are brass, their surfaces tarnished to brown, their cage visi
           prototype: 'furniture',
           name: 'directory board',
           aliases: ['directory', 'board'],
-          description: `A large directory board, black felt with white plastic letters arranged in neat rows. The letters list businesses that occupied the building's suites—law firms, importers, consultants, the professional services that once filled Pioneer Square. Most slots are filled with names. All the names belong to businesses that closed. The board is a census of economic extinction.`
+          description: `A large directory board, black felt with white plastic letters arranged in neat rows. The letters list businesses that occupied the building's suites—law firms, importers, consultants, the professional services that once filled Pioneer Square. Most slots are filled with names. All the names belong to businesses that closed. The board is a census of economic extinction.`,
         },
         {
           prototype: 'describable',
           name: 'brass elevator doors',
           aliases: ['elevator', 'lift'],
-          description: `Ornate brass elevator doors, their decorative grillwork allowing a glimpse of the cage car within. The elevator is a genuine antique—mechanical controls, a collapsing gate, the kind of lift that required an operator before automation made them obsolete. The car is visible at lobby level, its interior dark. The machinery hasn't moved in years.`
+          description: `Ornate brass elevator doors, their decorative grillwork allowing a glimpse of the cage car within. The elevator is a genuine antique—mechanical controls, a collapsing gate, the kind of lift that required an operator before automation made them obsolete. The car is visible at lobby level, its interior dark. The machinery hasn't moved in years.`,
         },
         {
           prototype: 'describable',
           name: 'marble floors',
           aliases: ['floor', 'marble'],
-          description: `The lobby floor is marble—real marble, imported from somewhere that produced marble, installed when such extravagance was merely expensive rather than impossible. The stone is worn in paths that reveal traffic patterns from a century of footsteps, darker where people walked, lighter where they didn't. The marble will outlast the building.`
+          description: `The lobby floor is marble—real marble, imported from somewhere that produced marble, installed when such extravagance was merely expensive rather than impossible. The stone is worn in paths that reveal traffic patterns from a century of footsteps, darker where people walked, lighter where they didn't. The marble will outlast the building.`,
         },
-      ]
+      ],
     },
 
     '%RETAIL': {
@@ -128,7 +128,7 @@ A door in the back leads to the mail room and building services—the infrastruc
       outdoor: false,
       exits: {
         south: '%LOBBY',
-        west: '%MAIL_ROOM'
+        west: '%MAIL_ROOM',
       },
       sittables: [
         {
@@ -136,7 +136,7 @@ A door in the back leads to the mail room and building services—the infrastruc
           capacity: 2,
           emptyMsg:
             'Small tables with mismatched chairs fill the space, arranged for intimate conversation.',
-          occupiedMsg: '%s sitting at a cafe table'
+          occupiedMsg: '%s sitting at a cafe table',
         },
       ],
       objects: [
@@ -144,21 +144,21 @@ A door in the back leads to the mail room and building services—the infrastruc
           prototype: 'furniture',
           name: 'espresso machine',
           aliases: ['espresso', 'coffee machine'],
-          description: `A commercial espresso machine, chrome and brass, the kind that small cafes invest in and maintain with devotion. The portafilters are still locked into the group heads, packed with grounds that have fossilized into solid pucks. The steam wands are crusted with dried milk. The machine was the heart of this place. The heart stopped.`
+          description: `A commercial espresso machine, chrome and brass, the kind that small cafes invest in and maintain with devotion. The portafilters are still locked into the group heads, packed with grounds that have fossilized into solid pucks. The steam wands are crusted with dried milk. The machine was the heart of this place. The heart stopped.`,
         },
         {
           prototype: 'cabinet',
           name: 'pastry case',
           aliases: ['pastry', 'case', 'display'],
-          description: `A glass display case containing pastries that have mummified into permanent shapes: muffins turned to stone, croissants fossilized mid-flake, a cheesecake that has achieved geological stability. The pastries are inedible but recognizable, preserved by dryness rather than intention.`
+          description: `A glass display case containing pastries that have mummified into permanent shapes: muffins turned to stone, croissants fossilized mid-flake, a cheesecake that has achieved geological stability. The pastries are inedible but recognizable, preserved by dryness rather than intention.`,
         },
         {
           prototype: 'describable',
           name: 'chalkboard menu',
           aliases: ['menu', 'chalkboard'],
-          description: `A chalkboard menu behind the counter, the offerings listed in careful handwriting: AMERICANO $3. LATTE $4. CAPPUCCINO $4.50. The handwriting was practiced to look artisanal, the prices calculated to cover rent and wages and still turn a profit. The math no longer matters. The menu remains.`
+          description: `A chalkboard menu behind the counter, the offerings listed in careful handwriting: AMERICANO $3. LATTE $4. CAPPUCCINO $4.50. The handwriting was practiced to look artisanal, the prices calculated to cover rent and wages and still turn a profit. The math no longer matters. The menu remains.`,
         },
-      ]
+      ],
     },
 
     '%MAIL_ROOM': {
@@ -182,29 +182,29 @@ A door leads to the basement and building utilities—the furnace room and elect
         north: '%RETAIL',
         down: {
           description: 'Stairs lead down to the basement utility area',
-          to: '%BASEMENT'
-        }
+          to: '%BASEMENT',
+        },
       },
       objects: [
         {
           prototype: 'cabinet',
           name: 'mailboxes',
           aliases: ['boxes', 'mail'],
-          description: `A wall of brass mailboxes, each one numbered to match a suite upstairs. The boxes are mostly full—envelopes visible through the small windows, packages stuffed into openings too small for them. The mail accumulated after delivery stopped making sense. The mailboxes preserved it, waiting for tenants who will never come.`
+          description: `A wall of brass mailboxes, each one numbered to match a suite upstairs. The boxes are mostly full—envelopes visible through the small windows, packages stuffed into openings too small for them. The mail accumulated after delivery stopped making sense. The mailboxes preserved it, waiting for tenants who will never come.`,
         },
         {
           prototype: 'desk',
           name: 'service counter',
           aliases: ['counter'],
-          description: `A wooden service counter separating the lobby side from the back office. The wood is worn smooth by decades of packages sliding across its surface, scarred where tape and labels were cut. A bell sits on the counter for summoning assistance. The bell still rings. No one answers.`
+          description: `A wooden service counter separating the lobby side from the back office. The wood is worn smooth by decades of packages sliding across its surface, scarred where tape and labels were cut. A bell sits on the counter for summoning assistance. The bell still rings. No one answers.`,
         },
         {
           prototype: 'describable',
           name: 'postal scale',
           aliases: ['scale'],
-          description: `A postal scale, the mechanical kind with a needle and a dial, sits on the counter. The scale is accurate to a quarter ounce, precise enough for calculating postage on letters that no longer need sending. The needle points to zero. Nothing weighs anything anymore.`
+          description: `A postal scale, the mechanical kind with a needle and a dial, sits on the counter. The scale is accurate to a quarter ounce, precise enough for calculating postage on letters that no longer need sending. The needle points to zero. Nothing weighs anything anymore.`,
         },
-      ]
+      ],
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -230,28 +230,28 @@ In the eastern wall, behind the furnace, a section of brickwork has been removed
       waterLevel: 0,
       outdoor: false,
       exits: {
-        up: '%MAIL_ROOM'
+        up: '%MAIL_ROOM',
       },
       objects: [
         {
           prototype: 'furniture',
           name: 'furnace',
           aliases: ['boiler', 'heater'],
-          description: `A massive gas furnace from the 1950s, iron and steel construction meant to heat the entire building. The furnace converted from coal at some point—the original coal chute is still visible, bricked over. The pilot light is out. The furnace is cold. The building's heating died with the maintenance schedule.`
+          description: `A massive gas furnace from the 1950s, iron and steel construction meant to heat the entire building. The furnace converted from coal at some point—the original coal chute is still visible, bricked over. The pilot light is out. The furnace is cold. The building's heating died with the maintenance schedule.`,
         },
         {
           prototype: 'describable',
           name: 'electrical panels',
           aliases: ['panels', 'breakers', 'electrical'],
-          description: `A wall of electrical panels, their covers open to reveal rows of circuit breakers. Labels identify the circuits in handwriting from different decades: "3RD FLOOR LIGHTS" in 1960s script, "RETAIL OUTLETS" in 1990s marker. Some breakers are tripped. Others remain on, feeding power to systems that somehow still function.`
+          description: `A wall of electrical panels, their covers open to reveal rows of circuit breakers. Labels identify the circuits in handwriting from different decades: "3RD FLOOR LIGHTS" in 1960s script, "RETAIL OUTLETS" in 1990s marker. Some breakers are tripped. Others remain on, feeding power to systems that somehow still function.`,
         },
         {
           prototype: 'describable',
           name: 'water heater',
           aliases: ['heater', 'tank'],
-          description: `A commercial water heater, a cylindrical tank connected to pipes that run throughout the building. The tank is insulated, its surface warm to the touch—somehow, the water heater still functions, maintaining temperature for sinks and showers that no one uses. The persistence is mysterious but useful.`
+          description: `A commercial water heater, a cylindrical tank connected to pipes that run throughout the building. The tank is insulated, its surface warm to the touch—somehow, the water heater still functions, maintaining temperature for sinks and showers that no one uses. The persistence is mysterious but useful.`,
         },
-      ]
+      ],
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -280,23 +280,23 @@ A water cooler stands in the hall, its bottle empty, its dispenser dry. Someone 
         west: '%OFFICE_2',
         up: {
           description: 'The stairwell continues up',
-          to: '%HALL_2'
-        }
+          to: '%HALL_2',
+        },
       },
       objects: [
         {
           prototype: 'describable',
           name: 'office doors',
           aliases: ['doors'],
-          description: `Solid wooden doors with frosted glass panels, each etched with a business name in gold leaf. PACIFIC RIM IMPORTS, SUITE 101. WESTSIDE CONSULTING, SUITE 102. The names are legible but meaningless—the businesses dissolved, the people scattered, the suites empty behind their labeled doors.`
+          description: `Solid wooden doors with frosted glass panels, each etched with a business name in gold leaf. PACIFIC RIM IMPORTS, SUITE 101. WESTSIDE CONSULTING, SUITE 102. The names are legible but meaningless—the businesses dissolved, the people scattered, the suites empty behind their labeled doors.`,
         },
         {
           prototype: 'describable',
           name: 'empty water cooler',
           aliases: ['cooler', 'water'],
-          description: `A water cooler, the kind found in every office, sits in the hallway. The bottle is empty, its plastic walls clouded with mineral deposits. The dispenser is dry. The cooler was shared infrastructure, maintained by someone whose job included maintaining it. That job no longer exists.`
+          description: `A water cooler, the kind found in every office, sits in the hallway. The bottle is empty, its plastic walls clouded with mineral deposits. The dispenser is dry. The cooler was shared infrastructure, maintained by someone whose job included maintaining it. That job no longer exists.`,
         },
-      ]
+      ],
     },
 
     '%OFFICE_1': {
@@ -316,7 +316,7 @@ A fax machine sits on a side table, its paper tray full of thermal printouts tha
       waterLevel: 0,
       outdoor: false,
       exits: {
-        south: '%HALL_1'
+        south: '%HALL_1',
       },
       sittables: [
         {
@@ -324,7 +324,7 @@ A fax machine sits on a side table, its paper tray full of thermal printouts tha
           capacity: 1,
           emptyMsg:
             'A leather executive chair sits behind the mahogany desk, its cushion shaped by years of use.',
-          occupiedMsg: '%s sitting in the executive chair'
+          occupiedMsg: '%s sitting in the executive chair',
         },
       ],
       objects: [
@@ -332,15 +332,15 @@ A fax machine sits on a side table, its paper tray full of thermal printouts tha
           prototype: 'desk',
           name: 'mahogany desk',
           aliases: ['desk'],
-          description: `A substantial mahogany desk, the kind that suggests permanence and prosperity. The surface is covered in shipping manifests, invoices, the paperwork of international trade. "CONTAINER 4521 - GUANGZHOU TO SEATTLE - PORCELAIN, SILK." The containers stopped arriving. The paperwork preserved the expectation that they would.`
+          description: `A substantial mahogany desk, the kind that suggests permanence and prosperity. The surface is covered in shipping manifests, invoices, the paperwork of international trade. "CONTAINER 4521 - GUANGZHOU TO SEATTLE - PORCELAIN, SILK." The containers stopped arriving. The paperwork preserved the expectation that they would.`,
         },
         {
           prototype: 'cabinet',
           name: 'sample shelves',
           aliases: ['shelves', 'samples'],
-          description: `Shelves displaying samples of imported goods: jade figurines in various sizes, silk scarves in bright colors, lacquered boxes with intricate designs. The samples were meant to show clients what Pacific Rim could provide. The clients are gone. The samples remain, artifacts of trade routes that no longer flow.`
+          description: `Shelves displaying samples of imported goods: jade figurines in various sizes, silk scarves in bright colors, lacquered boxes with intricate designs. The samples were meant to show clients what Pacific Rim could provide. The clients are gone. The samples remain, artifacts of trade routes that no longer flow.`,
         },
-      ]
+      ],
     },
 
     '%OFFICE_2': {
@@ -360,7 +360,7 @@ Filing cabinets line the back wall, their drawers marked with client names and p
       waterLevel: 0,
       outdoor: false,
       exits: {
-        east: '%HALL_1'
+        east: '%HALL_1',
       },
       sittables: [
         {
@@ -368,7 +368,7 @@ Filing cabinets line the back wall, their drawers marked with client names and p
           capacity: 6,
           emptyMsg:
             'Ergonomic office chairs surround the conference table, arranged for meetings that never happened.',
-          occupiedMsg: '%s seated at the conference table'
+          occupiedMsg: '%s seated at the conference table',
         },
       ],
       objects: [
@@ -376,21 +376,21 @@ Filing cabinets line the back wall, their drawers marked with client names and p
           prototype: 'furniture',
           name: 'conference table',
           aliases: ['table'],
-          description: `An oval conference table surrounded by ergonomic chairs, the setting for meetings that mattered to people who aren't here. A projector hangs from the ceiling, pointed at a pull-down screen. The last presentation is probably still loaded, slides about quarterly projections or market analysis, optimism preserved in PowerPoint.`
+          description: `An oval conference table surrounded by ergonomic chairs, the setting for meetings that mattered to people who aren't here. A projector hangs from the ceiling, pointed at a pull-down screen. The last presentation is probably still loaded, slides about quarterly projections or market analysis, optimism preserved in PowerPoint.`,
         },
         {
           prototype: 'describable',
           name: 'strategy whiteboard',
           aliases: ['whiteboard', 'board'],
-          description: `A whiteboard covered in diagrams and bullet points that have become permanent—dry-erase marker dried to immovability. "Q4 OBJECTIVES: 1) EXPAND CLIENT BASE 2) IMPROVE MARGINS 3) SYNERGY." The objectives are corporate poetry, meaning nothing specific, applicable to any business, achieved by none.`
+          description: `A whiteboard covered in diagrams and bullet points that have become permanent—dry-erase marker dried to immovability. "Q4 OBJECTIVES: 1) EXPAND CLIENT BASE 2) IMPROVE MARGINS 3) SYNERGY." The objectives are corporate poetry, meaning nothing specific, applicable to any business, achieved by none.`,
         },
         {
           prototype: 'cabinet',
           name: 'filing cabinets',
           aliases: ['cabinets', 'files'],
-          description: `Filing cabinets labeled with project codes and client names: "PROJECT AURORA," "SMITH INDUSTRIES," "CONFIDENTIAL." The files inside contain whatever consultants produce—reports, analyses, recommendations. The recommendations were never implemented. The reports gather dust. The confidentiality protects nothing.`
+          description: `Filing cabinets labeled with project codes and client names: "PROJECT AURORA," "SMITH INDUSTRIES," "CONFIDENTIAL." The files inside contain whatever consultants produce—reports, analyses, recommendations. The recommendations were never implemented. The reports gather dust. The confidentiality protects nothing.`,
         },
-      ]
+      ],
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -419,17 +419,17 @@ The stairwell continues up toward the top floors, where corner offices offered b
         west: '%OFFICE_4',
         up: {
           description: 'The stairwell continues up to the top floor',
-          to: '%HALL_3'
-        }
+          to: '%HALL_3',
+        },
       },
       objects: [
         {
           prototype: 'describable',
           name: 'bulletin board',
           aliases: ['board', 'flyers'],
-          description: `A bulletin board covered in flyers and announcements, all of them outdated: PIONEER SQUARE ART WALK - FIRST THURSDAY. JAZZ AT THE CENTRAL - FRIDAY NIGHTS. ROOM FOR RENT - QUIET PROFESSIONAL. The events happened or didn't. The room was rented or wasn't. The flyers remain, thumbtacked in place.`
+          description: `A bulletin board covered in flyers and announcements, all of them outdated: PIONEER SQUARE ART WALK - FIRST THURSDAY. JAZZ AT THE CENTRAL - FRIDAY NIGHTS. ROOM FOR RENT - QUIET PROFESSIONAL. The events happened or didn't. The room was rented or wasn't. The flyers remain, thumbtacked in place.`,
         },
-      ]
+      ],
     },
 
     '%OFFICE_3': {
@@ -449,7 +449,7 @@ A CAD workstation sits dark on one desk, its monitor dusty, its designs frozen i
       waterLevel: 0,
       outdoor: false,
       exits: {
-        south: '%HALL_2'
+        south: '%HALL_2',
       },
       sittables: [
         {
@@ -457,7 +457,7 @@ A CAD workstation sits dark on one desk, its monitor dusty, its designs frozen i
           capacity: 3,
           emptyMsg:
             'Drafting stools sit at tilted tables, positioned for work that will never be completed.',
-          occupiedMsg: '%s sitting at a drafting table'
+          occupiedMsg: '%s sitting at a drafting table',
         },
       ],
       objects: [
@@ -465,21 +465,21 @@ A CAD workstation sits dark on one desk, its monitor dusty, its designs frozen i
           prototype: 'furniture',
           name: 'drafting tables',
           aliases: ['tables', 'drafting'],
-          description: `Tilted drafting tables arranged along the windows, their surfaces angled for drawing by hand. Some tables still have blueprints taped in place—building elevations, floor plans, the visual language of architecture. The drawings are detailed and careful, the work of people who cared about getting things right.`
+          description: `Tilted drafting tables arranged along the windows, their surfaces angled for drawing by hand. Some tables still have blueprints taped in place—building elevations, floor plans, the visual language of architecture. The drawings are detailed and careful, the work of people who cared about getting things right.`,
         },
         {
           prototype: 'cabinet',
           name: 'blueprint tubes',
           aliases: ['tubes', 'blueprints'],
-          description: `Cardboard tubes containing rolled blueprints, each one labeled with a project name and date. "PIONEER SQUARE HOTEL - RENOVATION - 2018." "WATERFRONT DEVELOPMENT - PHASE 2." The plans inside represent months of work, now archived in tubes that no one will open.`
+          description: `Cardboard tubes containing rolled blueprints, each one labeled with a project name and date. "PIONEER SQUARE HOTEL - RENOVATION - 2018." "WATERFRONT DEVELOPMENT - PHASE 2." The plans inside represent months of work, now archived in tubes that no one will open.`,
         },
         {
           prototype: 'describable',
           name: 'building models',
           aliases: ['models'],
-          description: `Scale models of buildings displayed on shelves: Pioneer Square storefronts, waterfront developments, a high-rise that was probably never built. The models are made of foam board and basswood, carefully painted, professionally presented. They show what buildings could become. What they actually became is different.`
+          description: `Scale models of buildings displayed on shelves: Pioneer Square storefronts, waterfront developments, a high-rise that was probably never built. The models are made of foam board and basswood, carefully painted, professionally presented. They show what buildings could become. What they actually became is different.`,
         },
-      ]
+      ],
     },
 
     '%OFFICE_4': {
@@ -499,7 +499,7 @@ A law degree hangs on the wall, University of Washington School of Law, Class of
       waterLevel: 0,
       outdoor: false,
       exits: {
-        east: '%HALL_2'
+        east: '%HALL_2',
       },
       sittables: [
         {
@@ -507,7 +507,7 @@ A law degree hangs on the wall, University of Washington School of Law, Class of
           capacity: 2,
           emptyMsg:
             'Leather client chairs face the attorney desk, positioned for confidential consultations.',
-          occupiedMsg: '%s seated in the client chair'
+          occupiedMsg: '%s seated in the client chair',
         },
       ],
       objects: [
@@ -515,21 +515,21 @@ A law degree hangs on the wall, University of Washington School of Law, Class of
           prototype: 'desk',
           name: 'attorney desk',
           aliases: ['desk'],
-          description: `A substantial desk in dark wood, the kind that conveys authority and justifies billing rates. Legal pads cover the surface, handwritten notes in the illegible scrawl that lawyers develop from years of depositions. A nameplate reads "MARGARET JOHNSON, ESQ." Margaret is gone. Her desk remains.`
+          description: `A substantial desk in dark wood, the kind that conveys authority and justifies billing rates. Legal pads cover the surface, handwritten notes in the illegible scrawl that lawyers develop from years of depositions. A nameplate reads "MARGARET JOHNSON, ESQ." Margaret is gone. Her desk remains.`,
         },
         {
           prototype: 'cabinet',
           name: 'law books',
           aliases: ['books', 'library'],
-          description: `Floor-to-ceiling bookshelves hold legal volumes in matching bindings: WASHINGTON PRACTICE, LEGAL ETHICS, REAL PROPERTY LAW. The books are current through whenever the subscriptions lapsed. The law they document is still valid, technically. Whether it applies to anything anymore is a different question.`
+          description: `Floor-to-ceiling bookshelves hold legal volumes in matching bindings: WASHINGTON PRACTICE, LEGAL ETHICS, REAL PROPERTY LAW. The books are current through whenever the subscriptions lapsed. The law they document is still valid, technically. Whether it applies to anything anymore is a different question.`,
         },
         {
           prototype: 'cabinet',
           name: 'case files',
           aliases: ['files', 'cases'],
-          description: `Filing cabinets full of case folders, each one representing a legal matter that someone cared enough to hire a lawyer for. JOHNSON V. SMITH - PROPERTY DISPUTE. IN RE: ESTATE OF WILLIAMS. The cases were never resolved. The files preserve the arguments that would have been made, the evidence that would have been presented, the outcomes that will never be reached.`
+          description: `Filing cabinets full of case folders, each one representing a legal matter that someone cared enough to hire a lawyer for. JOHNSON V. SMITH - PROPERTY DISPUTE. IN RE: ESTATE OF WILLIAMS. The cases were never resolved. The files preserve the arguments that would have been made, the evidence that would have been presented, the outcomes that will never be reached.`,
         },
-      ]
+      ],
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -558,17 +558,17 @@ The offices here had views—west toward the waterfront, north toward downtown�
         west: '%STORAGE',
         up: {
           description: 'A door leads to the roof',
-          to: '%ROOF_SE'
-        }
+          to: '%ROOF_SE',
+        },
       },
       objects: [
         {
           prototype: 'describable',
           name: 'skylights',
           aliases: ['skylight', 'windows'],
-          description: `Skylights set into the ceiling let natural light into the hallway—a luxury in a building where most illumination came from fixtures. The glass is dirty, clouded with years of accumulated grime, but light still filters through, brighter than the floors below. The skylights were a selling point once. They still work.`
+          description: `Skylights set into the ceiling let natural light into the hallway—a luxury in a building where most illumination came from fixtures. The glass is dirty, clouded with years of accumulated grime, but light still filters through, brighter than the floors below. The skylights were a selling point once. They still work.`,
         },
-      ]
+      ],
     },
 
     '%CORNER_OFFICE': {
@@ -588,7 +588,7 @@ The desk is remarkably clean, as if the occupant left with everything in order, 
       waterLevel: 0,
       outdoor: false,
       exits: {
-        south: '%HALL_3'
+        south: '%HALL_3',
       },
       sittables: [
         {
@@ -596,14 +596,14 @@ The desk is remarkably clean, as if the occupant left with everything in order, 
           capacity: 1,
           emptyMsg:
             'A high-backed executive chair commands the view from behind the massive desk.',
-          occupiedMsg: '%s sitting in the executive chair'
+          occupiedMsg: '%s sitting in the executive chair',
         },
         {
           name: 'leather sofa',
           capacity: 3,
           emptyMsg:
             'A leather sofa faces the window, positioned for contemplating success.',
-          occupiedMsg: '%s lounging on the leather sofa'
+          occupiedMsg: '%s lounging on the leather sofa',
         },
       ],
       objects: [
@@ -611,21 +611,21 @@ The desk is remarkably clean, as if the occupant left with everything in order, 
           prototype: 'furniture',
           name: 'executive desk',
           aliases: ['desk'],
-          description: `A massive desk in dark wood, its surface remarkably clean—no papers, no clutter, just a leather blotter and a pen set and the careful emptiness of someone who kept things organized. The desk drawers are locked. Whatever's inside stayed inside.`
+          description: `A massive desk in dark wood, its surface remarkably clean—no papers, no clutter, just a leather blotter and a pen set and the careful emptiness of someone who kept things organized. The desk drawers are locked. Whatever's inside stayed inside.`,
         },
         {
           prototype: 'describable',
           name: 'brass telescope',
           aliases: ['telescope', 'spyglass'],
-          description: `A brass telescope on a wooden tripod, pointed toward Elliott Bay. The telescope is antique or made to look antique—either way, expensive. Through the eyepiece, ships would have been visible, or the islands, or whatever the owner wanted to watch. The view is still there. The watcher is not.`
+          description: `A brass telescope on a wooden tripod, pointed toward Elliott Bay. The telescope is antique or made to look antique—either way, expensive. Through the eyepiece, ships would have been visible, or the islands, or whatever the owner wanted to watch. The view is still there. The watcher is not.`,
         },
         {
           prototype: 'describable',
           name: 'artwork',
           aliases: ['art', 'paintings'],
-          description: `Art hangs on the walls—original paintings, based on the signatures, in frames that cost as much as the paintings. Abstract expressionism, mostly, the kind of art that suggests taste without requiring understanding. The art was investment and decoration and status symbol. Now it's just colors on canvas, waiting for viewers.`
+          description: `Art hangs on the walls—original paintings, based on the signatures, in frames that cost as much as the paintings. Abstract expressionism, mostly, the kind of art that suggests taste without requiring understanding. The art was investment and decoration and status symbol. Now it's just colors on canvas, waiting for viewers.`,
         },
-      ]
+      ],
     },
 
     '%STORAGE': {
@@ -648,23 +648,23 @@ A ladder leads up to a roof hatch, providing maintenance access to the building'
         east: '%HALL_3',
         up: {
           description: 'A ladder leads up through a roof hatch',
-          to: '%ROOF_SW'
-        }
+          to: '%ROOF_SW',
+        },
       },
       objects: [
         {
           prototype: 'cabinet',
           name: 'storage shelves',
           aliases: ['shelves', 'storage'],
-          description: `Metal shelving units hold boxes labeled with tenant names and dates—archive storage, the paper trail of businesses that generated paper. "PACIFIC RIM - 2015." "JOHNSON & ASSOC - TAX YEARS 2010-2014." The boxes contain history that mattered to someone, preserved here because destroying it seemed wrong.`
+          description: `Metal shelving units hold boxes labeled with tenant names and dates—archive storage, the paper trail of businesses that generated paper. "PACIFIC RIM - 2015." "JOHNSON & ASSOC - TAX YEARS 2010-2014." The boxes contain history that mattered to someone, preserved here because destroying it seemed wrong.`,
         },
         {
           prototype: 'describable',
           name: 'obsolete equipment',
           aliases: ['equipment', 'typewriters'],
-          description: `A graveyard of office technology: typewriters from the 1960s, adding machines from the 1970s, fax machines from the 1990s. Each device was state-of-the-art once, then obsolete, then stored here rather than discarded. The equipment documents the evolution of office work, from mechanical to electronic to digital to whatever comes next.`
+          description: `A graveyard of office technology: typewriters from the 1960s, adding machines from the 1970s, fax machines from the 1990s. Each device was state-of-the-art once, then obsolete, then stored here rather than discarded. The equipment documents the evolution of office work, from mechanical to electronic to digital to whatever comes next.`,
         },
-      ]
+      ],
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -690,22 +690,22 @@ A radio antenna rises from one corner, its purpose unclear—amateur radio, perh
       exits: {
         down: '%HALL_3',
         north: '%ROOF_NE',
-        west: '%ROOF_SW'
+        west: '%ROOF_SW',
       },
       objects: [
         {
           prototype: 'furniture',
           name: 'HVAC units',
           aliases: ['hvac', 'equipment'],
-          description: `Commercial HVAC equipment on concrete pads—compressors, fans, the machinery of climate control. The units are silent, their last maintenance visit years ago, their function ended. They'll rust in place, slowly, returning to the ore from which they were smelted.`
+          description: `Commercial HVAC equipment on concrete pads—compressors, fans, the machinery of climate control. The units are silent, their last maintenance visit years ago, their function ended. They'll rust in place, slowly, returning to the ore from which they were smelted.`,
         },
         {
           prototype: 'describable',
           name: 'radio antenna',
           aliases: ['antenna', 'radio'],
-          description: `A radio antenna rises from the roof, its wire elements pointing at the sky. The antenna is ham radio equipment, probably, installed by some tenant who wanted to talk to the world from the office roof. Whether the world is still listening is a question the antenna can't answer.`
+          description: `A radio antenna rises from the roof, its wire elements pointing at the sky. The antenna is ham radio equipment, probably, installed by some tenant who wanted to talk to the world from the office roof. Whether the world is still listening is a question the antenna can't answer.`,
         },
-      ]
+      ],
     },
 
     '%ROOF_NE': {
@@ -726,16 +726,16 @@ The parapet here is low, offering unobstructed views but minimal protection. The
       outdoor: true,
       exits: {
         south: '%ROOF_SE',
-        west: '%ROOF_NW'
+        west: '%ROOF_NW',
       },
       objects: [
         {
           prototype: 'furniture',
           name: 'rooftop greenhouse',
           aliases: ['greenhouse', 'garden'],
-          description: `A small greenhouse, maybe eight feet by ten, its glass panels clouded with grime. Inside, terra cotta pots hold the desiccated remains of plants—herbs, based on the leaf shapes, maybe tomatoes. Someone gardened here, tending a rooftop oasis above the city. The garden died when the gardening stopped.`
+          description: `A small greenhouse, maybe eight feet by ten, its glass panels clouded with grime. Inside, terra cotta pots hold the desiccated remains of plants—herbs, based on the leaf shapes, maybe tomatoes. Someone gardened here, tending a rooftop oasis above the city. The garden died when the gardening stopped.`,
         },
-      ]
+      ],
     },
 
     '%ROOF_SW': {
@@ -757,22 +757,22 @@ The fire escape is old but sound, Victorian ironwork built before liability conc
       exits: {
         east: '%ROOF_SE',
         north: '%ROOF_NW',
-        down: '%STORAGE'
+        down: '%STORAGE',
       },
       objects: [
         {
           prototype: 'describable',
           name: 'fire escape',
           aliases: ['escape', 'stairs'],
-          description: `An iron fire escape descending the building's western face, switchbacking down four stories to the alley. The construction is Victorian—riveted iron, decorative brackets, built when fire escapes were meant to last generations. The escape would still work, probably. The iron is sound.`
+          description: `An iron fire escape descending the building's western face, switchbacking down four stories to the alley. The construction is Victorian—riveted iron, decorative brackets, built when fire escapes were meant to last generations. The escape would still work, probably. The iron is sound.`,
         },
         {
           prototype: 'describable',
           name: 'train graffiti',
           aliases: ['graffiti', 'mural'],
-          description: `A graffiti mural covers part of the parapet—a stylized train in silver and blue, sleek and fast, captioned INTERURBAN in period-appropriate lettering. The artist knew history: the interurban railway connected Seattle to Tacoma until 1928, giving this building its name. The trains are gone. The building remains. The art remembers both.`
+          description: `A graffiti mural covers part of the parapet—a stylized train in silver and blue, sleek and fast, captioned INTERURBAN in period-appropriate lettering. The artist knew history: the interurban railway connected Seattle to Tacoma until 1928, giving this building its name. The trains are gone. The building remains. The art remembers both.`,
         },
-      ]
+      ],
     },
 
     '%ROOF_NW': {
@@ -793,7 +793,7 @@ From here, the entire neighborhood is visible: the brick buildings of Pioneer Sq
       outdoor: true,
       exits: {
         east: '%ROOF_NE',
-        south: '%ROOF_SW'
+        south: '%ROOF_SW',
       },
       sittables: [
         {
@@ -801,7 +801,7 @@ From here, the entire neighborhood is visible: the brick buildings of Pioneer Sq
           capacity: 2,
           emptyMsg:
             'A wooden bench faces the view, its surface grey with age but still sound.',
-          occupiedMsg: '%s sitting on the weathered bench'
+          occupiedMsg: '%s sitting on the weathered bench',
         },
       ],
       objects: [
@@ -809,9 +809,9 @@ From here, the entire neighborhood is visible: the brick buildings of Pioneer Sq
           prototype: 'describable',
           name: 'tank mounts',
           aliases: ['mounts', 'brackets'],
-          description: `Iron mounting brackets bolted to a concrete pad, the remains of a water tank that supplied the building before city pressure was sufficient. The tank is gone—rotted, salvaged, or simply removed. The brackets remain, rusted to permanence, waiting for a tank that won't be installed.`
+          description: `Iron mounting brackets bolted to a concrete pad, the remains of a water tank that supplied the building before city pressure was sufficient. The tank is gone—rotted, salvaged, or simply removed. The brackets remain, rusted to permanence, waiting for a tank that won't be installed.`,
         },
-      ]
-    }
-  }
+      ],
+    },
+  },
 };

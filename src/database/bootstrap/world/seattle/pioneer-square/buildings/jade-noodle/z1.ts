@@ -18,8 +18,7 @@ export const building = {
     '%BEDROOM_LOCK': {
       prototype: 'lock',
       name: 'Bedroom Lock',
-      description:
-        'A simple privacy lock on the bedroom door.',
+      description: 'A simple privacy lock on the bedroom door.',
       difficulty: 1,
     },
     '%BEDROOM_DOOR': {
@@ -37,8 +36,7 @@ export const building = {
     '%ROOF_LOCK': {
       prototype: 'lock',
       name: 'Roof Access Lock',
-      description:
-        'A simple padlock on the roof hatch.',
+      description: 'A simple padlock on the roof hatch.',
       difficulty: 2,
     },
     '%ROOF_HATCH': {

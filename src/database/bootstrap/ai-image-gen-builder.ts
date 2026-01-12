@@ -42,7 +42,8 @@ export class AiImageGenBuilder implements Builder {
         properties: {
           name: 'AI Image Generator',
           description: 'Generate images using Midjourney',
-          apiUrl: process.env.MIDJOURNEY_API_URL || 'http://midjourney-api:3000',
+          apiUrl:
+            process.env.MIDJOURNEY_API_URL || 'http://midjourney-api:3000',
           defaultModel: '7',
         },
       });

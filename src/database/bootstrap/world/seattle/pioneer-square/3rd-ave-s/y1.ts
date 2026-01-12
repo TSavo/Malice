@@ -23,7 +23,8 @@ Main Street stretches east and west, empty and wide.`,
   exits: {
     west: {
       to: 'buildings/corp-construction/z0.ts:%GATE_ENTRANCE',
-      description: 'The Corp Construction gate looms on the west side of the avenue',
+      description:
+        'The Corp Construction gate looms on the west side of the avenue',
     },
   },
 };

@@ -1,3 +1,4 @@
+import { EventEmitter } from 'node:events';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Connection } from '../src/connection/connection.js';
@@ -5,7 +6,6 @@ import { ConnectionContext } from '../src/game/connection-context.js';
 import { MultiplexedTransport } from '../src/transport/multiplexed/multiplexed-transport.js';
 import type { ObjId, RuntimeObject } from '../types/object.js';
 import type { ITransport, TerminalCapabilities } from '../types/transport.js';
-import { EventEmitter } from 'events';
 
 // Mock transport for testing
 class MockTransport implements ITransport {

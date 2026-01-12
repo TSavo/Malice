@@ -207,7 +207,9 @@ describe('GuardedExit', () => {
 
       const result = await testExit.canUse(testPlayer);
       expect(result.allowed).toBe(false);
-      expect(result.reason).toBe('A padlock secures the door. You lack the key.');
+      expect(result.reason).toBe(
+        'A padlock secures the door. You lack the key.',
+      );
     });
   });
 

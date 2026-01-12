@@ -116,7 +116,9 @@ describe('$docs - Documentation System', () => {
 
       if (docs.length > 1) {
         for (let i = 1; i < docs.length; i++) {
-          expect(docs[i - 1].path.localeCompare(docs[i].path)).toBeLessThanOrEqual(0);
+          expect(
+            docs[i - 1].path.localeCompare(docs[i].path),
+          ).toBeLessThanOrEqual(0);
         }
       }
     });
@@ -278,7 +280,16 @@ describe('$docs - Documentation System', () => {
       expect(categories.length).toBeGreaterThan(0);
 
       // Should contain expected categories from reorganization
-      const expectedCategories = ['city-ai', 'greeter', 'guides', 'internal', 'lore', 'moo', 'prompts', 'reference'];
+      const expectedCategories = [
+        'city-ai',
+        'greeter',
+        'guides',
+        'internal',
+        'lore',
+        'moo',
+        'prompts',
+        'reference',
+      ];
       for (const expected of expectedCategories) {
         expect(categories).toContain(expected);
       }

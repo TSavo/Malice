@@ -74,9 +74,7 @@ describe('$greeter - Pool System', () => {
     });
 
     it('should reject invalid faction', async () => {
-      await expect(
-        $greeter.spawnPooledGreeter('invalid'),
-      ).rejects.toThrow();
+      await expect($greeter.spawnPooledGreeter('invalid')).rejects.toThrow();
     });
 
     it('should spawn greeter with unique name', async () => {
@@ -281,10 +279,7 @@ describe('$greeter - Pool System', () => {
         playername: 'test_continuum',
       });
 
-      const greeter = await $greeter.spawnForPlayer(
-        testPlayer.id,
-        'continuum',
-      );
+      const greeter = await $greeter.spawnForPlayer(testPlayer.id, 'continuum');
 
       expect(greeter).toBeDefined();
       expect(greeter.role).toBe('continuum-greeter');
@@ -332,10 +327,7 @@ describe('$greeter - Pool System', () => {
         playername: 'test_fallback',
       });
 
-      const greeter = await $greeter.spawnForPlayer(
-        testPlayer.id,
-        'continuum',
-      );
+      const greeter = await $greeter.spawnForPlayer(testPlayer.id, 'continuum');
 
       expect(greeter).toBeDefined();
       expect(greeter.role).toBe('continuum-greeter');
@@ -369,10 +361,7 @@ describe('$greeter - Pool System', () => {
         playername: 'test_prompt',
       });
 
-      const greeter = await $greeter.spawnForPlayer(
-        testPlayer.id,
-        'continuum',
-      );
+      const greeter = await $greeter.spawnForPlayer(testPlayer.id, 'continuum');
 
       expect(greeter.systemPrompt).toBeTruthy();
       expect(greeter.systemPrompt).toContain(testPlayer.name);
@@ -424,10 +413,7 @@ describe('$greeter - Pool System', () => {
         playername: 'test_complete',
       });
 
-      const greeter = await $greeter.spawnForPlayer(
-        testPlayer.id,
-        'continuum',
-      );
+      const greeter = await $greeter.spawnForPlayer(testPlayer.id, 'continuum');
       const greeterId = greeter.id;
 
       // Initialize some orientation progress

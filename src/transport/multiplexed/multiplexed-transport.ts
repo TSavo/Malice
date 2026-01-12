@@ -1,4 +1,4 @@
-import { Subject, type Observable } from 'rxjs';
+import { type Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import type { WebSocket } from 'ws';
 import { BaseTransport } from '../base-transport';
@@ -59,9 +59,12 @@ export class MultiplexedTransport extends BaseTransport {
     });
 
     // Handle window manager channel messages
-    this.mux.channel('wm').input$.pipe(takeUntil(this.closed$)).subscribe({
-      next: (msg) => this.wmSubject.next(msg),
-    });
+    this.mux
+      .channel('wm')
+      .input$.pipe(takeUntil(this.closed$))
+      .subscribe({
+        next: (msg) => this.wmSubject.next(msg),
+      });
 
     // Handle mux events
     this.mux.events$.pipe(takeUntil(this.closed$)).subscribe({

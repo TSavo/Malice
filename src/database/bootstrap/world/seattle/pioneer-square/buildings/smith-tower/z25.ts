@@ -80,7 +80,8 @@ export const building = {
 
     '%A1_z25': {
       name: 'Smith Tower - 25th Floor - North Suite - Living Room',
-      description: 'A corner unit with tall windows and pale wood floors. A kitchenette occupies one wall, its appliances dark and silent. Built-in shelving holds the remnants of someone\'s life—books, decorative objects, a dead potted plant.',
+      description:
+        "A corner unit with tall windows and pale wood floors. A kitchenette occupies one wall, its appliances dark and silent. Built-in shelving holds the remnants of someone's life—books, decorative objects, a dead potted plant.",
       x: -3,
       y: 11,
       z: 25,
@@ -96,10 +97,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'table', name: 'a marble-top console table', description: 'A delicate console table with cabriole legs supports a slab of cream-veined marble. The wood is whitewashed and distressed, showing hints of pale blue paint beneath.', boltedDown: false },
-        { prototype: 'furniture', name: 'a provincial kitchenette', description: 'A built-in kitchenette features whitewashed cabinets with carved shell motifs. The ceramic sink is dry, copper fixtures turned green with age.', boltedDown: true },
-        { prototype: 'furniture', name: 'a carved wall shelf', description: 'An ornate wall shelf with scrollwork brackets holds a ceramic pitcher, a faded toile tea tin, and a dried lavender bouquet in a cracked vase.', boltedDown: true },
-        { prototype: 'furniture', name: 'a gilt-framed mirror', description: 'An oval mirror in a tarnished gilt frame hangs above the console, its glass clouded at the edges with age spots.', boltedDown: true },
+        {
+          prototype: 'table',
+          name: 'a marble-top console table',
+          description:
+            'A delicate console table with cabriole legs supports a slab of cream-veined marble. The wood is whitewashed and distressed, showing hints of pale blue paint beneath.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a provincial kitchenette',
+          description:
+            'A built-in kitchenette features whitewashed cabinets with carved shell motifs. The ceramic sink is dry, copper fixtures turned green with age.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a carved wall shelf',
+          description:
+            'An ornate wall shelf with scrollwork brackets holds a ceramic pitcher, a faded toile tea tin, and a dried lavender bouquet in a cracked vase.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a gilt-framed mirror',
+          description:
+            'An oval mirror in a tarnished gilt frame hangs above the console, its glass clouded at the edges with age spots.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -142,10 +167,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a French provincial bed', description: 'A queen bed with a curved headboard and footboard in whitewashed wood. Carved wheat sheaves and ribbons adorn the panels, the finish worn to show warm oak beneath.', quality: 'nice' },
-        { prototype: 'furniture', name: 'a mirrored armoire', description: 'A tall armoire with a beveled mirror door stands against the wall. The whitewashed frame is carved with delicate acanthus leaves, the interior cedar-lined and empty.', boltedDown: true },
-        { prototype: 'table', name: 'a marble-top nightstand', description: 'A petite nightstand with a single drawer and marble top sits beside the bed. A porcelain candlestick holder with dried wax drippings rests atop it.', boltedDown: false },
-        { prototype: 'furniture', name: 'a ceramic washbasin set', description: 'A decorative pitcher and basin in blue and white provincial pottery sit on a wire stand, purely ornamental now.', boltedDown: false },
+        {
+          prototype: 'bed',
+          name: 'a French provincial bed',
+          description:
+            'A queen bed with a curved headboard and footboard in whitewashed wood. Carved wheat sheaves and ribbons adorn the panels, the finish worn to show warm oak beneath.',
+          quality: 'nice',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a mirrored armoire',
+          description:
+            'A tall armoire with a beveled mirror door stands against the wall. The whitewashed frame is carved with delicate acanthus leaves, the interior cedar-lined and empty.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a marble-top nightstand',
+          description:
+            'A petite nightstand with a single drawer and marble top sits beside the bed. A porcelain candlestick holder with dried wax drippings rests atop it.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a ceramic washbasin set',
+          description:
+            'A decorative pitcher and basin in blue and white provincial pottery sit on a wire stand, purely ornamental now.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -184,10 +233,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a provincial galley kitchen', description: 'Whitewashed cabinets with iron hardware line the narrow kitchen. A ceramic farmhouse sink is set into a butcher-block counter, the wood scrubbed pale from years of use.', boltedDown: true },
-        { prototype: 'table', name: 'a writing desk', description: 'A ladies\' writing desk with slender cabriole legs and a tooled leather top sits under the window. Small drawers with brass pulls line the front.', boltedDown: false },
-        { prototype: 'furniture', name: 'a provincial daybed', description: 'A daybed with scrolled ends and carved finials serves as both seating and sleeping. The mattress is covered in faded blue toile depicting shepherdesses and lambs.', boltedDown: false },
-        { prototype: 'furniture', name: 'a floral tapestry', description: 'A small tapestry depicting a basket of provincial flowers hangs on the exposed brick, its colors muted by decades of dust.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a provincial galley kitchen',
+          description:
+            'Whitewashed cabinets with iron hardware line the narrow kitchen. A ceramic farmhouse sink is set into a butcher-block counter, the wood scrubbed pale from years of use.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a writing desk',
+          description:
+            "A ladies' writing desk with slender cabriole legs and a tooled leather top sits under the window. Small drawers with brass pulls line the front.",
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a provincial daybed',
+          description:
+            'A daybed with scrolled ends and carved finials serves as both seating and sleeping. The mattress is covered in faded blue toile depicting shepherdesses and lambs.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a floral tapestry',
+          description:
+            'A small tapestry depicting a basket of provincial flowers hangs on the exposed brick, its colors muted by decades of dust.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -226,10 +299,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a carved loft ladder', description: 'A sturdy wooden ladder with turned spindles is bolted to the mezzanine edge. The wood is painted cream with blue trim, worn at the handholds.', boltedDown: true },
-        { prototype: 'bed', name: 'a provincial loft bed', description: 'A narrow bed with a carved headboard fills the mezzanine. A faded toile coverlet in rose and cream drapes over the thin mattress.', quality: 'standard' },
-        { prototype: 'furniture', name: 'a camelback sofa', description: 'A camelback sofa with rolled arms sits beneath the mezzanine, upholstered in cream damask now yellowed with age. The cabriole legs end in carved pad feet.', boltedDown: false },
-        { prototype: 'table', name: 'an oval side table', description: 'A small oval table with a scalloped edge and cabriole legs holds a provincial pottery vase, its painted flowers faded to soft pastels.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'a carved loft ladder',
+          description:
+            'A sturdy wooden ladder with turned spindles is bolted to the mezzanine edge. The wood is painted cream with blue trim, worn at the handholds.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'bed',
+          name: 'a provincial loft bed',
+          description:
+            'A narrow bed with a carved headboard fills the mezzanine. A faded toile coverlet in rose and cream drapes over the thin mattress.',
+          quality: 'standard',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a camelback sofa',
+          description:
+            'A camelback sofa with rolled arms sits beneath the mezzanine, upholstered in cream damask now yellowed with age. The cabriole legs end in carved pad feet.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'table',
+          name: 'an oval side table',
+          description:
+            'A small oval table with a scalloped edge and cabriole legs holds a provincial pottery vase, its painted flowers faded to soft pastels.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -268,10 +365,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a provincial cot', description: 'A narrow wooden cot with turned posts and a thin mattress is wedged into the corner. A faded quilt in provincial blue and yellow covers it.', quality: 'cheap' },
-        { prototype: 'furniture', name: 'carved wall pegs', description: 'A row of hand-carved wooden pegs is mounted on the wall, shaped like acorns. One holds a dusty straw hat.', boltedDown: true },
-        { prototype: 'furniture', name: 'a corner shelf', description: 'A small triangular shelf is bolted into the corner, holding a ceramic candlestick and a tiny provincial clock that stopped long ago.', boltedDown: true },
-        { prototype: 'furniture', name: 'a provincial footstool', description: 'A small footstool with cabriole legs and needlepoint upholstery depicting a rooster sits beside the cot.', boltedDown: false },
+        {
+          prototype: 'bed',
+          name: 'a provincial cot',
+          description:
+            'A narrow wooden cot with turned posts and a thin mattress is wedged into the corner. A faded quilt in provincial blue and yellow covers it.',
+          quality: 'cheap',
+        },
+        {
+          prototype: 'furniture',
+          name: 'carved wall pegs',
+          description:
+            'A row of hand-carved wooden pegs is mounted on the wall, shaped like acorns. One holds a dusty straw hat.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a corner shelf',
+          description:
+            'A small triangular shelf is bolted into the corner, holding a ceramic candlestick and a tiny provincial clock that stopped long ago.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a provincial footstool',
+          description:
+            'A small footstool with cabriole legs and needlepoint upholstery depicting a rooster sits beside the cot.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -308,11 +429,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a Louis XV sofa', description: 'A large sofa with a serpentine back and carved floral cresting dominates the room. The toile upholstery depicts romantic pastoral scenes in faded blue on cream.', boltedDown: false },
-        { prototype: 'table', name: 'a provincial coffee table', description: 'A low table with cabriole legs and a shaped top in whitewashed oak sits before the sofa. A porcelain cachepot with dried flowers rests at its center.', boltedDown: false },
-        { prototype: 'furniture', name: 'a provincial display cabinet', description: 'A built-in display cabinet with chicken-wire doors holds provincial pottery, faience plates, and a collection of ceramic roosters.', boltedDown: true },
-        { prototype: 'furniture', name: 'a provincial coat closet', description: 'A small closet is built into the wall, its door painted with a faded floral motif. Wire hangers chime softly inside.', boltedDown: true },
-        { prototype: 'furniture', name: 'an ornate gilt mirror', description: 'A large mirror in an elaborate gilt frame carved with roses and ribbons hangs above the sofa, its glass silvered at the edges.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a Louis XV sofa',
+          description:
+            'A large sofa with a serpentine back and carved floral cresting dominates the room. The toile upholstery depicts romantic pastoral scenes in faded blue on cream.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'table',
+          name: 'a provincial coffee table',
+          description:
+            'A low table with cabriole legs and a shaped top in whitewashed oak sits before the sofa. A porcelain cachepot with dried flowers rests at its center.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a provincial display cabinet',
+          description:
+            'A built-in display cabinet with chicken-wire doors holds provincial pottery, faience plates, and a collection of ceramic roosters.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a provincial coat closet',
+          description:
+            'A small closet is built into the wall, its door painted with a faded floral motif. Wire hangers chime softly inside.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'an ornate gilt mirror',
+          description:
+            'A large mirror in an elaborate gilt frame carved with roses and ribbons hangs above the sofa, its glass silvered at the edges.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -351,10 +502,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'provincial built-in shelves', description: 'Floor-to-ceiling shelving with carved molding is built into the walls. Leather-bound books with gilt spines share space with faience vases and a ceramic quail figurine.', boltedDown: true },
-        { prototype: 'table', name: 'a bureau plat', description: 'A bureau plat with cabriole legs and ormolu mounts sits in the window bay. The leather writing surface is tooled with gold, now faded and cracked.', boltedDown: false },
-        { prototype: 'chair', name: 'a caned bergere', description: 'A bergere with a caned back and sides sits angled toward the window. The loose cushion is covered in faded gold damask.', boltedDown: false },
-        { prototype: 'furniture', name: 'a provincial floor lamp', description: 'A tall candlestand lamp with a carved wooden base and pleated fabric shade stands behind the chair. The bulb is dead.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'provincial built-in shelves',
+          description:
+            'Floor-to-ceiling shelving with carved molding is built into the walls. Leather-bound books with gilt spines share space with faience vases and a ceramic quail figurine.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a bureau plat',
+          description:
+            'A bureau plat with cabriole legs and ormolu mounts sits in the window bay. The leather writing surface is tooled with gold, now faded and cracked.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'chair',
+          name: 'a caned bergere',
+          description:
+            'A bergere with a caned back and sides sits angled toward the window. The loose cushion is covered in faded gold damask.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a provincial floor lamp',
+          description:
+            'A tall candlestand lamp with a carved wooden base and pleated fabric shade stands behind the chair. The bulb is dead.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -376,7 +551,8 @@ export const building = {
 
     '%C2_z25': {
       name: 'Smith Tower - 25th Floor - South Suite - Living Room',
-      description: 'A corner unit with western exposure and aged carpeting. The afternoon sun has bleached everything near the windows to a uniform pale.',
+      description:
+        'A corner unit with western exposure and aged carpeting. The afternoon sun has bleached everything near the windows to a uniform pale.',
       x: -3,
       y: 9,
       z: 25,
@@ -392,11 +568,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a provincial loveseat', description: 'A compact loveseat with carved fruitwood frame faces the window. The upholstery is toile de Jouy in faded rose, depicting a romantic garden scene.', boltedDown: false },
-        { prototype: 'table', name: 'a bouillotte table', description: 'A small round table with a brass gallery rail and marble top holds a provincial oil lamp, its glass chimney dusty but intact.', boltedDown: false },
-        { prototype: 'furniture', name: 'a cast-iron radiator', description: 'An ornate cast-iron radiator is built into the wall beneath the window, its curves echoing provincial scrollwork. It still radiates faint warmth.', boltedDown: true },
-        { prototype: 'furniture', name: 'toile curtains', description: 'Sun-bleached toile curtains hang from carved wooden rods. The pastoral scenes have faded to ghostly outlines on cream fabric.', boltedDown: true },
-        { prototype: 'furniture', name: 'a faience jardiniere', description: 'A large faience planter with painted provincial flowers holds the desiccated remains of what might have been a fern.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'a provincial loveseat',
+          description:
+            'A compact loveseat with carved fruitwood frame faces the window. The upholstery is toile de Jouy in faded rose, depicting a romantic garden scene.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'table',
+          name: 'a bouillotte table',
+          description:
+            'A small round table with a brass gallery rail and marble top holds a provincial oil lamp, its glass chimney dusty but intact.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a cast-iron radiator',
+          description:
+            'An ornate cast-iron radiator is built into the wall beneath the window, its curves echoing provincial scrollwork. It still radiates faint warmth.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'toile curtains',
+          description:
+            'Sun-bleached toile curtains hang from carved wooden rods. The pastoral scenes have faded to ghostly outlines on cream fabric.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a faience jardiniere',
+          description:
+            'A large faience planter with painted provincial flowers holds the desiccated remains of what might have been a fern.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -432,11 +638,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a provincial settee', description: 'A small settee with a carved floral crest and cabriole legs sits against the wall. The toile upholstery depicts lavender fields in blue and cream.', boltedDown: false },
-        { prototype: 'furniture', name: 'a provincial entry cabinet', description: 'A narrow cabinet with carved panels is built into the wall beside the door. Its interior is cedar-lined, still faintly fragrant.', boltedDown: true },
-        { prototype: 'furniture', name: 'an antique mail slot', description: 'A brass mail slot with a decorative fleur-de-lis plate is set into the door, tarnished to a warm bronze.', boltedDown: true },
-        { prototype: 'table', name: 'a demilune console', description: 'A half-moon console table with cabriole legs holds a faience bowl for keys and a small provincial clock that no longer ticks.', boltedDown: false },
-        { prototype: 'furniture', name: 'a trumeau mirror', description: 'A trumeau mirror hangs above the console, its upper panel painted with a faded pastoral scene of peasants at harvest.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a provincial settee',
+          description:
+            'A small settee with a carved floral crest and cabriole legs sits against the wall. The toile upholstery depicts lavender fields in blue and cream.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a provincial entry cabinet',
+          description:
+            'A narrow cabinet with carved panels is built into the wall beside the door. Its interior is cedar-lined, still faintly fragrant.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'an antique mail slot',
+          description:
+            'A brass mail slot with a decorative fleur-de-lis plate is set into the door, tarnished to a warm bronze.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a demilune console',
+          description:
+            'A half-moon console table with cabriole legs holds a faience bowl for keys and a small provincial clock that no longer ticks.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a trumeau mirror',
+          description:
+            'A trumeau mirror hangs above the console, its upper panel painted with a faded pastoral scene of peasants at harvest.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -468,10 +704,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'an alcove lit en bateau', description: 'A boat-shaped bed with curved ends fills the recessed alcove. The whitewashed frame is carved with rope motifs, and faded toile curtains half-hide it from view.', quality: 'nice' },
-        { prototype: 'furniture', name: 'a provincial wardrobe', description: 'A tall wardrobe with carved cornices and long iron hinges stands against the wall. The doors are painted with faded floral garlands.', boltedDown: false },
-        { prototype: 'furniture', name: 'a cheval mirror', description: 'A full-length mirror on a carved stand is positioned near the window. The wood is whitewashed, the glass spotted with age.', boltedDown: false },
-        { prototype: 'table', name: 'a provincial nightstand', description: 'A small nightstand with a shaped marble top and cabriole legs holds a ceramic candlestick and a water-stained book of poetry.', boltedDown: false },
+        {
+          prototype: 'bed',
+          name: 'an alcove lit en bateau',
+          description:
+            'A boat-shaped bed with curved ends fills the recessed alcove. The whitewashed frame is carved with rope motifs, and faded toile curtains half-hide it from view.',
+          quality: 'nice',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a provincial wardrobe',
+          description:
+            'A tall wardrobe with carved cornices and long iron hinges stands against the wall. The doors are painted with faded floral garlands.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a cheval mirror',
+          description:
+            'A full-length mirror on a carved stand is positioned near the window. The wood is whitewashed, the glass spotted with age.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'table',
+          name: 'a provincial nightstand',
+          description:
+            'A small nightstand with a shaped marble top and cabriole legs holds a ceramic candlestick and a water-stained book of poetry.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -510,11 +770,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a lit clos bed', description: 'A box bed in the Breton style is built into a wall alcove, its carved panels painted with faded blue and white provincial motifs. Curtains can be drawn for privacy.', quality: 'standard' },
-        { prototype: 'furniture', name: 'a lit clos cabinet', description: 'The box bed is set into carved woodwork with small cupboards below for storage. The painted finish shows wheat sheaves and birds.', boltedDown: true },
-        { prototype: 'furniture', name: 'provincial wall shelving', description: 'Carved shelving with scalloped edges is built into the walls around the window, holding faience plates, a ceramic hen, and dusty books.', boltedDown: true },
-        { prototype: 'table', name: 'a drop-leaf table', description: 'A small drop-leaf table with cabriole legs is hinged to the wall. When raised, it serves as a desk; when lowered, it disappears into the provincial paneling.', boltedDown: true },
-        { prototype: 'furniture', name: 'a provincial commode', description: 'A serpentine-front commode with painted floral panels is wedged into the corner. Its drawers are fitted with brass teardrop pulls.', boltedDown: false },
+        {
+          prototype: 'bed',
+          name: 'a lit clos bed',
+          description:
+            'A box bed in the Breton style is built into a wall alcove, its carved panels painted with faded blue and white provincial motifs. Curtains can be drawn for privacy.',
+          quality: 'standard',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a lit clos cabinet',
+          description:
+            'The box bed is set into carved woodwork with small cupboards below for storage. The painted finish shows wheat sheaves and birds.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'provincial wall shelving',
+          description:
+            'Carved shelving with scalloped edges is built into the walls around the window, holding faience plates, a ceramic hen, and dusty books.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a drop-leaf table',
+          description:
+            'A small drop-leaf table with cabriole legs is hinged to the wall. When raised, it serves as a desk; when lowered, it disappears into the provincial paneling.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a provincial commode',
+          description:
+            'A serpentine-front commode with painted floral panels is wedged into the corner. Its drawers are fitted with brass teardrop pulls.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {

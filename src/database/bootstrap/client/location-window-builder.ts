@@ -310,7 +310,9 @@ export class LocationWindow extends Window {
     `,
     );
 
-    console.log(`[LocationWindowBuilder] Built $.locationWindowJs -> #${obj.id}`);
+    console.log(
+      `[LocationWindowBuilder] Built $.locationWindowJs -> #${obj.id}`,
+    );
   }
 
   async registerAliases(): Promise<void> {

@@ -27,7 +27,8 @@ export const building = {
     '%STORAGE_LOCK': {
       prototype: 'lock',
       name: 'Storage Room Lock',
-      description: 'A heavy padlock on the storage room door, rusted but functional.',
+      description:
+        'A heavy padlock on the storage room door, rusted but functional.',
       difficulty: 4,
     },
     '%STORAGE_DOOR': {
@@ -63,8 +64,16 @@ A ladder bolted to the wall leads up through a hatch in the ceiling to the roof.
       exits: {
         down: '%HALL_Z1',
         up: '%ROOF_NW',
-        west: { room: '%OFFICE', door: '%OFFICE_DOOR', locks: ['%OFFICE_LOCK'] },
-        south: { room: '%STORAGE', door: '%STORAGE_DOOR', locks: ['%STORAGE_LOCK'] },
+        west: {
+          room: '%OFFICE',
+          door: '%OFFICE_DOOR',
+          locks: ['%OFFICE_LOCK'],
+        },
+        south: {
+          room: '%STORAGE',
+          door: '%STORAGE_DOOR',
+          locks: ['%STORAGE_LOCK'],
+        },
       },
     },
 
@@ -85,7 +94,11 @@ A small safe sits in the corner, its door slightly ajar. Whatever was inside has
       waterLevel: 0,
       outdoor: false,
       exits: {
-        east: { room: '%HALL_Z2', door: '%OFFICE_DOOR', locks: ['%OFFICE_LOCK'] },
+        east: {
+          room: '%HALL_Z2',
+          door: '%OFFICE_DOOR',
+          locks: ['%OFFICE_LOCK'],
+        },
       },
       objects: [
         {
@@ -113,7 +126,7 @@ A small safe sits in the corner, its door slightly ajar. Whatever was inside has
           capacity: 1,
           emptyMsg:
             'A leather office chair sits behind the desk, its cushion cracked and flattened by decades of use.',
-          occupiedMsg: '%s sitting in the manager\'s chair',
+          occupiedMsg: "%s sitting in the manager's chair",
         },
       ],
     },
@@ -135,7 +148,11 @@ Boxes of preserved goods sit on the shelves—canned truffles, dried mushrooms, 
       waterLevel: 0,
       outdoor: false,
       exits: {
-        out: { room: '%HALL_Z2', door: '%STORAGE_DOOR', locks: ['%STORAGE_LOCK'] },
+        out: {
+          room: '%HALL_Z2',
+          door: '%STORAGE_DOOR',
+          locks: ['%STORAGE_LOCK'],
+        },
       },
       objects: [
         {

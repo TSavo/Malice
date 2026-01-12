@@ -29,7 +29,11 @@ export const building = {
       description:
         'A modern biometric scanner retrofitted to the service entrance, incongruous against the Beaux-Arts stonework.',
       scanners: [
-        { type: 'fingerprint', part: 'hand', message: 'Authorized personnel only.' },
+        {
+          type: 'fingerprint',
+          part: 'hand',
+          message: 'Authorized personnel only.',
+        },
       ],
       authorizedUsers: {},
     },
@@ -37,8 +41,7 @@ export const building = {
     '%PLATFORM_LOCK': {
       prototype: 'lock',
       name: 'Platform Gate Lock',
-      description:
-        'A heavy padlock on the gate leading down to the platforms.',
+      description: 'A heavy padlock on the gate leading down to the platforms.',
       difficulty: 4,
     },
 
@@ -292,7 +295,8 @@ The waiting continued here longer than most places. The 1990s conversion kept th
           capacity: 4,
           emptyMsg:
             'Gaps in the bench rows show where some were removed. The remaining benches are worn but intact.',
-          occupiedMsg: '%s sitting on one of the remaining waiting room benches',
+          occupiedMsg:
+            '%s sitting on one of the remaining waiting room benches',
         },
       ],
       objects: [

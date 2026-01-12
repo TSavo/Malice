@@ -90,7 +90,11 @@ Finished orders sit in cubbies behind the counter, organized alphabetically, wra
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: { to: '1st-ave-s/y3.ts', description: 'The glass door leads to 1st Ave S', door: '%FRONT_DOOR' },
+        west: {
+          to: '1st-ave-s/y3.ts',
+          description: 'The glass door leads to 1st Ave S',
+          door: '%FRONT_DOOR',
+        },
         east: '%PRESS_ROOM',
         up: {
           description: 'A narrow stairway leads to the apartment above',
@@ -154,7 +158,11 @@ Band posters cover every wall, the shop's portfolio and decoration combined: SOU
       exits: {
         west: '%FRONT',
         north: '%STORAGE',
-        south: { door: '%BACK_DOOR', description: 'A fire door leads to the alley', to: '%ALLEY' },
+        south: {
+          door: '%BACK_DOOR',
+          description: 'A fire door leads to the alley',
+          to: '%ALLEY',
+        },
       },
       sittables: [
         {
@@ -252,7 +260,11 @@ The alley connects to streets at both ends, a through-passage for those who know
       waterLevel: 0,
       outdoor: true,
       exits: {
-        north: { door: '%BACK_DOOR', description: 'A fire door leads into the shop', to: '%PRESS_ROOM' },
+        north: {
+          door: '%BACK_DOOR',
+          description: 'A fire door leads into the shop',
+          to: '%PRESS_ROOM',
+        },
         up: {
           description: 'A fire escape climbs the back of the building',
           to: '%ROOF_SOUTH',
@@ -292,7 +304,11 @@ Through a window on the landing, you can see the street below, the view that ren
       outdoor: false,
       exits: {
         down: '%FRONT',
-        east: { door: '%UPSTAIRS_DOOR', description: 'The apartment door', to: '%APARTMENT_MAIN' },
+        east: {
+          door: '%UPSTAIRS_DOOR',
+          description: 'The apartment door',
+          to: '%APARTMENT_MAIN',
+        },
       },
     },
   },

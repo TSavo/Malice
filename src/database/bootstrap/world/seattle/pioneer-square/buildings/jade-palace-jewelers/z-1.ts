@@ -81,8 +81,10 @@ Corridors branch off to the private rooms—the real business of karaoke, the so
           name: 'waiting couches',
           aliases: ['couches', 'sofas', 'seating'],
           capacity: 6,
-          emptyMsg: 'Cracked leather couches line the waiting area, their cushions compressed from use that ended decades ago.',
-          occupiedMsg: 'Someone sits on the cracked leather, disturbing dust that has settled for fifty-five years.',
+          emptyMsg:
+            'Cracked leather couches line the waiting area, their cushions compressed from use that ended decades ago.',
+          occupiedMsg:
+            'Someone sits on the cracked leather, disturbing dust that has settled for fifty-five years.',
           description: `Black leather couches arranged in a U-shape around a low table, the waiting area for groups not yet assigned rooms. The leather has cracked in the absence of conditioning, splitting along seams, revealing foam beneath. Cushions bear the permanent impressions of the last people to sit here—waiting for rooms, waiting for friends, waiting for nights that never ended properly.`,
         },
         {
@@ -219,8 +221,10 @@ Speakers are mounted in corners, silent. The song list screen is dark. The karao
           name: 'karaoke couch',
           aliases: ['couch', 'sofa', 'seating', 'semicircle'],
           capacity: 8,
-          emptyMsg: 'A semicircular couch faces the dark screen, waiting for singers to gather.',
-          occupiedMsg: 'Someone sits on the karaoke couch, facing a screen that will never light up.',
+          emptyMsg:
+            'A semicircular couch faces the dark screen, waiting for singers to gather.',
+          occupiedMsg:
+            'Someone sits on the karaoke couch, facing a screen that will never light up.',
           description: `A semicircular couch in synthetic leather, designed to let groups face the screen while still seeing each other. The cushions are compressed from years of use, the surface sticky from spilled drinks that no one cleaned. This is where people gathered to watch friends perform, to cheer terrible singing, to share the kind of vulnerability that alcohol and private rooms made possible.`,
         },
         {
@@ -280,8 +284,10 @@ Now it's a mausoleum of status. The leather has cracked worse than the standard 
           name: 'vip couches',
           aliases: ['couches', 'leather', 'seating'],
           capacity: 12,
-          emptyMsg: 'Leather couches line three walls, arranged for a party that never ended properly.',
-          occupiedMsg: 'Someone claims a spot on the cracked leather, raising dust from cushions that haven\'t been disturbed in decades.',
+          emptyMsg:
+            'Leather couches line three walls, arranged for a party that never ended properly.',
+          occupiedMsg:
+            "Someone claims a spot on the cracked leather, raising dust from cushions that haven't been disturbed in decades.",
           description: `Real leather couches—the kind that cost extra, that signaled VIP status—line three walls. The leather has cracked and split from decades without conditioning, revealing stuffing beneath. The couches could seat twelve comfortably, more if people didn't mind proximity. They're empty now, their cushions still bearing the impressions of the last party.`,
         },
         {

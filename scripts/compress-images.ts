@@ -11,10 +11,10 @@
  * State is saved to compress-state.json for restartability.
  */
 
-import { execFile } from 'child_process';
-import { promisify } from 'util';
-import * as fs from 'fs';
-import * as path from 'path';
+import { execFile } from 'node:child_process';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
 
@@ -68,7 +68,10 @@ function saveState(state: CompressionState): void {
   fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
 }
 
-async function compressImage(filePath: string, oxipngPath: string): Promise<{
+async function compressImage(
+  filePath: string,
+  oxipngPath: string,
+): Promise<{
   originalSize: number;
   compressedSize: number;
   saved: boolean;
@@ -86,14 +89,20 @@ async function compressImage(filePath: string, oxipngPath: string): Promise<{
     return { originalSize, compressedSize, saved: true };
   }
 
-  return { originalSize, compressedSize: originalSize, saved: false, reason: 'no-improvement' };
+  return {
+    originalSize,
+    compressedSize: originalSize,
+    saved: false,
+    reason: 'no-improvement',
+  };
 }
 
 function formatBytes(bytes: number): string {
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-  if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-  return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024 * 1024 * 1024)
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 }
 
 async function main() {
@@ -102,8 +111,10 @@ async function main() {
   const parallelIndex = args.indexOf('--parallel');
   const limitIndex = args.indexOf('--limit');
 
-  const parallel = parallelIndex >= 0 ? parseInt(args[parallelIndex + 1]) || 2 : 2;
-  const limit = limitIndex >= 0 ? parseInt(args[limitIndex + 1]) || Infinity : Infinity;
+  const parallel =
+    parallelIndex >= 0 ? parseInt(args[parallelIndex + 1], 10) || 2 : 2;
+  const limit =
+    limitIndex >= 0 ? parseInt(args[limitIndex + 1], 10) || Infinity : Infinity;
 
   // Get oxipng binary path
   const { default: oxipngPath } = await import('oxipng-bin');
@@ -119,8 +130,9 @@ async function main() {
   const state = loadState();
 
   // Get all PNG files
-  const allFiles = fs.readdirSync(ASSETS_DIR)
-    .filter(f => f.endsWith('.png'))
+  const allFiles = fs
+    .readdirSync(ASSETS_DIR)
+    .filter((f) => f.endsWith('.png'))
     .sort();
 
   state.totalImages = allFiles.length;
@@ -128,9 +140,7 @@ async function main() {
   console.log(`Already processed: ${Object.keys(state.images).length}`);
 
   // Filter to unprocessed files
-  const toProcess = allFiles
-    .filter(f => !state.images[f])
-    .slice(0, limit);
+  const toProcess = allFiles.filter((f) => !state.images[f]).slice(0, limit);
 
   console.log(`To process: ${toProcess.length}`);
   console.log('');
@@ -165,10 +175,10 @@ async function main() {
             originalSize: 0,
             compressedSize: 0,
             saved: false,
-            error: err instanceof Error ? err.message : String(err)
+            error: err instanceof Error ? err.message : String(err),
           };
         }
-      })
+      }),
     );
 
     // Update state with results
@@ -178,14 +188,19 @@ async function main() {
         state.errorCount++;
         console.log(`❌ ${result.filename}: ${result.error}`);
       } else {
-        const ratio = result.originalSize > 0
-          ? ((result.originalSize - result.compressedSize) / result.originalSize * 100).toFixed(1)
-          : '0';
+        const ratio =
+          result.originalSize > 0
+            ? (
+                ((result.originalSize - result.compressedSize) /
+                  result.originalSize) *
+                100
+              ).toFixed(1)
+            : '0';
 
         state.images[result.filename] = {
           originalSize: result.originalSize,
           compressedSize: result.compressedSize,
-          compressionRatio: ratio + '%',
+          compressionRatio: `${ratio}%`,
           compressedAt: new Date().toISOString(),
         };
         state.processedCount++;
@@ -193,10 +208,14 @@ async function main() {
         state.totalCompressedBytes += result.compressedSize;
 
         if (result.saved) {
-          console.log(`✅ ${result.filename}: ${formatBytes(result.originalSize)} → ${formatBytes(result.compressedSize)} (-${ratio}%)`);
+          console.log(
+            `✅ ${result.filename}: ${formatBytes(result.originalSize)} → ${formatBytes(result.compressedSize)} (-${ratio}%)`,
+          );
         } else {
           state.skippedCount++;
-          console.log(`⏭️  ${result.filename}: already optimal (${formatBytes(result.originalSize)})`);
+          console.log(
+            `⏭️  ${result.filename}: already optimal (${formatBytes(result.originalSize)})`,
+          );
         }
       }
       processed++;
@@ -211,7 +230,9 @@ async function main() {
     const remaining = toProcess.length - processed;
     const eta = remaining / rate;
 
-    console.log(`\n--- Progress: ${processed}/${toProcess.length} (${(processed/toProcess.length*100).toFixed(1)}%) | Rate: ${rate.toFixed(2)}/s | ETA: ${Math.ceil(eta)}s ---\n`);
+    console.log(
+      `\n--- Progress: ${processed}/${toProcess.length} (${((processed / toProcess.length) * 100).toFixed(1)}%) | Rate: ${rate.toFixed(2)}/s | ETA: ${Math.ceil(eta)}s ---\n`,
+    );
   }
 
   printSummary(state);
@@ -226,9 +247,10 @@ function printSummary(state: CompressionState): void {
   console.log(`Original size: ${formatBytes(state.totalOriginalBytes)}`);
   console.log(`Compressed size: ${formatBytes(state.totalCompressedBytes)}`);
   const savedBytes = state.totalOriginalBytes - state.totalCompressedBytes;
-  const savedPct = state.totalOriginalBytes > 0
-    ? (savedBytes / state.totalOriginalBytes * 100).toFixed(1)
-    : '0';
+  const savedPct =
+    state.totalOriginalBytes > 0
+      ? ((savedBytes / state.totalOriginalBytes) * 100).toFixed(1)
+      : '0';
   console.log(`Space saved: ${formatBytes(savedBytes)} (${savedPct}%)`);
   console.log('=============================\n');
 }

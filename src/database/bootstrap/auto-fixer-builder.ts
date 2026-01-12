@@ -64,14 +64,38 @@ export class AutoFixerBuilder implements Builder {
     }
 
     // Set property descriptions
-    this.autoFixer.setPropertyDescription('enabled', 'Whether auto-fixer is active');
-    this.autoFixer.setPropertyDescription('maxAttemptsPerHour', 'Maximum fix attempts per hourly tick');
-    this.autoFixer.setPropertyDescription('cooldownHours', 'Hours to wait before re-attempting same issue');
-    this.autoFixer.setPropertyDescription('minPriority', 'Minimum priority level to attempt: low, medium, high, critical');
-    this.autoFixer.setPropertyDescription('history', 'Array of past fix attempts with results');
-    this.autoFixer.setPropertyDescription('attemptedThisHour', 'Counter for rate limiting');
-    this.autoFixer.setPropertyDescription('lastTickTime', 'Timestamp of last tick execution');
-    this.autoFixer.setPropertyDescription('lastAttempts', 'Map of issueId to last attempt timestamp for cooldown');
+    this.autoFixer.setPropertyDescription(
+      'enabled',
+      'Whether auto-fixer is active',
+    );
+    this.autoFixer.setPropertyDescription(
+      'maxAttemptsPerHour',
+      'Maximum fix attempts per hourly tick',
+    );
+    this.autoFixer.setPropertyDescription(
+      'cooldownHours',
+      'Hours to wait before re-attempting same issue',
+    );
+    this.autoFixer.setPropertyDescription(
+      'minPriority',
+      'Minimum priority level to attempt: low, medium, high, critical',
+    );
+    this.autoFixer.setPropertyDescription(
+      'history',
+      'Array of past fix attempts with results',
+    );
+    this.autoFixer.setPropertyDescription(
+      'attemptedThisHour',
+      'Counter for rate limiting',
+    );
+    this.autoFixer.setPropertyDescription(
+      'lastTickTime',
+      'Timestamp of last tick execution',
+    );
+    this.autoFixer.setPropertyDescription(
+      'lastAttempts',
+      'Map of issueId to last attempt timestamp for cooldown',
+    );
 
     // Always rebuild methods
     this.buildMethods();

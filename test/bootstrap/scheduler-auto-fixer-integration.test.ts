@@ -89,7 +89,7 @@ describe('Scheduler Auto-Fixer Integration', () => {
       expect(Array.isArray(allJobs)).toBe(true);
 
       const autoFixerJob = allJobs.find(
-        (job: any) => job.name === 'autoFixerTick'
+        (job: any) => job.name === 'autoFixerTick',
       );
 
       expect(autoFixerJob).toBeDefined();
@@ -184,7 +184,7 @@ describe('Scheduler Auto-Fixer Integration', () => {
         msUntilNextQuarter,
         msPerHour,
         $autoFixer,
-        'tick'
+        'tick',
       );
 
       job = await $scheduler.getJob('autoFixerTick');
@@ -200,13 +200,13 @@ describe('Scheduler Auto-Fixer Integration', () => {
 
       // Test at various times within an hour
       const testCases = [
-        { minute: 0, expected: 15 },   // :00 -> :15
-        { minute: 10, expected: 15 },  // :10 -> :15
-        { minute: 14, expected: 15 },  // :14 -> :15
-        { minute: 15, expected: 15 },  // :15 -> :15 (next hour)
-        { minute: 20, expected: 15 },  // :20 -> :15 (next hour)
-        { minute: 45, expected: 15 },  // :45 -> :15 (next hour)
-        { minute: 59, expected: 15 },  // :59 -> :15 (next hour)
+        { minute: 0, expected: 15 }, // :00 -> :15
+        { minute: 10, expected: 15 }, // :10 -> :15
+        { minute: 14, expected: 15 }, // :14 -> :15
+        { minute: 15, expected: 15 }, // :15 -> :15 (next hour)
+        { minute: 20, expected: 15 }, // :20 -> :15 (next hour)
+        { minute: 45, expected: 15 }, // :45 -> :15 (next hour)
+        { minute: 59, expected: 15 }, // :59 -> :15 (next hour)
       ];
 
       for (const testCase of testCases) {

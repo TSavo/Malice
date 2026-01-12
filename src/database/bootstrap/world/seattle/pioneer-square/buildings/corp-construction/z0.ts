@@ -40,7 +40,11 @@ export const building = {
       description:
         'A keycard reader beside the office trailer door. The light glows red, waiting for valid credentials.',
       scanners: [
-        { type: 'keycard', part: 'hand', message: 'Authorized personnel only.' },
+        {
+          type: 'keycard',
+          part: 'hand',
+          message: 'Authorized personnel only.',
+        },
       ],
       authorizedUsers: {},
     },
@@ -51,7 +55,11 @@ export const building = {
       description:
         'A retinal scanner mounted beside the elevator shaft access. High security for what should be a construction site.',
       scanners: [
-        { type: 'retinal', part: 'head', message: 'Authorized personnel only.' },
+        {
+          type: 'retinal',
+          part: 'head',
+          message: 'Authorized personnel only.',
+        },
       ],
       authorizedUsers: {},
     },

@@ -158,11 +158,10 @@ A drinks cabinet stands in the corner, its glass doors revealing crystal decante
       },
       sittables: [
         {
-          name: 'the partner\'s chair',
+          name: "the partner's chair",
           capacity: 1,
-          emptyMsg:
-            'A high-backed leather chair sits behind the massive desk.',
-          occupiedMsg: '%s sitting in the senior partner\'s chair',
+          emptyMsg: 'A high-backed leather chair sits behind the massive desk.',
+          occupiedMsg: "%s sitting in the senior partner's chair",
         },
         {
           name: 'client chairs',
@@ -228,7 +227,7 @@ A motivational poster hangs on the wall: JUSTICE DELAYED IS JUSTICE DENIED. The 
           prototype: 'describable',
           name: 'motivational poster',
           aliases: ['poster', 'sign'],
-          description: `A framed poster showing scales of justice against a sunset, with the quote: \"JUSTICE DELAYED IS JUSTICE DENIED - WILLIAM GLADSTONE.\" The kind of corporate inspiration meant to keep associates billing through their exhaustion. The poster is slightly askew, never straightened by hands too busy with briefs to care about wall decor.`,
+          description: `A framed poster showing scales of justice against a sunset, with the quote: "JUSTICE DELAYED IS JUSTICE DENIED - WILLIAM GLADSTONE." The kind of corporate inspiration meant to keep associates billing through their exhaustion. The poster is slightly askew, never straightened by hands too busy with briefs to care about wall decor.`,
         },
       ],
     },
@@ -300,8 +299,7 @@ A credenza along one wall holds legal documents in labeled folders, the files of
         {
           name: 'a conference chair',
           capacity: 8,
-          emptyMsg:
-            'Leather chairs surround the long conference table.',
+          emptyMsg: 'Leather chairs surround the long conference table.',
           occupiedMsg: '%s sitting at the conference table',
         },
       ],

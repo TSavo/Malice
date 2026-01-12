@@ -1,4 +1,3 @@
-import http from 'node:http';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ObjectManager } from '../../src/database/object-manager.js';
 import { MaliceMCPServer } from '../../src/mcp/mcp-server-codefirst.js';

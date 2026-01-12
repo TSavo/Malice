@@ -48,7 +48,8 @@ export class TtsBuilder implements Builder {
           description:
             'Text-to-Speech voice manager using VibeVoice (self-hosted)',
           // VibeVoice server URL (Docker internal network)
-          serverUrl: process.env.VIBEVOICE_URL || 'http://vibevoice-server:8880',
+          serverUrl:
+            process.env.VIBEVOICE_URL || 'http://vibevoice-server:8880',
           // Built-in voices available in VibeVoice
           builtinVoices: ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'],
           // Custom voices added via addVoice() - maps name -> true

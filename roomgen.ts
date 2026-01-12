@@ -8,7 +8,7 @@
  * - Deterministic by seed
  */
 
-export type Axis = "x" | "y" | "z";
+export type Axis = 'x' | 'y' | 'z';
 export type Vec3 = { x: number; y: number; z: number };
 
 export type Room = {
@@ -21,7 +21,7 @@ export type Room = {
   };
 };
 
-export type ExitKind = "cardinal" | "arbitrary";
+export type ExitKind = 'cardinal' | 'arbitrary';
 
 export type Exit = {
   from: string;
@@ -40,21 +40,21 @@ export type Bounds = { min: Vec3; max: Vec3 };
 
 export type PrefabExit = {
   from: Vec3; // local
-  to: Vec3;   // local
+  to: Vec3; // local
   kind: ExitKind; // usually cardinal; arbitrary supported
 };
 
-export type PortalDir = "+x" | "-x" | "+y" | "-y" | "+z" | "-z";
+export type PortalDir = '+x' | '-x' | '+y' | '-y' | '+z' | '-z';
 
 export type PrefabPortal = {
-  cell: Vec3;                 // local cell allowed to connect externally
-  allowedDirs?: PortalDir[];  // optional restriction on how external network may connect
+  cell: Vec3; // local cell allowed to connect externally
+  allowedDirs?: PortalDir[]; // optional restriction on how external network may connect
 };
 
 export type Prefab = {
   id: string;
-  cells: Vec3[];        // local occupied cells
-  exits: PrefabExit[];  // internal edges only
+  cells: Vec3[]; // local occupied cells
+  exits: PrefabExit[]; // internal edges only
   portals: PrefabPortal[];
 };
 
@@ -62,14 +62,14 @@ export type GrowthParams = {
   // growth
   maxRooms: number;
 
-  branchChance: number;   // e.g. 0.2
-  linearBias: number;     // e.g. 0.7
-  centerBias: number;     // e.g. 1.2
-  centerPenalty: number;  // e.g. 0.9
+  branchChance: number; // e.g. 0.2
+  linearBias: number; // e.g. 0.7
+  centerBias: number; // e.g. 1.2
+  centerPenalty: number; // e.g. 0.9
   linkPreference: number; // e.g. 0.8 - prefer linking to existing rooms over creating new ones
 
   // prefab
-  prefabChance: number;   // e.g. 0.25
+  prefabChance: number; // e.g. 0.25
   prefabs: Prefab[];
 
   // if true, after generation we add cardinal exits between *non-prefab* adjacent rooms
@@ -82,7 +82,7 @@ export type GrowthParams = {
 
 export function mulberry32(seed: number) {
   return function rand() {
-    let t = (seed += 0x6D2B79f5);
+    let t = (seed += 0x6d2b79f5);
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
@@ -91,7 +91,7 @@ export function mulberry32(seed: number) {
 
 // -------- Utilities --------
 
-const AXES: Axis[] = ["x", "y", "z"];
+const AXES: Axis[] = ['x', 'y', 'z'];
 
 function key(p: Vec3): string {
   return `${p.x},${p.y},${p.z}`;
@@ -107,9 +107,12 @@ function eqVec(a: Vec3, b: Vec3): boolean {
 
 function inBounds(p: Vec3, b: Bounds): boolean {
   return (
-    p.x >= b.min.x && p.x <= b.max.x &&
-    p.y >= b.min.y && p.y <= b.max.y &&
-    p.z >= b.min.z && p.z <= b.max.z
+    p.x >= b.min.x &&
+    p.x <= b.max.x &&
+    p.y >= b.min.y &&
+    p.y <= b.max.y &&
+    p.z >= b.min.z &&
+    p.z <= b.max.z
   );
 }
 
@@ -133,33 +136,39 @@ function dirBetween(a: Vec3, b: Vec3): PortalDir | null {
   const dy = b.y - a.y;
   const dz = b.z - a.z;
   if (Math.abs(dx) + Math.abs(dy) + Math.abs(dz) !== 1) return null;
-  if (dx === 1) return "+x";
-  if (dx === -1) return "-x";
-  if (dy === 1) return "+y";
-  if (dy === -1) return "-y";
-  if (dz === 1) return "+z";
-  if (dz === -1) return "-z";
+  if (dx === 1) return '+x';
+  if (dx === -1) return '-x';
+  if (dy === 1) return '+y';
+  if (dy === -1) return '-y';
+  if (dz === 1) return '+z';
+  if (dz === -1) return '-z';
   return null;
 }
 
 function dirToVec(d: PortalDir): Vec3 {
   switch (d) {
-    case "+x": return { x: 1, y: 0, z: 0 };
-    case "-x": return { x: -1, y: 0, z: 0 };
-    case "+y": return { x: 0, y: 1, z: 0 };
-    case "-y": return { x: 0, y: -1, z: 0 };
-    case "+z": return { x: 0, y: 0, z: 1 };
-    case "-z": return { x: 0, y: 0, z: -1 };
+    case '+x':
+      return { x: 1, y: 0, z: 0 };
+    case '-x':
+      return { x: -1, y: 0, z: 0 };
+    case '+y':
+      return { x: 0, y: 1, z: 0 };
+    case '-y':
+      return { x: 0, y: -1, z: 0 };
+    case '+z':
+      return { x: 0, y: 0, z: 1 };
+    case '-z':
+      return { x: 0, y: 0, z: -1 };
   }
 }
 
 function vecToDir(v: Vec3): PortalDir | null {
-  if (v.x === 1 && v.y === 0 && v.z === 0) return "+x";
-  if (v.x === -1 && v.y === 0 && v.z === 0) return "-x";
-  if (v.x === 0 && v.y === 1 && v.z === 0) return "+y";
-  if (v.x === 0 && v.y === -1 && v.z === 0) return "-y";
-  if (v.x === 0 && v.y === 0 && v.z === 1) return "+z";
-  if (v.x === 0 && v.y === 0 && v.z === -1) return "-z";
+  if (v.x === 1 && v.y === 0 && v.z === 0) return '+x';
+  if (v.x === -1 && v.y === 0 && v.z === 0) return '-x';
+  if (v.x === 0 && v.y === 1 && v.z === 0) return '+y';
+  if (v.x === 0 && v.y === -1 && v.z === 0) return '-y';
+  if (v.x === 0 && v.y === 0 && v.z === 1) return '+z';
+  if (v.x === 0 && v.y === 0 && v.z === -1) return '-z';
   return null;
 }
 
@@ -175,22 +184,24 @@ function detSign(r: Rot): 1 | -1 {
     (perm[0] > perm[1] ? 1 : 0) +
     (perm[0] > perm[2] ? 1 : 0) +
     (perm[1] > perm[2] ? 1 : 0);
-  const permSign = (inv % 2 === 0) ? 1 : -1;
+  const permSign = inv % 2 === 0 ? 1 : -1;
   const flipSign = (r.sx * r.sy * r.sz) as 1 | -1;
   return (permSign * flipSign) as 1 | -1;
 }
 
 function allProperRotations(): Rot[] {
   const rots: Rot[] = [];
-  for (const ax of AXES) for (const ay of AXES) for (const az of AXES) {
-    if (new Set([ax, ay, az]).size !== 3) continue;
-    for (const sx of [1, -1] as const)
-      for (const sy of [1, -1] as const)
-        for (const sz of [1, -1] as const) {
-          const r: Rot = { ax, ay, az, sx, sy, sz };
-          if (detSign(r) === 1) rots.push(r);
-        }
-  }
+  for (const ax of AXES)
+    for (const ay of AXES)
+      for (const az of AXES) {
+        if (new Set([ax, ay, az]).size !== 3) continue;
+        for (const sx of [1, -1] as const)
+          for (const sy of [1, -1] as const)
+            for (const sz of [1, -1] as const) {
+              const r: Rot = { ax, ay, az, sx, sy, sz };
+              if (detSign(r) === 1) rots.push(r);
+            }
+      }
   return rots;
 }
 
@@ -267,12 +278,17 @@ type InternalState = {
   roomIdByPosKey: Map<string, string>;
   portalPosKeys: Set<string>; // absolute positions that are portals
   prefabPosKeys: Set<string>; // absolute positions that belong to any prefab cell
-  
+
   // connectivity tracking
   connectivity: UnionFind;
 };
 
-function addExitBidirectional(state: InternalState, aId: string, bId: string, kind: ExitKind) {
+function addExitBidirectional(
+  state: InternalState,
+  aId: string,
+  bId: string,
+  kind: ExitKind,
+) {
   state.exits.push({ from: aId, to: bId, kind });
   state.exits.push({ from: bId, to: aId, kind });
   state.connectivity.union(aId, bId);
@@ -281,7 +297,7 @@ function addExitBidirectional(state: InternalState, aId: string, bId: string, ki
 function ensureRoom(
   state: InternalState,
   pos: Vec3,
-  meta?: Room["meta"]
+  meta?: Room['meta'],
 ): Room {
   const k = key(pos);
   const existing = state.roomsByPos.get(k);
@@ -291,7 +307,11 @@ function ensureRoom(
     return existing;
   }
   const id = `r${state.nextRoomId++}`;
-  const room: Room = { id, pos: { ...pos }, meta: meta ? { ...meta } : undefined };
+  const room: Room = {
+    id,
+    pos: { ...pos },
+    meta: meta ? { ...meta } : undefined,
+  };
   state.roomsByPos.set(k, room);
   state.roomIdByPosKey.set(k, id);
   state.sumPos = addVec(state.sumPos, pos);
@@ -304,7 +324,11 @@ function roomCount(state: InternalState): number {
 
 function centroid(state: InternalState): Vec3 {
   const n = state.roomsByPos.size;
-  return { x: state.sumPos.x / n, y: state.sumPos.y / n, z: state.sumPos.z / n };
+  return {
+    x: state.sumPos.x / n,
+    y: state.sumPos.y / n,
+    z: state.sumPos.z / n,
+  };
 }
 
 function isOccupied(state: InternalState, pos: Vec3): boolean {
@@ -355,7 +379,7 @@ function tryPlacePrefabAt(
   params: GrowthParams,
   rand: () => number,
   outsidePos: Vec3,
-  attachPos: Vec3
+  attachPos: Vec3,
 ): boolean {
   if (params.prefabs.length === 0) return false;
   if (rand() >= params.prefabChance) return false;
@@ -376,7 +400,7 @@ function tryPlacePrefabAt(
 
     // Check if portal allows entry from this direction after rotation
     if (portal.allowedDirs) {
-      const rotatedAllowed = portal.allowedDirs.map(d => rotateDir(d, rot));
+      const rotatedAllowed = portal.allowedDirs.map((d) => rotateDir(d, rot));
       if (!rotatedAllowed.includes(attachDir)) continue;
     }
 
@@ -438,7 +462,7 @@ function tryPlacePrefabAt(
     // This is allowed by construction because attachPos is a portal.
     const outsideRoom = ensureRoom(state, outsidePos);
     const attachRoom = ensureRoom(state, attachPos);
-    addExitBidirectional(state, outsideRoom.id, attachRoom.id, "cardinal");
+    addExitBidirectional(state, outsideRoom.id, attachRoom.id, 'cardinal');
 
     // Create internal exits ONLY as defined
     for (const ex of prefab.exits) {
@@ -463,20 +487,25 @@ function chooseNextStep(
   bounds: Bounds,
   rand: () => number,
   frontier: Frontier,
-  params: GrowthParams
+  params: GrowthParams,
 ): { nextPos: Vec3; nextDir: Axis } | null {
   const cur = frontier.pos;
   // Use frontier's target if available, otherwise fall back to centroid
   const target = frontier.target ?? centroid(state);
   const curDist = manhattan(cur, target);
 
-  const candidates: Array<{ pos: Vec3; axis: Axis; score: number; isExisting: boolean }> = [];
+  const candidates: Array<{
+    pos: Vec3;
+    axis: Axis;
+    score: number;
+    isExisting: boolean;
+  }> = [];
 
   for (const axis of AXES) {
     for (const step of [-1, 1] as const) {
-      const nxt: Vec3 = { ...cur, [axis]: (cur[axis] + step) } as Vec3;
+      const nxt: Vec3 = { ...cur, [axis]: cur[axis] + step } as Vec3;
       if (!inBounds(nxt, bounds)) continue;
-      
+
       // Never go above z=-2 during generation (z=-1 is only for entrance rooms)
       if (nxt.z > -2) continue;
 
@@ -494,8 +523,9 @@ function chooseNextStep(
 
       // target bias - move toward the target entrance
       const nextDist = manhattan(nxt, target);
-      if (nextDist < curDist) score += 2.0;  // strongly prefer moving closer
-      else if (nextDist > curDist) score -= 0.5;  // mild penalty for moving away
+      if (nextDist < curDist)
+        score += 2.0; // strongly prefer moving closer
+      else if (nextDist > curDist) score -= 0.5; // mild penalty for moving away
 
       candidates.push({ pos: nxt, axis, score, isExisting });
     }
@@ -504,14 +534,18 @@ function chooseNextStep(
   if (candidates.length === 0) return null;
 
   // weighted choice; clamp scores positive
-  const weights = candidates.map(cand => Math.max(0.01, cand.score));
+  const weights = candidates.map((cand) => Math.max(0.01, cand.score));
   const total = weights.reduce((a, b) => a + b, 0);
   let r = rand() * total;
   for (let i = 0; i < candidates.length; i++) {
     r -= weights[i];
-    if (r <= 0) return { nextPos: candidates[i].pos, nextDir: candidates[i].axis };
+    if (r <= 0)
+      return { nextPos: candidates[i].pos, nextDir: candidates[i].axis };
   }
-  return { nextPos: candidates[candidates.length - 1].pos, nextDir: candidates[candidates.length - 1].axis };
+  return {
+    nextPos: candidates[candidates.length - 1].pos,
+    nextDir: candidates[candidates.length - 1].axis,
+  };
 }
 
 // -------- Public API --------
@@ -520,10 +554,12 @@ export function generateWorld(
   entrances: Vec3[],
   bounds: Bounds,
   seed: number,
-  params: GrowthParams
+  params: GrowthParams,
 ): World {
   if (entrances.length < 2) {
-    throw new Error("Need at least 2 entrances to enforce all-to-all reachability meaningfully.");
+    throw new Error(
+      'Need at least 2 entrances to enforce all-to-all reachability meaningfully.',
+    );
   }
 
   const rand = mulberry32(seed);
@@ -544,9 +580,9 @@ export function generateWorld(
   // z=-1 entrances must first descend to z=-2
   const frontiers: Frontier[] = [];
   for (const e of entrances) {
-    if (!inBounds(e, bounds)) throw new Error("Entrance out of bounds");
+    if (!inBounds(e, bounds)) throw new Error('Entrance out of bounds');
     ensureRoom(state, e);
-    
+
     // For z=-1 entrances, first create a room at z=-2 directly below
     let startPos = { ...e };
     if (e.z === -1) {
@@ -554,43 +590,43 @@ export function generateWorld(
       if (inBounds(belowPos, bounds)) {
         const above = ensureRoom(state, e);
         const below = ensureRoom(state, belowPos);
-        addExitBidirectional(state, above.id, below.id, "cardinal");
+        addExitBidirectional(state, above.id, below.id, 'cardinal');
         startPos = belowPos; // Frontiers start from z=-2
       }
     }
-    
+
     // Sort all other entrances by distance (from the start position)
     const others = entrances
-      .filter(o => !eqVec(o, e))
-      .map(o => ({ pos: o, dist: manhattan(startPos, o) }))
+      .filter((o) => !eqVec(o, e))
+      .map((o) => ({ pos: o, dist: manhattan(startPos, o) }))
       .sort((a, b) => a.dist - b.dist);
-    
+
     // Take 3 closest and 1 most distant (deduplicated if overlap)
     const closest = others.slice(0, 3);
     const mostDistant = others.slice(-1); // Just 1 most distant
     const targets = [...closest];
     for (const t of mostDistant) {
-      if (!targets.some(c => eqVec(c.pos, t.pos))) {
+      if (!targets.some((c) => eqVec(c.pos, t.pos))) {
         targets.push(t);
       }
     }
-    
+
     for (const other of targets) {
       // Determine initial direction toward this target
       const dx = other.pos.x - startPos.x;
       const dy = other.pos.y - startPos.y;
       const dz = other.pos.z - startPos.z;
-      
+
       // Pick the axis with the largest delta as initial direction
       let dir: Axis;
       if (Math.abs(dx) >= Math.abs(dy) && Math.abs(dx) >= Math.abs(dz)) {
-        dir = "x";
+        dir = 'x';
       } else if (Math.abs(dy) >= Math.abs(dz)) {
-        dir = "y";
+        dir = 'y';
       } else {
-        dir = "z";
+        dir = 'z';
       }
-      
+
       frontiers.push({ pos: { ...startPos }, dir, target: { ...other.pos } });
     }
   }
@@ -598,16 +634,16 @@ export function generateWorld(
   // Growth loop - stop when all targeted frontiers complete (not when hitting room budget)
   while (frontiers.length > 0) {
     // Check if any targeted frontiers remain - if not, we're done
-    const hasTargetedFrontier = frontiers.some(f => f.target);
+    const hasTargetedFrontier = frontiers.some((f) => f.target);
     if (!hasTargetedFrontier) break;
-    
+
     // Safety check for room budget (but targeted frontiers should complete first)
     if (roomCount(state) >= params.maxRooms) break;
-    
+
     // Only process targeted frontiers - discard untargeted ones
-    const targetedIdx = frontiers.findIndex(f => f.target);
+    const targetedIdx = frontiers.findIndex((f) => f.target);
     if (targetedIdx === -1) break;
-    
+
     const frontier = frontiers.splice(targetedIdx, 1)[0];
 
     // If frontier position is invalid (shouldn't be), skip
@@ -616,36 +652,42 @@ export function generateWorld(
     // Check if frontier has reached its target (or is adjacent to it)
     if (frontier.target) {
       const distToTarget = manhattan(frontier.pos, frontier.target);
-      
+
       // If we're AT the target, we're done with this frontier
       if (distToTarget === 0) {
         continue; // Don't re-add this frontier
       }
-      
+
       // If we're adjacent to target, connect and stop
       if (distToTarget === 1) {
         const a = ensureRoom(state, frontier.pos);
         const b = ensureRoom(state, frontier.target);
-        addExitBidirectional(state, a.id, b.id, "cardinal");
+        addExitBidirectional(state, a.id, b.id, 'cardinal');
         continue; // Frontier completed its mission
       }
-      
+
       // Check if we're already connected to the target via existing rooms
       const frontierRoom = state.roomsByPos.get(key(frontier.pos));
       const targetRoom = state.roomsByPos.get(key(frontier.target));
-      if (frontierRoom && targetRoom && state.connectivity.connected(frontierRoom.id, targetRoom.id)) {
+      if (
+        frontierRoom &&
+        targetRoom &&
+        state.connectivity.connected(frontierRoom.id, targetRoom.id)
+      ) {
         continue; // Already connected - frontier done
       }
-      
+
       // Check if current pos is adjacent to any room in target's component
       if (targetRoom) {
         for (const neighbor of neighbors6(frontier.pos)) {
           const neighborRoom = state.roomsByPos.get(key(neighbor));
-          if (neighborRoom && state.connectivity.connected(neighborRoom.id, targetRoom.id)) {
+          if (
+            neighborRoom &&
+            state.connectivity.connected(neighborRoom.id, targetRoom.id)
+          ) {
             // We're adjacent to target's network - connect and done
             const a = ensureRoom(state, frontier.pos);
-            addExitBidirectional(state, a.id, neighborRoom.id, "cardinal");
-            continue; // Frontier completed
+            addExitBidirectional(state, a.id, neighborRoom.id, 'cardinal');
           }
         }
       }
@@ -659,31 +701,42 @@ export function generateWorld(
 
     // Option A: try prefab placement anchored by a portal at nextPos
     // This requires outside->attach adjacency (which holds for cardinal step selection).
-    const placedPrefab = tryPlacePrefabAt(state, bounds, params, rand, curPos, nextPos);
+    const placedPrefab = tryPlacePrefabAt(
+      state,
+      bounds,
+      params,
+      rand,
+      curPos,
+      nextPos,
+    );
 
     if (!placedPrefab) {
       // Normal single-cell expansion (non-prefab)
       const a = ensureRoom(state, curPos);
       const b = ensureRoom(state, nextPos);
-      addExitBidirectional(state, a.id, b.id, "cardinal");
+      addExitBidirectional(state, a.id, b.id, 'cardinal');
     }
 
     // Continue frontier from nextPos, inheriting the target (no branching)
-    frontiers.push({ pos: { ...nextPos }, dir: step.nextDir, target: frontier.target });
+    frontiers.push({
+      pos: { ...nextPos },
+      dir: step.nextDir,
+      target: frontier.target,
+    });
   }
 
   // Ensure all entrances are connected by bridging disconnected components
-  const entranceRooms = entrances.map(e => state.roomsByPos.get(key(e))!.id);
+  const entranceRooms = entrances.map((e) => state.roomsByPos.get(key(e))!.id);
   for (let i = 1; i < entranceRooms.length; i++) {
     if (!state.connectivity.connected(entranceRooms[0], entranceRooms[i])) {
       // Find closest pair of rooms between the two components and connect them
-      const comp1Rooms = Array.from(state.roomsByPos.values()).filter(
-        r => state.connectivity.connected(r.id, entranceRooms[0])
+      const comp1Rooms = Array.from(state.roomsByPos.values()).filter((r) =>
+        state.connectivity.connected(r.id, entranceRooms[0]),
       );
-      const comp2Rooms = Array.from(state.roomsByPos.values()).filter(
-        r => state.connectivity.connected(r.id, entranceRooms[i])
+      const comp2Rooms = Array.from(state.roomsByPos.values()).filter((r) =>
+        state.connectivity.connected(r.id, entranceRooms[i]),
       );
-      
+
       let bestDist = Infinity;
       let bestPair: [Room, Room] | null = null;
       for (const r1 of comp1Rooms) {
@@ -698,9 +751,9 @@ export function generateWorld(
           }
         }
       }
-      
+
       if (bestPair) {
-        addExitBidirectional(state, bestPair[0].id, bestPair[1].id, "cardinal");
+        addExitBidirectional(state, bestPair[0].id, bestPair[1].id, 'cardinal');
       } else {
         // No adjacent rooms found - find closest and create bridge rooms with prefab chances
         for (const r1 of comp1Rooms) {
@@ -720,25 +773,46 @@ export function generateWorld(
           const maxExtraSteps = Math.max(2, Math.floor(directDist * 0.2));
           let extraSteps = 0;
           let lastAxis: Axis | null = null;
-          
+
           while (!eqVec(current.pos, target)) {
             const dx = target.x - current.pos.x;
             const dy = target.y - current.pos.y;
             const dz = target.z - current.pos.z;
-            
+
             // Always include moves toward target
             const moves: { next: Vec3; axis: Axis; isToward: boolean }[] = [];
-            if (dx !== 0) moves.push({ next: { ...current.pos, x: current.pos.x + Math.sign(dx) }, axis: "x", isToward: true });
-            if (dy !== 0) moves.push({ next: { ...current.pos, y: current.pos.y + Math.sign(dy) }, axis: "y", isToward: true });
-            if (dz !== 0) moves.push({ next: { ...current.pos, z: current.pos.z + Math.sign(dz) }, axis: "z", isToward: true });
-            
+            if (dx !== 0)
+              moves.push({
+                next: { ...current.pos, x: current.pos.x + Math.sign(dx) },
+                axis: 'x',
+                isToward: true,
+              });
+            if (dy !== 0)
+              moves.push({
+                next: { ...current.pos, y: current.pos.y + Math.sign(dy) },
+                axis: 'y',
+                isToward: true,
+              });
+            if (dz !== 0)
+              moves.push({
+                next: { ...current.pos, z: current.pos.z + Math.sign(dz) },
+                axis: 'z',
+                isToward: true,
+              });
+
             // Only consider perpendicular if we have budget left
             if (extraSteps < maxExtraSteps) {
               for (const axis of AXES) {
-                const isPerp = (axis === "x" && dx === 0) || (axis === "y" && dy === 0) || (axis === "z" && dz === 0);
+                const isPerp =
+                  (axis === 'x' && dx === 0) ||
+                  (axis === 'y' && dy === 0) ||
+                  (axis === 'z' && dz === 0);
                 if (isPerp) {
                   for (const step of [-1, 1]) {
-                    const next: Vec3 = { ...current.pos, [axis]: current.pos[axis] + step };
+                    const next: Vec3 = {
+                      ...current.pos,
+                      [axis]: current.pos[axis] + step,
+                    };
                     if (inBounds(next, bounds) && !isOccupied(state, next)) {
                       moves.push({ next, axis, isToward: false });
                     }
@@ -746,44 +820,54 @@ export function generateWorld(
                 }
               }
             }
-            
+
             if (moves.length === 0) break;
-            
+
             // Weight: toward=3, perpendicular=1, plus jitter
-            const weights = moves.map(m => {
+            const weights = moves.map((m) => {
               let w = m.isToward ? 3.0 : 1.0;
               if (lastAxis && m.axis === lastAxis) w += 0.3;
               w += rand() * 0.4;
               return w;
             });
-            
+
             const total = weights.reduce((a, b) => a + b, 0);
             let r = rand() * total;
             let chosenMove = moves[0];
             for (let j = 0; j < moves.length; j++) {
               r -= weights[j];
-              if (r <= 0) { chosenMove = moves[j]; break; }
+              if (r <= 0) {
+                chosenMove = moves[j];
+                break;
+              }
             }
-            
+
             if (!chosenMove.isToward) extraSteps++;
-            
+
             const nextPos = chosenMove.next;
             lastAxis = chosenMove.axis;
-            
+
             // Try to place a prefab along the bridge (boosted chance: 50%)
             let placedPrefab = false;
             if (rand() < 0.5 && params.prefabs.length > 0) {
               // Force try prefab by temporarily setting high chance
               const origChance = params.prefabChance;
               params.prefabChance = 1.0; // guarantee attempt
-              placedPrefab = tryPlacePrefabAt(state, bounds, params, rand, current.pos, nextPos);
+              placedPrefab = tryPlacePrefabAt(
+                state,
+                bounds,
+                params,
+                rand,
+                current.pos,
+                nextPos,
+              );
               params.prefabChance = origChance;
             }
-            
+
             if (!placedPrefab) {
               if (!inBounds(nextPos, bounds)) break;
               const nextRoom = ensureRoom(state, nextPos);
-              addExitBidirectional(state, current.id, nextRoom.id, "cardinal");
+              addExitBidirectional(state, current.id, nextRoom.id, 'cardinal');
               current = nextRoom;
             } else {
               const nextRoom = state.roomsByPos.get(key(nextPos));
@@ -809,7 +893,7 @@ export function generateWorld(
         // Privacy gate: if either side is prefab non-portal, do not link.
         if (!canLinkCardinal(state, room.pos, n)) continue;
 
-        addExitBidirectional(state, room.id, nRoom.id, "cardinal");
+        addExitBidirectional(state, room.id, nRoom.id, 'cardinal');
       }
     }
   }

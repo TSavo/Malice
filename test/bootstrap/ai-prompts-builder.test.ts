@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { describe, expect, it } from 'vitest';
 
 /**
  * Test AiPromptsBuilder path resolution (PR #118)
@@ -51,7 +51,7 @@ describe('AiPromptsBuilder - Path Resolution', () => {
   it('should have all prompts from PROMPT_FILES available', () => {
     // These are the files defined in ai-prompts-builder.ts PROMPT_FILES constant
     const promptFiles = [
-      'NARRATOR-PROMPT.md',  // internal/
+      'NARRATOR-PROMPT.md', // internal/
       'PLURIBUS.md',
       'SISTER-GRAY.md',
       'TAILOR.md',
