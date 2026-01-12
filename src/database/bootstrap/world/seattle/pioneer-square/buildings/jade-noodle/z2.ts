@@ -27,6 +27,7 @@ A wooden crate serves as seating, positioned to watch the sunset over Elliott Ba
       x: -10,
       y: -6,
       z: 2,
+      imageOnDisk: 'jade-noodle-house-roof-x-10-y-6-z2.png',
       population: 0,
       ambientNoise: 10,
       lighting: 100,
