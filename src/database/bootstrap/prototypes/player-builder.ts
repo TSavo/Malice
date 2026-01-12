@@ -436,13 +436,13 @@ export class PlayerBuilder implements Builder {
                 data.imageUrl = '/blob/' + blobKey;
               }
 
-              await self.state('show', data);
+              self.state('show', data);
             }
           } else if (showData.type === 'html') {
             // For HTML windows, we can't restore the content without storing it
             // For now, just restore the window frame - AI can re-populate if needed
             // This is intentional: HTML content could be stale/large
-            await self.state('show', {
+            self.state('show', {
               window: showData.window,
               persist: showData.persist || false,
               icon: showData.icon || win.icon || null,
