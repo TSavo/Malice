@@ -1,12 +1,13 @@
 #!/usr/bin/env bun
+
 /**
  * Convert WAV voice samples to MP3 320kbps
  * Keeps original WAVs, creates MP3s alongside them
  */
 
-import { readdir } from 'fs/promises';
-import { execSync } from 'child_process';
-import { existsSync } from 'fs';
+import { execSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import { readdir } from 'node:fs/promises';
 
 const VOICES_DIR = 'vibevoice-server/voices';
 const BITRATE = '320k';
@@ -24,8 +25,8 @@ async function main() {
   }
 
   const files = await readdir(VOICES_DIR);
-  const wavFiles = files.filter(f => f.endsWith('.wav'));
-  
+  const wavFiles = files.filter((f) => f.endsWith('.wav'));
+
   console.log(`Found ${wavFiles.length} WAV files\n`);
 
   let converted = 0;
@@ -42,12 +43,15 @@ async function main() {
     }
 
     try {
-      execSync(`ffmpeg -i "${wavPath}" -b:a ${BITRATE} -q:a 0 "${mp3Path}" -y -loglevel error`, {
-        stdio: 'pipe'
-      });
+      execSync(
+        `ffmpeg -i "${wavPath}" -b:a ${BITRATE} -q:a 0 "${mp3Path}" -y -loglevel error`,
+        {
+          stdio: 'pipe',
+        },
+      );
       converted++;
       process.stdout.write(`\r  Converted: ${converted} / ${wavFiles.length}`);
-    } catch (err) {
+    } catch (_err) {
       console.log(`\n  ❌ Failed: ${wav}`);
     }
   }
@@ -56,16 +60,21 @@ async function main() {
   console.log('================================');
   console.log(`✅ Converted: ${converted}`);
   console.log(`⏭️  Skipped (already exist): ${skipped}`);
-  
+
   // Show size comparison
-  const wavSize = execSync(`du -sh ${VOICES_DIR}/*.wav | tail -1`).toString().split('\t')[0];
-  const mp3Size = execSync(`du -sh ${VOICES_DIR}/*.mp3 2>/dev/null | tail -1`).toString().split('\t')[0] || '0';
+  const wavSize = execSync(`du -sh ${VOICES_DIR}/*.wav | tail -1`)
+    .toString()
+    .split('\t')[0];
+  const mp3Size =
+    execSync(`du -sh ${VOICES_DIR}/*.mp3 2>/dev/null | tail -1`)
+      .toString()
+      .split('\t')[0] || '0';
   console.log(`\n📊 Size comparison:`);
   console.log(`   WAV: ${wavSize}`);
   console.log(`   MP3: ${mp3Size}`);
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error('Error:', err);
   process.exit(1);
 });

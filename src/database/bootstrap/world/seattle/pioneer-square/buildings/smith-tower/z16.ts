@@ -80,7 +80,8 @@ export const building = {
 
     '%A1_z16': {
       name: 'Smith Tower - 16th Floor - North Suite - Living Room',
-      description: 'A corner unit with tall windows and pale wood floors. A kitchenette occupies one wall, its appliances dark and silent. Built-in shelving holds the remnants of someone\'s life—books, decorative objects, a dead potted plant.',
+      description:
+        "A corner unit with tall windows and pale wood floors. A kitchenette occupies one wall, its appliances dark and silent. Built-in shelving holds the remnants of someone's life—books, decorative objects, a dead potted plant.",
       x: -3,
       y: 11,
       z: 16,
@@ -96,10 +97,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a kiva fireplace', description: 'A rounded adobe kiva fireplace fills one corner, its smooth plaster cracked in places. Cold ashes and a dried chili ristra hang nearby.', boltedDown: true },
-        { prototype: 'table', name: 'a mesquite coffee table', description: 'A low table of twisted mesquite wood sits before the seating area, its natural edges preserved. Turquoise inlay traces the grain.', boltedDown: false },
-        { prototype: 'furniture', name: 'a trastero cabinet', description: 'A tall wooden trastero stands against the wall, its carved doors depicting desert flowers. Shelves inside hold pueblo-style pottery and a dead cactus.', boltedDown: true },
-        { prototype: 'furniture', name: 'a Navajo rug', description: 'A faded Navajo rug in reds and ochres covers the saltillo tile floor, its geometric patterns still visible despite decades of dust.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'a kiva fireplace',
+          description:
+            'A rounded adobe kiva fireplace fills one corner, its smooth plaster cracked in places. Cold ashes and a dried chili ristra hang nearby.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a mesquite coffee table',
+          description:
+            'A low table of twisted mesquite wood sits before the seating area, its natural edges preserved. Turquoise inlay traces the grain.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a trastero cabinet',
+          description:
+            'A tall wooden trastero stands against the wall, its carved doors depicting desert flowers. Shelves inside hold pueblo-style pottery and a dead cactus.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a Navajo rug',
+          description:
+            'A faded Navajo rug in reds and ochres covers the saltillo tile floor, its geometric patterns still visible despite decades of dust.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -142,10 +167,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a carved pine bed', description: 'A massive bed frame of carved pine features desert motifs—saguaros, roadrunners, sun symbols. A faded Chimayo blanket serves as a bedspread.', quality: 'standard' },
-        { prototype: 'furniture', name: 'adobe wall niches', description: 'Rounded niches are built into the adobe-style walls, displaying turquoise-studded crosses and dried desert flowers in clay pots.', boltedDown: true },
-        { prototype: 'table', name: 'a wrought iron nightstand', description: 'A nightstand of twisted wrought iron and mesquite wood holds a dead oil lamp with a copper shade.', boltedDown: false },
-        { prototype: 'furniture', name: 'a cowhide rug', description: 'A genuine cowhide rug in brown and white patches lies beside the bed, its edges curling with age.', boltedDown: false },
+        {
+          prototype: 'bed',
+          name: 'a carved pine bed',
+          description:
+            'A massive bed frame of carved pine features desert motifs—saguaros, roadrunners, sun symbols. A faded Chimayo blanket serves as a bedspread.',
+          quality: 'standard',
+        },
+        {
+          prototype: 'furniture',
+          name: 'adobe wall niches',
+          description:
+            'Rounded niches are built into the adobe-style walls, displaying turquoise-studded crosses and dried desert flowers in clay pots.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a wrought iron nightstand',
+          description:
+            'A nightstand of twisted wrought iron and mesquite wood holds a dead oil lamp with a copper shade.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a cowhide rug',
+          description:
+            'A genuine cowhide rug in brown and white patches lies beside the bed, its edges curling with age.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -177,10 +226,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a saltillo tile kitchen', description: 'The galley kitchen features hand-painted Talavera tile backsplashes in cobalt and yellow. Copper pots hang from a wrought iron rack, tarnished green with age.', boltedDown: true },
-        { prototype: 'table', name: 'a mission-style desk', description: 'A heavy oak mission desk sits near the window, its clean lines and exposed joinery unmistakably Arts and Crafts. A dead cactus in a terra cotta pot decorates one corner.', boltedDown: false },
-        { prototype: 'furniture', name: 'a serape-draped daybed', description: 'A wrought iron daybed is draped with layered serape blankets in stripes of orange, red, and brown. The iron is worked into a pattern of desert flowers.', boltedDown: false },
-        { prototype: 'furniture', name: 'a dried chili ristra', description: 'A long ristra of dried red chilies hangs from a ceiling beam, its peppers shriveled and dusty but still holding their crimson color.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a saltillo tile kitchen',
+          description:
+            'The galley kitchen features hand-painted Talavera tile backsplashes in cobalt and yellow. Copper pots hang from a wrought iron rack, tarnished green with age.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a mission-style desk',
+          description:
+            'A heavy oak mission desk sits near the window, its clean lines and exposed joinery unmistakably Arts and Crafts. A dead cactus in a terra cotta pot decorates one corner.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a serape-draped daybed',
+          description:
+            'A wrought iron daybed is draped with layered serape blankets in stripes of orange, red, and brown. The iron is worked into a pattern of desert flowers.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a dried chili ristra',
+          description:
+            'A long ristra of dried red chilies hangs from a ceiling beam, its peppers shriveled and dusty but still holding their crimson color.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -219,11 +292,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a juniper log ladder', description: 'A rustic ladder of twisted juniper logs leads up to the sleeping loft, its bark still clinging in places. The rungs are worn smooth by hands.', boltedDown: true },
-        { prototype: 'bed', name: 'a loft sleeping platform', description: 'The mezzanine holds a sleeping platform covered in sheepskins and a faded Zapotec weaving. Kachina dolls line a narrow shelf.', quality: 'cheap' },
-        { prototype: 'furniture', name: 'a pueblo-style banco', description: 'A curved adobe banco is built beneath the mezzanine, its surface worn smooth. Faded cushions in terracotta and sage green line it.', boltedDown: true },
-        { prototype: 'table', name: 'a carved santos shelf', description: 'A low shelf of carved pine holds santos figurines and a collection of pueblo pottery, all coated in decades of dust.', boltedDown: false },
-        { prototype: 'furniture', name: 'a bleached cow skull', description: 'A bleached cow skull with curving horns hangs above the banco, a turquoise stone wedged in one eye socket.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a juniper log ladder',
+          description:
+            'A rustic ladder of twisted juniper logs leads up to the sleeping loft, its bark still clinging in places. The rungs are worn smooth by hands.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'bed',
+          name: 'a loft sleeping platform',
+          description:
+            'The mezzanine holds a sleeping platform covered in sheepskins and a faded Zapotec weaving. Kachina dolls line a narrow shelf.',
+          quality: 'cheap',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a pueblo-style banco',
+          description:
+            'A curved adobe banco is built beneath the mezzanine, its surface worn smooth. Faded cushions in terracotta and sage green line it.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a carved santos shelf',
+          description:
+            'A low shelf of carved pine holds santos figurines and a collection of pueblo pottery, all coated in decades of dust.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a bleached cow skull',
+          description:
+            'A bleached cow skull with curving horns hangs above the banco, a turquoise stone wedged in one eye socket.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -262,10 +365,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a hide-covered cot', description: 'A simple cot is covered with a worn elk hide, the hair rubbed off in patches. A woven Navajo saddle blanket serves as bedding.', quality: 'cheap' },
-        { prototype: 'furniture', name: 'antler hooks', description: 'Deer antlers mounted on the wall serve as coat hooks, their tines worn smooth. A leather satchel dangles from one.', boltedDown: true },
-        { prototype: 'furniture', name: 'a wall niche with santos', description: 'A small rounded niche holds a carved wooden santo—a faded Saint Francis with missing fingers and flaking paint.', boltedDown: true },
-        { prototype: 'furniture', name: 'a woven basket', description: 'A large Tohono O\'odham basket sits in the corner, its coiled patterns depicting a man-in-the-maze motif. Empty now, dusty.', boltedDown: false },
+        {
+          prototype: 'bed',
+          name: 'a hide-covered cot',
+          description:
+            'A simple cot is covered with a worn elk hide, the hair rubbed off in patches. A woven Navajo saddle blanket serves as bedding.',
+          quality: 'cheap',
+        },
+        {
+          prototype: 'furniture',
+          name: 'antler hooks',
+          description:
+            'Deer antlers mounted on the wall serve as coat hooks, their tines worn smooth. A leather satchel dangles from one.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a wall niche with santos',
+          description:
+            'A small rounded niche holds a carved wooden santo—a faded Saint Francis with missing fingers and flaking paint.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a woven basket',
+          description:
+            "A large Tohono O'odham basket sits in the corner, its coiled patterns depicting a man-in-the-maze motif. Empty now, dusty.",
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -302,11 +429,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a massive leather sofa', description: 'An enormous leather sofa in worn saddle brown dominates the room. Branded into the leather are subtle cattle brand patterns—Circle K, Lazy J, Double Bar.', boltedDown: true },
-        { prototype: 'table', name: 'a petrified wood table', description: 'A coffee table made from a cross-section of petrified wood sits before the sofa, its ancient rings polished smooth. Turquoise fills the cracks.', boltedDown: false },
-        { prototype: 'furniture', name: 'a built-in kiva entertainment niche', description: 'A rounded adobe-style niche holds a dead television and shelves of dusty Western DVDs. Carved vigas frame the opening.', boltedDown: true },
-        { prototype: 'furniture', name: 'a Southwestern blanket chest', description: 'A painted pine blanket chest features geometric Southwestern designs in turquoise and terracotta. The hinges are rusty but functional.', boltedDown: true },
-        { prototype: 'furniture', name: 'a wrought iron coat tree', description: 'A tall coat tree of twisted wrought iron stands near the door, its hooks shaped like saguaro arms. A dusty felt cowboy hat hangs from one.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'a massive leather sofa',
+          description:
+            'An enormous leather sofa in worn saddle brown dominates the room. Branded into the leather are subtle cattle brand patterns—Circle K, Lazy J, Double Bar.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a petrified wood table',
+          description:
+            'A coffee table made from a cross-section of petrified wood sits before the sofa, its ancient rings polished smooth. Turquoise fills the cracks.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a built-in kiva entertainment niche',
+          description:
+            'A rounded adobe-style niche holds a dead television and shelves of dusty Western DVDs. Carved vigas frame the opening.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a Southwestern blanket chest',
+          description:
+            'A painted pine blanket chest features geometric Southwestern designs in turquoise and terracotta. The hinges are rusty but functional.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a wrought iron coat tree',
+          description:
+            'A tall coat tree of twisted wrought iron stands near the door, its hooks shaped like saguaro arms. A dusty felt cowboy hat hangs from one.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -338,11 +495,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'built-in vigas shelving', description: 'Shelves supported by rough-hewn vigas line the walls, holding books on Southwestern art, Anasazi archaeology, and desert ecology. All dusty, all untouched.', boltedDown: true },
-        { prototype: 'table', name: 'a Santa Fe writing desk', description: 'A painted pine desk in sun-bleached turquoise sits in the window bay. Desert scenes are hand-painted on its sides—mesas, coyotes, thunderbirds.', boltedDown: false },
-        { prototype: 'chair', name: 'a tooled leather armchair', description: 'A deep armchair upholstered in tooled leather features desert rose patterns. The leather is cracked but supple.', boltedDown: false },
-        { prototype: 'furniture', name: 'a wrought iron floor lamp', description: 'A tall floor lamp of twisted wrought iron stands behind the chair, its mica shade casting a warm amber glow when it worked.', boltedDown: false },
-        { prototype: 'furniture', name: 'a Hopi kachina collection', description: 'A glass-fronted case displays a collection of Hopi kachina dolls—Eagle Dancer, Mudhead, Crow Mother—all draped in dust and silence.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'built-in vigas shelving',
+          description:
+            'Shelves supported by rough-hewn vigas line the walls, holding books on Southwestern art, Anasazi archaeology, and desert ecology. All dusty, all untouched.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a Santa Fe writing desk',
+          description:
+            'A painted pine desk in sun-bleached turquoise sits in the window bay. Desert scenes are hand-painted on its sides—mesas, coyotes, thunderbirds.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'chair',
+          name: 'a tooled leather armchair',
+          description:
+            'A deep armchair upholstered in tooled leather features desert rose patterns. The leather is cracked but supple.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a wrought iron floor lamp',
+          description:
+            'A tall floor lamp of twisted wrought iron stands behind the chair, its mica shade casting a warm amber glow when it worked.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a Hopi kachina collection',
+          description:
+            'A glass-fronted case displays a collection of Hopi kachina dolls—Eagle Dancer, Mudhead, Crow Mother—all draped in dust and silence.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -364,7 +551,8 @@ export const building = {
 
     '%C2_z16': {
       name: 'Smith Tower - 16th Floor - South Suite - Living Room',
-      description: 'A corner unit with western exposure and aged carpeting. The afternoon sun has bleached everything near the windows to a uniform pale.',
+      description:
+        'A corner unit with western exposure and aged carpeting. The afternoon sun has bleached everything near the windows to a uniform pale.',
       x: -3,
       y: 9,
       z: 16,
@@ -380,10 +568,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a corner kiva fireplace', description: 'A traditional corner kiva fireplace bulges from the wall, its beehive shape plastered smooth. A collection of dried gourds rests on the hearth.', boltedDown: true },
-        { prototype: 'table', name: 'an ironwood side table', description: 'A small table of dense desert ironwood holds a terra cotta lamp shaped like a howling coyote. The shade is made of pierced tin.', boltedDown: false },
-        { prototype: 'furniture', name: 'a Navajo Chief\'s blanket', description: 'A faded Chief\'s blanket in the classic third-phase pattern hangs on the wall—reds and indigos muted by decades of dust and light.', boltedDown: true },
-        { prototype: 'furniture', name: 'a collection of olla pottery', description: 'Large pueblo olla jars sit in a row beneath the window, their painted designs depicting rain clouds and corn maidens.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'a corner kiva fireplace',
+          description:
+            'A traditional corner kiva fireplace bulges from the wall, its beehive shape plastered smooth. A collection of dried gourds rests on the hearth.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'an ironwood side table',
+          description:
+            'A small table of dense desert ironwood holds a terra cotta lamp shaped like a howling coyote. The shade is made of pierced tin.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: "a Navajo Chief's blanket",
+          description:
+            "A faded Chief's blanket in the classic third-phase pattern hangs on the wall—reds and indigos muted by decades of dust and light.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a collection of olla pottery',
+          description:
+            'Large pueblo olla jars sit in a row beneath the window, their painted designs depicting rain clouds and corn maidens.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -419,11 +631,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a carved mesquite bench', description: 'A heavy bench of carved mesquite sits against the wall, its seat polished smooth by years of use. Desert animals are carved into the legs.', boltedDown: false },
-        { prototype: 'furniture', name: 'an adobe entry niche', description: 'A rounded adobe niche is built into the wall, designed for removing boots. A pair of dusty cowboy boots still wait there.', boltedDown: true },
-        { prototype: 'furniture', name: 'a copper-clad mail slot', description: 'The mail slot is framed in hammered copper with a patina of verdigris. A sun symbol is embossed above it.', boltedDown: true },
-        { prototype: 'table', name: 'a turquoise-inlay console', description: 'A narrow pine console features turquoise chips inlaid in a thunderbird pattern. A painted gourd bowl holds ancient keys.', boltedDown: false },
-        { prototype: 'furniture', name: 'a saguaro rib hat rack', description: 'A hat rack made from dried saguaro ribs leans in the corner, its pale wood bleached silver. A dusty straw hat hangs from one arm.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'a carved mesquite bench',
+          description:
+            'A heavy bench of carved mesquite sits against the wall, its seat polished smooth by years of use. Desert animals are carved into the legs.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'an adobe entry niche',
+          description:
+            'A rounded adobe niche is built into the wall, designed for removing boots. A pair of dusty cowboy boots still wait there.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a copper-clad mail slot',
+          description:
+            'The mail slot is framed in hammered copper with a patina of verdigris. A sun symbol is embossed above it.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a turquoise-inlay console',
+          description:
+            'A narrow pine console features turquoise chips inlaid in a thunderbird pattern. A painted gourd bowl holds ancient keys.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a saguaro rib hat rack',
+          description:
+            'A hat rack made from dried saguaro ribs leans in the corner, its pale wood bleached silver. A dusty straw hat hangs from one arm.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -455,11 +697,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a pueblo-style platform bed', description: 'A low platform bed built of adobe-colored stucco fills the alcove, draped with a faded Rio Grande weaving in stripes of rust and gold.', quality: 'standard' },
-        { prototype: 'furniture', name: 'a rustic pine armoire', description: 'A tall armoire of distressed pine features carved sunbursts and painted desert flowers. Its doors hang slightly open.', boltedDown: true },
-        { prototype: 'furniture', name: 'a sun mirror', description: 'A full-length mirror is framed in hammered tin shaped like a radiating sun. The metal has darkened to pewter.', boltedDown: true },
-        { prototype: 'table', name: 'a terracotta nightstand', description: 'A nightstand of painted terracotta holds a dead candle in a punched tin holder and a collection of small turquoise stones.', boltedDown: false },
-        { prototype: 'furniture', name: 'a dreamcatcher', description: 'A large dreamcatcher hangs above the bed, its willow hoop wrapped in leather. The feathers are dusty, the web intact.', boltedDown: true },
+        {
+          prototype: 'bed',
+          name: 'a pueblo-style platform bed',
+          description:
+            'A low platform bed built of adobe-colored stucco fills the alcove, draped with a faded Rio Grande weaving in stripes of rust and gold.',
+          quality: 'standard',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a rustic pine armoire',
+          description:
+            'A tall armoire of distressed pine features carved sunbursts and painted desert flowers. Its doors hang slightly open.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a sun mirror',
+          description:
+            'A full-length mirror is framed in hammered tin shaped like a radiating sun. The metal has darkened to pewter.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a terracotta nightstand',
+          description:
+            'A nightstand of painted terracotta holds a dead candle in a punched tin holder and a collection of small turquoise stones.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a dreamcatcher',
+          description:
+            'A large dreamcatcher hangs above the bed, its willow hoop wrapped in leather. The feathers are dusty, the web intact.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -491,12 +763,48 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a Murphy bed with Chimayo blanket', description: 'A Murphy bed folds down from a cabinet painted with Kokopelli dancers. A faded Chimayo blanket in sunset colors covers the mattress.', quality: 'standard' },
-        { prototype: 'furniture', name: 'a painted Murphy cabinet', description: 'The Murphy bed cabinet is painted in the distinctive New Mexican style—turquoise, terra cotta, and ochre with geometric patterns.', boltedDown: true },
-        { prototype: 'furniture', name: 'nichos with santos', description: 'Small rounded nichos are built into the walls, each holding a carved wooden santo or a collection of milagros—tiny tin charms of body parts.', boltedDown: true },
-        { prototype: 'table', name: 'a fold-down mesquite desk', description: 'A fold-down desk of mesquite wood is hinged to the wall, its live edge preserved. Burn marks suggest someone once used it for leather work.', boltedDown: true },
-        { prototype: 'furniture', name: 'a painted pine dresser', description: 'A narrow dresser painted in faded desert rose features carved pulls shaped like roadrunners. The drawers stick in the humidity.', boltedDown: true },
-        { prototype: 'furniture', name: 'a Zuni fetish collection', description: 'A small shelf holds a collection of Zuni stone fetishes—bear, wolf, eagle—each bound with offerings of turquoise and shell.', boltedDown: true },
+        {
+          prototype: 'bed',
+          name: 'a Murphy bed with Chimayo blanket',
+          description:
+            'A Murphy bed folds down from a cabinet painted with Kokopelli dancers. A faded Chimayo blanket in sunset colors covers the mattress.',
+          quality: 'standard',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a painted Murphy cabinet',
+          description:
+            'The Murphy bed cabinet is painted in the distinctive New Mexican style—turquoise, terra cotta, and ochre with geometric patterns.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'nichos with santos',
+          description:
+            'Small rounded nichos are built into the walls, each holding a carved wooden santo or a collection of milagros—tiny tin charms of body parts.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a fold-down mesquite desk',
+          description:
+            'A fold-down desk of mesquite wood is hinged to the wall, its live edge preserved. Burn marks suggest someone once used it for leather work.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a painted pine dresser',
+          description:
+            'A narrow dresser painted in faded desert rose features carved pulls shaped like roadrunners. The drawers stick in the humidity.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a Zuni fetish collection',
+          description:
+            'A small shelf holds a collection of Zuni stone fetishes—bear, wolf, eagle—each bound with offerings of turquoise and shell.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {

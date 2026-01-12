@@ -12,7 +12,7 @@ export const building = {
       name: 'Basement Padlock',
       description:
         'A worn brass padlock, the kind that came with the building.',
-      difficulty: 3
+      difficulty: 3,
     },
     '%BASEMENT_DOOR': {
       prototype: 'door',
@@ -23,7 +23,7 @@ export const building = {
       open: false,
       locks: ['%BASEMENT_LOCK'],
       material: 'wood',
-      durability: 55
+      durability: 55,
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -51,9 +51,9 @@ The ceiling is low, the floor unfinished concrete, the lighting dim emergency fi
           to: 'z0.ts#%COFFEE',
           description: 'A trapdoor leads up to the coffee shop',
           door: '%BASEMENT_DOOR',
-          locks: ['%BASEMENT_LOCK']
+          locks: ['%BASEMENT_LOCK'],
         },
-        south: '%OLD_CELLAR'
+        south: '%OLD_CELLAR',
       },
       objects: [
         {
@@ -61,9 +61,9 @@ The ceiling is low, the floor unfinished concrete, the lighting dim emergency fi
           name: 'storage cages',
           aliases: ['cages', 'storage', 'partitions'],
           description:
-            'Wire mesh partitions divide the basement into caged storage sections, each one padlocked. The gallery\'s cage holds art supplies and wrapped works. The roaster\'s contains equipment and green beans in burlap sacks. The bookstore\'s is a wall of boxes labeled by genre and author. The inventory of abandoned commerce.'
+            "Wire mesh partitions divide the basement into caged storage sections, each one padlocked. The gallery's cage holds art supplies and wrapped works. The roaster's contains equipment and green beans in burlap sacks. The bookstore's is a wall of boxes labeled by genre and author. The inventory of abandoned commerce.",
         },
-      ]
+      ],
     },
 
     '%OLD_CELLAR': {
@@ -83,7 +83,7 @@ A breach in the southern wall opens into darkness—the underground tunnel netwo
       waterLevel: 5,
       outdoor: false,
       exits: {
-        north: '%STORAGE'
+        north: '%STORAGE',
       },
       objects: [
         {
@@ -91,16 +91,16 @@ A breach in the southern wall opens into darkness—the underground tunnel netwo
           name: 'fire-blackened brick',
           aliases: ['brick', 'walls', 'soot'],
           description:
-            'The brick walls show the scorch marks of the Great Fire of 1889, preserved underground for over a century. The soot is permanent now, baked into the brick at temperatures that made the material stronger. The fire that destroyed old Seattle hardened what it didn\'t consume.'
+            "The brick walls show the scorch marks of the Great Fire of 1889, preserved underground for over a century. The soot is permanent now, baked into the brick at temperatures that made the material stronger. The fire that destroyed old Seattle hardened what it didn't consume.",
         },
         {
           prototype: 'describable',
           name: 'wall breach',
           aliases: ['breach', 'opening', 'hole'],
           description:
-            'A section of wall where bricks have been removed, the edges worn smooth by generations of passage. The breach is old—the mortar around it crumbling, the surrounding bricks darkened by the touch of hands. Someone connected this cellar to the underground network. The connection has been used ever since.'
+            'A section of wall where bricks have been removed, the edges worn smooth by generations of passage. The breach is old—the mortar around it crumbling, the surrounding bricks darkened by the touch of hands. Someone connected this cellar to the underground network. The connection has been used ever since.',
         },
-      ]
-    }
-  }
+      ],
+    },
+  },
 };

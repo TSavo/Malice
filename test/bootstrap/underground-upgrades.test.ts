@@ -59,7 +59,7 @@ describe('UndergroundUpgradesBuilder', () => {
       await builder.build();
 
       const allObjects = await db.listAll();
-      const objectCount = allObjects.length;
+      const _objectCount = allObjects.length;
 
       // Should not create any furniture/locks
       const furniture = allObjects.filter(

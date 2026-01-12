@@ -61,29 +61,38 @@ interface UndergroundData {
 // Exits INTO these coordinates should be guarded
 const SISTER_GRAY_COORDS = new Set([
   // z=-4 key entry points
-  '-14,5,-4',   // LJ - Lower Junction (main entry)
-  '-14,-5,-4',  // SH - Supply Hub
-  '-16,5,-4',   // ARMORY
-  '-14,6,-4',   // CB - Cutter Barracks
-  '-12,6,-4',   // MEDICAL_BAY
-  '-11,5,-4',   // COMMS_CENTER
-  '-16,1,-4',   // SW - Spark Workshop
+  '-14,5,-4', // LJ - Lower Junction (main entry)
+  '-14,-5,-4', // SH - Supply Hub
+  '-16,5,-4', // ARMORY
+  '-14,6,-4', // CB - Cutter Barracks
+  '-12,6,-4', // MEDICAL_BAY
+  '-11,5,-4', // COMMS_CENTER
+  '-16,1,-4', // SW - Spark Workshop
   // z=-5 sensitive areas
-  '-14,-5,-5',  // TD - The Descent
-  '-14,-3,-5',  // WR - War Room
-  '-14,-1,-5',  // TV - The Vault
-  '-16,-1,-5',  // CC - Council Chambers
-  '-14,1,-5',   // SQ - Sister's Quarters
-  '-16,1,-5',   // ML - Medical Lab
-  '-16,-3,-5',  // AR - Archive
-  '-10,-3,-5',  // HC - Holding Cells
+  '-14,-5,-5', // TD - The Descent
+  '-14,-3,-5', // WR - War Room
+  '-14,-1,-5', // TV - The Vault
+  '-16,-1,-5', // CC - Council Chambers
+  '-14,1,-5', // SQ - Sister's Quarters
+  '-16,1,-5', // ML - Medical Lab
+  '-16,-3,-5', // AR - Archive
+  '-10,-3,-5', // HC - Holding Cells
   // z=-6 The Blind
-  '-14,1,-6',   // TB - The Blind
+  '-14,1,-6', // TB - The Blind
 ]);
 
 export class UndergroundJsonBuilder implements Builder {
   static provides = ['undergroundRooms'];
-  static depends = ['room', 'exit', 'guardedExit', 'recycler', 'spatial', 'startRoom', 'buildings', 'basements']; // After world & buildings
+  static depends = [
+    'room',
+    'exit',
+    'guardedExit',
+    'recycler',
+    'spatial',
+    'startRoom',
+    'buildings',
+    'basements',
+  ]; // After world & buildings
 
   private rooms: Map<string, RuntimeObject> = new Map();
   private roomDefs: Map<string, GeneratedRoom> = new Map(); // JSON definitions for exit flags
@@ -119,7 +128,9 @@ export class UndergroundJsonBuilder implements Builder {
       return;
     }
 
-    const data: UndergroundData = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+    const data: UndergroundData = JSON.parse(
+      fs.readFileSync(jsonPath, 'utf-8'),
+    );
     console.log(`    Loaded ${data.rooms.length} room definitions from JSON`);
 
     // Create room objects
@@ -263,7 +274,10 @@ export class UndergroundJsonBuilder implements Builder {
         // Also check if the neighbor's JSON says the reverse exit is blocked
         const neighborDef = this.roomDefs.get(neighborKey);
         const reverseDir = this.getOppositeDirection(dir.name);
-        if (neighborDef?.exits && neighborDef.exits[reverseDir.name] === false) {
+        if (
+          neighborDef?.exits &&
+          neighborDef.exits[reverseDir.name] === false
+        ) {
           skippedByJson++;
           continue;
         }
@@ -275,14 +289,18 @@ export class UndergroundJsonBuilder implements Builder {
         if (!neighbor) {
           neighbor = await $.spatial?.getRoomDataAt(nx, ny, nz);
           if (neighbor) {
-            console.log(`    [SPATIAL] Found room at ${neighborKey}: ${neighbor.get('name')} (#${neighbor.id})`);
+            console.log(
+              `    [SPATIAL] Found room at ${neighborKey}: ${neighbor.get('name')} (#${neighbor.id})`,
+            );
           }
         }
 
         if (neighbor) {
           // Check if exit already exists
           const exits = (room.get('exits') || []) as RuntimeObject[];
-          const hasExit = exits.some((e: RuntimeObject) => e.get('name') === dir.name);
+          const hasExit = exits.some(
+            (e: RuntimeObject) => e.get('name') === dir.name,
+          );
 
           if (!hasExit) {
             // Calculate distance
@@ -290,7 +308,8 @@ export class UndergroundJsonBuilder implements Builder {
 
             // Check if this exit leads INTO Sister Gray's secured domain
             const isGuardedEntry = SISTER_GRAY_COORDS.has(neighborKey);
-            const exitParent = isGuardedEntry && guardedExitProto ? guardedExitProto : exitProto;
+            const exitParent =
+              isGuardedEntry && guardedExitProto ? guardedExitProto : exitProto;
 
             // Create exit
             const exitProps: Record<string, unknown> = {
@@ -306,7 +325,8 @@ export class UndergroundJsonBuilder implements Builder {
             // Add guard properties for secured entries
             if (isGuardedEntry) {
               exitProps.allowedFaction = 'cartel';
-              exitProps.denyMessage = 'The passage ahead is watched. Cartel territory. You are not recognized.';
+              exitProps.denyMessage =
+                'The passage ahead is watched. Cartel territory. You are not recognized.';
               guardedCount++;
             }
 
@@ -327,9 +347,10 @@ export class UndergroundJsonBuilder implements Builder {
             // This ensures bidirectional connectivity
             if (!this.rooms.has(neighborKey)) {
               const reverseDir = this.getOppositeDirection(dir.name);
-              const neighborExits = (neighbor.get('exits') || []) as RuntimeObject[];
+              const neighborExits = (neighbor.get('exits') ||
+                []) as RuntimeObject[];
               const hasReverseExit = neighborExits.some(
-                (e: RuntimeObject) => e.get('name') === reverseDir.name
+                (e: RuntimeObject) => e.get('name') === reverseDir.name,
               );
 
               if (!hasReverseExit) {
@@ -355,8 +376,12 @@ export class UndergroundJsonBuilder implements Builder {
     }
 
     console.log(`    Created ${exitCount} underground exits`);
-    console.log(`    Honored ${skippedByJson} JSON exit flags (walls/blocked passages)`);
-    console.log(`    Connected ${connectedToBuildings} rooms to building basements (z=-1)`);
+    console.log(
+      `    Honored ${skippedByJson} JSON exit flags (walls/blocked passages)`,
+    );
+    console.log(
+      `    Connected ${connectedToBuildings} rooms to building basements (z=-1)`,
+    );
     console.log(`    Guarded ${guardedCount} entries to Sister Gray's domain`);
 
     // Log if no connections were made to basements
@@ -365,14 +390,20 @@ export class UndergroundJsonBuilder implements Builder {
       console.log(`    Checking spatial index for z=-1 rooms...`);
       // Sample check - look for any rooms at z=-1
       const sampleCoords = [
-        [-16, 8, -1], [-15, 8, -1], [-15, 9, -1], // City Services
-        [2, 3, -1], [1, 3, -1], // Corp Construction
-        [9, 3, -1], [9, 2, -1], // Courthouse
+        [-16, 8, -1],
+        [-15, 8, -1],
+        [-15, 9, -1], // City Services
+        [2, 3, -1],
+        [1, 3, -1], // Corp Construction
+        [9, 3, -1],
+        [9, 2, -1], // Courthouse
       ];
       for (const [sx, sy, sz] of sampleCoords) {
         const sampleRoom = await $.spatial?.getRoomDataAt(sx, sy, sz);
         if (sampleRoom) {
-          console.log(`      Found z=-1 room at ${sx},${sy},${sz}: ${sampleRoom.get('name')} (#${sampleRoom.id})`);
+          console.log(
+            `      Found z=-1 room at ${sx},${sy},${sz}: ${sampleRoom.get('name')} (#${sampleRoom.id})`,
+          );
         }
       }
     }
@@ -381,7 +412,10 @@ export class UndergroundJsonBuilder implements Builder {
   /**
    * Get the opposite direction for bidirectional exits
    */
-  private getOppositeDirection(dir: string): { name: string; aliases: string[] } {
+  private getOppositeDirection(dir: string): {
+    name: string;
+    aliases: string[];
+  } {
     const opposites: Record<string, { name: string; aliases: string[] }> = {
       north: { name: 'south', aliases: ['s'] },
       south: { name: 'north', aliases: ['n'] },

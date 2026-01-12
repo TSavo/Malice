@@ -8,16 +8,19 @@
  * - Exit/path sentences
  */
 
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 
 // Configuration
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
 const MODEL = process.env.OLLAMA_MODEL || 'mistral:7b';
 const INPUT_FILE = process.argv[2];
-const OUTPUT_FILE = process.argv[3] || INPUT_FILE?.replace('.json', '-fixed.json');
+const OUTPUT_FILE =
+  process.argv[3] || INPUT_FILE?.replace('.json', '-fixed.json');
 
 if (!INPUT_FILE) {
-  console.error('Usage: npx tsx fix-room-descriptions.ts <input.json> [output.json]');
+  console.error(
+    'Usage: npx tsx fix-room-descriptions.ts <input.json> [output.json]',
+  );
   process.exit(1);
 }
 
@@ -43,7 +46,12 @@ function hasObviousProblems(description: string): boolean {
   if (/\(-?\d+\s*,\s*-?\d+\s*,\s*-?\d+\)/.test(description)) return true;
 
   // Check for common exit patterns
-  if (/\b(paths?\s+beckon|exits?\s*:|leads?\s+(to|toward|down|up|north|south|east|west)|directions?\s+open)/i.test(description)) return true;
+  if (
+    /\b(paths?\s+beckon|exits?\s*:|leads?\s+(to|toward|down|up|north|south|east|west)|directions?\s+open)/i.test(
+      description,
+    )
+  )
+    return true;
 
   return false;
 }
@@ -91,15 +99,21 @@ OUTPUT RULES:
 OUTPUT:`;
 }
 
-function extractCleanedDescription(response: string, original: string): string | null {
+function extractCleanedDescription(
+  response: string,
+  original: string,
+): string | null {
   // If response starts with CLEAN, no changes needed
   if (response.trim().toUpperCase().startsWith('CLEAN')) {
     return null;
   }
 
   // Strip common prefixes the model might add
-  let cleaned = response
-    .replace(/^(The remaining.*?:|After deleting.*?:|Fixed.*?:|Here.*?:)\s*/i, '')
+  const cleaned = response
+    .replace(
+      /^(The remaining.*?:|After deleting.*?:|Fixed.*?:|Here.*?:)\s*/i,
+      '',
+    )
     .replace(/^["'"]|["'"]$/g, '')
     .replace(/\n\n(So,?\s*)?CLEAN.*$/i, '')
     .replace(/^\s*"\s*|\s*"\s*$/g, '')
@@ -150,7 +164,9 @@ async function main() {
     }
   }
 
-  console.log(`Quick scan: ${skippedClean} rooms look clean, ${needsCheck.length} need AI review`);
+  console.log(
+    `Quick scan: ${skippedClean} rooms look clean, ${needsCheck.length} need AI review`,
+  );
   console.log('');
 
   if (needsCheck.length === 0) {
@@ -173,7 +189,10 @@ async function main() {
       const prompt = buildPrompt(room.description!);
       const response = await callOllama(prompt);
 
-      const cleanedDesc = extractCleanedDescription(response, room.description!);
+      const cleanedDesc = extractCleanedDescription(
+        response,
+        room.description!,
+      );
 
       processed++;
       (room as any)._checked = true;
@@ -181,12 +200,16 @@ async function main() {
       if (cleanedDesc && cleanedDesc !== room.description) {
         room.description = cleanedDesc;
         fixed++;
-        console.log(`[${processed}/${needsCheck.length}] ${room.id} (${room.era}) - FIXED`);
+        console.log(
+          `[${processed}/${needsCheck.length}] ${room.id} (${room.era}) - FIXED`,
+        );
         console.log(`  Before: ${room.description?.substring(0, 60)}...`);
         console.log(`  After:  ${cleanedDesc.substring(0, 60)}...`);
       } else {
         unchanged++;
-        console.log(`[${processed}/${needsCheck.length}] ${room.id} (${room.era}) - OK (AI confirmed clean)`);
+        console.log(
+          `[${processed}/${needsCheck.length}] ${room.id} (${room.era}) - OK (AI confirmed clean)`,
+        );
       }
 
       const elapsed = (Date.now() - startTime) / 1000;
@@ -197,7 +220,6 @@ async function main() {
 
       // Save progress after each room
       fs.writeFileSync(OUTPUT_FILE, JSON.stringify(data, null, 2));
-
     } catch (error) {
       console.error(`Error processing ${room.id}:`, error);
     }

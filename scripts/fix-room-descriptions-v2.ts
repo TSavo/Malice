@@ -8,13 +8,16 @@
  * - Exit/path patterns (beckon, leads to, paths)
  */
 
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 
 const INPUT_FILE = process.argv[2];
-const OUTPUT_FILE = process.argv[3] || INPUT_FILE?.replace('.json', '-fixed.json');
+const OUTPUT_FILE =
+  process.argv[3] || INPUT_FILE?.replace('.json', '-fixed.json');
 
 if (!INPUT_FILE) {
-  console.error('Usage: npx tsx fix-room-descriptions-v2.ts <input.json> [output.json]');
+  console.error(
+    'Usage: npx tsx fix-room-descriptions-v2.ts <input.json> [output.json]',
+  );
   process.exit(1);
 }
 
@@ -42,24 +45,29 @@ const BAD_PATTERNS = [
 ];
 
 function hasBadPattern(sentence: string): boolean {
-  return BAD_PATTERNS.some(pattern => pattern.test(sentence));
+  return BAD_PATTERNS.some((pattern) => pattern.test(sentence));
 }
 
 function splitIntoSentences(text: string): string[] {
   // Split on sentence boundaries, keeping the delimiter
   // Handle newlines as paragraph breaks too
   const parts = text.split(/(?<=[.!?])\s+|\n+/);
-  return parts.filter(s => s.trim().length > 0);
+  return parts.filter((s) => s.trim().length > 0);
 }
 
-function fixDescription(description: string): { fixed: string; deleted: string[] } {
+function fixDescription(description: string): {
+  fixed: string;
+  deleted: string[];
+} {
   const sentences = splitIntoSentences(description);
   const kept: string[] = [];
   const deleted: string[] = [];
 
   for (const sentence of sentences) {
     if (hasBadPattern(sentence)) {
-      deleted.push(sentence.substring(0, 50) + (sentence.length > 50 ? '...' : ''));
+      deleted.push(
+        sentence.substring(0, 50) + (sentence.length > 50 ? '...' : ''),
+      );
     } else {
       kept.push(sentence);
     }
@@ -105,7 +113,9 @@ async function main() {
     if (deleted.length > 0) {
       fixedCount++;
       totalDeleted += deleted.length;
-      console.log(`[${room.id}] (${room.era}) - Deleted ${deleted.length} sentence(s):`);
+      console.log(
+        `[${room.id}] (${room.era}) - Deleted ${deleted.length} sentence(s):`,
+      );
       for (const d of deleted) {
         console.log(`    - "${d}"`);
       }

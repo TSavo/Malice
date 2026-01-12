@@ -124,7 +124,7 @@ The freight elevator gate stands against the south wall. Stairs wind down to the
         west: { room: '%STUDIO_A', door: '%DOOR_A', locks: ['%LOCK_A'] },
         down: '%GALLERY_LOBBY',
         up: '%LOFT_LOBBY',
-        'in': '%E',
+        in: '%E',
       },
       sittables: [
         {
@@ -196,7 +196,7 @@ The smell here is a mixture of paint and turpentine and something vaguely chemic
     },
 
     '%STUDIO_A': {
-      name: 'Studio A - Painter\'s Space',
+      name: "Studio A - Painter's Space",
       description: `A painter's studio, the kind of space artists dream about and rarely afford. North-facing windows fill the room with even, cool light—the light that painters have sought since painting began. The walls are splattered with decades of color, a palimpsest of every artist who's worked here.
 
 An easel stands near the window, holding a canvas that's been primed but never painted. The artist left it ready, expecting to return. Tubes of oil paint litter a worktable, some hardened, some still viable. Brushes soak in jars of murky solvent.
@@ -219,8 +219,9 @@ The smell is linseed oil and turpentine and the particular dust of old buildings
         {
           name: 'a paint-stained stool',
           capacity: 1,
-          emptyMsg: 'A wooden stool splattered with paint sits before the easel.',
-          occupiedMsg: '%s perched on the painter\'s stool',
+          emptyMsg:
+            'A wooden stool splattered with paint sits before the easel.',
+          occupiedMsg: "%s perched on the painter's stool",
         },
         {
           name: 'a daybed',
@@ -232,7 +233,7 @@ The smell is linseed oil and turpentine and the particular dust of old buildings
     },
 
     '%STUDIO_B': {
-      name: 'Studio B - Sculptor\'s Workshop',
+      name: "Studio B - Sculptor's Workshop",
       description: `A sculptor's space, the floor reinforced to handle weight and impact. Stone dust dulls every surface despite the industrial air filtration humming in the corner. Tools hang on pegboard walls: chisels, mallets, rasps, the implements of someone who argues with rock.
 
 A half-finished marble piece stands on a heavy turntable—a figure emerging from rough stone, the face defined while the body remains trapped. The work is skilled, patient, the kind of project that takes years. Whether those years will ever be completed is unclear.
@@ -254,7 +255,7 @@ A pneumatic hammer sits silent, its air compressor unplugged. The dust collector
           name: 'a work bench',
           capacity: 1,
           emptyMsg: 'A sturdy work bench holds sculpting tools.',
-          occupiedMsg: '%s at the sculptor\'s bench',
+          occupiedMsg: "%s at the sculptor's bench",
         },
         {
           name: 'a resting chair',
@@ -287,7 +288,8 @@ Contact sheets pin to a cork board show the last project: portraits of hands, cl
         {
           name: 'a photography stool',
           capacity: 1,
-          emptyMsg: 'A height-adjustable stool sits before the camera equipment.',
+          emptyMsg:
+            'A height-adjustable stool sits before the camera equipment.',
           occupiedMsg: '%s at the photography setup',
         },
       ],

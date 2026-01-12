@@ -42,7 +42,8 @@ Restrooms are marked to the west—stick figures in white on black doors. The gr
         {
           name: 'a lobby bench',
           capacity: 3,
-          emptyMsg: 'A padded bench lines one wall, its vinyl cracked and taped.',
+          emptyMsg:
+            'A padded bench lines one wall, its vinyl cracked and taped.',
           occupiedMsg: '%s sitting in the club lobby',
         },
       ],
@@ -76,7 +77,8 @@ The silence here is louder than it should be. This room remembers sound.`,
         {
           name: 'the dance floor edge',
           capacity: 6,
-          emptyMsg: 'The perimeter of the dance floor has a narrow ledge for leaning.',
+          emptyMsg:
+            'The perimeter of the dance floor has a narrow ledge for leaning.',
           occupiedMsg: '%s at the edge of the dance floor',
         },
       ],
@@ -140,7 +142,8 @@ The cash register is mechanical, an antique even before The Burning. It sits ope
         {
           name: 'a bar stool',
           capacity: 8,
-          emptyMsg: 'Metal stools with vinyl seats line the bar, some spinning, some stuck.',
+          emptyMsg:
+            'Metal stools with vinyl seats line the bar, some spinning, some stuck.',
           occupiedMsg: '%s at the bar',
         },
       ],
@@ -173,7 +176,8 @@ The floor slopes slightly toward a drain in the center—practical for cleaning 
         {
           name: 'a high table',
           capacity: 4,
-          emptyMsg: 'High tables without stools offer standing spots near the action.',
+          emptyMsg:
+            'High tables without stools offer standing spots near the action.',
           occupiedMsg: '%s at a high table',
         },
       ],
@@ -315,7 +319,11 @@ The floor is sloped toward a drain. Even in the service areas, everything was de
       outdoor: false,
       exits: {
         north: '%BAR_FLOOR',
-        east: { room: '%OFFICE', door: '%OFFICE_DOOR', locks: ['%OFFICE_LOCK'] },
+        east: {
+          room: '%OFFICE',
+          door: '%OFFICE_DOOR',
+          locks: ['%OFFICE_LOCK'],
+        },
         west: '%GREEN_ROOM',
         down: '%VIP_STAIRS',
       },
@@ -377,7 +385,11 @@ A calendar on the wall shows a month from years ago, its pages never turned, its
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: { room: '%BACK_HALL', door: '%OFFICE_DOOR', locks: ['%OFFICE_LOCK'] },
+        west: {
+          room: '%BACK_HALL',
+          door: '%OFFICE_DOOR',
+          locks: ['%OFFICE_LOCK'],
+        },
       },
       sittables: [
         {

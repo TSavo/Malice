@@ -80,7 +80,8 @@ export const building = {
 
     '%A1_z22': {
       name: 'Smith Tower - 22th Floor - North Suite - Living Room',
-      description: 'A corner unit with tall windows and pale wood floors. A kitchenette occupies one wall, its appliances dark and silent. Built-in shelving holds the remnants of someone\'s life—books, decorative objects, a dead potted plant.',
+      description:
+        "A corner unit with tall windows and pale wood floors. A kitchenette occupies one wall, its appliances dark and silent. Built-in shelving holds the remnants of someone's life—books, decorative objects, a dead potted plant.",
       x: -3,
       y: 11,
       z: 22,
@@ -96,16 +97,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'table', name: 'a boomerang coffee table', description: 'A kidney-shaped coffee table with tapered peg legs and a laminate top in faded turquoise. Boomerang patterns are still visible under the dust.', boltedDown: false },
-        { prototype: 'furniture', name: 'a pastel kitchenette', description: 'A built-in kitchenette in mint green with chrome trim. The O\'Keefe & Merritt stove sits cold, its clock frozen at 2:15.', boltedDown: true },
-        { prototype: 'furniture', name: 'floating wall shelves', description: 'Atomic-age floating shelves in blonde wood display a collection of Fiestaware in assorted colors, all dusty but unbroken.', boltedDown: true },
-        { prototype: 'furniture', name: 'a console TV cabinet', description: 'A massive Zenith console television in mahogany veneer dominates one corner. Its round screen is dark, the tubes long dead.', boltedDown: false },
+        {
+          prototype: 'table',
+          name: 'a boomerang coffee table',
+          description:
+            'A kidney-shaped coffee table with tapered peg legs and a laminate top in faded turquoise. Boomerang patterns are still visible under the dust.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a pastel kitchenette',
+          description:
+            "A built-in kitchenette in mint green with chrome trim. The O'Keefe & Merritt stove sits cold, its clock frozen at 2:15.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'floating wall shelves',
+          description:
+            'Atomic-age floating shelves in blonde wood display a collection of Fiestaware in assorted colors, all dusty but unbroken.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a console TV cabinet',
+          description:
+            'A massive Zenith console television in mahogany veneer dominates one corner. Its round screen is dark, the tubes long dead.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
           name: 'a sectional sofa',
           capacity: 4,
-          emptyMsg: 'A turquoise Naugahyde sectional curves around the coffee table, its chrome legs still gleaming.',
+          emptyMsg:
+            'A turquoise Naugahyde sectional curves around the coffee table, its chrome legs still gleaming.',
           occupiedMsg: '%s lounging on the atomic-age sectional.',
         },
       ],
@@ -134,22 +160,48 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a princess phone bed', description: 'A blonde wood bed frame with built-in headboard shelves and a princess phone nook. The pink rotary phone sits silent.', quality: 'nice' },
-        { prototype: 'furniture', name: 'a louvered closet', description: 'Built-in louvered closet doors in painted white hide an empty rod and a few plastic hangers in pastel colors.', boltedDown: true },
-        { prototype: 'table', name: 'a tripod nightstand', description: 'A small tripod nightstand in blonde wood holds a Sputnik lamp, its chrome arms reaching out like frozen fireworks.', boltedDown: false },
-        { prototype: 'furniture', name: 'a vanity with round mirror', description: 'A kidney-shaped vanity with a round mirror on a swivel arm. Dried lipstick and a cracked compact remain on its surface.', boltedDown: false },
+        {
+          prototype: 'bed',
+          name: 'a princess phone bed',
+          description:
+            'A blonde wood bed frame with built-in headboard shelves and a princess phone nook. The pink rotary phone sits silent.',
+          quality: 'nice',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a louvered closet',
+          description:
+            'Built-in louvered closet doors in painted white hide an empty rod and a few plastic hangers in pastel colors.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a tripod nightstand',
+          description:
+            'A small tripod nightstand in blonde wood holds a Sputnik lamp, its chrome arms reaching out like frozen fireworks.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a vanity with round mirror',
+          description:
+            'A kidney-shaped vanity with a round mirror on a swivel arm. Dried lipstick and a cracked compact remain on its surface.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
           name: 'the blonde wood bed',
           capacity: 2,
-          emptyMsg: 'The atomic-age bed waits, its chenille bedspread slightly faded.',
+          emptyMsg:
+            'The atomic-age bed waits, its chenille bedspread slightly faded.',
           occupiedMsg: '%s resting in mid-century comfort.',
         },
         {
           name: 'a vanity stool',
           capacity: 1,
-          emptyMsg: 'A tufted pink vanity stool sits before the kidney-shaped vanity.',
+          emptyMsg:
+            'A tufted pink vanity stool sits before the kidney-shaped vanity.',
           occupiedMsg: '%s seated at the vanity.',
         },
       ],
@@ -174,22 +226,48 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'an aqua appliance kitchen', description: 'A built-in galley kitchen with aqua blue appliances and chrome handles. The Frigidaire hums silently, long dead. A wall-mounted can opener remains.', boltedDown: true },
-        { prototype: 'table', name: 'a chrome dinette table', description: 'A chrome and Formica dinette table in red speckle pattern. Its surface is scratched but the chrome legs still shine.', boltedDown: false },
-        { prototype: 'furniture', name: 'a hi-fi console', description: 'A mahogany hi-fi console with fold-out turntable and radio dial. A stack of 45s gathers dust beside it.', boltedDown: false },
-        { prototype: 'bed', name: 'a daybed', description: 'A tubular steel daybed with bolster pillows serves as both couch and sleeping space. The plaid upholstery is faded but intact.', quality: 'standard' },
+        {
+          prototype: 'furniture',
+          name: 'an aqua appliance kitchen',
+          description:
+            'A built-in galley kitchen with aqua blue appliances and chrome handles. The Frigidaire hums silently, long dead. A wall-mounted can opener remains.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a chrome dinette table',
+          description:
+            'A chrome and Formica dinette table in red speckle pattern. Its surface is scratched but the chrome legs still shine.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a hi-fi console',
+          description:
+            'A mahogany hi-fi console with fold-out turntable and radio dial. A stack of 45s gathers dust beside it.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'bed',
+          name: 'a daybed',
+          description:
+            'A tubular steel daybed with bolster pillows serves as both couch and sleeping space. The plaid upholstery is faded but intact.',
+          quality: 'standard',
+        },
       ],
       sittables: [
         {
           name: 'the daybed',
           capacity: 2,
-          emptyMsg: 'The tubular steel daybed invites a rest, bolster pillows propped at each end.',
+          emptyMsg:
+            'The tubular steel daybed invites a rest, bolster pillows propped at each end.',
           occupiedMsg: '%s stretched out on the daybed.',
         },
         {
           name: 'a chrome dinette chair',
           capacity: 1,
-          emptyMsg: 'A chrome dinette chair with red vinyl seat sits at the table.',
+          emptyMsg:
+            'A chrome dinette chair with red vinyl seat sits at the table.',
           occupiedMsg: '%s seated at the dinette.',
         },
       ],
@@ -214,22 +292,48 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a ship\'s ladder', description: 'A steep ship\'s ladder in chrome and rubber treads is bolted to the mezzanine. Very space-age, very dangerous.', boltedDown: true },
-        { prototype: 'bed', name: 'a platform bed', description: 'A low platform bed in the mezzanine with built-in task lighting. The atomic-pattern sheets are faded but intact.', quality: 'standard' },
-        { prototype: 'furniture', name: 'an Eames-style lounge', description: 'A leather and plywood lounge chair in the Eames style sits beneath the mezzanine, its rosewood veneer cracked.', boltedDown: false },
-        { prototype: 'table', name: 'a sunburst clock table', description: 'A small side table holds a broken sunburst wall clock laying flat, its gold rays tarnished.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: "a ship's ladder",
+          description:
+            "A steep ship's ladder in chrome and rubber treads is bolted to the mezzanine. Very space-age, very dangerous.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'bed',
+          name: 'a platform bed',
+          description:
+            'A low platform bed in the mezzanine with built-in task lighting. The atomic-pattern sheets are faded but intact.',
+          quality: 'standard',
+        },
+        {
+          prototype: 'furniture',
+          name: 'an Eames-style lounge',
+          description:
+            'A leather and plywood lounge chair in the Eames style sits beneath the mezzanine, its rosewood veneer cracked.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'table',
+          name: 'a sunburst clock table',
+          description:
+            'A small side table holds a broken sunburst wall clock laying flat, its gold rays tarnished.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
           name: 'the Eames lounge',
           capacity: 1,
-          emptyMsg: 'The Eames-style lounge chair reclines invitingly, ottoman nearby.',
+          emptyMsg:
+            'The Eames-style lounge chair reclines invitingly, ottoman nearby.',
           occupiedMsg: '%s lounging in mid-century modern comfort.',
         },
         {
           name: 'the platform bed',
           capacity: 2,
-          emptyMsg: 'The mezzanine platform bed awaits above, accessible by ladder.',
+          emptyMsg:
+            'The mezzanine platform bed awaits above, accessible by ladder.',
           occupiedMsg: '%s resting on the platform bed.',
         },
       ],
@@ -254,16 +358,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a fold-out cot', description: 'A tubular aluminum fold-out cot with a striped canvas mattress. Pure 1950s summer camp aesthetic.', quality: 'cheap' },
-        { prototype: 'furniture', name: 'plastic wall hooks', description: 'Bright yellow plastic hooks in atomic starburst shapes are mounted to the wall. Very optimistic, very dusty.', boltedDown: true },
-        { prototype: 'furniture', name: 'a metal utility shelf', description: 'A small metal utility shelf in aqua enamel is bolted above the cot. A dead transistor radio sits there.', boltedDown: true },
-        { prototype: 'table', name: 'a TV tray', description: 'A folding TV tray with a laminate top showing a faded rural scene. Still functional for eating or working.', boltedDown: false },
+        {
+          prototype: 'bed',
+          name: 'a fold-out cot',
+          description:
+            'A tubular aluminum fold-out cot with a striped canvas mattress. Pure 1950s summer camp aesthetic.',
+          quality: 'cheap',
+        },
+        {
+          prototype: 'furniture',
+          name: 'plastic wall hooks',
+          description:
+            'Bright yellow plastic hooks in atomic starburst shapes are mounted to the wall. Very optimistic, very dusty.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a metal utility shelf',
+          description:
+            'A small metal utility shelf in aqua enamel is bolted above the cot. A dead transistor radio sits there.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a TV tray',
+          description:
+            'A folding TV tray with a laminate top showing a faded rural scene. Still functional for eating or working.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
           name: 'the fold-out cot',
           capacity: 1,
-          emptyMsg: 'The striped canvas cot waits, its aluminum frame slightly bent.',
+          emptyMsg:
+            'The striped canvas cot waits, its aluminum frame slightly bent.',
           occupiedMsg: '%s stretched out on the fold-out cot.',
         },
       ],
@@ -293,22 +422,48 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a curved sectional sofa', description: 'A dramatic curved sectional in coral pink with tapered wooden legs. The kind of sofa that defined 1950s glamour, now faded but still elegant.', boltedDown: false },
-        { prototype: 'table', name: 'a biomorphic coffee table', description: 'An amoeba-shaped coffee table with a glass top on sculptural wooden legs. Pure Noguchi-inspired design.', boltedDown: false },
-        { prototype: 'furniture', name: 'a built-in bar', description: 'A built-in wet bar with mirrored backsplash and chrome accents. Empty martini glasses and a shaker await a party that ended decades ago.', boltedDown: true },
-        { prototype: 'furniture', name: 'a louvered coat closet', description: 'A built-in closet with louvered doors in blonde wood. Inside, a few plastic hangers in assorted colors.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a curved sectional sofa',
+          description:
+            'A dramatic curved sectional in coral pink with tapered wooden legs. The kind of sofa that defined 1950s glamour, now faded but still elegant.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'table',
+          name: 'a biomorphic coffee table',
+          description:
+            'An amoeba-shaped coffee table with a glass top on sculptural wooden legs. Pure Noguchi-inspired design.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a built-in bar',
+          description:
+            'A built-in wet bar with mirrored backsplash and chrome accents. Empty martini glasses and a shaker await a party that ended decades ago.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a louvered coat closet',
+          description:
+            'A built-in closet with louvered doors in blonde wood. Inside, a few plastic hangers in assorted colors.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
           name: 'the curved sectional',
           capacity: 4,
-          emptyMsg: 'The coral pink sectional curves invitingly around the coffee table.',
+          emptyMsg:
+            'The coral pink sectional curves invitingly around the coffee table.',
           occupiedMsg: '%s lounging on the curved sectional.',
         },
         {
           name: 'a bar stool',
           capacity: 1,
-          emptyMsg: 'A chrome bar stool with red vinyl seat waits at the built-in bar.',
+          emptyMsg:
+            'A chrome bar stool with red vinyl seat waits at the built-in bar.',
           occupiedMsg: '%s perched at the bar.',
         },
       ],
@@ -333,10 +488,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'steel case bookcases', description: 'Industrial steel case bookcases in olive drab line the walls. They hold Popular Mechanics magazines and a model rocket collection.', boltedDown: true },
-        { prototype: 'table', name: 'a tanker desk', description: 'A massive steel tanker desk in battleship grey dominates the room. Its green blotter is faded, a Bakelite phone sits silent.', boltedDown: false },
-        { prototype: 'chair', name: 'a swivel desk chair', description: 'A green vinyl swivel chair on chrome casters waits at the desk. The pneumatic lift still works, surprisingly.', boltedDown: false },
-        { prototype: 'furniture', name: 'a cone floor lamp', description: 'A fiberglass cone floor lamp in orange stands in the corner. Its glow once seemed futuristic.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'steel case bookcases',
+          description:
+            'Industrial steel case bookcases in olive drab line the walls. They hold Popular Mechanics magazines and a model rocket collection.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a tanker desk',
+          description:
+            'A massive steel tanker desk in battleship grey dominates the room. Its green blotter is faded, a Bakelite phone sits silent.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'chair',
+          name: 'a swivel desk chair',
+          description:
+            'A green vinyl swivel chair on chrome casters waits at the desk. The pneumatic lift still works, surprisingly.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a cone floor lamp',
+          description:
+            'A fiberglass cone floor lamp in orange stands in the corner. Its glow once seemed futuristic.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -348,7 +527,8 @@ export const building = {
         {
           name: 'an inflatable chair',
           capacity: 1,
-          emptyMsg: 'A deflated inflatable chair in clear plastic slumps in the corner—very space age.',
+          emptyMsg:
+            'A deflated inflatable chair in clear plastic slumps in the corner—very space age.',
           occupiedMsg: '%s sinking into the inflatable chair.',
         },
       ],
@@ -356,7 +536,8 @@ export const building = {
 
     '%C2_z22': {
       name: 'Smith Tower - 22th Floor - South Suite - Living Room',
-      description: 'A corner unit with western exposure and aged carpeting. The afternoon sun has bleached everything near the windows to a uniform pale.',
+      description:
+        'A corner unit with western exposure and aged carpeting. The afternoon sun has bleached everything near the windows to a uniform pale.',
       x: -3,
       y: 9,
       z: 22,
@@ -372,17 +553,48 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a kidney-shaped loveseat', description: 'A kidney-shaped loveseat in chartreuse upholstery faces the window. Its tapered legs end in brass ferrules.', boltedDown: false },
-        { prototype: 'table', name: 'a tile-top table', description: 'A small table with a mosaic tile top in abstract boomerang patterns. Very California modern.', boltedDown: false },
-        { prototype: 'furniture', name: 'a metal radiator cover', description: 'A perforated metal radiator cover in white enamel hides the heating element. Atomic starburst cutouts decorate it.', boltedDown: true },
-        { prototype: 'furniture', name: 'fiberglass curtains', description: 'Fiberglass drapes in gold threads hang from a chrome rod, their atomic pattern still visible despite sun damage.', boltedDown: true },
-        { prototype: 'furniture', name: 'a pole lamp', description: 'A tension pole lamp stretches floor to ceiling, its three cone shades in orange, yellow, and avocado.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a kidney-shaped loveseat',
+          description:
+            'A kidney-shaped loveseat in chartreuse upholstery faces the window. Its tapered legs end in brass ferrules.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'table',
+          name: 'a tile-top table',
+          description:
+            'A small table with a mosaic tile top in abstract boomerang patterns. Very California modern.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a metal radiator cover',
+          description:
+            'A perforated metal radiator cover in white enamel hides the heating element. Atomic starburst cutouts decorate it.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'fiberglass curtains',
+          description:
+            'Fiberglass drapes in gold threads hang from a chrome rod, their atomic pattern still visible despite sun damage.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a pole lamp',
+          description:
+            'A tension pole lamp stretches floor to ceiling, its three cone shades in orange, yellow, and avocado.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
           name: 'the kidney loveseat',
           capacity: 2,
-          emptyMsg: 'The chartreuse kidney-shaped loveseat catches the afternoon light.',
+          emptyMsg:
+            'The chartreuse kidney-shaped loveseat catches the afternoon light.',
           occupiedMsg: '%s nestled into the kidney loveseat.',
         },
       ],
@@ -411,10 +623,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a vinyl bench', description: 'A long vinyl bench in cherry red with chrome legs sits against the wall. Pure diner-booth aesthetic.', boltedDown: false },
-        { prototype: 'furniture', name: 'an accordion door closet', description: 'A built-in closet with a vinyl accordion door in woodgrain print. Inside, a few wire hangers and a shoe rack.', boltedDown: true },
-        { prototype: 'furniture', name: 'a chrome mail slot', description: 'A streamlined chrome mail slot is set into the door, its art deco lines still gleaming.', boltedDown: true },
-        { prototype: 'table', name: 'a telephone table', description: 'A small telephone table with built-in seat holds a dead rotary phone in powder blue.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'a vinyl bench',
+          description:
+            'A long vinyl bench in cherry red with chrome legs sits against the wall. Pure diner-booth aesthetic.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'an accordion door closet',
+          description:
+            'A built-in closet with a vinyl accordion door in woodgrain print. Inside, a few wire hangers and a shoe rack.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a chrome mail slot',
+          description:
+            'A streamlined chrome mail slot is set into the door, its art deco lines still gleaming.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a telephone table',
+          description:
+            'A small telephone table with built-in seat holds a dead rotary phone in powder blue.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -426,7 +662,8 @@ export const building = {
         {
           name: 'the telephone seat',
           capacity: 1,
-          emptyMsg: 'The telephone table\'s built-in seat waits for a call that will never come.',
+          emptyMsg:
+            "The telephone table's built-in seat waits for a call that will never come.",
           occupiedMsg: '%s seated at the telephone table.',
         },
       ],
@@ -451,16 +688,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a Hollywood bed', description: 'A low platform bed with a padded headboard in quilted pink vinyl. Pure Hollywood glamour from the Eisenhower era.', quality: 'nice' },
-        { prototype: 'furniture', name: 'a mirrored dressing screen', description: 'A three-panel dressing screen with mirrored backs and pink fabric fronts conceals the corner.', boltedDown: false },
-        { prototype: 'furniture', name: 'a starburst wall mirror', description: 'A large sunburst mirror with gold rays radiates from the wall above the bed. Very dramatic, very 1950s.', boltedDown: true },
-        { prototype: 'table', name: 'a Heywood-Wakefield nightstand', description: 'A blonde wood nightstand in the Heywood-Wakefield style holds a Tiffany-style lamp with a pink glass shade.', boltedDown: false },
+        {
+          prototype: 'bed',
+          name: 'a Hollywood bed',
+          description:
+            'A low platform bed with a padded headboard in quilted pink vinyl. Pure Hollywood glamour from the Eisenhower era.',
+          quality: 'nice',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a mirrored dressing screen',
+          description:
+            'A three-panel dressing screen with mirrored backs and pink fabric fronts conceals the corner.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a starburst wall mirror',
+          description:
+            'A large sunburst mirror with gold rays radiates from the wall above the bed. Very dramatic, very 1950s.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a Heywood-Wakefield nightstand',
+          description:
+            'A blonde wood nightstand in the Heywood-Wakefield style holds a Tiffany-style lamp with a pink glass shade.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
           name: 'the Hollywood bed',
           capacity: 2,
-          emptyMsg: 'The pink Hollywood bed awaits beneath the starburst mirror.',
+          emptyMsg:
+            'The pink Hollywood bed awaits beneath the starburst mirror.',
           occupiedMsg: '%s lounging on the Hollywood bed.',
         },
       ],
@@ -485,11 +747,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a trundle bed', description: 'A streamlined trundle bed with blonde wood frame and a hidden pull-out mattress. Space-efficient 1950s design.', quality: 'standard' },
-        { prototype: 'furniture', name: 'a built-in wardrobe', description: 'A built-in wardrobe with sliding doors in blonde wood and chrome handles. Inside, a vintage suit bag hangs alone.', boltedDown: true },
-        { prototype: 'furniture', name: 'shadow box shelving', description: 'Built-in shadow box shelving displays a collection of ceramic poodles and a ballerina figurine in various poses.', boltedDown: true },
-        { prototype: 'table', name: 'a secretary desk', description: 'A compact secretary desk with a fold-down writing surface reveals pigeonholes and a dried-up inkpad inside.', boltedDown: true },
-        { prototype: 'furniture', name: 'a Lane cedar chest', description: 'A Lane cedar chest in honey finish sits at the foot of the bed, once holding hope, now holding nothing.', boltedDown: false },
+        {
+          prototype: 'bed',
+          name: 'a trundle bed',
+          description:
+            'A streamlined trundle bed with blonde wood frame and a hidden pull-out mattress. Space-efficient 1950s design.',
+          quality: 'standard',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a built-in wardrobe',
+          description:
+            'A built-in wardrobe with sliding doors in blonde wood and chrome handles. Inside, a vintage suit bag hangs alone.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'shadow box shelving',
+          description:
+            'Built-in shadow box shelving displays a collection of ceramic poodles and a ballerina figurine in various poses.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a secretary desk',
+          description:
+            'A compact secretary desk with a fold-down writing surface reveals pigeonholes and a dried-up inkpad inside.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a Lane cedar chest',
+          description:
+            'A Lane cedar chest in honey finish sits at the foot of the bed, once holding hope, now holding nothing.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {

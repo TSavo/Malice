@@ -45,7 +45,8 @@ export class GreeterBuilder implements Builder {
         parent: root!,
         properties: {
           name: 'Greeter',
-          description: 'Post-chargen orientation system with pre-spawned greeter pool',
+          description:
+            'Post-chargen orientation system with pre-spawned greeter pool',
 
           abilities: `Infrastructure system for spawning faction greeter NPCs.
 

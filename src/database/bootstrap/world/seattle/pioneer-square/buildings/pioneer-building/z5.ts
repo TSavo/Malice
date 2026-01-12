@@ -13,7 +13,11 @@ export const building = {
       description:
         'A modern biometric scanner, incongruous against the century-old architecture. It requires fingerprint authentication for access.',
       scanners: [
-        { type: 'fingerprint', part: 'hand', message: 'Executive access only.' },
+        {
+          type: 'fingerprint',
+          part: 'hand',
+          message: 'Executive access only.',
+        },
       ],
       authorizedUsers: {},
     },
@@ -49,7 +53,8 @@ Through the reinforced glass, the executive suite beyond is visible—richer, mo
         west: {
           room: '%EXEC_RECEPTION',
           locks: ['%EXEC_LOCK'],
-          description: 'A reinforced door with biometric scanner leads to the executive suite',
+          description:
+            'A reinforced door with biometric scanner leads to the executive suite',
         },
         south: '%HALL_Z5',
         down: '%STAIR_Z4',
@@ -187,7 +192,7 @@ A private bathroom is visible through an open door, its fixtures marble and bras
           capacity: 1,
           emptyMsg:
             'A massive leather chair sits behind the desk, positioned against the windows.',
-          occupiedMsg: '%s sitting in the building\'s most prestigious seat',
+          occupiedMsg: "%s sitting in the building's most prestigious seat",
         },
         {
           name: 'visitor chairs',
@@ -238,7 +243,7 @@ The books are eclectic: history, philosophy, industry manuals, a few novels. The
           capacity: 1,
           emptyMsg:
             'A leather reading chair sits near the window, angled to catch the light.',
-          occupiedMsg: '%s reading in the executive\'s private chair',
+          occupiedMsg: "%s reading in the executive's private chair",
         },
       ],
       objects: [
@@ -340,7 +345,7 @@ Windows line the eastern wall, offering views of the buildings across 2nd Avenue
           capacity: 1,
           emptyMsg:
             'The chair at the head of the table is slightly larger, slightly more imposing.',
-          occupiedMsg: '%s sitting in the chairman\'s seat',
+          occupiedMsg: "%s sitting in the chairman's seat",
         },
       ],
       objects: [

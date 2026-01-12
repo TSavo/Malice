@@ -36,8 +36,20 @@ The chamber was rediscovered by those who dug the Chinatown tunnels. They found 
         south: '%CENTRAL_CISTERN',
       },
       objects: [
-        { prototype: 'sign', name: 'carved markers', description: 'Chinese characters are carved into the brick above the waterline—markers left by those who found this place and understood its value.', boltedDown: true },
-        { prototype: 'furniture', name: 'a mooring ring', description: 'An iron ring is set into the wall at water level. Someone once moored boats here.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'carved markers',
+          description:
+            'Chinese characters are carved into the brick above the waterline—markers left by those who found this place and understood its value.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a mooring ring',
+          description:
+            'An iron ring is set into the wall at water level. Someone once moored boats here.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -62,8 +74,20 @@ The water is dark, tainted with the residue of a century of industrial use.`,
         west: '%INDUSTRIAL_RESERVOIR',
       },
       objects: [
-        { prototype: 'furniture', name: 'industrial intake pipes', description: 'Large iron intake pipes extend from the walls, drawing water to the factories above. The pipes are cold, the water still.', boltedDown: true },
-        { prototype: 'sign', name: 'a depth gauge', description: 'A rusted depth gauge is mounted to the wall, its needle resting at the bottom of its range. The water level hasn\'t been monitored for decades.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'industrial intake pipes',
+          description:
+            'Large iron intake pipes extend from the walls, drawing water to the factories above. The pipes are cold, the water still.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'a depth gauge',
+          description:
+            "A rusted depth gauge is mounted to the wall, its needle resting at the bottom of its range. The water level hasn't been monitored for decades.",
+          boltedDown: true,
+        },
       ],
     },
 
@@ -86,8 +110,20 @@ The water is dark, tainted with the residue of a century of industrial use.`,
         west: '%INDUSTRIAL_RESERVOIR',
       },
       objects: [
-        { prototype: 'sign', name: 'an overflow marker', description: 'Painted lines on the wall show overflow levels: "10%", "25%", "50%", "DANGER". The highest mark shows evidence of being reached.', boltedDown: true },
-        { prototype: 'furniture', name: 'an overflow weir', description: 'A concrete weir controls overflow into deeper passages. The mechanism is automated but no longer functional.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'an overflow marker',
+          description:
+            'Painted lines on the wall show overflow levels: "10%", "25%", "50%", "DANGER". The highest mark shows evidence of being reached.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'an overflow weir',
+          description:
+            'A concrete weir controls overflow into deeper passages. The mechanism is automated but no longer functional.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -116,9 +152,27 @@ The water is waist-deep and cold. What lies beneath the surface is unclear.`,
         south: '%DEEP_PASSAGE_N',
       },
       objects: [
-        { prototype: 'sign', name: 'a construction date', description: 'Carved into the keystone of the dome: "1876". Thirteen years before the Great Fire. The cistern survived what the city above did not.', boltedDown: true },
-        { prototype: 'furniture', name: 'the intake well', description: 'A circular well in the center of the chamber once drew water from deeper aquifers. The mechanism is gone; the shaft remains.', boltedDown: true },
-        { prototype: 'sign', name: 'scratched warnings', description: 'Scratched into the brick at water level: "DEPTH UNKNOWN" and "DO NOT DIVE".', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'a construction date',
+          description:
+            'Carved into the keystone of the dome: "1876". Thirteen years before the Great Fire. The cistern survived what the city above did not.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'the intake well',
+          description:
+            'A circular well in the center of the chamber once drew water from deeper aquifers. The mechanism is gone; the shaft remains.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'scratched warnings',
+          description:
+            'Scratched into the brick at water level: "DEPTH UNKNOWN" and "DO NOT DIVE".',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -141,9 +195,27 @@ This chamber was used for storage during Prohibition. The bottles are gone. The 
         east: '%INDUSTRIAL_RESERVOIR',
       },
       objects: [
-        { prototype: 'furniture', name: 'bottle racks', description: 'Wooden racks are bolted to the walls above the waterline, designed to hold bottles. A few broken bottles remain, their contents long since dispersed.', boltedDown: true },
-        { prototype: 'crate', name: 'a floating crate', description: 'A wooden crate floats in the water, its lid missing. Whatever it contained is gone.', boltedDown: true },
-        { prototype: 'sign', name: 'a prohibition marker', description: 'Chalked on the wall: "PROPERTY OF THE GOLDEN DRAGON - 1927". The Golden Dragon was a notorious speakeasy.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'bottle racks',
+          description:
+            'Wooden racks are bolted to the walls above the waterline, designed to hold bottles. A few broken bottles remain, their contents long since dispersed.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'crate',
+          name: 'a floating crate',
+          description:
+            'A wooden crate floats in the water, its lid missing. Whatever it contained is gone.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'a prohibition marker',
+          description:
+            'Chalked on the wall: "PROPERTY OF THE GOLDEN DRAGON - 1927". The Golden Dragon was a notorious speakeasy.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -164,8 +236,20 @@ This chamber was used for storage during Prohibition. The bottles are gone. The 
         south: '%COLLAPSED_TUNNEL',
       },
       objects: [
-        { prototype: 'sign', name: 'a pioneer inscription', description: 'Carved into the oldest section of wall: "H.Y. 1865" and "WATER FOR THE PEOPLE". Henry Yesler, perhaps, or one of his workers.', boltedDown: true },
-        { prototype: 'furniture', name: 'a hand pump base', description: 'The iron base of a hand pump remains bolted to a platform. The pump itself was removed; the base was too heavy to salvage.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'a pioneer inscription',
+          description:
+            'Carved into the oldest section of wall: "H.Y. 1865" and "WATER FOR THE PEOPLE". Henry Yesler, perhaps, or one of his workers.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a hand pump base',
+          description:
+            'The iron base of a hand pump remains bolted to a platform. The pump itself was removed; the base was too heavy to salvage.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -190,9 +274,27 @@ The water is deeper here. The bottom is not visible.`,
         south: '%DEEP_PASSAGE_E',
       },
       objects: [
-        { prototype: 'furniture', name: 'industrial intake headers', description: 'Massive iron headers distributed water to the factories above. The valves are frozen shut, the headers corroded but intact.', boltedDown: true },
-        { prototype: 'sign', name: 'a capacity plate', description: 'A brass plate reads: "RESERVOIR 7 - CAPACITY 500,000 GALLONS - SEATTLE WATER DEPT 1904".', boltedDown: true },
-        { prototype: 'sign', name: 'a drowning warning', description: 'A painted sign, barely visible above the waterline: "DANGER - NO SWIMMING - STRONG CURRENTS". The currents are gone. The danger may remain.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'industrial intake headers',
+          description:
+            'Massive iron headers distributed water to the factories above. The valves are frozen shut, the headers corroded but intact.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'a capacity plate',
+          description:
+            'A brass plate reads: "RESERVOIR 7 - CAPACITY 500,000 GALLONS - SEATTLE WATER DEPT 1904".',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'a drowning warning',
+          description:
+            'A painted sign, barely visible above the waterline: "DANGER - NO SWIMMING - STRONG CURRENTS". The currents are gone. The danger may remain.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -219,7 +321,13 @@ Something built these passages before the city existed. The city just found them
         south: '%ANCIENT_CHAMBER',
       },
       objects: [
-        { prototype: 'sign', name: 'natural formations', description: 'The walls show signs of water erosion—not construction, but natural cave formation. The passage existed before it was discovered.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'natural formations',
+          description:
+            'The walls show signs of water erosion—not construction, but natural cave formation. The passage existed before it was discovered.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -240,7 +348,13 @@ Something built these passages before the city existed. The city just found them
         west: '%ANCIENT_CHAMBER',
       },
       objects: [
-        { prototype: 'sign', name: 'a surveyor\'s mark', description: 'A surveyor\'s mark is chiseled into the wall: "END OF SURVEY - CONTINUE AT OWN RISK - 1898". No one continued.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: "a surveyor's mark",
+          description:
+            'A surveyor\'s mark is chiseled into the wall: "END OF SURVEY - CONTINUE AT OWN RISK - 1898". No one continued.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -263,8 +377,20 @@ What lies beyond is unknown. What was sealed away remains sealed.`,
         east: '%ANCIENT_CHAMBER',
       },
       objects: [
-        { prototype: 'sign', name: 'a warning stone', description: 'A flat stone is set into the collapse, carved with a single word: "SEALED". Below it, in smaller letters: "1889". The year of the fire.', boltedDown: true },
-        { prototype: 'crate', name: 'sealed debris', description: 'The debris is too regular to be accidental—bricks laid deliberately, earth packed carefully. Someone wanted this passage closed forever.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'a warning stone',
+          description:
+            'A flat stone is set into the collapse, carved with a single word: "SEALED". Below it, in smaller letters: "1889". The year of the fire.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'crate',
+          name: 'sealed debris',
+          description:
+            'The debris is too regular to be accidental—bricks laid deliberately, earth packed carefully. Someone wanted this passage closed forever.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -291,9 +417,27 @@ This is the oldest place beneath Seattle. The city above is young. This place wa
         down: '%ABYSSAL_SHAFT',
       },
       objects: [
-        { prototype: 'sign', name: 'petroglyphs', description: 'Faded marks on the walls might be natural formations or might be very old carvings. If they are art, they predate any known culture in the region.', boltedDown: true },
-        { prototype: 'furniture', name: 'a natural altar', description: 'A flat stone rises from the water, smooth and level. Its position seems too perfect to be natural, but no tool marks are visible.', boltedDown: true },
-        { prototype: 'sign', name: 'a modern warning', description: 'A plastic placard, incongruous against the ancient stone: "STRUCTURAL SURVEY INCOMPLETE - DO NOT PROCEED - CITY ENGINEERING 1987". No further surveys were conducted.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'petroglyphs',
+          description:
+            'Faded marks on the walls might be natural formations or might be very old carvings. If they are art, they predate any known culture in the region.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a natural altar',
+          description:
+            'A flat stone rises from the water, smooth and level. Its position seems too perfect to be natural, but no tool marks are visible.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'a modern warning',
+          description:
+            'A plastic placard, incongruous against the ancient stone: "STRUCTURAL SURVEY INCOMPLETE - DO NOT PROCEED - CITY ENGINEERING 1987". No further surveys were conducted.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -317,9 +461,27 @@ Some shafts are better left unexplored.`,
         up: '%ANCIENT_CHAMBER',
       },
       objects: [
-        { prototype: 'sign', name: 'a warning scratched in stone', description: 'Scratched into the shaft wall, barely visible: "WENT DOWN. DID NOT RETURN. - T.M. 1923"', boltedDown: true },
-        { prototype: 'furniture', name: 'a rusted cable', description: 'A cable extends down into the shaft, its upper end anchored to a ring in the stone. The cable disappears into darkness. Its lower end is not visible.', boltedDown: true },
-        { prototype: 'sign', name: 'the silence', description: 'The absence of sound is profound. No dripping. No echo. No movement. The shaft swallows everything.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'a warning scratched in stone',
+          description:
+            'Scratched into the shaft wall, barely visible: "WENT DOWN. DID NOT RETURN. - T.M. 1923"',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a rusted cable',
+          description:
+            'A cable extends down into the shaft, its upper end anchored to a ring in the stone. The cable disappears into darkness. Its lower end is not visible.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'the silence',
+          description:
+            'The absence of sound is profound. No dripping. No echo. No movement. The shaft swallows everything.',
+          boltedDown: true,
+        },
       ],
     },
   },

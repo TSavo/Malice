@@ -38,8 +38,20 @@ The rats allow passage. For now. But they watch everything.`,
         east: '%CORPSE_TUNNEL',
       },
       objects: [
-        { prototype: 'sign', name: 'claw marks', description: 'Deep scratches cover every surface—territorial markings from generations of rats. Some of the marks are disturbingly large.', boltedDown: true },
-        { prototype: 'furniture', name: 'gnawed bones', description: 'Bones are scattered across the floor—animal bones, mostly. The rats leave warnings for those who enter their territory.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'claw marks',
+          description:
+            'Deep scratches cover every surface—territorial markings from generations of rats. Some of the marks are disturbingly large.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'gnawed bones',
+          description:
+            'Bones are scattered across the floor—animal bones, mostly. The rats leave warnings for those who enter their territory.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -66,8 +78,20 @@ The stench is overpowering. The sounds from within are worse.`,
         north: '%FEEDING_GROUND',
       },
       objects: [
-        { prototype: 'furniture', name: 'the sewer pipe', description: 'A concrete sewer pipe, cracked and leaking, provides passage to the sewer system. Rats pour in and out in constant streams.', boltedDown: true },
-        { prototype: 'sign', name: 'rat trails', description: 'Greasy trails mark the paths most traveled by the rats. The stone is worn smooth by countless tiny feet.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'the sewer pipe',
+          description:
+            'A concrete sewer pipe, cracked and leaking, provides passage to the sewer system. Rats pour in and out in constant streams.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'rat trails',
+          description:
+            'Greasy trails mark the paths most traveled by the rats. The stone is worn smooth by countless tiny feet.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -95,9 +119,27 @@ Feeding frenzies happen here. Best not to be present when they do.`,
         west: '%BONE_YARD',
       },
       objects: [
-        { prototype: 'furniture', name: 'garbage piles', description: 'Heaps of garbage cover the floor—food waste from the surface, brought down through the sewers. The rats pick through it constantly.', boltedDown: true },
-        { prototype: 'furniture', name: 'feeding stations', description: 'Certain spots are reserved for dominant rats—cleared areas where the largest specimens eat first. The hierarchy is absolute.', boltedDown: true },
-        { prototype: 'sign', name: 'territorial scratches', description: 'The walls are covered in scratches that seem to form patterns—territorial boundaries, perhaps, or something more organized.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'garbage piles',
+          description:
+            'Heaps of garbage cover the floor—food waste from the surface, brought down through the sewers. The rats pick through it constantly.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'feeding stations',
+          description:
+            'Certain spots are reserved for dominant rats—cleared areas where the largest specimens eat first. The hierarchy is absolute.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'territorial scratches',
+          description:
+            'The walls are covered in scratches that seem to form patterns—territorial boundaries, perhaps, or something more organized.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -120,8 +162,20 @@ The colony remembers its dead. Or perhaps it just uses them.`,
         east: '%RAT_HIGHWAY',
       },
       objects: [
-        { prototype: 'furniture', name: 'bone walls', description: 'Bones line the walls in dense layers—rat bones primarily, but mixed with others. Some skulls are almost recognizable.', boltedDown: true },
-        { prototype: 'sign', name: 'arranged remains', description: 'Some bones appear deliberately placed—skulls facing outward, long bones forming patterns. Coincidence, or something else?', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'bone walls',
+          description:
+            'Bones line the walls in dense layers—rat bones primarily, but mixed with others. Some skulls are almost recognizable.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'arranged remains',
+          description:
+            'Some bones appear deliberately placed—skulls facing outward, long bones forming patterns. Coincidence, or something else?',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -144,9 +198,27 @@ Things die here. Many things.`,
         west: '%ALPHA_CHAMBER',
       },
       objects: [
-        { prototype: 'furniture', name: 'a bone carpet', description: 'The floor is covered in bones—inches deep, impossible to avoid. They crunch and shift with every step.', boltedDown: true },
-        { prototype: 'sign', name: 'fresh remains', description: 'Near one wall, the bones are fresher—still connected by sinew, still wearing scraps of fur or fabric. The colony feeds well.', boltedDown: true },
-        { prototype: 'furniture', name: 'a feeding pit', description: 'A depression in the floor serves as an active feeding site. The bones here are wet, the smell overpowering.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a bone carpet',
+          description:
+            'The floor is covered in bones—inches deep, impossible to avoid. They crunch and shift with every step.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'fresh remains',
+          description:
+            'Near one wall, the bones are fresher—still connected by sinew, still wearing scraps of fur or fabric. The colony feeds well.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a feeding pit',
+          description:
+            'A depression in the floor serves as an active feeding site. The bones here are wet, the smell overpowering.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -173,9 +245,27 @@ The colony grows. Always growing. The surface has no idea how many rats live ben
         south: '%DEEP_NEST',
       },
       objects: [
-        { prototype: 'furniture', name: 'nest holes', description: 'Countless holes riddle the walls—each one a nest, each nest containing a breeding pair and their young. The squeaking never stops.', boltedDown: true },
-        { prototype: 'furniture', name: 'nesting material', description: 'Shredded paper, fabric, insulation, and other soft materials are piled for nest building. The rats are efficient scavengers.', boltedDown: true },
-        { prototype: 'sign', name: 'colony growth marks', description: 'Scratches on a central pillar seem to mark something—perhaps generations, perhaps population milestones. The marks go back decades.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'nest holes',
+          description:
+            'Countless holes riddle the walls—each one a nest, each nest containing a breeding pair and their young. The squeaking never stops.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'nesting material',
+          description:
+            'Shredded paper, fabric, insulation, and other soft materials are piled for nest building. The rats are efficient scavengers.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'colony growth marks',
+          description:
+            'Scratches on a central pillar seem to mark something—perhaps generations, perhaps population milestones. The marks go back decades.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -197,9 +287,27 @@ Challenging the alpha means death. But the alpha grows old. Others are watching.
         south: '%TREASURE_HOARD',
       },
       objects: [
-        { prototype: 'furniture', name: 'the throne mound', description: 'A mound of bones and debris serves as the alpha\'s throne—elevated above its subjects, commanding a view of all approaches.', boltedDown: true },
-        { prototype: 'sign', name: 'challenge scars', description: 'Deep gouges in the floor mark where challenges have been fought. Dark stains show where they ended.', boltedDown: true },
-        { prototype: 'furniture', name: 'tribute piles', description: 'Offerings from the colony are piled around the throne—choice bits of food, shiny objects, tokens of submission.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'the throne mound',
+          description:
+            "A mound of bones and debris serves as the alpha's throne—elevated above its subjects, commanding a view of all approaches.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'challenge scars',
+          description:
+            'Deep gouges in the floor mark where challenges have been fought. Dark stains show where they ended.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'tribute piles',
+          description:
+            'Offerings from the colony are piled around the throne—choice bits of food, shiny objects, tokens of submission.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -222,8 +330,20 @@ The highway connects everything. Control the highway, control the colony.`,
         south: '%FLOODED_PASSAGE',
       },
       objects: [
-        { prototype: 'furniture', name: 'worn pathways', description: 'The floor is worn into distinct lanes—grooves carved by countless tiny feet over years of constant use.', boltedDown: true },
-        { prototype: 'sign', name: 'scent markers', description: 'Invisible to human eyes but obvious to rats: scent markers that designate lanes, territories, and warnings.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'worn pathways',
+          description:
+            'The floor is worn into distinct lanes—grooves carved by countless tiny feet over years of constant use.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'scent markers',
+          description:
+            'Invisible to human eyes but obvious to rats: scent markers that designate lanes, territories, and warnings.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -251,9 +371,27 @@ They have eaten humans.`,
         down: '%ABYSSAL_DEN',
       },
       objects: [
-        { prototype: 'furniture', name: 'massive burrows', description: 'The burrows here are larger than elsewhere—sized for rats grown fat on decades of feeding. The scratching from within is deep and slow.', boltedDown: true },
-        { prototype: 'sign', name: 'human remains', description: 'Scattered among the rat bones: human finger bones, a jawbone, a watch still clasped around nothing. The colony remembers its meals.', boltedDown: true },
-        { prototype: 'furniture', name: 'a feeding station', description: 'A cleared area where the deep nest rats eat. The bones here are larger, the teeth marks deeper.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'massive burrows',
+          description:
+            'The burrows here are larger than elsewhere—sized for rats grown fat on decades of feeding. The scratching from within is deep and slow.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'human remains',
+          description:
+            'Scattered among the rat bones: human finger bones, a jawbone, a watch still clasped around nothing. The colony remembers its meals.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a feeding station',
+          description:
+            'A cleared area where the deep nest rats eat. The bones here are larger, the teeth marks deeper.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -280,9 +418,27 @@ Some of the jewelry still has fingers attached.`,
         },
       },
       objects: [
-        { prototype: 'furniture', name: 'treasure mounds', description: 'Piles of glittering objects cover the floor: coins, jewelry, foil wrappers, broken glass, anything that catches light. The rats have accumulated this over decades.', boltedDown: true },
-        { prototype: 'sign', name: 'grisly trinkets', description: 'Among the treasures: rings still on fingers, necklaces still clasped, a gold tooth still in its jaw. The rats don\'t discriminate.', boltedDown: true },
-        { prototype: 'furniture', name: 'guardian nests', description: 'Large burrows surround the treasure—home to the rats who guard it. They are always watching.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'treasure mounds',
+          description:
+            'Piles of glittering objects cover the floor: coins, jewelry, foil wrappers, broken glass, anything that catches light. The rats have accumulated this over decades.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'grisly trinkets',
+          description:
+            "Among the treasures: rings still on fingers, necklaces still clasped, a gold tooth still in its jaw. The rats don't discriminate.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'guardian nests',
+          description:
+            'Large burrows surround the treasure—home to the rats who guard it. They are always watching.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -308,8 +464,20 @@ Some of the jewelry still has fingers attached.`,
         },
       },
       objects: [
-        { prototype: 'furniture', name: 'rat rafts', description: 'Debris accumulates at the water line—platforms the rats use to cross without swimming. They\'re constantly maintained.', boltedDown: true },
-        { prototype: 'sign', name: 'high water marks', description: 'Marks on the walls show how high the water rises. Sometimes it floods the entire passage. Sometimes rats drown.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'rat rafts',
+          description:
+            "Debris accumulates at the water line—platforms the rats use to cross without swimming. They're constantly maintained.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'high water marks',
+          description:
+            'Marks on the walls show how high the water rises. Sometimes it floods the entire passage. Sometimes rats drown.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -330,10 +498,33 @@ What lives here has lived here for a very long time.`,
         up: '%DEEP_NEST',
       },
       objects: [
-        { prototype: 'furniture', name: 'the den entrance', description: 'A single massive burrow dominates the chamber—easily three feet in diameter, worn smooth by something large moving in and out.', boltedDown: true },
-        { prototype: 'sign', name: 'offerings', description: 'Rat corpses are piled at the burrow entrance—offerings from the colony above. Some are fresh. Something accepts them.', boltedDown: true },
-        { prototype: 'furniture', name: 'deep scratches', description: 'Gouges in the stone floor are too large, too deep to be made by any normal rat. They lead into the burrow.', boltedDown: true },
-        { prototype: 'sign', name: 'the silence', description: 'The scratching has stopped. Something is listening.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'the den entrance',
+          description:
+            'A single massive burrow dominates the chamber—easily three feet in diameter, worn smooth by something large moving in and out.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'offerings',
+          description:
+            'Rat corpses are piled at the burrow entrance—offerings from the colony above. Some are fresh. Something accepts them.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'deep scratches',
+          description:
+            'Gouges in the stone floor are too large, too deep to be made by any normal rat. They lead into the burrow.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'the silence',
+          description: 'The scratching has stopped. Something is listening.',
+          boltedDown: true,
+        },
       ],
     },
   },

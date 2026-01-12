@@ -32,7 +32,8 @@ Old lawn chairs sit by the parapet, arranged to face west toward Elliott Bay. So
       outdoor: true,
       exits: {
         down: {
-          description: 'A ladder leads down through the roof hatch to the bedroom below',
+          description:
+            'A ladder leads down through the roof hatch to the bedroom below',
           to: '%BEDROOM',
         },
         south: '%ROOF_SOUTH',

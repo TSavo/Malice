@@ -25,7 +25,8 @@ The smell of old fire lingers in the debris, decades of rain unable to wash away
     west: {
       to: 'buildings/pioneer-building/z0.ts',
       room: '%SERVICE_CORRIDOR',
-      description: 'A path through the debris leads to the Pioneer Building service entrance',
+      description:
+        'A path through the debris leads to the Pioneer Building service entrance',
     },
   },
 };

@@ -1191,9 +1191,17 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
             filePath = join(docsDir, dirPath, fileName);
           } else {
             // No path - search in all subdirectories for the filename
-            const searchDirs = ['guides', 'reference', 'lore', 'internal', 'moo', 'city-ai', 'greeter', 'prompts'];
+            const searchDirs = [
+              'guides',
+              'reference',
+              'lore',
+              'internal',
+              'moo',
+              'city-ai',
+              'greeter',
+              'prompts',
+            ];
             const fileName = `${name.toUpperCase()}.md`;
-            let found = false;
             filePath = join(docsDir, fileName); // Default to root (won't exist but provides error context)
 
             for (const dir of searchDirs) {
@@ -1201,7 +1209,6 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
               try {
                 await access(candidatePath);
                 filePath = candidatePath;
-                found = true;
                 break;
               } catch {
                 // File doesn't exist in this directory, continue searching

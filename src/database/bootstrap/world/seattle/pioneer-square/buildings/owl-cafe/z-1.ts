@@ -68,7 +68,7 @@ The original stone walls are visible behind the refrigeration units—this was a
           name: 'supply crates',
           aliases: ['crates', 'supplies', 'boxes'],
           description:
-            'Wooden crates and cardboard boxes stacked along the walls—dry goods, paper supplies, the non-perishables that restaurants order in bulk. SYSCO labels, CHARLIE\'s PRODUCE invoices, the supply chain of diner cooking. Most of it is still usable. Some of it has been claimed by rodents. The mice, at least, are still eating.',
+            "Wooden crates and cardboard boxes stacked along the walls—dry goods, paper supplies, the non-perishables that restaurants order in bulk. SYSCO labels, CHARLIE's PRODUCE invoices, the supply chain of diner cooking. Most of it is still usable. Some of it has been claimed by rodents. The mice, at least, are still eating.",
         },
       ],
     },

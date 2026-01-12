@@ -175,7 +175,8 @@ The smell of books is different up here—personal, lived-in, mixed with the oth
         {
           name: 'a reading chair',
           capacity: 1,
-          emptyMsg: 'A comfortable chair sits beside a reading lamp, a stack of books on the floor beside it.',
+          emptyMsg:
+            'A comfortable chair sits beside a reading lamp, a stack of books on the floor beside it.',
           occupiedMsg: '%s reading in the chair',
         },
       ],
@@ -220,7 +221,8 @@ A small table with two chairs occupies what space remains. The table is cluttere
         {
           name: 'kitchen chairs',
           capacity: 2,
-          emptyMsg: 'Two mismatched chairs sit at a small table cluttered with mail.',
+          emptyMsg:
+            'Two mismatched chairs sit at a small table cluttered with mail.',
           occupiedMsg: '%s sitting at the kitchen table',
         },
       ],

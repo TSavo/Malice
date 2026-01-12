@@ -39,9 +39,27 @@ The walls are stained with tide marks. The highest mark is near the ceiling.`,
         east: '%STORM_DRAIN',
       },
       objects: [
-        { prototype: 'furniture', name: 'overflow grates', description: 'Heavy iron grates allow water to flow in from above. They\'re designed to prevent backflow, trapping anyone who enters.', boltedDown: true },
-        { prototype: 'sign', name: 'depth warnings', description: 'Painted markers show water depths: "SAFE" at knee height, "DANGER" at waist, "FATAL" at chest. The fatal line has been crossed.', boltedDown: true },
-        { prototype: 'furniture', name: 'debris ledge', description: 'A narrow ledge runs along one wall, above the highest water mark. It\'s the only refuge when the chamber floods.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'overflow grates',
+          description:
+            "Heavy iron grates allow water to flow in from above. They're designed to prevent backflow, trapping anyone who enters.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'depth warnings',
+          description:
+            'Painted markers show water depths: "SAFE" at knee height, "DANGER" at waist, "FATAL" at chest. The fatal line has been crossed.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'debris ledge',
+          description:
+            "A narrow ledge runs along one wall, above the highest water mark. It's the only refuge when the chamber floods.",
+          boltedDown: true,
+        },
       ],
     },
 
@@ -67,8 +85,20 @@ Graffiti covers the accessible walls—tags from those who explore these passage
         },
       },
       objects: [
-        { prototype: 'sign', name: 'urban explorer graffiti', description: 'Tags cover the walls: crew names, dates, messages. "SEWER RATS 2019", "FIRST TO MAP THIS SECTION", "WATCH THE WATER".', boltedDown: true },
-        { prototype: 'furniture', name: 'flow gauge', description: 'A rusted gauge measures water flow. Its needle is pinned at maximum, though the flow today is moderate.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'urban explorer graffiti',
+          description:
+            'Tags cover the walls: crew names, dates, messages. "SEWER RATS 2019", "FIRST TO MAP THIS SECTION", "WATCH THE WATER".',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'flow gauge',
+          description:
+            'A rusted gauge measures water flow. Its needle is pinned at maximum, though the flow today is moderate.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -102,9 +132,27 @@ Old infrastructure and new intersect here. Neither works properly.`,
         south: '%DEEP_FLOW',
       },
       objects: [
-        { prototype: 'furniture', name: 'junction platform', description: 'A raised platform provides access to the various pipes. It\'s the only dry ground in the chamber.', boltedDown: true },
-        { prototype: 'sign', name: 'pipe labels', description: 'Faded labels mark each pipe: "COMBINED SEWER OVERFLOW", "STORM DRAIN 7", "INDUSTRIAL EFFLUENT". Some labels are deliberately obscured.', boltedDown: true },
-        { prototype: 'furniture', name: 'maintenance equipment', description: 'Abandoned maintenance equipment rusts on the platform: wrenches, a broken pump, coiled hose. The city stopped sending workers here years ago.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'junction platform',
+          description:
+            "A raised platform provides access to the various pipes. It's the only dry ground in the chamber.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'pipe labels',
+          description:
+            'Faded labels mark each pipe: "COMBINED SEWER OVERFLOW", "STORM DRAIN 7", "INDUSTRIAL EFFLUENT". Some labels are deliberately obscured.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'maintenance equipment',
+          description:
+            'Abandoned maintenance equipment rusts on the platform: wrenches, a broken pump, coiled hose. The city stopped sending workers here years ago.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -128,9 +176,27 @@ Homeless people sometimes shelter here during dry spells. When it rains, they di
         south: '%SUBMERGED_TUNNEL',
       },
       objects: [
-        { prototype: 'furniture', name: 'debris accumulation', description: 'Street debris piles against the grates: plastic bottles, food wrappers, a shopping cart wheel, countless plastic bags.', boltedDown: true },
-        { prototype: 'furniture', name: 'a makeshift camp', description: 'Evidence of temporary habitation: a waterlogged sleeping bag, empty cans, a soaked paperback. The camp was abandoned quickly.', boltedDown: true },
-        { prototype: 'sign', name: 'flash flood warning', description: 'A hand-painted sign wired to the grate: "WHEN IT RAINS ABOVE, RUN". The paint has run from exposure to water.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'debris accumulation',
+          description:
+            'Street debris piles against the grates: plastic bottles, food wrappers, a shopping cart wheel, countless plastic bags.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a makeshift camp',
+          description:
+            'Evidence of temporary habitation: a waterlogged sleeping bag, empty cans, a soaked paperback. The camp was abandoned quickly.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'flash flood warning',
+          description:
+            'A hand-painted sign wired to the grate: "WHEN IT RAINS ABOVE, RUN". The paint has run from exposure to water.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -154,9 +220,27 @@ The newer pipes are labeled. The older ones are mysteries.`,
         south: '%INDUSTRIAL_OUTFALL',
       },
       objects: [
-        { prototype: 'furniture', name: 'pipe infrastructure', description: 'Pipes of various sizes line the walls: modern PVC, older concrete, ancient cast iron. They carry the city\'s liquid waste to processing—or to the bay.', boltedDown: true },
-        { prototype: 'sign', name: 'utility markings', description: 'Color-coded markings identify pipe contents: blue for water, green for storm, brown for sanitary. Some pipes have no markings at all.', boltedDown: true },
-        { prototype: 'furniture', name: 'a leaking junction', description: 'A joint between old and new pipe weeps constantly, adding to the water level. No one has come to repair it.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'pipe infrastructure',
+          description:
+            "Pipes of various sizes line the walls: modern PVC, older concrete, ancient cast iron. They carry the city's liquid waste to processing—or to the bay.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'utility markings',
+          description:
+            'Color-coded markings identify pipe contents: blue for water, green for storm, brown for sanitary. Some pipes have no markings at all.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a leaking junction',
+          description:
+            'A joint between old and new pipe weeps constantly, adding to the water level. No one has come to repair it.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -184,9 +268,27 @@ The splash of tiny bodies is constant. They're always here, always feeding.`,
         south: '%TOXIC_CORRIDOR',
       },
       objects: [
-        { prototype: 'furniture', name: 'rat highways', description: 'Pipes and ledges above the waterline serve as rat highways—dry routes through the wet territory. Traffic is constant.', boltedDown: true },
-        { prototype: 'sign', name: 'feeding evidence', description: 'Food scraps accumulate where the current is slow—the rats\' harvest from the city\'s waste. They never go hungry.', boltedDown: true },
-        { prototype: 'furniture', name: 'a floating platform', description: 'A wooden pallet wedged against the wall serves as a feeding platform. Rats gather here to consume their finds.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'rat highways',
+          description:
+            'Pipes and ledges above the waterline serve as rat highways—dry routes through the wet territory. Traffic is constant.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'feeding evidence',
+          description:
+            "Food scraps accumulate where the current is slow—the rats' harvest from the city's waste. They never go hungry.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a floating platform',
+          description:
+            'A wooden pallet wedged against the wall serves as a feeding platform. Rats gather here to consume their finds.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -210,9 +312,27 @@ Some say bodies are weighted and dropped here. The water keeps its secrets.`,
         down: '%DEEP_POOL',
       },
       objects: [
-        { prototype: 'furniture', name: 'debris dam', description: 'Collapsed concrete and brick form a dam across the passage, backing up water into a deep pool. Debris continues to accumulate.', boltedDown: true },
-        { prototype: 'sign', name: 'depth unknown', description: 'A painted warning on the wall: "DEPTH UNKNOWN - DO NOT SWIM". Someone has added: "BODIES".', boltedDown: true },
-        { prototype: 'furniture', name: 'floating debris', description: 'Debris floats on the pool\'s surface: wood, plastic, a shoe, something that might be fabric or might be something else.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'debris dam',
+          description:
+            'Collapsed concrete and brick form a dam across the passage, backing up water into a deep pool. Debris continues to accumulate.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'depth unknown',
+          description:
+            'A painted warning on the wall: "DEPTH UNKNOWN - DO NOT SWIM". Someone has added: "BODIES".',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'floating debris',
+          description:
+            "Debris floats on the pool's surface: wood, plastic, a shoe, something that might be fabric or might be something else.",
+          boltedDown: true,
+        },
       ],
     },
 
@@ -236,9 +356,27 @@ The water here has an oily sheen. The smell burns the throat.`,
         south: '%TOXIC_POOL',
       },
       objects: [
-        { prototype: 'furniture', name: 'sealed outfall pipes', description: 'Large pipes are welded shut, painted with hazard symbols. But the welds have cracked, and dark liquid seeps from the joints.', boltedDown: true },
-        { prototype: 'sign', name: 'hazmat warnings', description: 'Faded signs warn of chemical hazards: "ARSENIC", "LEAD", "BENZENE". The industrial past doesn\'t stay in the past.', boltedDown: true },
-        { prototype: 'furniture', name: 'chemical residue', description: 'An oily film covers the water, rainbow-sheened in the dim light. It clings to everything it touches.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'sealed outfall pipes',
+          description:
+            'Large pipes are welded shut, painted with hazard symbols. But the welds have cracked, and dark liquid seeps from the joints.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'hazmat warnings',
+          description:
+            'Faded signs warn of chemical hazards: "ARSENIC", "LEAD", "BENZENE". The industrial past doesn\'t stay in the past.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'chemical residue',
+          description:
+            'An oily film covers the water, rainbow-sheened in the dim light. It clings to everything it touches.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -261,8 +399,19 @@ The water level rises as you move south, carrying the concentrated runoff toward
         south: '%TOXIC_POOL',
       },
       objects: [
-        { prototype: 'furniture', name: 'chemical stains', description: 'Dark stains streak the walls where chemical runoff has eaten into the concrete. The patterns look almost deliberate.', boltedDown: true },
-        { prototype: 'sign', name: 'warning scratches', description: 'Scratched into the wall: "HOLD BREATH". Sound advice.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'chemical stains',
+          description:
+            'Dark stains streak the walls where chemical runoff has eaten into the concrete. The patterns look almost deliberate.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'warning scratches',
+          description: 'Scratched into the wall: "HOLD BREATH". Sound advice.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -285,9 +434,27 @@ Entering this water is suicide. Slow, painful suicide.`,
         west: '%INDUSTRIAL_OUTFALL',
       },
       objects: [
-        { prototype: 'furniture', name: 'glowing water', description: 'The pool glows with sickly bioluminescence—bacteria that thrive in toxic conditions. The glow reveals shapes beneath the surface.', boltedDown: true },
-        { prototype: 'sign', name: 'death warning', description: 'Scratched into the concrete: "DON\'T TOUCH THE WATER. DON\'T BREATHE THE AIR. DON\'T STAY LONG."', boltedDown: true },
-        { prototype: 'furniture', name: 'chemical crusts', description: 'Crystalline deposits ring the pool\'s edge—chemicals precipitating as the water evaporates. They crumble at a touch.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'glowing water',
+          description:
+            'The pool glows with sickly bioluminescence—bacteria that thrive in toxic conditions. The glow reveals shapes beneath the surface.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'death warning',
+          description:
+            "Scratched into the concrete: \"DON'T TOUCH THE WATER. DON'T BREATHE THE AIR. DON'T STAY LONG.\"",
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'chemical crusts',
+          description:
+            "Crystalline deposits ring the pool's edge—chemicals precipitating as the water evaporates. They crumble at a touch.",
+          boltedDown: true,
+        },
       ],
     },
 
@@ -316,8 +483,20 @@ The current is stronger than it should be. Something is drawing the water deeper
         down: '%DEEP_POOL',
       },
       objects: [
-        { prototype: 'furniture', name: 'the current', description: 'A strong current pulls water toward the unknown depths. It\'s too powerful to swim against for long.', boltedDown: true },
-        { prototype: 'sign', name: 'old pipe markings', description: 'Faded markings from before the Fire: "SEATTLE WATER WORKS - 1887". The original infrastructure, still functioning after a fashion.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'the current',
+          description:
+            "A strong current pulls water toward the unknown depths. It's too powerful to swim against for long.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'old pipe markings',
+          description:
+            'Faded markings from before the Fire: "SEATTLE WATER WORKS - 1887". The original infrastructure, still functioning after a fashion.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -340,8 +519,20 @@ The water is cold. The current is strong. The darkness is absolute.`,
         down: '%SUNKEN_PASSAGE',
       },
       objects: [
-        { prototype: 'sign', name: 'diving warnings', description: 'A waterproof sign: "SUBMERGED TUNNEL - 30M - EXPERIENCED DIVERS ONLY". Someone has added: "CAME BACK ALONE".', boltedDown: true },
-        { prototype: 'furniture', name: 'abandoned gear', description: 'Diving equipment lies abandoned at the tunnel entrance: a wetsuit, a weight belt, a flashlight that no longer works.', boltedDown: true },
+        {
+          prototype: 'sign',
+          name: 'diving warnings',
+          description:
+            'A waterproof sign: "SUBMERGED TUNNEL - 30M - EXPERIENCED DIVERS ONLY". Someone has added: "CAME BACK ALONE".',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'abandoned gear',
+          description:
+            'Diving equipment lies abandoned at the tunnel entrance: a wetsuit, a weight belt, a flashlight that no longer works.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -365,8 +556,20 @@ What lies below the waterline is not visible. But it's there.`,
         down: '%DEEP_POOL',
       },
       objects: [
-        { prototype: 'furniture', name: 'air pocket ceiling', description: 'A dome of trapped air provides a small breathing space. The air is foul with decay and methane. It won\'t sustain life for long.', boltedDown: true },
-        { prototype: 'sign', name: 'waterline progression', description: 'Marks on the walls show the rising waterline over years. Each year, more of the chamber disappears.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'air pocket ceiling',
+          description:
+            "A dome of trapped air provides a small breathing space. The air is foul with decay and methane. It won't sustain life for long.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'waterline progression',
+          description:
+            'Marks on the walls show the rising waterline over years. Each year, more of the chamber disappears.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -394,9 +597,27 @@ The water is cold. The darkness is complete. Something moves in the depths.`,
         },
       },
       objects: [
-        { prototype: 'furniture', name: 'the depths', description: 'The pool\'s depth is unknown. Lights dropped from above fade into blackness before reaching bottom—if there is a bottom.', boltedDown: true },
-        { prototype: 'sign', name: 'diver\'s last message', description: 'Scratched into the wall near the water: "WENT DOWN 40M. SAW SOMETHING. NOT GOING BACK DOWN."', boltedDown: true },
-        { prototype: 'furniture', name: 'air bubbles', description: 'Occasionally, bubbles rise from the depths—air escaping from somewhere below. Or something breathing.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'the depths',
+          description:
+            "The pool's depth is unknown. Lights dropped from above fade into blackness before reaching bottom—if there is a bottom.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: "diver's last message",
+          description:
+            'Scratched into the wall near the water: "WENT DOWN 40M. SAW SOMETHING. NOT GOING BACK DOWN."',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'air bubbles',
+          description:
+            'Occasionally, bubbles rise from the depths—air escaping from somewhere below. Or something breathing.',
+          boltedDown: true,
+        },
       ],
     },
 
@@ -419,9 +640,27 @@ What waits at the other end is a mystery. Most prefer it that way.`,
         west: '%DEEP_POOL',
       },
       objects: [
-        { prototype: 'furniture', name: 'guide rope', description: 'A frayed rope is anchored here, leading into the flooded passage. It\'s the only way to navigate in complete darkness.', boltedDown: true },
-        { prototype: 'sign', name: 'passage length', description: 'Scratched numbers on the wall: "47M TO AIR. 3 MIN BREATH HOLD. BRING LIGHT. BRING BACKUP."', boltedDown: true },
-        { prototype: 'furniture', name: 'diving cache', description: 'A waterproof container holds emergency supplies: a working flashlight, spare batteries, a knife. Someone maintains this for fellow explorers.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'guide rope',
+          description:
+            "A frayed rope is anchored here, leading into the flooded passage. It's the only way to navigate in complete darkness.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'sign',
+          name: 'passage length',
+          description:
+            'Scratched numbers on the wall: "47M TO AIR. 3 MIN BREATH HOLD. BRING LIGHT. BRING BACKUP."',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'diving cache',
+          description:
+            'A waterproof container holds emergency supplies: a working flashlight, spare batteries, a knife. Someone maintains this for fellow explorers.',
+          boltedDown: true,
+        },
       ],
     },
 

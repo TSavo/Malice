@@ -18,7 +18,8 @@ export const building = {
     '%APT1_LOCK': {
       prototype: 'rentableLock',
       name: 'Apartment 1 Lock',
-      description: 'A deadbolt on the apartment door, the standard hardware of urban rentals.',
+      description:
+        'A deadbolt on the apartment door, the standard hardware of urban rentals.',
       difficulty: 4,
     },
     '%APT1_DOOR': {
@@ -36,7 +37,8 @@ export const building = {
     '%APT2_LOCK': {
       prototype: 'rentableLock',
       name: 'Apartment 2 Lock',
-      description: 'A deadbolt and chain, more security than the building probably warrants.',
+      description:
+        'A deadbolt and chain, more security than the building probably warrants.',
       difficulty: 4,
     },
     '%APT2_DOOR': {
@@ -54,7 +56,8 @@ export const building = {
     '%APT3_LOCK': {
       prototype: 'rentableLock',
       name: 'Apartment 3 Lock',
-      description: 'A basic deadbolt, the lock replaced more recently than the others.',
+      description:
+        'A basic deadbolt, the lock replaced more recently than the others.',
       difficulty: 3,
     },
     '%APT3_DOOR': {
@@ -72,7 +75,8 @@ export const building = {
     '%APT4_LOCK': {
       prototype: 'rentableLock',
       name: 'Apartment 4 Lock',
-      description: 'A deadbolt with a sticky mechanism, requiring precise key angles.',
+      description:
+        'A deadbolt with a sticky mechanism, requiring precise key angles.',
       difficulty: 4,
     },
     '%APT4_DOOR': {
@@ -210,7 +214,8 @@ Books are stacked everywhere—on the desk, on the floor, on the windowsill. The
         {
           name: 'the desk chair',
           capacity: 1,
-          emptyMsg: 'An office chair on casters sits at the desk, positioned for work or reading.',
+          emptyMsg:
+            'An office chair on casters sits at the desk, positioned for work or reading.',
           occupiedMsg: '%s seated at the desk',
         },
       ],

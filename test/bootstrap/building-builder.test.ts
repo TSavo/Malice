@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { BuildingBuilder } from '../../src/database/bootstrap/building-builder.js';
 import { MinimalBootstrap } from '../../src/database/bootstrap/minimal-bootstrap.js';
-import { RecyclerBuilder } from '../../src/database/bootstrap/recycler-builder.js';
-import { RoomBuilder } from '../../src/database/bootstrap/prototypes/room-builder.js';
 import { ExitBuilder } from '../../src/database/bootstrap/prototypes/exit-builder.js';
+import { RoomBuilder } from '../../src/database/bootstrap/prototypes/room-builder.js';
+import { RecyclerBuilder } from '../../src/database/bootstrap/recycler-builder.js';
 import { ObjectDatabase } from '../../src/database/object-db.js';
 import { ObjectManager } from '../../src/database/object-manager.js';
 
@@ -125,10 +125,8 @@ describe('BuildingBuilder', () => {
       await builder.build();
 
       const objectManager = await manager.load(0);
-      const aliases = (objectManager?.get('aliases') as Record<
-        string,
-        number
-      >) || {};
+      const aliases =
+        (objectManager?.get('aliases') as Record<string, number>) || {};
 
       // Building aliases should exist (the exact names depend on building definitions)
       const aliasCount = Object.keys(aliases).length;

@@ -12,7 +12,7 @@ export const building = {
       name: 'Basement Lock',
       description:
         'A heavy iron padlock, its mechanism stiff with age but still functional.',
-      difficulty: 5
+      difficulty: 5,
     },
     '%BASEMENT_HATCH': {
       prototype: 'door',
@@ -23,7 +23,7 @@ export const building = {
       open: false,
       locks: ['%BASEMENT_LOCK'],
       material: 'metal',
-      durability: 80
+      durability: 80,
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -51,10 +51,10 @@ The stairwell opens into a main corridor that runs the length of the building, r
           to: 'z0.ts#%GC_SERVICE',
           description: 'Iron stairs lead up to the service area',
           door: '%BASEMENT_HATCH',
-          locks: ['%BASEMENT_LOCK']
+          locks: ['%BASEMENT_LOCK'],
         },
         west: '%MAIN_CORRIDOR',
-        south: '%BOILER_ROOM'
+        south: '%BOILER_ROOM',
       },
       objects: [
         {
@@ -62,9 +62,9 @@ The stairwell opens into a main corridor that runs the length of the building, r
           name: 'gas fixtures',
           aliases: ['fixtures', 'lights', 'jets'],
           description:
-            'Brass gas light fixtures line the walls, their jets cold and empty. The fixtures are beautiful in their Victorian way—decorative ironwork holding glass globes that once glowed with burning gas. They became decorative when electricity arrived and stayed decorative as everything else failed.'
+            'Brass gas light fixtures line the walls, their jets cold and empty. The fixtures are beautiful in their Victorian way—decorative ironwork holding glass globes that once glowed with burning gas. They became decorative when electricity arrived and stayed decorative as everything else failed.',
         },
-      ]
+      ],
     },
 
     '%MAIN_CORRIDOR': {
@@ -86,7 +86,7 @@ Electrical conduit runs along the ceiling, a later addition that brought power t
       exits: {
         east: '%BASEMENT_STAIRS',
         west: '%STORAGE_WEST',
-        south: '%CISTERN'
+        south: '%CISTERN',
       },
       objects: [
         {
@@ -94,9 +94,9 @@ Electrical conduit runs along the ceiling, a later addition that brought power t
           name: 'iron columns',
           aliases: ['columns', 'supports'],
           description:
-            'Iron columns support the basement ceiling at regular intervals, plain cylinders without the decorative capitals of their ground-floor counterparts. The columns are load-bearing, essential, doing their work without acknowledgment.'
+            'Iron columns support the basement ceiling at regular intervals, plain cylinders without the decorative capitals of their ground-floor counterparts. The columns are load-bearing, essential, doing their work without acknowledgment.',
         },
-      ]
+      ],
     },
 
     '%BOILER_ROOM': {
@@ -117,7 +117,7 @@ The floor is concrete, stained with decades of coal dust and oil. A drain in the
       outdoor: false,
       exits: {
         north: '%BASEMENT_STAIRS',
-        west: '%CISTERN'
+        west: '%CISTERN',
       },
       objects: [
         {
@@ -126,16 +126,16 @@ The floor is concrete, stained with decades of coal dust and oil. A drain in the
           aliases: ['boiler', 'furnace'],
           description:
             'A massive cast iron boiler, its riveted construction a monument to Victorian engineering. The firebox door hangs open, revealing decades of accumulated ash. Steam pipes radiate from the top like metal tentacles, disappearing into the ceiling above.',
-          boltedDown: true
+          boltedDown: true,
         },
         {
           prototype: 'crate',
           name: 'coal bins',
           aliases: ['bins', 'coal'],
           description:
-            'Wooden bins along the wall, still holding the remnants of coal that was never burned. The coal has degraded into dust and small chunks, useless for heating but evidence of how the building once stayed warm.'
+            'Wooden bins along the wall, still holding the remnants of coal that was never burned. The coal has degraded into dust and small chunks, useless for heating but evidence of how the building once stayed warm.',
         },
-      ]
+      ],
     },
 
     '%CISTERN': {
@@ -157,7 +157,7 @@ One pipe is larger than the others, a culvert of sorts that leads south into the
       exits: {
         north: '%MAIN_CORRIDOR',
         east: '%BOILER_ROOM',
-        west: '%STORAGE_WEST'
+        west: '%STORAGE_WEST',
       },
       objects: [
         {
@@ -165,16 +165,16 @@ One pipe is larger than the others, a culvert of sorts that leads south into the
           name: 'brick cistern',
           aliases: ['cistern', 'tank', 'reservoir'],
           description:
-            'A circular brick cistern, its walls rising to a domed ceiling. The tank once held water for the building above—drinking water, fire suppression, whatever was needed. Now it holds only a few inches of dark water and the echoes of drops falling from somewhere above.'
+            'A circular brick cistern, its walls rising to a domed ceiling. The tank once held water for the building above—drinking water, fire suppression, whatever was needed. Now it holds only a few inches of dark water and the echoes of drops falling from somewhere above.',
         },
         {
           prototype: 'describable',
           name: 'culvert passage',
           aliases: ['culvert', 'passage', 'tunnel'],
           description:
-            'A large pipe or culvert leads south from the cistern room, wide enough for a person to walk through hunched. The brick around the opening is worn smooth, polished by use. Cold air flows from the passage, carrying the smell of the underground.'
+            'A large pipe or culvert leads south from the cistern room, wide enough for a person to walk through hunched. The brick around the opening is worn smooth, polished by use. Cold air flows from the passage, carrying the smell of the underground.',
         },
-      ]
+      ],
     },
 
     '%STORAGE_WEST': {
@@ -195,7 +195,7 @@ The ceiling is lower here, the floor uneven. Water has pooled in the southwest c
       outdoor: false,
       exits: {
         east: '%CISTERN',
-        north: '%MAIN_CORRIDOR'
+        north: '%MAIN_CORRIDOR',
       },
       objects: [
         {
@@ -203,16 +203,16 @@ The ceiling is lower here, the floor uneven. Water has pooled in the southwest c
           name: 'storage cages',
           aliases: ['cages', 'storage', 'lockers'],
           description:
-            'Wire mesh storage cages, the kind used by tenants for overflow inventory. Most are empty, their doors hanging open. Numbers painted on the mesh—7, 12, 23—identify which shops rented which spaces. The shops are gone. The cages remain.'
+            'Wire mesh storage cages, the kind used by tenants for overflow inventory. Most are empty, their doors hanging open. Numbers painted on the mesh—7, 12, 23—identify which shops rented which spaces. The shops are gone. The cages remain.',
         },
         {
           prototype: 'crate',
           name: 'china crates',
           aliases: ['crates', 'china', 'merchandise'],
           description:
-            'Wooden crates marked SQUIRE & SONS DRY GOODS, their contents protected by straw packing. Inside, Victorian-era china waits in perfect condition—plates, cups, saucers in delicate patterns. The dry goods store closed decades ago. The china never sold. It waits still.'
+            'Wooden crates marked SQUIRE & SONS DRY GOODS, their contents protected by straw packing. Inside, Victorian-era china waits in perfect condition—plates, cups, saucers in delicate patterns. The dry goods store closed decades ago. The china never sold. It waits still.',
         },
-      ]
-    }
-  }
+      ],
+    },
+  },
 };

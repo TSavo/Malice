@@ -380,7 +380,7 @@
     ];
 
     function key(p) { return `${p.x},${p.y},${p.z}`; }
-    function manhattan(a, b) {
+    function _manhattan(a, b) {
       return Math.abs(a.x - b.x) + Math.abs(a.y - b.y) + Math.abs(a.z - b.z);
     }
 
@@ -524,7 +524,7 @@
     }
     
     function updateCursorPreviewZ() {
-      if (cursorPreview && cursorPreview.visible) {
+      if (cursorPreview?.visible) {
         const spacing = 2;
         cursorPreview.position.y = editorZ * spacing;
       }
@@ -601,7 +601,7 @@
     // Seeded random for consistent room features
     function seededRandom(seed) {
       let s = seed;
-      return function() {
+      return () => {
         s = (s * 1103515245 + 12345) & 0x7fffffff;
         return s / 0x7fffffff;
       };
@@ -613,7 +613,7 @@
       // Build adjacency and exit direction maps
       const roomById = new Map();
       const exitsByRoom = new Map();
-      const neighborTypes = new Map();
+      const _neighborTypes = new Map();
       
       for (const room of currentWorld.rooms) {
         roomById.set(room.id, room);
@@ -825,7 +825,7 @@
       
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'underground-world-' + Date.now() + '.json';
+      a.download = `underground-world-${Date.now()}.json`;
       a.click();
       
       URL.revokeObjectURL(url);
@@ -992,7 +992,7 @@
           }
         } else {
           // Exit mode - only works on existing rooms
-          if (existingRoom && existingRoom.id) {
+          if (existingRoom?.id) {
             if (exitStartRoomId === null) {
               exitStartRoomId = existingRoom.id;
               console.log('Exit start room:', exitStartRoomId);
@@ -1000,7 +1000,7 @@
             } else if (exitStartRoomId !== existingRoom.id) {
               const startRoom = findRoomById(exitStartRoomId);
               console.log('Creating exit from', exitStartRoomId, 'to', existingRoom.id);
-              if (startRoom && startRoom.id) {
+              if (startRoom?.id) {
                 addExit(startRoom, existingRoom);
               }
               exitStartRoomId = null;
@@ -1016,7 +1016,7 @@
       
       // Generate a unique string ID (matching the format used by generateWorld)
       const maxNumericId = currentWorld.rooms
-        .map(r => typeof r.id === 'string' ? parseInt(r.id.replace(/\D/g, '')) || 0 : r.id)
+        .map(r => typeof r.id === 'string' ? parseInt(r.id.replace(/\D/g, ''), 10) || 0 : r.id)
         .reduce((max, id) => Math.max(max, id), 0);
       const newId = `r${maxNumericId + 1}`;
       
@@ -1095,7 +1095,7 @@
         const el = document.getElementById(id);
         el.addEventListener('input', () => {
           const val = id === 'maxRooms' ? el.value : (el.value / 100).toFixed(2);
-          document.getElementById(id + 'Val').textContent = val;
+          document.getElementById(`${id}Val`).textContent = val;
         });
       });
 
@@ -1126,7 +1126,7 @@
             const data = JSON.parse(event.target.result);
             importWorld(data);
           } catch (err) {
-            alert('Failed to parse JSON: ' + err.message);
+            alert(`Failed to parse JSON: ${err.message}`);
           }
         };
         reader.readAsText(file);
@@ -1190,14 +1190,14 @@
       exitStartRoomId = null; // Reset exit selection on regenerate
       updateCursorPreviewColor();
 
-      const seed = parseInt(document.getElementById('seed').value) || 12345;
-      const maxRooms = parseInt(document.getElementById('maxRooms').value) || 500;
-      const branchChance = parseInt(document.getElementById('branchChance').value) / 100;
-      const linearBias = parseInt(document.getElementById('linearBias').value) / 100;
-      const centerBias = parseInt(document.getElementById('centerBias').value) / 100;
-      const centerPenalty = parseInt(document.getElementById('centerPenalty').value) / 100;
-      const prefabChance = parseInt(document.getElementById('prefabChance').value) / 100;
-      const linkPreference = parseInt(document.getElementById('linkPreference').value) / 100;
+      const seed = parseInt(document.getElementById('seed').value, 10) || 12345;
+      const maxRooms = parseInt(document.getElementById('maxRooms').value, 10) || 500;
+      const branchChance = parseInt(document.getElementById('branchChance').value, 10) / 100;
+      const linearBias = parseInt(document.getElementById('linearBias').value, 10) / 100;
+      const centerBias = parseInt(document.getElementById('centerBias').value, 10) / 100;
+      const centerPenalty = parseInt(document.getElementById('centerPenalty').value, 10) / 100;
+      const prefabChance = parseInt(document.getElementById('prefabChance').value, 10) / 100;
+      const linkPreference = parseInt(document.getElementById('linkPreference').value, 10) / 100;
 
       const bounds = {
         min: { x: -25, y: -12, z: -6 },
@@ -1275,7 +1275,7 @@
       const roomPosById = new Map();
 
       // Create room meshes
-      const entranceSet = new Set(entrances.map(e => key(e)));
+      const _entranceSet = new Set(entrances.map(e => key(e)));
       
       for (const room of world.rooms) {
         const pos = new THREE.Vector3(room.pos.x * spacing, room.pos.z * spacing, room.pos.y * spacing);
@@ -1284,9 +1284,9 @@
         // Get room type and colors
         const roomType = room.meta?.roomType || 'room';
         const colors = ROOM_COLORS[roomType] || ROOM_COLORS.room;
-        let color = colors.color;
-        let emissive = colors.emissive;
-        let scale = roomType === 'entrance' ? 1.3 : 1;
+        const color = colors.color;
+        const emissive = colors.emissive;
+        const scale = roomType === 'entrance' ? 1.3 : 1;
 
         const geometry = new THREE.BoxGeometry(roomSize * scale, roomSize * scale, roomSize * scale);
         const material = new THREE.MeshStandardMaterial({

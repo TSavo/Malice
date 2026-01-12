@@ -1,7 +1,7 @@
-import { ObjectManager } from '../database/object-manager.js';
-import { ObjectDatabase } from '../database/object-db.js';
-import { AliasLoader } from '../database/bootstrap/alias-loader.js';
 import { hash } from 'bcrypt';
+import { AliasLoader } from '../database/bootstrap/alias-loader.js';
+import { ObjectDatabase } from '../database/object-db.js';
+import { ObjectManager } from '../database/object-manager.js';
 
 async function createAdmin() {
   const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017';
@@ -29,7 +29,9 @@ async function createAdmin() {
   // Get password from environment variable or command-line argument
   const password = process.env.ADMIN_PASSWORD || process.argv[2];
   if (!password) {
-    console.error('Error: Password required. Set ADMIN_PASSWORD env var or pass as argument.');
+    console.error(
+      'Error: Password required. Set ADMIN_PASSWORD env var or pass as argument.',
+    );
     await db.disconnect();
     process.exit(1);
   }
@@ -60,12 +62,12 @@ async function createAdmin() {
   console.log('   isAdmin:', admin.get('isAdmin'));
 
   // Flush writes
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   await db.disconnect();
 }
 
-createAdmin().catch(err => {
+createAdmin().catch((err) => {
   console.error('Error:', err);
   process.exit(1);
 });

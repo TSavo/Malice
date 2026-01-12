@@ -64,7 +64,8 @@ Benches line the platform, their wooden slats rotted through in places. Passenge
           capacity: 4,
           emptyMsg:
             'Wooden benches line the platform, their slats rotted in places but still usable.',
-          occupiedMsg: '%s sitting on a platform bench, facing the empty tracks',
+          occupiedMsg:
+            '%s sitting on a platform bench, facing the empty tracks',
         },
       ],
       objects: [
@@ -111,7 +112,8 @@ A newsstand kiosk occupies one corner, its windows dark, its merchandise rotted 
           capacity: 6,
           emptyMsg:
             'Long benches line the platform center, positioned for viewing the departure boards.',
-          occupiedMsg: '%s sitting on the central platform, watching the frozen departure boards',
+          occupiedMsg:
+            '%s sitting on the central platform, watching the frozen departure boards',
         },
       ],
       objects: [

@@ -45,7 +45,7 @@ export const building = {
       prototype: 'door',
       name: 'Service Door',
       description:
-        'A reinforced steel door leading to the building\'s service corridor. No glass, no windows—jewelry stores learned not to provide easy access.',
+        "A reinforced steel door leading to the building's service corridor. No glass, no windows—jewelry stores learned not to provide easy access.",
       locked: true,
       open: false,
       locks: ['%BACK_LOCK'],

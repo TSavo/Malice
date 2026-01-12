@@ -37,7 +37,8 @@ export const building = {
     '%OFFICE_LOCK': {
       prototype: 'lock',
       name: 'Manager Office Lock',
-      description: 'A brass lock on the manager\'s office door, more ceremonial than secure.',
+      description:
+        "A brass lock on the manager's office door, more ceremonial than secure.",
       difficulty: 3,
     },
     '%OFFICE_DOOR': {
@@ -58,7 +59,11 @@ export const building = {
       description:
         'A circular vault door with a time lock mechanism. The dial shows numbers from 0-99. A small digital display, long since dead, once showed the countdown to the next opening window.',
       scanners: [
-        { type: 'keypad', part: 'hand', message: 'Time lock engaged. Vault sealed.' },
+        {
+          type: 'keypad',
+          part: 'hand',
+          message: 'Time lock engaged. Vault sealed.',
+        },
       ],
       authorizedUsers: {},
       difficulty: 10,
@@ -161,7 +166,7 @@ The branch manager's office is visible through a frosted glass door, its interio
       exits: {
         east: '%LOBBY',
         south: {
-          description: 'A frosted glass door leads to the manager\'s office',
+          description: "A frosted glass door leads to the manager's office",
           door: '%OFFICE_DOOR',
           to: '%MANAGER_OFFICE',
         },
@@ -183,7 +188,7 @@ The branch manager's office is visible through a frosted glass door, its interio
     },
 
     '%MANAGER_OFFICE': {
-      name: 'Washington Federal - Manager\'s Office',
+      name: "Washington Federal - Manager's Office",
       description: `The branch manager's corner office, appointed with the subtle luxury that says "I have access to money but I don't flaunt it." A mahogany desk faces the door, its leather blotter still holding a pen and notepad. The walls display framed certificates and photos—David Harrison shaking hands with regional executives, cutting ribbons, receiving plaques.
 
 The desk drawers have been forced open, their contents rifled through. A bottle of scotch sits on a credenza, half-empty, the good stuff that managers keep for special occasions. The special occasions ended. The scotch remains.
@@ -206,14 +211,14 @@ A window looks out onto an air shaft, grey light filtering through dirty glass. 
           capacity: 1,
           emptyMsg:
             'A high-backed leather chair sits behind the desk, the seat shaped by years of managerial sitting.',
-          occupiedMsg: '%s sitting in the manager\'s chair',
+          occupiedMsg: "%s sitting in the manager's chair",
         },
         {
           name: 'visitor chairs',
           capacity: 2,
           emptyMsg:
             'Two leather chairs face the desk, positioned for difficult conversations about loans.',
-          occupiedMsg: '%s in the visitor\'s chair',
+          occupiedMsg: "%s in the visitor's chair",
         },
       ],
       objects: [

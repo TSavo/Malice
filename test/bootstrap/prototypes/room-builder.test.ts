@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { RoomBuilder } from '../../../src/database/bootstrap/prototypes/room-builder.js';
 import { MinimalBootstrap } from '../../../src/database/bootstrap/minimal-bootstrap.js';
+import { RoomBuilder } from '../../../src/database/bootstrap/prototypes/room-builder.js';
 import { ObjectDatabase } from '../../../src/database/object-db.js';
 import { ObjectManager } from '../../../src/database/object-manager.js';
 

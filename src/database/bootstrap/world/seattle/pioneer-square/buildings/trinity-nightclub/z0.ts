@@ -17,9 +17,14 @@ export const building = {
     '%MAIN_LOCK': {
       prototype: 'biometricLock',
       name: 'Trinity Entry Scanner',
-      description: 'A matte black panel beside the door, nearly invisible against the steel. No instructions—you either know or you don\'t.',
+      description:
+        "A matte black panel beside the door, nearly invisible against the steel. No instructions—you either know or you don't.",
       scanners: [
-        { type: 'fingerprint', part: 'hand', message: 'The panel pulses red once. Nothing happens.' },
+        {
+          type: 'fingerprint',
+          part: 'hand',
+          message: 'The panel pulses red once. Nothing happens.',
+        },
       ],
       authorizedUsers: {},
     },
@@ -38,9 +43,7 @@ export const building = {
       prototype: 'biometricLock',
       name: 'Office Lock',
       description: 'A heavy-duty lock on a reinforced door.',
-      scanners: [
-        { type: 'fingerprint', part: 'hand', message: 'Staff only.' },
-      ],
+      scanners: [{ type: 'fingerprint', part: 'hand', message: 'Staff only.' }],
       authorizedUsers: {},
     },
 
@@ -51,7 +54,8 @@ export const building = {
     '%MAIN_DOOR': {
       prototype: 'door',
       name: 'Black Steel Door',
-      description: 'A featureless black steel door, no handle visible from outside. Those who belong know how to open it.',
+      description:
+        'A featureless black steel door, no handle visible from outside. Those who belong know how to open it.',
       locked: false,
       open: false,
       locks: ['%MAIN_LOCK'],
@@ -97,15 +101,20 @@ A sign on the wall, hand-painted in white on black: NO PHOTOS. NO PHONES. NO BUL
       waterLevel: 0,
       outdoor: false,
       exits: {
-        east: { to: '1st-ave-s/y2.ts', door: '%MAIN_DOOR', description: 'The black steel door leads east to 1st Ave S' },
+        east: {
+          to: '1st-ave-s/y2.ts',
+          door: '%MAIN_DOOR',
+          description: 'The black steel door leads east to 1st Ave S',
+        },
         down: '%LANDING',
       },
       sittables: [
         {
-          name: 'the bouncer\'s stool',
+          name: "the bouncer's stool",
           capacity: 1,
-          emptyMsg: 'A metal stool stands by the door, positioned for watching who enters.',
-          occupiedMsg: '%s on the bouncer\'s stool',
+          emptyMsg:
+            'A metal stool stands by the door, positioned for watching who enters.',
+          occupiedMsg: "%s on the bouncer's stool",
         },
       ],
     },

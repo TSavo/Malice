@@ -81,8 +81,14 @@ export class IssuesBuilder implements Builder {
       'items',
       'Array of issue objects with id, title, body, type, status, priority, etc.',
     );
-    this.issues.setPropertyDescription('nextId', 'Auto-incrementing ID for new issues');
-    this.issues.setPropertyDescription('types', 'Valid issue types: bug, feature, task, question');
+    this.issues.setPropertyDescription(
+      'nextId',
+      'Auto-incrementing ID for new issues',
+    );
+    this.issues.setPropertyDescription(
+      'types',
+      'Valid issue types: bug, feature, task, question',
+    );
     this.issues.setPropertyDescription(
       'statuses',
       'Valid statuses: open, in_progress, resolved, closed, wontfix',

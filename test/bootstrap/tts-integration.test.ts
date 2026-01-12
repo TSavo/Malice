@@ -56,7 +56,14 @@ describe('TTS Integration', () => {
       );
 
       const voice = await obj.call('getVoiceId');
-      const builtinVoices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
+      const builtinVoices = [
+        'alloy',
+        'echo',
+        'fable',
+        'onyx',
+        'nova',
+        'shimmer',
+      ];
 
       // Voice is either a built-in or a speaker_XXX from LibriTTS
       const isBuiltin = builtinVoices.includes(voice);
@@ -101,7 +108,14 @@ describe('TTS Integration', () => {
       const voice2 = await obj2.call('getVoiceId');
 
       // Both should be valid voices (built-in or speaker_XXX)
-      const builtinVoices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
+      const builtinVoices = [
+        'alloy',
+        'echo',
+        'fable',
+        'onyx',
+        'nova',
+        'shimmer',
+      ];
       const isValid = (v: string) =>
         builtinVoices.includes(v) || /^speaker_\d+$/.test(v);
       expect(isValid(voice1)).toBe(true);
@@ -196,7 +210,7 @@ describe('TTS Integration', () => {
       await speaker.moveTo(room);
 
       // Create a listener to capture announce calls
-      const announcements: any[] = [];
+      const _announcements: any[] = [];
       const originalAnnounce = room.getMethodCode('announce');
 
       room.setMethod(
@@ -332,7 +346,8 @@ describe('TTS Integration', () => {
           properties: {
             name: 'Menacing NPC',
             voiceId: 'onyx',
-            voiceStyle: 'speak slowly and menacingly, with a deep threatening tone',
+            voiceStyle:
+              'speak slowly and menacingly, with a deep threatening tone',
           },
         },
         null,
@@ -359,7 +374,8 @@ describe('TTS Integration', () => {
           speaker: String(speaker.id),
           speakerName: 'Menacing NPC',
           voiceId: 'onyx',
-          voiceStyle: 'speak slowly and menacingly, with a deep threatening tone',
+          voiceStyle:
+            'speak slowly and menacingly, with a deep threatening tone',
           text: 'I will find you',
         },
       ]);
@@ -519,7 +535,9 @@ describe('TTS Integration', () => {
       ];
 
       // Should not throw error even though item doesn't have audio method
-      await expect(room.call('broadcastAudio', segments)).resolves.toBeDefined();
+      await expect(
+        room.call('broadcastAudio', segments),
+      ).resolves.toBeDefined();
 
       expect(player._audioSegments.length).toBe(1);
     });
@@ -546,7 +564,9 @@ describe('TTS Integration', () => {
       );
 
       await expect(room.call('broadcastAudio', null)).resolves.toBeDefined();
-      await expect(room.call('broadcastAudio', undefined)).resolves.toBeDefined();
+      await expect(
+        room.call('broadcastAudio', undefined),
+      ).resolves.toBeDefined();
     });
   });
 
@@ -570,7 +590,12 @@ describe('TTS Integration', () => {
       };
 
       const segments = [
-        { speaker: '5', speakerName: 'NPC', voiceId: 'fable', text: 'Greetings' },
+        {
+          speaker: '5',
+          speakerName: 'NPC',
+          voiceId: 'fable',
+          text: 'Greetings',
+        },
       ];
 
       const result = await player.call('audio', segments);
@@ -732,10 +757,19 @@ describe('TTS Integration', () => {
       await speaker.call('say', 'Attention everyone');
 
       // All listeners should receive the same audio
-      const builtinVoices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
+      const builtinVoices = [
+        'alloy',
+        'echo',
+        'fable',
+        'onyx',
+        'nova',
+        'shimmer',
+      ];
       for (let i = 0; i < 3; i++) {
         expect(deliveredAudio[i].length).toBe(1);
-        expect(deliveredAudio[i][0].segments[0].text).toBe('Attention everyone');
+        expect(deliveredAudio[i][0].segments[0].text).toBe(
+          'Attention everyone',
+        );
         const voiceId = deliveredAudio[i][0].segments[0].voiceId;
         const isValid =
           builtinVoices.includes(voiceId) || /^speaker_\d+$/.test(voiceId);

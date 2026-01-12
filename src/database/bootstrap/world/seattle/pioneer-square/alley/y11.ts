@@ -24,7 +24,8 @@ The Fabrication Factory's loading bay is visible through a gap in the fence to t
       allowedFaction: 'Citizen',
       denyMessage:
         'A retinal scanner beside the reinforced door flashes red. "Security personnel only."',
-      description: 'A reinforced security door leads into the Fabrication Factory',
+      description:
+        'A reinforced security door leads into the Fabrication Factory',
     },
   },
 };

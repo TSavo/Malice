@@ -26,7 +26,7 @@ export const building = {
       prototype: 'door',
       name: 'Courthouse Entrance',
       description:
-        'Glass doors in aluminum frames, the utilitarian aesthetic of government architecture. One door is propped open with a fire extinguisher—someone needed to get in or out and didn\'t care about security protocols.',
+        "Glass doors in aluminum frames, the utilitarian aesthetic of government architecture. One door is propped open with a fire extinguisher—someone needed to get in or out and didn't care about security protocols.",
       locked: false,
       open: true,
       locks: ['%MAIN_LOCK'],
@@ -137,7 +137,7 @@ The directory is accurate. The departments are empty. The distinction between cr
     },
 
     '%CLERKS_OFFICE': {
-      name: 'King County Courthouse - Clerk\'s Office',
+      name: "King County Courthouse - Clerk's Office",
       description: `The County Clerk's office processed the paperwork of justice—filing fees, court dates, the bureaucratic infrastructure that turned disputes into cases and cases into records. The counter separates staff from public, a barrier of laminate and institutional distrust.
 
 Behind the counter, desks are arranged in the open-plan style that someone thought promoted efficiency. Stacks of files cover every surface—cases pending, cases filed, cases that will never be resolved. The filing system made sense to someone. That someone is gone.

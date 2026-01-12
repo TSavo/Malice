@@ -31,7 +31,11 @@ A window overlooks First Avenue, the view that someone watched every day while d
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: { door: '%UPSTAIRS_DOOR', description: 'The apartment door leads to the stairs', to: '%LANDING' },
+        west: {
+          door: '%UPSTAIRS_DOOR',
+          description: 'The apartment door leads to the stairs',
+          to: '%LANDING',
+        },
         east: '%KITCHEN',
         north: '%BEDROOM',
       },
@@ -157,8 +161,7 @@ Clothes drape over a chair, hang from door hooks, spill from dresser drawers. Th
         {
           name: 'a clothes chair',
           capacity: 1,
-          emptyMsg:
-            'A chair piled with clothes serves as secondary storage.',
+          emptyMsg: 'A chair piled with clothes serves as secondary storage.',
           occupiedMsg: '%s perched among the laundry',
         },
       ],

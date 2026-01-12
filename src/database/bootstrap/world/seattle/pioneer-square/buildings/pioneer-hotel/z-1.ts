@@ -12,7 +12,7 @@ export const building = {
       name: 'Basement Lock',
       description:
         'A cheap padlock on a hasp, the kind that could be defeated with bolt cutters or patience.',
-      difficulty: 2
+      difficulty: 2,
     },
     '%BASEMENT_DOOR': {
       prototype: 'door',
@@ -23,7 +23,7 @@ export const building = {
       open: false,
       locks: ['%BASEMENT_LOCK'],
       material: 'wood',
-      durability: 50
+      durability: 50,
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -51,9 +51,9 @@ Stairs lead up to the lobby. A maintenance corridor leads east toward the buildi
           to: 'z0.ts#%LOBBY',
           description: 'Stairs lead up to the lobby',
           door: '%BASEMENT_DOOR',
-          locks: ['%BASEMENT_LOCK']
+          locks: ['%BASEMENT_LOCK'],
         },
-        east: '%MECHANICAL'
+        east: '%MECHANICAL',
       },
       objects: [
         {
@@ -61,16 +61,16 @@ Stairs lead up to the lobby. A maintenance corridor leads east toward the buildi
           name: 'industrial washers',
           aliases: ['washers', 'machines', 'laundry'],
           description:
-            'A row of industrial washing machines, their drum doors hanging open like mouths. The machines are dead—no power, no water. Someone stripped the copper wiring from one of them. The others remain intact, waiting for electricity that will never come.'
+            'A row of industrial washing machines, their drum doors hanging open like mouths. The machines are dead—no power, no water. Someone stripped the copper wiring from one of them. The others remain intact, waiting for electricity that will never come.',
         },
         {
           prototype: 'furniture',
           name: 'dryers',
           aliases: ['dryer'],
           description:
-            'Industrial dryers line the opposite wall, their vents disconnected and hanging loose. Lint clogs the filters, accumulated from the last loads ever dried here. The lint is grey and matted, compressed into felt by time.'
+            'Industrial dryers line the opposite wall, their vents disconnected and hanging loose. Lint clogs the filters, accumulated from the last loads ever dried here. The lint is grey and matted, compressed into felt by time.',
         },
-      ]
+      ],
     },
 
     '%MECHANICAL': {
@@ -90,7 +90,7 @@ A section of wall in the eastern corner has been knocked through, revealing an o
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: '%LAUNDRY'
+        west: '%LAUNDRY',
       },
       objects: [
         {
@@ -98,23 +98,23 @@ A section of wall in the eastern corner has been knocked through, revealing an o
           name: 'water heater',
           aliases: ['boiler', 'heater'],
           description:
-            'A commercial water heater, large enough to supply six floors of hotel rooms. The heater is cold now, its pilot light extinguished, its tank empty of hot water. The residents use cold water when they can get it. The pressure varies.'
+            'A commercial water heater, large enough to supply six floors of hotel rooms. The heater is cold now, its pilot light extinguished, its tank empty of hot water. The residents use cold water when they can get it. The pressure varies.',
         },
         {
           prototype: 'describable',
           name: 'electrical panel',
           aliases: ['panel', 'breaker', 'electrical'],
           description:
-            'An electrical panel, its breakers labeled with floor numbers and zones. The panel hums with current from somewhere—the grid still functions, or something like it. Some breakers are tripped. Others remain on. The pattern suggests selective maintenance by someone who knew what they were doing.'
+            'An electrical panel, its breakers labeled with floor numbers and zones. The panel hums with current from somewhere—the grid still functions, or something like it. Some breakers are tripped. Others remain on. The pattern suggests selective maintenance by someone who knew what they were doing.',
         },
         {
           prototype: 'describable',
           name: 'wall breach',
           aliases: ['breach', 'hole', 'passage'],
           description:
-            'A section of the eastern wall has been knocked through, bricks piled to either side. The breach reveals an older passage beyond—the underground that exists beneath all of Pioneer Square. Someone uses this passage. The footprints in the dust lead both ways.'
+            'A section of the eastern wall has been knocked through, bricks piled to either side. The breach reveals an older passage beyond—the underground that exists beneath all of Pioneer Square. Someone uses this passage. The footprints in the dust lead both ways.',
         },
-      ]
-    }
-  }
+      ],
+    },
+  },
 };

@@ -83,7 +83,11 @@ A stairwell at the north end leads down to the kitchen and up to the third floor
       exits: {
         down: '%KITCHEN',
         up: '%HALL_Z2',
-        west: { room: '%ROOM_101', door: '%ROOM_101_DOOR', locks: ['%ROOM_101_LOCK'] },
+        west: {
+          room: '%ROOM_101',
+          door: '%ROOM_101_DOOR',
+          locks: ['%ROOM_101_LOCK'],
+        },
         south: '%BATH_Z1',
       },
     },
@@ -105,7 +109,11 @@ The smell of the kitchen below is strongest here, rising through gaps in the flo
       waterLevel: 0,
       outdoor: false,
       exits: {
-        out: { room: '%HALL_Z1', door: '%ROOM_101_DOOR', locks: ['%ROOM_101_LOCK'] },
+        out: {
+          room: '%HALL_Z1',
+          door: '%ROOM_101_DOOR',
+          locks: ['%ROOM_101_LOCK'],
+        },
       },
       objects: [
         {
@@ -120,7 +128,8 @@ The smell of the kitchen below is strongest here, rising through gaps in the flo
         {
           name: 'a wooden chair',
           capacity: 1,
-          emptyMsg: 'A simple wooden chair sits by the window, its cane seat partially broken through.',
+          emptyMsg:
+            'A simple wooden chair sits by the window, its cane seat partially broken through.',
           occupiedMsg: '%s sitting carefully on the broken chair',
         },
       ],
@@ -144,14 +153,23 @@ The tile floor is hexagonal—black and white in an alternating pattern—severa
       outdoor: false,
       exits: {
         north: '%HALL_Z1',
-        west: { room: '%ROOM_102', door: '%ROOM_102_DOOR', locks: ['%ROOM_102_LOCK'] },
-        south: { room: '%ROOM_103', door: '%ROOM_103_DOOR', locks: ['%ROOM_103_LOCK'] },
+        west: {
+          room: '%ROOM_102',
+          door: '%ROOM_102_DOOR',
+          locks: ['%ROOM_102_LOCK'],
+        },
+        south: {
+          room: '%ROOM_103',
+          door: '%ROOM_103_DOOR',
+          locks: ['%ROOM_103_LOCK'],
+        },
       },
       sittables: [
         {
           name: 'the bathtub',
           capacity: 1,
-          emptyMsg: 'A claw-foot bathtub, stained and dry, large enough to sit in.',
+          emptyMsg:
+            'A claw-foot bathtub, stained and dry, large enough to sit in.',
           occupiedMsg: '%s sitting in the empty tub',
         },
       ],
@@ -174,7 +192,11 @@ A radiator beneath the west window is cold and silent, its cast iron decorated w
       waterLevel: 0,
       outdoor: false,
       exits: {
-        out: { room: '%BATH_Z1', door: '%ROOM_102_DOOR', locks: ['%ROOM_102_LOCK'] },
+        out: {
+          room: '%BATH_Z1',
+          door: '%ROOM_102_DOOR',
+          locks: ['%ROOM_102_LOCK'],
+        },
       },
       objects: [
         {
@@ -195,7 +217,8 @@ A radiator beneath the west window is cold and silent, its cast iron decorated w
         {
           name: 'a cushioned chair',
           capacity: 1,
-          emptyMsg: 'A cushioned chair sits before the writing desk, its upholstery faded and worn.',
+          emptyMsg:
+            'A cushioned chair sits before the writing desk, its upholstery faded and worn.',
           occupiedMsg: '%s sitting at the writing desk',
         },
       ],
@@ -218,7 +241,11 @@ A fire escape landing is visible through the window, the rusted grating providin
       waterLevel: 0,
       outdoor: false,
       exits: {
-        north: { room: '%BATH_Z1', door: '%ROOM_103_DOOR', locks: ['%ROOM_103_LOCK'] },
+        north: {
+          room: '%BATH_Z1',
+          door: '%ROOM_103_DOOR',
+          locks: ['%ROOM_103_LOCK'],
+        },
       },
       objects: [
         {

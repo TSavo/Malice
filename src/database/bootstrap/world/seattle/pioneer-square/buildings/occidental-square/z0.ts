@@ -36,7 +36,8 @@ export const building = {
     '%COFFEE_LOCK': {
       prototype: 'lock',
       name: 'Coffee Shop Lock',
-      description: 'A worn brass lock, the keyhole scratched from years of use.',
+      description:
+        'A worn brass lock, the keyhole scratched from years of use.',
       difficulty: 2,
     },
     '%COFFEE_DOOR': {
@@ -53,15 +54,14 @@ export const building = {
     '%BOOKSTORE_LOCK': {
       prototype: 'lock',
       name: 'Bookstore Lock',
-      description:
-        'An antique brass lock, the mechanism stiff but functional.',
+      description: 'An antique brass lock, the mechanism stiff but functional.',
       difficulty: 3,
     },
     '%BOOKSTORE_DOOR': {
       prototype: 'door',
       name: 'Bookstore Entrance',
       description:
-        "A heavy wooden door painted dark green, a brass bell mounted above that jingles when the door moves. The transom window above reads PIONEER SQUARE BOOKS - EST. 1978 in gold letters.",
+        'A heavy wooden door painted dark green, a brass bell mounted above that jingles when the door moves. The transom window above reads PIONEER SQUARE BOOKS - EST. 1978 in gold letters.',
       locked: false,
       open: false,
       locks: ['%BOOKSTORE_LOCK'],
@@ -103,13 +103,15 @@ The gallery was artist-run, the placard on the wall explains. Twenty members sha
         down: {
           to: 'buildings/underground-east/z-2.ts',
           room: '%OCC_CROSS',
-          description: 'A trapdoor beneath the spiral sculpture leads to darkness',
+          description:
+            'A trapdoor beneath the spiral sculpture leads to darkness',
           hidden: true,
         },
         shaft: {
           to: 'buildings/arterial-tunnel/z-3.ts',
           room: '%ARTERY_HUB',
-          description: 'A ventilation shaft behind the display case descends into deep darkness',
+          description:
+            'A ventilation shaft behind the display case descends into deep darkness',
           hidden: true,
         },
       },

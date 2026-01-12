@@ -17,7 +17,8 @@ export const building = {
     '%STAFF_LOCK': {
       prototype: 'biometricLock',
       name: 'Staff Door Scanner',
-      description: 'A small keypad beside a metal door, the numbers worn smooth.',
+      description:
+        'A small keypad beside a metal door, the numbers worn smooth.',
       scanners: [
         { type: 'fingerprint', part: 'hand', message: 'Staff access only.' },
       ],
@@ -29,7 +30,11 @@ export const building = {
       name: 'Service Entrance Scanner',
       description: 'A weathered keypad beside the loading door.',
       scanners: [
-        { type: 'fingerprint', part: 'hand', message: 'Authorized personnel only.' },
+        {
+          type: 'fingerprint',
+          part: 'hand',
+          message: 'Authorized personnel only.',
+        },
       ],
       authorizedUsers: {},
     },
@@ -108,17 +113,21 @@ The smell is espresso and old wood and that particular mustiness of buildings th
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: { to: '1st-ave-s/y1.ts', description: 'Glass doors lead west to 1st Ave S' },
+        west: {
+          to: '1st-ave-s/y1.ts',
+          description: 'Glass doors lead west to 1st Ave S',
+        },
         north: '%COFFEE',
         southwest: '%STORAGE',
         up: '%GALLERY_LOBBY',
-        'in': '%E',
+        in: '%E',
       },
       sittables: [
         {
           name: 'a worn leather bench',
           capacity: 3,
-          emptyMsg: 'A leather bench sits against the wall, its cushions shaped by countless visitors.',
+          emptyMsg:
+            'A leather bench sits against the wall, its cushions shaped by countless visitors.',
           occupiedMsg: '%s waiting on the lobby bench',
         },
       ],
@@ -141,7 +150,11 @@ Art hangs on every wall—photographs, paintings, prints—all for sale, price t
       outdoor: false,
       exits: {
         south: '%LOBBY',
-        north: { room: '%KITCHEN', door: '%STAFF_DOOR', locks: ['%STAFF_LOCK'] },
+        north: {
+          room: '%KITCHEN',
+          door: '%STAFF_DOOR',
+          locks: ['%STAFF_LOCK'],
+        },
       },
       sittables: [
         {
@@ -153,7 +166,8 @@ Art hangs on every wall—photographs, paintings, prints—all for sale, price t
         {
           name: 'a spool table seat',
           capacity: 2,
-          emptyMsg: 'Stools surround an industrial spool repurposed as a table.',
+          emptyMsg:
+            'Stools surround an industrial spool repurposed as a table.',
           occupiedMsg: '%s at the spool table',
         },
         {
@@ -165,7 +179,8 @@ Art hangs on every wall—photographs, paintings, prints—all for sale, price t
         {
           name: 'a wingback chair',
           capacity: 1,
-          emptyMsg: 'A threadbare wingback chair occupies the corner, its velvet worn thin.',
+          emptyMsg:
+            'A threadbare wingback chair occupies the corner, its velvet worn thin.',
           occupiedMsg: '%s ensconced in the wingback chair',
         },
       ],
@@ -206,7 +221,11 @@ A time clock on the wall has punch cards still in their slots. The last punches 
       outdoor: false,
       exits: {
         south: { room: '%COFFEE', door: '%STAFF_DOOR', locks: ['%STAFF_LOCK'] },
-        southwest: { room: '%STORAGE', door: '%SERVICE_DOOR', locks: ['%SERVICE_LOCK'] },
+        southwest: {
+          room: '%STORAGE',
+          door: '%SERVICE_DOOR',
+          locks: ['%SERVICE_LOCK'],
+        },
       },
     },
 
@@ -227,7 +246,12 @@ The air is cool and dry, climate-controlled even now—someone understood that a
       outdoor: false,
       exits: {
         east: '%LOBBY',
-        north: { room: '%KITCHEN', door: '%SERVICE_DOOR', locks: ['%SERVICE_LOCK'], distance: 30 },
+        north: {
+          room: '%KITCHEN',
+          door: '%SERVICE_DOOR',
+          locks: ['%SERVICE_LOCK'],
+          distance: 30,
+        },
         down: {
           to: 'z-1.ts#%ART_STORAGE',
           description: 'A trapdoor leads down to basement storage',

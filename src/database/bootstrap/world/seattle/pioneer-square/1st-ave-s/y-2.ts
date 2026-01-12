@@ -21,7 +21,8 @@ The curb cut here still shows yellow paint where carriages loaded passengers. Th
     },
     east: {
       to: 'buildings/colman-building/z0.ts#%WEST_RETAIL',
-      description: 'Glass doors lead into the vacant Colman Building retail space',
+      description:
+        'Glass doors lead into the vacant Colman Building retail space',
     },
   },
   // Environmental properties

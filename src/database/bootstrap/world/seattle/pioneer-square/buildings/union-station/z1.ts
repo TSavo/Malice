@@ -18,8 +18,7 @@ export const building = {
     '%ROOF_HATCH_LOCK': {
       prototype: 'lock',
       name: 'Roof Access Lock',
-      description:
-        'A heavy padlock securing the roof hatch.',
+      description: 'A heavy padlock securing the roof hatch.',
       difficulty: 5,
     },
 
@@ -53,7 +52,8 @@ The mezzanine was added in the 1920s, a way to increase usable space without alt
           capacity: 2,
           emptyMsg:
             'A wooden bench sits against the inner wall, positioned for viewing the hall below.',
-          occupiedMsg: '%s sitting on the mezzanine bench, overlooking the grand hall',
+          occupiedMsg:
+            '%s sitting on the mezzanine bench, overlooking the grand hall',
         },
       ],
       objects: [
@@ -270,11 +270,11 @@ Someone left in a hurry, or didn't care enough to take everything. The photo fra
       },
       sittables: [
         {
-          name: 'the manager\'s chair',
+          name: "the manager's chair",
           capacity: 1,
           emptyMsg:
             'An executive chair sits in the private office, positioned to face both the door and the window.',
-          occupiedMsg: '%s sitting in the manager\'s office',
+          occupiedMsg: "%s sitting in the manager's office",
         },
       ],
       objects: [

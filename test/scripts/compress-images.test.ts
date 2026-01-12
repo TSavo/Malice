@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock sharp before importing the module
 const mockSharp = vi.fn();
@@ -42,11 +42,11 @@ describe('compress-images script helpers', () => {
   describe('formatBytes', () => {
     // Helper to import and test formatBytes function
     const formatBytes = (bytes: number): string => {
-      if (bytes < 1024) return bytes + ' B';
-      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      if (bytes < 1024) return `${bytes} B`;
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
       if (bytes < 1024 * 1024 * 1024)
-        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-      return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+      return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
     };
 
     it('should format bytes correctly', () => {
@@ -200,7 +200,7 @@ describe('compress-images script helpers', () => {
       const args = ['--parallel', '4'];
       const parallelIndex = args.indexOf('--parallel');
       const parallel =
-        parallelIndex >= 0 ? parseInt(args[parallelIndex + 1]) || 2 : 2;
+        parallelIndex >= 0 ? parseInt(args[parallelIndex + 1], 10) || 2 : 2;
       expect(parallel).toBe(4);
     });
 
@@ -208,7 +208,7 @@ describe('compress-images script helpers', () => {
       const args: string[] = [];
       const parallelIndex = args.indexOf('--parallel');
       const parallel =
-        parallelIndex >= 0 ? parseInt(args[parallelIndex + 1]) || 2 : 2;
+        parallelIndex >= 0 ? parseInt(args[parallelIndex + 1], 10) || 2 : 2;
       expect(parallel).toBe(2);
     });
 
@@ -217,7 +217,7 @@ describe('compress-images script helpers', () => {
       const limitIndex = args.indexOf('--limit');
       const limit =
         limitIndex >= 0
-          ? parseInt(args[limitIndex + 1]) || Infinity
+          ? parseInt(args[limitIndex + 1], 10) || Infinity
           : Infinity;
       expect(limit).toBe(10);
     });
@@ -227,7 +227,7 @@ describe('compress-images script helpers', () => {
       const limitIndex = args.indexOf('--limit');
       const limit =
         limitIndex >= 0
-          ? parseInt(args[limitIndex + 1]) || Infinity
+          ? parseInt(args[limitIndex + 1], 10) || Infinity
           : Infinity;
       expect(limit).toBe(Infinity);
     });
@@ -236,7 +236,7 @@ describe('compress-images script helpers', () => {
       const args = ['--parallel', 'invalid'];
       const parallelIndex = args.indexOf('--parallel');
       const parallel =
-        parallelIndex >= 0 ? parseInt(args[parallelIndex + 1]) || 2 : 2;
+        parallelIndex >= 0 ? parseInt(args[parallelIndex + 1], 10) || 2 : 2;
       expect(parallel).toBe(2); // Falls back to default
     });
   });
@@ -369,9 +369,7 @@ describe('compress-images script helpers', () => {
       const totalCompressedBytes = 800000;
       const savedBytes = totalOriginalBytes - totalCompressedBytes;
       const savedPct =
-        totalOriginalBytes > 0
-          ? (savedBytes / totalOriginalBytes) * 100
-          : 0;
+        totalOriginalBytes > 0 ? (savedBytes / totalOriginalBytes) * 100 : 0;
 
       expect(savedBytes).toBe(200000);
       expect(savedPct).toBe(20);
@@ -383,9 +381,7 @@ describe('compress-images script helpers', () => {
       const totalCompressedBytes = 0;
       const savedBytes = totalOriginalBytes - totalCompressedBytes;
       const savedPct =
-        totalOriginalBytes > 0
-          ? (savedBytes / totalOriginalBytes) * 100
-          : 0;
+        totalOriginalBytes > 0 ? (savedBytes / totalOriginalBytes) * 100 : 0;
 
       expect(savedBytes).toBe(0);
       expect(savedPct).toBe(0);

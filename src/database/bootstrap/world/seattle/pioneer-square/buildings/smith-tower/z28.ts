@@ -80,7 +80,8 @@ export const building = {
 
     '%A1_z28': {
       name: 'Smith Tower - 28th Floor - North Suite - Living Room',
-      description: 'A corner unit with tall windows and pale wood floors. A kitchenette occupies one wall, its appliances dark and silent. Built-in shelving holds the remnants of someone\'s life—books, decorative objects, a dead potted plant.',
+      description:
+        "A corner unit with tall windows and pale wood floors. A kitchenette occupies one wall, its appliances dark and silent. Built-in shelving holds the remnants of someone's life—books, decorative objects, a dead potted plant.",
       x: -3,
       y: 11,
       z: 28,
@@ -96,9 +97,27 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'table', name: 'a gear-motif coffee table', description: 'A low table with a glass top reveals an intricate arrangement of interlocking brass gears beneath, frozen mid-turn. The copper frame is riveted at each joint.', boltedDown: false },
-        { prototype: 'furniture', name: 'a brass pipe kitchenette', description: 'Exposed copper and brass pipes run along the wall, connecting a deep copper sink to overhead cabinets faced with riveted steel panels. Gas burners sit cold beneath brass fixtures.', boltedDown: true },
-        { prototype: 'furniture', name: 'an apothecary cabinet', description: 'A tall mahogany cabinet with dozens of small glass-fronted drawers lines one wall. Faded labels in copperplate script mark each drawer: Cogs, Springs, Escapements, Mainsprings.', boltedDown: true },
+        {
+          prototype: 'table',
+          name: 'a gear-motif coffee table',
+          description:
+            'A low table with a glass top reveals an intricate arrangement of interlocking brass gears beneath, frozen mid-turn. The copper frame is riveted at each joint.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a brass pipe kitchenette',
+          description:
+            'Exposed copper and brass pipes run along the wall, connecting a deep copper sink to overhead cabinets faced with riveted steel panels. Gas burners sit cold beneath brass fixtures.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'an apothecary cabinet',
+          description:
+            'A tall mahogany cabinet with dozens of small glass-fronted drawers lines one wall. Faded labels in copperplate script mark each drawer: Cogs, Springs, Escapements, Mainsprings.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -134,16 +153,33 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a brass four-poster bed', description: 'An ornate brass bed frame with spiraling posts and gear-shaped finials. The headboard features an inlaid clockwork design, hands frozen at midnight. Heavy velvet curtains can be drawn around it.', quality: 'nice' },
-        { prototype: 'furniture', name: 'a porthole closet', description: 'The closet doors are fitted with brass porthole windows, their glass thick and beveled. Through them, you glimpse empty brass hooks and dusty shelving.', boltedDown: true },
-        { prototype: 'table', name: 'a steamer trunk nightstand', description: 'A battered leather steamer trunk serves as a nightstand, its brass fittings tarnished but intact. Travel stickers from airship lines peel at the corners.', boltedDown: false },
+        {
+          prototype: 'bed',
+          name: 'a brass four-poster bed',
+          description:
+            'An ornate brass bed frame with spiraling posts and gear-shaped finials. The headboard features an inlaid clockwork design, hands frozen at midnight. Heavy velvet curtains can be drawn around it.',
+          quality: 'nice',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a porthole closet',
+          description:
+            'The closet doors are fitted with brass porthole windows, their glass thick and beveled. Through them, you glimpse empty brass hooks and dusty shelving.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a steamer trunk nightstand',
+          description:
+            'A battered leather steamer trunk serves as a nightstand, its brass fittings tarnished but intact. Travel stickers from airship lines peel at the corners.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
           name: 'the brass four-poster',
           capacity: 2,
-          emptyMsg:
-            'The brass bed gleams dully, velvet curtains half-drawn.',
+          emptyMsg: 'The brass bed gleams dully, velvet curtains half-drawn.',
           occupiedMsg: '%s reclining on the four-poster.',
         },
       ],
@@ -168,9 +204,27 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a copper galley kitchen', description: 'Hammered copper countertops and a deep farmhouse sink gleam beneath a rack of hanging brass pots. The gas range features ornate iron grates and porcelain knobs.', boltedDown: true },
-        { prototype: 'table', name: 'a drafting table', description: 'A large drafting table with brass adjustment mechanisms holds yellowed blueprints of impossible machines. An articulated brass lamp is clamped to one edge.', boltedDown: false },
-        { prototype: 'furniture', name: 'a brass telescope on tripod', description: 'A magnificent brass telescope stands on a mahogany tripod near the window, its lens cap missing. The focusing mechanism turns smoothly despite its age.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'a copper galley kitchen',
+          description:
+            'Hammered copper countertops and a deep farmhouse sink gleam beneath a rack of hanging brass pots. The gas range features ornate iron grates and porcelain knobs.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a drafting table',
+          description:
+            'A large drafting table with brass adjustment mechanisms holds yellowed blueprints of impossible machines. An articulated brass lamp is clamped to one edge.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a brass telescope on tripod',
+          description:
+            'A magnificent brass telescope stands on a mahogany tripod near the window, its lens cap missing. The focusing mechanism turns smoothly despite its age.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -209,10 +263,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a brass spiral ladder', description: 'A spiral ladder of wrought iron and brass leads up to the sleeping loft, its steps worn smooth from decades of use. Gear-shaped brackets anchor it to the ceiling.', boltedDown: true },
-        { prototype: 'bed', name: 'a dirigible-style loft bed', description: 'The loft bed is suspended from the ceiling by brass chains, its frame shaped like an airship gondola. Canvas and leather straps form the sleeping surface.', quality: 'standard' },
-        { prototype: 'furniture', name: 'a tufted leather settee', description: 'A Victorian settee upholstered in distressed brown leather sits beneath the loft, brass casters on its feet. The tufting is held by brass buttons.', boltedDown: false },
-        { prototype: 'table', name: 'a gear-topped side table', description: 'A small table made from a massive gear wheel mounted on iron pipe legs. The teeth have been filed smooth around the edges.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'a brass spiral ladder',
+          description:
+            'A spiral ladder of wrought iron and brass leads up to the sleeping loft, its steps worn smooth from decades of use. Gear-shaped brackets anchor it to the ceiling.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'bed',
+          name: 'a dirigible-style loft bed',
+          description:
+            'The loft bed is suspended from the ceiling by brass chains, its frame shaped like an airship gondola. Canvas and leather straps form the sleeping surface.',
+          quality: 'standard',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a tufted leather settee',
+          description:
+            'A Victorian settee upholstered in distressed brown leather sits beneath the loft, brass casters on its feet. The tufting is held by brass buttons.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'table',
+          name: 'a gear-topped side table',
+          description:
+            'A small table made from a massive gear wheel mounted on iron pipe legs. The teeth have been filed smooth around the edges.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -251,9 +329,27 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a folding brass cot', description: 'A compact brass-framed cot folds against the wall when not in use. Canvas stretched over the frame serves as the sleeping surface, military-efficient.', quality: 'cheap' },
-        { prototype: 'furniture', name: 'a gauge cluster', description: 'A brass panel mounted on the wall displays a cluster of gauges and dials—pressure, temperature, humidity—their needles all frozen at different positions.', boltedDown: true },
-        { prototype: 'furniture', name: 'brass coat pegs', description: 'A row of brass pegs shaped like gear teeth juts from the wall, designed for hanging coats and bags. One holds a dusty leather aviator cap.', boltedDown: true },
+        {
+          prototype: 'bed',
+          name: 'a folding brass cot',
+          description:
+            'A compact brass-framed cot folds against the wall when not in use. Canvas stretched over the frame serves as the sleeping surface, military-efficient.',
+          quality: 'cheap',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a gauge cluster',
+          description:
+            'A brass panel mounted on the wall displays a cluster of gauges and dials—pressure, temperature, humidity—their needles all frozen at different positions.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'brass coat pegs',
+          description:
+            'A row of brass pegs shaped like gear teeth juts from the wall, designed for hanging coats and bags. One holds a dusty leather aviator cap.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -290,10 +386,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a massive leather sectional', description: 'An L-shaped sectional upholstered in tobacco-brown leather dominates the room. Brass rivets trace every seam, and the armrests are wide enough to set a drink on.', boltedDown: false },
-        { prototype: 'table', name: 'an aviator trunk coffee table', description: 'A large steamer trunk reinforced with brass straps and corners serves as a coffee table. Faded airship line labels cover its leather surface.', boltedDown: false },
-        { prototype: 'furniture', name: 'a clockwork entertainment cabinet', description: 'A tall mahogany cabinet with brass trim houses a complex arrangement of gears and cylinders behind beveled glass doors—some sort of automated music machine, long silent.', boltedDown: true },
-        { prototype: 'furniture', name: 'an iron coat tree', description: 'A cast iron coat tree shaped like a stylized gas lamp stands near the entrance, its hooks shaped like small gears.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'a massive leather sectional',
+          description:
+            'An L-shaped sectional upholstered in tobacco-brown leather dominates the room. Brass rivets trace every seam, and the armrests are wide enough to set a drink on.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'table',
+          name: 'an aviator trunk coffee table',
+          description:
+            'A large steamer trunk reinforced with brass straps and corners serves as a coffee table. Faded airship line labels cover its leather surface.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a clockwork entertainment cabinet',
+          description:
+            'A tall mahogany cabinet with brass trim houses a complex arrangement of gears and cylinders behind beveled glass doors—some sort of automated music machine, long silent.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'an iron coat tree',
+          description:
+            'A cast iron coat tree shaped like a stylized gas lamp stands near the entrance, its hooks shaped like small gears.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -325,10 +445,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'floor-to-ceiling brass shelving', description: 'Industrial brass shelving with adjustable gear-track brackets lines the walls. Leather-bound volumes and mechanical curiosities fill every shelf.', boltedDown: true },
-        { prototype: 'table', name: 'a roll-top writing desk', description: 'An oak roll-top desk with brass drawer pulls sits in the window bay. The tambour cover is half-open, revealing a chaos of yellowed papers and brass implements.', boltedDown: false },
-        { prototype: 'chair', name: 'a wingback reading chair', description: 'A high-backed chair upholstered in bottle-green leather sits angled toward the light. Brass nailheads outline its shape, and the armrests are worn smooth.', boltedDown: false },
-        { prototype: 'furniture', name: 'a Tesla coil lamp', description: 'A decorative lamp shaped like a miniature Tesla coil stands on a side table, its glass globe dark. The brass base is engraved with lightning motifs.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'floor-to-ceiling brass shelving',
+          description:
+            'Industrial brass shelving with adjustable gear-track brackets lines the walls. Leather-bound volumes and mechanical curiosities fill every shelf.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a roll-top writing desk',
+          description:
+            'An oak roll-top desk with brass drawer pulls sits in the window bay. The tambour cover is half-open, revealing a chaos of yellowed papers and brass implements.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'chair',
+          name: 'a wingback reading chair',
+          description:
+            'A high-backed chair upholstered in bottle-green leather sits angled toward the light. Brass nailheads outline its shape, and the armrests are worn smooth.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a Tesla coil lamp',
+          description:
+            'A decorative lamp shaped like a miniature Tesla coil stands on a side table, its glass globe dark. The brass base is engraved with lightning motifs.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -350,7 +494,8 @@ export const building = {
 
     '%C2_z28': {
       name: 'Smith Tower - 28th Floor - South Suite - Living Room',
-      description: 'A corner unit with western exposure and aged carpeting. The afternoon sun has bleached everything near the windows to a uniform pale.',
+      description:
+        'A corner unit with western exposure and aged carpeting. The afternoon sun has bleached everything near the windows to a uniform pale.',
       x: -3,
       y: 9,
       z: 28,
@@ -366,10 +511,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a button-tufted loveseat', description: 'A compact loveseat upholstered in burgundy velvet faces the window, its button-tufted back held by brass buttons. The legs are carved to resemble gas pipes.', boltedDown: false },
-        { prototype: 'table', name: 'a brass lamp table', description: 'A small round table holds an Edison bulb lamp with exposed filament, its brass base shaped like a miniature boiler.', boltedDown: false },
-        { prototype: 'furniture', name: 'a steam radiator', description: 'An ornate cast iron steam radiator with decorative brass fittings dominates one corner. Despite decades of disuse, the pipes still gurgle occasionally.', boltedDown: true },
-        { prototype: 'furniture', name: 'brass porthole mirrors', description: 'Three porthole-shaped mirrors with thick brass frames are mounted in a row along one wall, their glass slightly warped with age.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a button-tufted loveseat',
+          description:
+            'A compact loveseat upholstered in burgundy velvet faces the window, its button-tufted back held by brass buttons. The legs are carved to resemble gas pipes.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'table',
+          name: 'a brass lamp table',
+          description:
+            'A small round table holds an Edison bulb lamp with exposed filament, its brass base shaped like a miniature boiler.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a steam radiator',
+          description:
+            'An ornate cast iron steam radiator with decorative brass fittings dominates one corner. Despite decades of disuse, the pipes still gurgle occasionally.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'brass porthole mirrors',
+          description:
+            'Three porthole-shaped mirrors with thick brass frames are mounted in a row along one wall, their glass slightly warped with age.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
@@ -405,10 +574,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a leather club bench', description: 'A low bench upholstered in cracked brown leather sits against the wall, brass studs tracing its edges. Perfect for removing boots.', boltedDown: false },
-        { prototype: 'furniture', name: 'a brass umbrella stand', description: 'A cylindrical brass umbrella stand shaped like an artillery shell casing stands by the door. A forgotten walking stick with a gear-shaped handle leans inside.', boltedDown: false },
-        { prototype: 'furniture', name: 'pneumatic tube terminus', description: 'A brass pneumatic tube terminus is mounted on the wall, its capsule door hanging open. The tube runs up into the ceiling, part of some long-defunct message system.', boltedDown: true },
-        { prototype: 'table', name: 'a console table with brass inlay', description: 'A narrow mahogany console table with brass gear inlays holds a tarnished silver calling card tray.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'a leather club bench',
+          description:
+            'A low bench upholstered in cracked brown leather sits against the wall, brass studs tracing its edges. Perfect for removing boots.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a brass umbrella stand',
+          description:
+            'A cylindrical brass umbrella stand shaped like an artillery shell casing stands by the door. A forgotten walking stick with a gear-shaped handle leans inside.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'pneumatic tube terminus',
+          description:
+            'A brass pneumatic tube terminus is mounted on the wall, its capsule door hanging open. The tube runs up into the ceiling, part of some long-defunct message system.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a console table with brass inlay',
+          description:
+            'A narrow mahogany console table with brass gear inlays holds a tarnished silver calling card tray.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -440,10 +633,34 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'an iron canopy bed', description: 'A bed frame of wrought iron with brass joints fills the alcove, its canopy frame designed to hold mosquito netting or curtains. Velvet drapes hang heavy and dust-laden.', quality: 'nice' },
-        { prototype: 'furniture', name: 'a brass valet stand', description: 'A standing valet with brass hooks and a trouser bar stands ready to receive a gentleman\'s attire. The wood is dark mahogany, polished smooth.', boltedDown: false },
-        { prototype: 'furniture', name: 'a riveted porthole mirror', description: 'A large oval mirror set in a frame of riveted brass plates hangs on the wall, its surface slightly oxidized around the edges.', boltedDown: true },
-        { prototype: 'table', name: 'a mechanical nightstand', description: 'A nightstand with a flip-top lid and internal compartments features tiny brass gears visible through a glass panel on its side. A pocket watch could be wound by the mechanism—once.', boltedDown: false },
+        {
+          prototype: 'bed',
+          name: 'an iron canopy bed',
+          description:
+            'A bed frame of wrought iron with brass joints fills the alcove, its canopy frame designed to hold mosquito netting or curtains. Velvet drapes hang heavy and dust-laden.',
+          quality: 'nice',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a brass valet stand',
+          description:
+            "A standing valet with brass hooks and a trouser bar stands ready to receive a gentleman's attire. The wood is dark mahogany, polished smooth.",
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a riveted porthole mirror',
+          description:
+            'A large oval mirror set in a frame of riveted brass plates hangs on the wall, its surface slightly oxidized around the edges.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a mechanical nightstand',
+          description:
+            'A nightstand with a flip-top lid and internal compartments features tiny brass gears visible through a glass panel on its side. A pocket watch could be wound by the mechanism—once.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
@@ -475,11 +692,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a fold-down brass bed', description: 'A Murphy-style bed with a brass frame folds down from an elaborate wall cabinet. The cabinet face is decorated with embossed gear patterns and leather straps hold the bed in place when stowed.', quality: 'standard' },
-        { prototype: 'furniture', name: 'a clockwork wall cabinet', description: 'The wall cabinet that houses the fold-down bed features exposed clockwork on one side—a complex arrangement of gears and springs that assists with raising and lowering the bed.', boltedDown: true },
-        { prototype: 'furniture', name: 'built-in brass shelving', description: 'Brass-framed shelving is built into the walls, each shelf adjustable via gear-track mechanisms. Technical manuals and brass instruments occupy most spaces.', boltedDown: true },
-        { prototype: 'table', name: 'a fold-out writing surface', description: 'A hinged writing surface folds out from the wall, supported by brass chains. When not in use, it lies flat against the wall, secured by leather straps.', boltedDown: true },
-        { prototype: 'furniture', name: 'a brass-bound wardrobe', description: 'A narrow wardrobe reinforced with brass corner brackets and leather straps stands in the corner. Its mirror is beveled and slightly foxed.', boltedDown: false },
+        {
+          prototype: 'bed',
+          name: 'a fold-down brass bed',
+          description:
+            'A Murphy-style bed with a brass frame folds down from an elaborate wall cabinet. The cabinet face is decorated with embossed gear patterns and leather straps hold the bed in place when stowed.',
+          quality: 'standard',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a clockwork wall cabinet',
+          description:
+            'The wall cabinet that houses the fold-down bed features exposed clockwork on one side—a complex arrangement of gears and springs that assists with raising and lowering the bed.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'built-in brass shelving',
+          description:
+            'Brass-framed shelving is built into the walls, each shelf adjustable via gear-track mechanisms. Technical manuals and brass instruments occupy most spaces.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a fold-out writing surface',
+          description:
+            'A hinged writing surface folds out from the wall, supported by brass chains. When not in use, it lies flat against the wall, secured by leather straps.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a brass-bound wardrobe',
+          description:
+            'A narrow wardrobe reinforced with brass corner brackets and leather straps stands in the corner. Its mirror is beveled and slightly foxed.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {

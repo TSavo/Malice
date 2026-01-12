@@ -2,9 +2,8 @@
  * Tests for UndergroundJsonBuilder
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import * as fs from 'node:fs';
-import * as path from 'node:path';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { UndergroundJsonBuilder } from '../../src/database/bootstrap/underground-json-builder.js';
 import type { ObjectManager } from '../../src/database/object-manager.js';
 import type { RuntimeObject } from '../../types/object.js';
@@ -148,7 +147,7 @@ describe('UndergroundJsonBuilder', () => {
       mockManager.room = null;
 
       await expect(builder.build()).rejects.toThrow(
-        'Room, Exit, Recycler, and Spatial must exist'
+        'Room, Exit, Recycler, and Spatial must exist',
       );
     });
 
@@ -219,7 +218,9 @@ describe('UndergroundJsonBuilder', () => {
       const room1 = createdRooms.get('-15,4,-2');
       expect(room1).toBeDefined();
       expect(room1?.get('name')).toBe('Victorian Passage');
-      expect(room1?.get('description')).toBe('A deteriorated Victorian passage.');
+      expect(room1?.get('description')).toBe(
+        'A deteriorated Victorian passage.',
+      );
       expect(room1?.get('underground')).toBe(true);
       expect(room1?.get('undergroundEra')).toBe('victorian');
       expect(room1?.get('outdoor')).toBe(false);
@@ -341,10 +342,10 @@ describe('UndergroundJsonBuilder', () => {
 
       // Should not create any exits between the rooms (both sides blocked)
       const exitsToRoom1 = createdExits.filter(
-        (e) => e.get('destRoom')?.id === createdRooms.get('0,0,-2')?.id
+        (e) => e.get('destRoom')?.id === createdRooms.get('0,0,-2')?.id,
       );
       const exitsToRoom2 = createdExits.filter(
-        (e) => e.get('destRoom')?.id === createdRooms.get('0,1,-2')?.id
+        (e) => e.get('destRoom')?.id === createdRooms.get('0,1,-2')?.id,
       );
 
       expect(exitsToRoom1.length).toBe(0);
@@ -362,7 +363,13 @@ describe('UndergroundJsonBuilder', () => {
             era: 'modern',
             condition: 'good',
             atmosphere: 'neutral',
-            exits: { north: true, south: true, east: false, west: false, down: true },
+            exits: {
+              north: true,
+              south: true,
+              east: false,
+              west: false,
+              down: true,
+            },
             exitCount: 3,
             depth: 3,
             features: [],
@@ -380,7 +387,13 @@ describe('UndergroundJsonBuilder', () => {
             era: 'modern',
             condition: 'secured',
             atmosphere: 'guarded',
-            exits: { north: true, south: true, east: true, west: true, up: true },
+            exits: {
+              north: true,
+              south: true,
+              east: true,
+              west: true,
+              up: true,
+            },
             exitCount: 5,
             depth: 4,
             features: ['guards', 'cameras'],
@@ -401,7 +414,9 @@ describe('UndergroundJsonBuilder', () => {
 
       // Find exit going DOWN INTO the secured room
       const guardedExit = createdExits.find(
-        (e) => e.get('destRoom')?.id === createdRooms.get('-14,5,-4')?.id && e.get('name') === 'down'
+        (e) =>
+          e.get('destRoom')?.id === createdRooms.get('-14,5,-4')?.id &&
+          e.get('name') === 'down',
       );
 
       // Should use guardedExit prototype and have faction properties
@@ -433,7 +448,13 @@ describe('UndergroundJsonBuilder', () => {
             era: 'victorian',
             condition: 'good',
             atmosphere: 'dank',
-            exits: { north: true, south: true, east: true, west: true, up: true },
+            exits: {
+              north: true,
+              south: true,
+              east: true,
+              west: true,
+              up: true,
+            },
             exitCount: 5,
             depth: 2,
             features: [],
@@ -454,12 +475,13 @@ describe('UndergroundJsonBuilder', () => {
 
       // Should create bidirectional exits between underground and basement
       const exitToBasement = createdExits.find(
-        (e) => e.get('destRoom')?.id === basementRoom.id && e.get('name') === 'up'
+        (e) =>
+          e.get('destRoom')?.id === basementRoom.id && e.get('name') === 'up',
       );
       const exitToUnderground = createdExits.find(
         (e) =>
           e.get('destRoom')?.id === createdRooms.get('0,0,-2')?.id &&
-          e.get('name') === 'down'
+          e.get('name') === 'down',
       );
 
       expect(exitToBasement).toBeDefined();
@@ -468,7 +490,7 @@ describe('UndergroundJsonBuilder', () => {
 
     it('should skip existing rooms and reuse them', async () => {
       // Pre-create a room at the same coordinates (from building-builder)
-      const existingRoom = await mockRecycler.create({
+      const _existingRoom = await mockRecycler.create({
         parent: mockRoom,
         properties: {
           name: 'Existing Basement Room',
@@ -513,7 +535,9 @@ describe('UndergroundJsonBuilder', () => {
       // Should not create a new room (only reuse existing)
       const roomCreateCalls = createCallsAfter - createCallsBefore;
       expect(roomCreateCalls).toBe(0); // No new rooms created
-      expect(createdRooms.get('0,0,-2')?.get('name')).toBe('Existing Basement Room');
+      expect(createdRooms.get('0,0,-2')?.get('name')).toBe(
+        'Existing Basement Room',
+      );
     });
   });
 
@@ -585,7 +609,9 @@ describe('UndergroundJsonBuilder', () => {
       await builder.build();
 
       expect(createdRooms.get('0,0,-2')?.get('name')).toBe('Victorian Passage');
-      expect(createdRooms.get('0,1,-3')?.get('name')).toBe('Industrial Junction');
+      expect(createdRooms.get('0,1,-3')?.get('name')).toBe(
+        'Industrial Junction',
+      );
       expect(createdRooms.get('0,2,-5')?.get('name')).toBe('Ancient Chamber');
     });
   });

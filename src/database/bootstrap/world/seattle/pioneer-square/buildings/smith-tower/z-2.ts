@@ -74,7 +74,8 @@ Somewhere ahead, the tunnel connects to the forgotten passages beneath Pioneer S
       exits: {
         east: '%DC_UTILITY',
         southwest: {
-          description: 'The tunnel continues southwest into the Seattle Underground',
+          description:
+            'The tunnel continues southwest into the Seattle Underground',
         },
       },
     },

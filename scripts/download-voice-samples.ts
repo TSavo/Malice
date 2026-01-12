@@ -1,4 +1,5 @@
 #!/usr/bin/env bun
+
 /**
  * Download diverse voice samples from LibriTTS dataset (Hugging Face)
  *
@@ -12,10 +13,10 @@
  *   bun scripts/download-voice-samples.ts --dry-run          # Preview without downloading
  */
 
-import { parseArgs } from 'util';
-import { mkdir, writeFile, readdir, readFile } from 'fs/promises';
-import { existsSync } from 'fs';
-import { join } from 'path';
+import { existsSync } from 'node:fs';
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { parseArgs } from 'node:util';
 
 // Cache file for speaker index (avoids re-scanning on restart)
 const CACHE_FILE = 'vibevoice-server/speaker-index.json';
@@ -86,7 +87,11 @@ interface HFResponse {
   num_rows_per_page: number;
 }
 
-async function fetchRows(offset: number, length: number, retries = 5): Promise<HFResponse> {
+async function fetchRows(
+  offset: number,
+  length: number,
+  retries = 5,
+): Promise<HFResponse> {
   const url = `${HF_API}/rows?dataset=${DATASET}&config=${CONFIG}&split=${SPLIT}&offset=${offset}&length=${length}`;
 
   for (let attempt = 1; attempt <= retries; attempt++) {
@@ -98,8 +103,10 @@ async function fetchRows(offset: number, length: number, retries = 5): Promise<H
 
     if (resp.status === 429 && attempt < retries) {
       // Rate limited - exponential backoff: 10s, 30s, 60s, 120s
-      const waitTime = Math.min(10000 * Math.pow(2, attempt - 1), 120000);
-      console.log(`\n  ⏳ Rate limited (attempt ${attempt}/${retries}), waiting ${waitTime / 1000}s...`);
+      const waitTime = Math.min(10000 * 2 ** (attempt - 1), 120000);
+      console.log(
+        `\n  ⏳ Rate limited (attempt ${attempt}/${retries}), waiting ${waitTime / 1000}s...`,
+      );
       await new Promise((r) => setTimeout(r, waitTime));
       continue;
     }
@@ -118,7 +125,7 @@ async function downloadAudio(url: string, retries = 3): Promise<Buffer> {
       return Buffer.from(arrayBuffer);
     }
     if (resp.status === 429 && attempt < retries) {
-      const waitTime = Math.min(5000 * Math.pow(2, attempt - 1), 60000);
+      const waitTime = Math.min(5000 * 2 ** (attempt - 1), 60000);
       await new Promise((r) => setTimeout(r, waitTime));
       continue;
     }
@@ -130,7 +137,7 @@ async function downloadAudio(url: string, retries = 3): Promise<Buffer> {
 async function downloadSpeaker(
   speakerId: string,
   sample: LibriTTSRow,
-  outputDir: string
+  outputDir: string,
 ): Promise<boolean> {
   const filename = `speaker_${speakerId}.wav`;
   const filepath = join(outputDir, filename);
@@ -144,7 +151,9 @@ async function downloadSpeaker(
 
     const audioBuffer = await downloadAudio(audioUrl);
     await writeFile(filepath, audioBuffer);
-    console.log(`  ✅ ${filename} (${(audioBuffer.length / 1024).toFixed(1)}KB)`);
+    console.log(
+      `  ✅ ${filename} (${(audioBuffer.length / 1024).toFixed(1)}KB)`,
+    );
     return true;
   } catch (err) {
     console.log(`  ❌ ${filename} - ${(err as Error).message}`);
@@ -189,15 +198,19 @@ async function main() {
         existingVoices.add(f.replace('.wav', ''));
       }
     }
-    console.log(`📁 Found ${existingVoices.size} existing voices in ${OUTPUT_DIR}`);
+    console.log(
+      `📁 Found ${existingVoices.size} existing voices in ${OUTPUT_DIR}`,
+    );
   }
 
   // Try to load cached speaker index
-  let cache = await loadCache();
-  let speakerSamples = new Map<string, LibriTTSRow>();
+  const cache = await loadCache();
+  const speakerSamples = new Map<string, LibriTTSRow>();
 
   if (cache) {
-    console.log(`📋 Loaded speaker index from cache (${cache.speakers.length} speakers, ${cache.scannedRows.toLocaleString()}/${cache.totalRows.toLocaleString()} rows scanned)`);
+    console.log(
+      `📋 Loaded speaker index from cache (${cache.speakers.length} speakers, ${cache.scannedRows.toLocaleString()}/${cache.totalRows.toLocaleString()} rows scanned)`,
+    );
     for (const { id, sample } of cache.speakers) {
       // Skip already downloaded
       if (!existingVoices.has(`speaker_${id}`)) {
@@ -208,7 +221,9 @@ async function main() {
   }
 
   // If we need more speakers, scan the dataset
-  const needMore = speakerSamples.size < COUNT && (!cache || cache.scannedRows < cache.totalRows);
+  const needMore =
+    speakerSamples.size < COUNT &&
+    (!cache || cache.scannedRows < cache.totalRows);
 
   // Create output directory early
   await mkdir(OUTPUT_DIR, { recursive: true });
@@ -219,7 +234,9 @@ async function main() {
   if (needMore && !DRY_RUN && !LIST_ONLY) {
     console.log('📡 Fetching dataset info from Hugging Face...');
     const initial = await fetchRows(0, 100);
-    console.log(`📊 Dataset has ${initial.num_rows_total.toLocaleString()} total samples\n`);
+    console.log(
+      `📊 Dataset has ${initial.num_rows_total.toLocaleString()} total samples\n`,
+    );
 
     // Start from where cache left off
     let offset = cache?.scannedRows ?? 0;
@@ -233,8 +250,12 @@ async function main() {
       }
     }
 
-    console.log(`🔍 Scanning and downloading (starting at row ${offset.toLocaleString()})...`);
-    console.log(`   Target: ${COUNT} speakers | Found: ${speakerSamples.size} | Downloaded: ${downloaded}\n`);
+    console.log(
+      `🔍 Scanning and downloading (starting at row ${offset.toLocaleString()})...`,
+    );
+    console.log(
+      `   Target: ${COUNT} speakers | Found: ${speakerSamples.size} | Downloaded: ${downloaded}\n`,
+    );
 
     // Scan through data to find diverse speakers AND download immediately
     while (downloaded < COUNT && offset < initial.num_rows_total) {
@@ -272,14 +293,16 @@ async function main() {
 
       // Progress update
       process.stdout.write(
-        `\r  Scanned ${scanned.toLocaleString()} rows | Found ${speakerSamples.size} speakers | Downloaded ${downloaded}   `
+        `\r  Scanned ${scanned.toLocaleString()} rows | Found ${speakerSamples.size} speakers | Downloaded ${downloaded}   `,
       );
 
       // Save cache periodically (every 1000 rows)
       if (scanned % 1000 === 0) {
         await saveCache({
           split: SPLIT,
-          speakers: Array.from(speakerSamples.entries()).map(([id, sample]) => ({ id, sample })),
+          speakers: Array.from(speakerSamples.entries()).map(
+            ([id, sample]) => ({ id, sample }),
+          ),
           scannedRows: scanned,
           totalRows: initial.num_rows_total,
         });
@@ -294,7 +317,10 @@ async function main() {
     // Final cache save
     await saveCache({
       split: SPLIT,
-      speakers: Array.from(speakerSamples.entries()).map(([id, sample]) => ({ id, sample })),
+      speakers: Array.from(speakerSamples.entries()).map(([id, sample]) => ({
+        id,
+        sample,
+      })),
       scannedRows: scanned,
       totalRows: initial.num_rows_total,
     });
@@ -303,13 +329,15 @@ async function main() {
 
   // Filter out already downloaded for the speakers list
   const speakers = Array.from(speakerSamples.entries()).filter(
-    ([id]) => !existingVoices.has(`speaker_${id}`)
+    ([id]) => !existingVoices.has(`speaker_${id}`),
   );
 
   if (LIST_ONLY) {
     console.log('📋 Available speakers:\n');
     for (const [id, sample] of speakers) {
-      console.log(`  speaker_${id}: "${sample.text_normalized.slice(0, 60)}..."`);
+      console.log(
+        `  speaker_${id}: "${sample.text_normalized.slice(0, 60)}..."`,
+      );
     }
     console.log(`\nTotal: ${speakers.length} speakers`);
     return;
@@ -318,7 +346,9 @@ async function main() {
   if (DRY_RUN) {
     console.log('🔍 Dry run - would download:\n');
     for (const [id, sample] of speakers) {
-      console.log(`  speaker_${id}.wav - "${sample.text_normalized.slice(0, 50)}..."`);
+      console.log(
+        `  speaker_${id}.wav - "${sample.text_normalized.slice(0, 50)}..."`,
+      );
     }
     console.log(`\nTotal: ${speakers.length} voice samples`);
     return;

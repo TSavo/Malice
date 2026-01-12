@@ -127,27 +127,27 @@ Until then, these room-sized installations are the only option.`,
 
       this.obj.setPropertyDescription(
         'powered',
-        'Whether main power is connected. Requires industrial 50kW supply'
+        'Whether main power is connected. Requires industrial 50kW supply',
       );
       this.obj.setPropertyDescription(
         'operational',
-        'Whether machine is functioning. False if damaged or missing components'
+        'Whether machine is functioning. False if damaged or missing components',
       );
       this.obj.setPropertyDescription(
         'calibrated',
-        'Whether sensors are calibrated. Requires quarterly maintenance'
+        'Whether sensors are calibrated. Requires quarterly maintenance',
       );
       this.obj.setPropertyDescription(
         'lastCalibration',
-        'Timestamp of most recent calibration. Null if never calibrated'
+        'Timestamp of most recent calibration. Null if never calibrated',
       );
       this.obj.setPropertyDescription(
         'scanInProgress',
-        'Whether a scan is currently running. Subject must remain still'
+        'Whether a scan is currently running. Subject must remain still',
       );
       this.obj.setPropertyDescription(
         'cooldownUntil',
-        'Timestamp when machine will be ready for next scan. 15 minute cooldown'
+        'Timestamp when machine will be ready for next scan. 15 minute cooldown',
       );
     }
   }

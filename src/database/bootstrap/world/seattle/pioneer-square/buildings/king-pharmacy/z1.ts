@@ -91,7 +91,7 @@ The carpet shows the wear pattern of decades: a path from the stairs to the apar
     },
 
     '%LIVING_ROOM': {
-      name: 'Pharmacist\'s Apartment - Living Room',
+      name: "Pharmacist's Apartment - Living Room",
       description: `The living room of a modest apartment, furnished with the practical simplicity of someone who spent most of their time downstairs. A sofa faces a television, both covered in dust thick enough to write in. Bookshelves line one wall, filled with volumes in both English and Chinese—medical texts, novels, the reading of a bicultural life.
 
 Family photos cover another wall in careful arrangement: children growing up through school portraits, graduation photos, wedding pictures. The narrative of a family, told in frozen moments. The most recent photos show grandchildren, their faces bright with the particular innocence of children who don't know what's coming.
@@ -155,7 +155,7 @@ A window looks out onto S. King Street, its view now showing only abandoned stor
     },
 
     '%KITCHEN': {
-      name: 'Pharmacist\'s Apartment - Kitchen',
+      name: "Pharmacist's Apartment - Kitchen",
       description: `A small kitchen, efficient in the way of spaces used by someone who cooked regularly but didn't have time for elaborate meals. The counter holds a rice cooker and an electric kettle—the essentials of Asian home cooking. Cabinets are filled with bowls and utensils, some Western, some traditional.
 
 The refrigerator door is closed, mercifully—whatever was inside decomposed long ago, and no one has opened it since. A calendar on the wall shows a month from fifty-five years ago, its squares filled with notations in neat handwriting: reminders, appointments, the scheduling of a busy life.
@@ -211,7 +211,7 @@ A small table with two chairs sits by the window, the breakfast nook where morni
     },
 
     '%BEDROOM': {
-      name: 'Pharmacist\'s Apartment - Bedroom',
+      name: "Pharmacist's Apartment - Bedroom",
       description: `The bedroom is undisturbed, frozen in the moment of a morning departure that expected an evening return. The bed is made—not perfectly, but with the habitual neatness of someone who makes their bed every day. Clothes hang in an open closet: practical work clothes, a few nicer items for occasions, the wardrobe of a life divided between pharmacy and home.
 
 A nightstand holds a lamp, reading glasses, and a book with a bookmark about two-thirds through. The book is in Chinese—a novel, something to read before sleep. The reading was never finished. The bookmark holds a place that will never be continued.

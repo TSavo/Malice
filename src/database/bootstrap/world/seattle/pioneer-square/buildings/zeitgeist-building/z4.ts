@@ -45,13 +45,14 @@ The freight elevator's call button glows faintly in the penthouse shadow. Above,
         east: '%ROOF_EAST',
         west: '%ROOF_WEST',
         down: '%LOFT_LOBBY',
-        'in': '%E',
+        in: '%E',
       },
       sittables: [
         {
           name: 'the penthouse steps',
           capacity: 2,
-          emptyMsg: 'Brick steps leading into the penthouse offer casual seating.',
+          emptyMsg:
+            'Brick steps leading into the penthouse offer casual seating.',
           occupiedMsg: '%s sitting on the penthouse steps',
         },
       ],
@@ -120,7 +121,8 @@ The view north shows Pioneer Square's roofscape: water towers, solar panels, the
         {
           name: 'a garden bench',
           capacity: 2,
-          emptyMsg: 'A wooden bench sits among the raised beds, weathered silver by exposure.',
+          emptyMsg:
+            'A wooden bench sits among the raised beds, weathered silver by exposure.',
           occupiedMsg: '%s sitting in the rooftop garden',
         },
         {
@@ -169,7 +171,8 @@ The neighboring building's wall rises close on the north side, a mural visible o
         {
           name: 'the car seat',
           capacity: 2,
-          emptyMsg: 'A car backseat bolted to a wooden frame provides surprisingly comfortable seating.',
+          emptyMsg:
+            'A car backseat bolted to a wooden frame provides surprisingly comfortable seating.',
           occupiedMsg: '%s in the car seat',
         },
         {
@@ -241,7 +244,8 @@ A telescope on a tripod points at the sky, its lens clouded. Someone was watchin
         {
           name: 'the viewing platform',
           capacity: 4,
-          emptyMsg: 'A pallet platform provides elevated seating at the roof corner.',
+          emptyMsg:
+            'A pallet platform provides elevated seating at the roof corner.',
           occupiedMsg: '%s on the viewing platform',
         },
         {

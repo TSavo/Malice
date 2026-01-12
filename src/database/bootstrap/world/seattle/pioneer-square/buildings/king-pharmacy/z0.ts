@@ -56,7 +56,7 @@ export const building = {
     '%OFFICE_LOCK': {
       prototype: 'lock',
       name: 'Office Lock',
-      description: 'A brass lock on the pharmacist\'s office door.',
+      description: "A brass lock on the pharmacist's office door.",
       difficulty: 3,
     },
     '%OFFICE_DOOR': {
@@ -165,7 +165,7 @@ A consultation desk sits against one wall, where practitioners once felt pulses 
           capacity: 1,
           emptyMsg:
             'A cushioned chair behind the desk, where the herbalist sat to diagnose.',
-          occupiedMsg: '%s in the practitioner\'s chair',
+          occupiedMsg: "%s in the practitioner's chair",
         },
       ],
       objects: [
@@ -222,7 +222,7 @@ A computer terminal sits dead on the counter, its screen grey, its database of p
         south: '%FRONT',
         west: '%STORAGE',
         east: {
-          description: 'A door leads to the pharmacist\'s office',
+          description: "A door leads to the pharmacist's office",
           door: '%OFFICE_DOOR',
           to: '%OFFICE',
         },
@@ -306,7 +306,7 @@ A steel door leads to the back alley, heavily locked, showing scratches where so
     },
 
     '%OFFICE': {
-      name: 'King Pharmacy - Pharmacist\'s Office',
+      name: "King Pharmacy - Pharmacist's Office",
       description: `The pharmacist's private office—a small room where paperwork happened, where difficult conversations about insurance and costs took place, where the business side of medicine was managed. A desk faces the door, its surface organized with the precision of someone who kept careful records.
 
 Diplomas and licenses hang on the wall: a pharmacy degree, state licensing, certification for traditional Chinese medicine—the credentials that allowed one person to practice both disciplines. The name on the documents is "David Chen, PharmD, L.Ac."—Doctor of Pharmacy, Licensed Acupuncturist. A rare combination of training.
@@ -330,7 +330,7 @@ Family photos on the desk show children at various ages, a spouse, the markers o
           capacity: 1,
           emptyMsg:
             'An ergonomic office chair sits behind the desk, adjusted for someone who spent long hours sitting.',
-          occupiedMsg: '%s in the pharmacist\'s chair',
+          occupiedMsg: "%s in the pharmacist's chair",
         },
         {
           name: 'visitor chair',

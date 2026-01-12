@@ -16,10 +16,10 @@ export const building = {
         {
           type: 'fingerprint',
           part: 'hand',
-          message: 'Maintenance access only.'
+          message: 'Maintenance access only.',
         },
       ],
-      authorizedUsers: {}
+      authorizedUsers: {},
     },
     '%BASEMENT_DOOR': {
       prototype: 'door',
@@ -30,7 +30,7 @@ export const building = {
       open: false,
       locks: ['%BASEMENT_LOCK'],
       material: 'metal',
-      durability: 80
+      durability: 80,
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -58,9 +58,9 @@ A stairwell leads up to the processing area. A passage in the western wall opens
           to: 'z0.ts#%PROCESSING',
           description: 'Stairs lead up to the processing area',
           door: '%BASEMENT_DOOR',
-          locks: ['%BASEMENT_LOCK']
+          locks: ['%BASEMENT_LOCK'],
         },
-        east: '%UTILITY_VAULT'
+        east: '%UTILITY_VAULT',
       },
       objects: [
         {
@@ -69,16 +69,16 @@ A stairwell leads up to the processing area. A passage in the western wall opens
           aliases: ['boiler', 'furnace'],
           description:
             'A commercial boiler, its heavy steel housing cold to the touch. The system was shut down properly—valves closed, gauges at zero, the checklist completed by the last maintenance worker. The boiler could be restarted. The fuel supply is the question.',
-          boltedDown: true
+          boltedDown: true,
         },
         {
           prototype: 'describable',
           name: 'electrical panels',
           aliases: ['panels', 'switchgear', 'electrical'],
           description:
-            'Banks of electrical panels and switchgear, the main distribution point for the building. The panels hum with current from somewhere—the city grid or something else. Warning labels caution about voltages that could kill. The warnings remain relevant.'
+            'Banks of electrical panels and switchgear, the main distribution point for the building. The panels hum with current from somewhere—the city grid or something else. Warning labels caution about voltages that could kill. The warnings remain relevant.',
         },
-      ]
+      ],
     },
 
     '%UTILITY_VAULT': {
@@ -99,7 +99,7 @@ Emergency equipment fills one corner: a backup generator, fuel cans, emergency l
       outdoor: false,
       exits: {
         west: '%MECHANICAL',
-        north: '%EMERGENCY_SYSTEMS'
+        north: '%EMERGENCY_SYSTEMS',
       },
       objects: [
         {
@@ -107,17 +107,17 @@ Emergency equipment fills one corner: a backup generator, fuel cans, emergency l
           name: 'water main',
           aliases: ['main', 'pipe', 'water'],
           description:
-            'A massive water main, its diameter measured in feet rather than inches. The pipe runs through the chamber, feeding city water to the building and beyond. Valves along its length control flow to different systems. The main still holds pressure—somewhere, the water system functions.'
+            'A massive water main, its diameter measured in feet rather than inches. The pipe runs through the chamber, feeding city water to the building and beyond. Valves along its length control flow to different systems. The main still holds pressure—somewhere, the water system functions.',
         },
         {
           prototype: 'furniture',
           name: 'backup generator',
           aliases: ['generator', 'genset'],
           description:
-            'A diesel backup generator, large enough to power the building\'s essential systems. The generator is silent, waiting. Fuel cans sit nearby, their levels visible through translucent plastic. Enough fuel for maybe a week of operation. The generator has never been started since the maintenance schedule ended.',
-          boltedDown: true
+            "A diesel backup generator, large enough to power the building's essential systems. The generator is silent, waiting. Fuel cans sit nearby, their levels visible through translucent plastic. Enough fuel for maybe a week of operation. The generator has never been started since the maintenance schedule ended.",
+          boltedDown: true,
         },
-      ]
+      ],
     },
 
     '%EMERGENCY_SYSTEMS': {
@@ -137,7 +137,7 @@ The room feels like a bunker, which it essentially is—hardened against whateve
       waterLevel: 0,
       outdoor: false,
       exits: {
-        south: '%UTILITY_VAULT'
+        south: '%UTILITY_VAULT',
       },
       objects: [
         {
@@ -145,16 +145,16 @@ The room feels like a bunker, which it essentially is—hardened against whateve
           name: 'radio equipment',
           aliases: ['radios', 'communication', 'comms'],
           description:
-            'Banks of radio equipment for emergency communication—frequencies for fire, police, EMS, and city services. The equipment is dark, unpowered or waiting for someone to activate it. The frequencies are probably still monitored. The question is by whom.'
+            'Banks of radio equipment for emergency communication—frequencies for fire, police, EMS, and city services. The equipment is dark, unpowered or waiting for someone to activate it. The frequencies are probably still monitored. The question is by whom.',
         },
         {
           prototype: 'describable',
           name: 'situation map',
           aliases: ['map', 'evacuation'],
           description:
-            'A large wall map of the district, marked with emergency infrastructure: evacuation routes in green, shelter locations in blue, utility nodes in red. The map predates the current situation but the geography is accurate. The routes still lead somewhere. Whether that somewhere is safe is unknown.'
+            'A large wall map of the district, marked with emergency infrastructure: evacuation routes in green, shelter locations in blue, utility nodes in red. The map predates the current situation but the geography is accurate. The routes still lead somewhere. Whether that somewhere is safe is unknown.',
         },
-      ]
-    }
-  }
+      ],
+    },
+  },
 };

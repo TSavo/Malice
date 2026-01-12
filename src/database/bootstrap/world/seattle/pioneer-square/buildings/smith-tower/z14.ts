@@ -80,7 +80,8 @@ export const building = {
 
     '%A1_z14': {
       name: 'Smith Tower - 14th Floor - North Suite - Living Room',
-      description: 'A corner unit with tall windows and pale wood floors. A kitchenette occupies one wall, its appliances dark and silent. Built-in shelving holds the remnants of someone\'s life—books, decorative objects, a dead potted plant.',
+      description:
+        "A corner unit with tall windows and pale wood floors. A kitchenette occupies one wall, its appliances dark and silent. Built-in shelving holds the remnants of someone's life—books, decorative objects, a dead potted plant.",
       x: -3,
       y: 11,
       z: 14,
@@ -96,17 +97,42 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'table', name: 'a sea chest coffee table', description: 'An old sea chest serves as a coffee table, its brass corners dented and tar-stained rope handles frayed. Faded labels from distant ports still cling to its sides.', boltedDown: false },
-        { prototype: 'furniture', name: 'a galley kitchenette', description: 'A compact kitchenette is fitted into one wall like a ship\'s galley, with brass hooks, a deep porcelain sink, and fiddle rails to keep items from sliding.', boltedDown: true },
-        { prototype: 'furniture', name: 'a navigation shelf', description: 'Built-in shelving holds rolled nautical charts, a dusty sextant, tide tables, and volumes on celestial navigation. A brass ship\'s clock hangs silent above.', boltedDown: true },
-        { prototype: 'furniture', name: 'a porthole mirror', description: 'A large brass porthole frame has been converted into a mirror, its glass fogged with age. The brass has gone green in places.', boltedDown: true },
+        {
+          prototype: 'table',
+          name: 'a sea chest coffee table',
+          description:
+            'An old sea chest serves as a coffee table, its brass corners dented and tar-stained rope handles frayed. Faded labels from distant ports still cling to its sides.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a galley kitchenette',
+          description:
+            "A compact kitchenette is fitted into one wall like a ship's galley, with brass hooks, a deep porcelain sink, and fiddle rails to keep items from sliding.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a navigation shelf',
+          description:
+            "Built-in shelving holds rolled nautical charts, a dusty sextant, tide tables, and volumes on celestial navigation. A brass ship's clock hangs silent above.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a porthole mirror',
+          description:
+            'A large brass porthole frame has been converted into a mirror, its glass fogged with age. The brass has gone green in places.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
-          name: 'a captain\'s settee',
+          name: "a captain's settee",
           capacity: 3,
-          emptyMsg: 'A curved settee in navy canvas is built against the wall, its cushions firm and nautically striped.',
-          occupiedMsg: '%s seated on the captain\'s settee.',
+          emptyMsg:
+            'A curved settee in navy canvas is built against the wall, its cushions firm and nautically striped.',
+          occupiedMsg: "%s seated on the captain's settee.",
         },
       ],
     },
@@ -134,17 +160,42 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a captain\'s berth', description: 'A substantial bed with rope-wrapped bedposts and a carved headboard depicting sailing ships. The wool blankets are navy blue with anchor patterns.', quality: 'nice' },
-        { prototype: 'furniture', name: 'a locker closet', description: 'Built-in ship\'s lockers line the wall, their varnished teak doors fitted with brass latches. Inside, moth-eaten peacoats hang beside faded uniforms.', boltedDown: true },
-        { prototype: 'table', name: 'a brass ship\'s lamp table', description: 'A small table bolted to the floor holds a brass gimbal lamp and a leather-bound ship\'s log, its pages yellowed.', boltedDown: true },
-        { prototype: 'furniture', name: 'a framed maritime chart', description: 'A framed nautical chart of the Puget Sound hangs on the wall, its depths marked in fathoms and its coastlines now inaccurate.', boltedDown: true },
+        {
+          prototype: 'bed',
+          name: "a captain's berth",
+          description:
+            'A substantial bed with rope-wrapped bedposts and a carved headboard depicting sailing ships. The wool blankets are navy blue with anchor patterns.',
+          quality: 'nice',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a locker closet',
+          description:
+            "Built-in ship's lockers line the wall, their varnished teak doors fitted with brass latches. Inside, moth-eaten peacoats hang beside faded uniforms.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: "a brass ship's lamp table",
+          description:
+            "A small table bolted to the floor holds a brass gimbal lamp and a leather-bound ship's log, its pages yellowed.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a framed maritime chart',
+          description:
+            'A framed nautical chart of the Puget Sound hangs on the wall, its depths marked in fathoms and its coastlines now inaccurate.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
-          name: 'the captain\'s berth',
+          name: "the captain's berth",
           capacity: 2,
-          emptyMsg: 'The captain\'s berth awaits, its navy blankets neatly tucked.',
-          occupiedMsg: '%s resting in the captain\'s berth.',
+          emptyMsg:
+            "The captain's berth awaits, its navy blankets neatly tucked.",
+          occupiedMsg: "%s resting in the captain's berth.",
         },
       ],
     },
@@ -168,22 +219,48 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a ship\'s galley kitchen', description: 'A narrow galley is fitted out like a ship\'s kitchen, with brass rails, a gimbaled stovetop, and canvas curtains covering the cabinets.', boltedDown: true },
-        { prototype: 'table', name: 'a chart table', description: 'A slanted chart table sits under the window, its surface scored with compass points and covered in faded maritime maps.', boltedDown: false },
-        { prototype: 'furniture', name: 'a hammock frame', description: 'A hammock is slung between two structural posts, its canvas stained with age but still sturdy. Perfect for swaying in imaginary seas.', boltedDown: true },
-        { prototype: 'furniture', name: 'a brass ship\'s barometer', description: 'A large brass barometer and thermometer set hangs on the wall, its needles frozen at readings from decades past.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: "a ship's galley kitchen",
+          description:
+            "A narrow galley is fitted out like a ship's kitchen, with brass rails, a gimbaled stovetop, and canvas curtains covering the cabinets.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a chart table',
+          description:
+            'A slanted chart table sits under the window, its surface scored with compass points and covered in faded maritime maps.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a hammock frame',
+          description:
+            'A hammock is slung between two structural posts, its canvas stained with age but still sturdy. Perfect for swaying in imaginary seas.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: "a brass ship's barometer",
+          description:
+            'A large brass barometer and thermometer set hangs on the wall, its needles frozen at readings from decades past.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
           name: 'the hammock',
           capacity: 1,
-          emptyMsg: 'The canvas hammock sways slightly, waiting for an occupant.',
+          emptyMsg:
+            'The canvas hammock sways slightly, waiting for an occupant.',
           occupiedMsg: '%s swaying gently in the hammock.',
         },
         {
-          name: 'a captain\'s chair',
+          name: "a captain's chair",
           capacity: 1,
-          emptyMsg: 'A wooden captain\'s chair with arms sits at the chart table.',
+          emptyMsg:
+            "A wooden captain's chair with arms sits at the chart table.",
           occupiedMsg: '%s seated at the chart table.',
         },
       ],
@@ -208,22 +285,48 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a ship\'s companionway', description: 'A steep ship\'s ladder with rope handrails leads to the upper berth, its brass fittings polished smooth from countless hands.', boltedDown: true },
-        { prototype: 'bed', name: 'an upper berth', description: 'The elevated sleeping area is fitted out like a ship\'s upper berth, with canvas privacy curtains and a narrow mattress wrapped in nautical striped sheets.', quality: 'standard' },
-        { prototype: 'furniture', name: 'a bench locker', description: 'A built-in bench with rope handles conceals storage beneath. The seat is covered in worn navy canvas.', boltedDown: true },
-        { prototype: 'table', name: 'a rope-wrapped chest', description: 'A small chest wrapped in decorative rope work serves as a side table, holding a brass compass and a collection of sea glass.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: "a ship's companionway",
+          description:
+            "A steep ship's ladder with rope handrails leads to the upper berth, its brass fittings polished smooth from countless hands.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'bed',
+          name: 'an upper berth',
+          description:
+            "The elevated sleeping area is fitted out like a ship's upper berth, with canvas privacy curtains and a narrow mattress wrapped in nautical striped sheets.",
+          quality: 'standard',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a bench locker',
+          description:
+            'A built-in bench with rope handles conceals storage beneath. The seat is covered in worn navy canvas.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a rope-wrapped chest',
+          description:
+            'A small chest wrapped in decorative rope work serves as a side table, holding a brass compass and a collection of sea glass.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
           name: 'the bench locker',
           capacity: 3,
-          emptyMsg: 'The navy canvas bench offers firm seating with hidden storage below.',
+          emptyMsg:
+            'The navy canvas bench offers firm seating with hidden storage below.',
           occupiedMsg: '%s seated on the bench locker.',
         },
         {
           name: 'the upper berth',
           capacity: 1,
-          emptyMsg: 'The ship\'s berth is visible above, accessible by the companionway.',
+          emptyMsg:
+            "The ship's berth is visible above, accessible by the companionway.",
           occupiedMsg: '%s resting in the upper berth.',
         },
       ],
@@ -248,17 +351,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a sailor\'s bunk', description: 'A narrow ship\'s bunk is built into the wall, barely wide enough for one person. Canvas straps can be pulled across to prevent rolling out in rough seas.', quality: 'cheap' },
-        { prototype: 'furniture', name: 'belaying pin hooks', description: 'Wooden belaying pins mounted on a rack serve as coat hooks, their rope still wrapped around some of them.', boltedDown: true },
-        { prototype: 'furniture', name: 'a rope shelf', description: 'A narrow shelf suspended by knotted rope holds a brass oil lamp and a tin mug with a faded maritime insignia.', boltedDown: true },
-        { prototype: 'furniture', name: 'a small porthole', description: 'A tiny porthole-style window lets in limited light, its brass frame green with verdigris.', boltedDown: true },
+        {
+          prototype: 'bed',
+          name: "a sailor's bunk",
+          description:
+            "A narrow ship's bunk is built into the wall, barely wide enough for one person. Canvas straps can be pulled across to prevent rolling out in rough seas.",
+          quality: 'cheap',
+        },
+        {
+          prototype: 'furniture',
+          name: 'belaying pin hooks',
+          description:
+            'Wooden belaying pins mounted on a rack serve as coat hooks, their rope still wrapped around some of them.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a rope shelf',
+          description:
+            'A narrow shelf suspended by knotted rope holds a brass oil lamp and a tin mug with a faded maritime insignia.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a small porthole',
+          description:
+            'A tiny porthole-style window lets in limited light, its brass frame green with verdigris.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
-          name: 'the sailor\'s bunk',
+          name: "the sailor's bunk",
           capacity: 1,
           emptyMsg: 'The narrow bunk waits, its canvas safety straps loose.',
-          occupiedMsg: '%s squeezed into the sailor\'s bunk.',
+          occupiedMsg: "%s squeezed into the sailor's bunk.",
         },
       ],
     },
@@ -287,17 +414,48 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a curved stern bench', description: 'A curved built-in bench follows the contour of the wall like a ship\'s stern, upholstered in salt-stained canvas with rope trim.', boltedDown: true },
-        { prototype: 'table', name: 'a helm wheel table', description: 'An old ship\'s wheel has been converted into a coffee table with a glass top, its spokes worn smooth by generations of hands.', boltedDown: false },
-        { prototype: 'furniture', name: 'a maritime display case', description: 'A built-in display case with brass-framed doors holds model ships, nautical instruments, and faded photographs of vessels.', boltedDown: true },
-        { prototype: 'furniture', name: 'a bosun\'s locker', description: 'A compact coat closet is fitted with brass hooks and rope handles, containing moldering oilskins and a moth-eaten captain\'s cap.', boltedDown: true },
-        { prototype: 'furniture', name: 'a ship\'s bell', description: 'A brass ship\'s bell hangs by the door, its clapper tied silent. The name "SS SEATTLE MIST" is engraved around its rim.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a curved stern bench',
+          description:
+            "A curved built-in bench follows the contour of the wall like a ship's stern, upholstered in salt-stained canvas with rope trim.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a helm wheel table',
+          description:
+            "An old ship's wheel has been converted into a coffee table with a glass top, its spokes worn smooth by generations of hands.",
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a maritime display case',
+          description:
+            'A built-in display case with brass-framed doors holds model ships, nautical instruments, and faded photographs of vessels.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: "a bosun's locker",
+          description:
+            "A compact coat closet is fitted with brass hooks and rope handles, containing moldering oilskins and a moth-eaten captain's cap.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: "a ship's bell",
+          description:
+            'A brass ship\'s bell hangs by the door, its clapper tied silent. The name "SS SEATTLE MIST" is engraved around its rim.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
           name: 'the stern bench',
           capacity: 5,
-          emptyMsg: 'The curved stern bench follows the wall like the aft of a great ship.',
+          emptyMsg:
+            'The curved stern bench follows the wall like the aft of a great ship.',
           occupiedMsg: '%s seated on the stern bench.',
         },
       ],
@@ -322,22 +480,48 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'maritime bookshelves', description: 'Built-in bookshelves with brass fiddle rails hold volumes on navigation, maritime law, and adventure stories. A bottle ship sits on one shelf.', boltedDown: true },
-        { prototype: 'table', name: 'a navigator\'s desk', description: 'A slanted desk with brass corners and a green leather top is fitted for chart work. Parallel rulers and dividers still rest in their proper places.', boltedDown: false },
-        { prototype: 'furniture', name: 'a ship\'s telescope', description: 'A brass telescope on a wooden tripod stands by the window, its lenses clouded but still functional. It points out toward where the harbor used to be.', boltedDown: false },
-        { prototype: 'furniture', name: 'a rope-hung oil lamp', description: 'A brass oil lamp hangs from the ceiling on rope and pulleys, its glass chimney blackened with old soot.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'maritime bookshelves',
+          description:
+            'Built-in bookshelves with brass fiddle rails hold volumes on navigation, maritime law, and adventure stories. A bottle ship sits on one shelf.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: "a navigator's desk",
+          description:
+            'A slanted desk with brass corners and a green leather top is fitted for chart work. Parallel rulers and dividers still rest in their proper places.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: "a ship's telescope",
+          description:
+            'A brass telescope on a wooden tripod stands by the window, its lenses clouded but still functional. It points out toward where the harbor used to be.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a rope-hung oil lamp',
+          description:
+            'A brass oil lamp hangs from the ceiling on rope and pulleys, its glass chimney blackened with old soot.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
-          name: 'a leather captain\'s chair',
+          name: "a leather captain's chair",
           capacity: 1,
-          emptyMsg: 'A revolving captain\'s chair in cracked brown leather sits at the navigator\'s desk.',
-          occupiedMsg: '%s seated at the navigator\'s desk.',
+          emptyMsg:
+            "A revolving captain's chair in cracked brown leather sits at the navigator's desk.",
+          occupiedMsg: "%s seated at the navigator's desk.",
         },
         {
           name: 'a stern window bench',
           capacity: 2,
-          emptyMsg: 'A narrow bench with cushions is built into the window bay.',
+          emptyMsg:
+            'A narrow bench with cushions is built into the window bay.',
           occupiedMsg: '%s looking out from the window bench.',
         },
       ],
@@ -345,7 +529,8 @@ export const building = {
 
     '%C2_z14': {
       name: 'Smith Tower - 14th Floor - South Suite - Living Room',
-      description: 'A corner unit with western exposure and aged carpeting. The afternoon sun has bleached everything near the windows to a uniform pale.',
+      description:
+        'A corner unit with western exposure and aged carpeting. The afternoon sun has bleached everything near the windows to a uniform pale.',
       x: -3,
       y: 9,
       z: 14,
@@ -361,16 +546,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a wicker settee', description: 'A wicker settee in the style of a steamship deck chair faces the window, its cushions covered in faded blue canvas.', boltedDown: false },
-        { prototype: 'table', name: 'a lobster trap table', description: 'An old lobster trap has been converted into a side table with a driftwood top, holding a brass lantern lamp.', boltedDown: false },
-        { prototype: 'furniture', name: 'a decorative anchor', description: 'A small ship\'s anchor is mounted on the wall as decoration, its flukes crossed and chain coiled artfully. Rust has begun to bloom.', boltedDown: true },
-        { prototype: 'furniture', name: 'sailcloth curtains', description: 'Heavy canvas sailcloth curtains hang from wooden rings on a brass rod, sun-bleached to a pale cream.', boltedDown: true },
+        {
+          prototype: 'furniture',
+          name: 'a wicker settee',
+          description:
+            'A wicker settee in the style of a steamship deck chair faces the window, its cushions covered in faded blue canvas.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'table',
+          name: 'a lobster trap table',
+          description:
+            'An old lobster trap has been converted into a side table with a driftwood top, holding a brass lantern lamp.',
+          boltedDown: false,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a decorative anchor',
+          description:
+            "A small ship's anchor is mounted on the wall as decoration, its flukes crossed and chain coiled artfully. Rust has begun to bloom.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'sailcloth curtains',
+          description:
+            'Heavy canvas sailcloth curtains hang from wooden rings on a brass rod, sun-bleached to a pale cream.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
           name: 'the wicker settee',
           capacity: 2,
-          emptyMsg: 'The wicker settee faces the fading western light like a ship\'s sun deck.',
+          emptyMsg:
+            "The wicker settee faces the fading western light like a ship's sun deck.",
           occupiedMsg: '%s lounging on the wicker settee.',
         },
       ],
@@ -399,16 +609,41 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'furniture', name: 'a built-in bench', description: 'A built-in bench with rope handles and a hinged top for storage sits against the wall, its canvas cushion stenciled with an anchor.', boltedDown: true },
-        { prototype: 'furniture', name: 'a sea locker', description: 'A narrow sea locker is built into the wall, its teak door fitted with brass hinges. Inside hang oilskin coats and a cork life preserver.', boltedDown: true },
-        { prototype: 'furniture', name: 'a brass mail slot', description: 'A brass mail slot shaped like a ship\'s porthole is set into the door, its hinge squeaking with age.', boltedDown: true },
-        { prototype: 'table', name: 'a rope-edged console', description: 'A narrow console table with a rope-wrapped edge holds a brass bowl for keys and a collection of sea shells.', boltedDown: false },
+        {
+          prototype: 'furniture',
+          name: 'a built-in bench',
+          description:
+            'A built-in bench with rope handles and a hinged top for storage sits against the wall, its canvas cushion stenciled with an anchor.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a sea locker',
+          description:
+            'A narrow sea locker is built into the wall, its teak door fitted with brass hinges. Inside hang oilskin coats and a cork life preserver.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a brass mail slot',
+          description:
+            "A brass mail slot shaped like a ship's porthole is set into the door, its hinge squeaking with age.",
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a rope-edged console',
+          description:
+            'A narrow console table with a rope-wrapped edge holds a brass bowl for keys and a collection of sea shells.',
+          boltedDown: false,
+        },
       ],
       sittables: [
         {
           name: 'the entry bench',
           capacity: 2,
-          emptyMsg: 'The nautical bench offers a place to sit while removing sea boots.',
+          emptyMsg:
+            'The nautical bench offers a place to sit while removing sea boots.',
           occupiedMsg: '%s resting on the entry bench.',
         },
       ],
@@ -433,17 +668,42 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a captain\'s cabin bed', description: 'A substantial bed is built into the alcove like a ship\'s cabin, with heavy canvas curtains for privacy and wool blankets in a maritime stripe pattern.', quality: 'nice' },
-        { prototype: 'furniture', name: 'a wardrobe sea chest', description: 'A tall sea chest with brass corners serves as a wardrobe, its interior fitted with cedar and smelling faintly of camphor.', boltedDown: true },
-        { prototype: 'furniture', name: 'a porthole mirror', description: 'A brass porthole frame has been converted into a wall mirror, complete with working dogs and hinges.', boltedDown: true },
-        { prototype: 'table', name: 'a brass ship\'s lamp table', description: 'A small table bolted to the floor holds a brass gimbal lamp, a worn leather journal, and a faded photograph in a rope frame.', boltedDown: true },
+        {
+          prototype: 'bed',
+          name: "a captain's cabin bed",
+          description:
+            "A substantial bed is built into the alcove like a ship's cabin, with heavy canvas curtains for privacy and wool blankets in a maritime stripe pattern.",
+          quality: 'nice',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a wardrobe sea chest',
+          description:
+            'A tall sea chest with brass corners serves as a wardrobe, its interior fitted with cedar and smelling faintly of camphor.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a porthole mirror',
+          description:
+            'A brass porthole frame has been converted into a wall mirror, complete with working dogs and hinges.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: "a brass ship's lamp table",
+          description:
+            'A small table bolted to the floor holds a brass gimbal lamp, a worn leather journal, and a faded photograph in a rope frame.',
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
-          name: 'the captain\'s cabin bed',
+          name: "the captain's cabin bed",
           capacity: 2,
-          emptyMsg: 'The cabin bed awaits behind its canvas curtains, wool blankets folded neatly.',
-          occupiedMsg: '%s resting in the captain\'s cabin bed.',
+          emptyMsg:
+            'The cabin bed awaits behind its canvas curtains, wool blankets folded neatly.',
+          occupiedMsg: "%s resting in the captain's cabin bed.",
         },
       ],
     },
@@ -467,17 +727,48 @@ export const building = {
           'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       objects: [
-        { prototype: 'bed', name: 'a fold-down berth', description: 'A ship\'s berth folds down from the wall, its canvas straps securing the mattress. When stowed, the berth is hidden behind a teak panel.', quality: 'standard' },
-        { prototype: 'furniture', name: 'a teak berth cabinet', description: 'The fold-down berth is concealed in a teak cabinet with brass latches. When closed, it displays a carved seascape of ships and waves.', boltedDown: true },
-        { prototype: 'furniture', name: 'nautical display shelves', description: 'Built-in shelving with brass fiddle rails displays model ships, a brass sextant, and books on maritime history.', boltedDown: true },
-        { prototype: 'table', name: 'a bulkhead fold-down desk', description: 'A small desk folds down from the bulkhead on brass hinges, fitted with a chart light and compass rose inlay.', boltedDown: true },
-        { prototype: 'furniture', name: 'a sea bag dresser', description: 'A compact chest of drawers with brass ring pulls is designed like a ship\'s quartermaster desk, each drawer labeled with brass plates.', boltedDown: true },
+        {
+          prototype: 'bed',
+          name: 'a fold-down berth',
+          description:
+            "A ship's berth folds down from the wall, its canvas straps securing the mattress. When stowed, the berth is hidden behind a teak panel.",
+          quality: 'standard',
+        },
+        {
+          prototype: 'furniture',
+          name: 'a teak berth cabinet',
+          description:
+            'The fold-down berth is concealed in a teak cabinet with brass latches. When closed, it displays a carved seascape of ships and waves.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'nautical display shelves',
+          description:
+            'Built-in shelving with brass fiddle rails displays model ships, a brass sextant, and books on maritime history.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'table',
+          name: 'a bulkhead fold-down desk',
+          description:
+            'A small desk folds down from the bulkhead on brass hinges, fitted with a chart light and compass rose inlay.',
+          boltedDown: true,
+        },
+        {
+          prototype: 'furniture',
+          name: 'a sea bag dresser',
+          description:
+            "A compact chest of drawers with brass ring pulls is designed like a ship's quartermaster desk, each drawer labeled with brass plates.",
+          boltedDown: true,
+        },
       ],
       sittables: [
         {
           name: 'the fold-down berth',
           capacity: 2,
-          emptyMsg: 'The berth is lowered, its canvas mattress exposed and ready.',
+          emptyMsg:
+            'The berth is lowered, its canvas mattress exposed and ready.',
           occupiedMsg: '%s resting in the fold-down berth.',
         },
       ],

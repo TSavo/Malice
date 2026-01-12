@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
 import { existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { describe, expect, it } from 'vitest';
 
 /**
  * Test subdirectory search logic added in PR #118
@@ -11,13 +11,20 @@ describe('Documentation Subdirectory Search Logic', () => {
   const docsDir = join(process.cwd(), 'docs');
 
   // Simulate the search logic from mcp-server-codefirst.ts and other builders
-  const searchDirs = ['guides', 'reference', 'lore', 'internal', 'moo', 'city-ai', 'greeter', 'prompts'];
+  const searchDirs = [
+    'guides',
+    'reference',
+    'lore',
+    'internal',
+    'moo',
+    'city-ai',
+    'greeter',
+    'prompts',
+  ];
 
   function findDocByFilename(filename: string): string | null {
     const upper = filename.toUpperCase();
-    const normalizedFilename = upper.endsWith('.MD')
-      ? upper
-      : `${upper}.MD`;
+    const normalizedFilename = upper.endsWith('.MD') ? upper : `${upper}.MD`;
 
     // First try root directory
     const rootPath = join(docsDir, normalizedFilename);
@@ -30,7 +37,7 @@ describe('Documentation Subdirectory Search Logic', () => {
       const dirPath = join(docsDir, dir);
       if (existsSync(dirPath)) {
         const files = readdirSync(dirPath);
-        const match = files.find(f => f.toUpperCase() === normalizedFilename);
+        const match = files.find((f) => f.toUpperCase() === normalizedFilename);
         if (match) {
           return join(dirPath, match);
         }

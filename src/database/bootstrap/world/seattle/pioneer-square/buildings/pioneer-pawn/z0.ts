@@ -19,7 +19,7 @@ export const building = {
       prototype: 'lock',
       name: 'Front Door Lock',
       description:
-        'A heavy-duty deadbolt, the kind pawn shops install when they realize what they\'re storing.',
+        "A heavy-duty deadbolt, the kind pawn shops install when they realize what they're storing.",
       difficulty: 5,
     },
     '%FRONT_DOOR': {
