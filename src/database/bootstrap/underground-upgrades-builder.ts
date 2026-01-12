@@ -239,9 +239,9 @@ OPENING: Swings outward on massive hinges. Takes effort to move even when unlock
       await door4.call('moveTo', theVault);
     }
 
-    // 5. CLONE LAB (x=-16, y=1, z=-5) - Restricted access
-    const cloneLab = await $.spatial.getRoomDataAt(-16, 1, -5);
-    if (cloneLab) {
+    // 5. MEDICAL LAB (x=-16, y=1, z=-5) - Restricted access
+    const medicalLab = await $.spatial.getRoomDataAt(-16, 1, -5);
+    if (medicalLab) {
       const lock5 = await $.recycler.create($.biometricLock, {
         name: 'Cleanroom Scanner',
         description:
@@ -276,7 +276,7 @@ OPENING: Cycles through decontamination sequence. UV lights flash, air hisses. T
         autolockOnClose: true,
       });
 
-      await door5.call('moveTo', cloneLab);
+      await door5.call('moveTo', medicalLab);
     }
 
     // 6. HOLDING CELLS (x=-10, y=-3, z=-5) - Detention security
@@ -618,9 +618,9 @@ CONTENTS: Minimal possessions. What does Sister Gray keep?`,
       await trunk.call('moveTo', sistersQuarters);
     }
 
-    // CLONE LAB (x=-16, y=1, z=-5) - Already has door, add equipment
-    const cloneLab2 = await $.spatial.getRoomDataAt(-16, 1, -5);
-    if (cloneLab2) {
+    // MEDICAL LAB (x=-16, y=1, z=-5) - Already has door, add equipment
+    const medicalLab2 = await $.spatial.getRoomDataAt(-16, 1, -5);
+    if (medicalLab2) {
       const examTable = await $.recycler.create($.table, {
         name: 'Examination Table',
         description:
@@ -651,12 +651,12 @@ CLIMATE: Maintains precise temperature for sample preservation.`,
 
 EQUIPMENT: Centrifuge, microscope, spectral analyzer, gene sequencer.
 
-WORK: Sample analysis, genetic research, clone development monitoring.`,
+WORK: Sample analysis, genetic research, medical diagnostics.`,
       });
 
-      await examTable.call('moveTo', cloneLab2);
-      await specCabinet.call('moveTo', cloneLab2);
-      await workstation.call('moveTo', cloneLab2);
+      await examTable.call('moveTo', medicalLab2);
+      await specCabinet.call('moveTo', medicalLab2);
+      await workstation.call('moveTo', medicalLab2);
     }
 
     // ARCHIVE (x=-16, y=-3, z=-5) - Information storage

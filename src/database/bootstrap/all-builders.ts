@@ -45,8 +45,7 @@ import './prototypes/magazine-builder';
 import './prototypes/one-time-locker-builder';
 import './prototypes/phone-db-builder';
 import './prototypes/telescope-builder';
-import './prototypes/clone-recording-studio-builder';
-import './prototypes/clone-tank-builder';
+// Clone system removed - permadeath is real
 import './prototypes/rentable-lock-builder';
 import './prototypes/totem-pole-builder';
 import './prototypes/sealed-box-builder';
