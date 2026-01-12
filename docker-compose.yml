@@ -81,7 +81,8 @@ services:
     build: ./midjourney-api
     container_name: malice-midjourney-api
     restart: unless-stopped
-    # No ports exposed - only accessible within Docker network
+    ports:
+      - "3020:3000"
     environment:
       - SERVER_ID=${MIDJOURNEY_SERVER_ID:-}
       - CHANNEL_ID=${MIDJOURNEY_CHANNEL_ID:-}
