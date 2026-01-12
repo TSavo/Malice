@@ -23,6 +23,7 @@ const PROMPT_FILES: Record<string, string> = {
   mechanic: 'MECHANIC.md',
   navComputer: 'NAV-COMPUTER.md',
   device: 'DEVICE.md',
+  autoFixer: 'AUTO-FIXER.md',
 };
 
 /**

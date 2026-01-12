@@ -410,12 +410,13 @@ export class SchedulerBuilder implements Builder {
 
   /**
    * Post-register hook: Register wake jobs for Pluribus and Sister Gray,
-   * and greeter pool maintenance job.
-   * Called after ALL aliases exist so we can find pluribus/sisterGray/greeter
+   * greeter pool maintenance job, and auto-fixer job.
+   * Called after ALL aliases exist so we can find pluribus/sisterGray/greeter/autoFixer
    */
   async postRegister(): Promise<void> {
     await this.registerWakeJobs();
     await this.registerGreeterPoolJob();
+    await this.registerAutoFixerJob();
   }
 
   /**
@@ -572,6 +573,51 @@ export class SchedulerBuilder implements Builder {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       this.scheduler.set('jobs', jobs as any);
       console.log('✅ Registered greeterPoolMaintenance job (every 5 min)');
+    }
+  }
+
+  /**
+   * Register auto-fixer tick job
+   * Called separately after autoFixer alias is registered
+   */
+  async registerAutoFixerJob(): Promise<void> {
+    if (!this.scheduler) return;
+
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
+
+    const jobs = (this.scheduler.get('jobs') as Record<string, unknown>) || {};
+
+    // Auto-fixer hourly tick - runs every hour on the quarter-hour
+    // Attempts to fix open issues using AI
+    const autoFixerId = (await objectManager.call('getAlias', 'autoFixer')) as
+      | number
+      | undefined;
+    if (autoFixerId && !jobs.autoFixerTick) {
+      // Calculate ms until next quarter-hour (15 min past the hour)
+      const now = Date.now();
+      const msPerHour = 3600000;
+      const msPerQuarterHour = 900000; // 15 minutes
+      const msSinceHour = now % msPerHour;
+      // Time until next :15 mark
+      const msUntilNextQuarter =
+        msSinceHour < msPerQuarterHour
+          ? msPerQuarterHour - msSinceHour
+          : msPerHour - msSinceHour + msPerQuarterHour;
+
+      (jobs as Record<string, unknown>).autoFixerTick = {
+        interval: msPerHour, // every hour
+        nextRun: now + msUntilNextQuarter, // aligned to :15 past the hour
+        targetId: autoFixerId,
+        method: 'tick',
+        args: [],
+        enabled: true,
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      this.scheduler.set('jobs', jobs as any);
+      console.log(
+        '✅ Registered autoFixerTick job (hourly, on the quarter-hour)',
+      );
     }
   }
 }
