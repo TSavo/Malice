@@ -129,6 +129,39 @@ Live Game Data:
 
 Use ListMcpResourcesTool to see all available resources.
 
+DOCUMENTATION LOOKUP ($docs):
+When you need to understand how something works, search the docs:
+```javascript
+// Search for documentation on a topic
+const results = await $docs.search('exits');
+
+// Get a specific document by name
+const doc = await $docs.get('BUILDERS-GUIDE');
+
+// List documents in a folder
+const mooDocs = await $docs.list('moo');
+```
+
+BUG REPORTING ($issues):
+When you encounter something broken, report it:
+```javascript
+// Check if issue already exists
+const existing = await $issues.search('exit not working');
+
+// Report a bug with context
+await $issues.create({
+  title: 'Exit link missing between rooms',
+  body: 'Room #123 has a north exit but room #456 has no south exit back.',
+  type: 'bug',
+  priority: 'medium',
+  tags: ['exits', 'rooms'],
+  reporter: self.name
+});
+
+// If you fix something, resolve the issue
+await $issues.resolve(issueId, 'Created bidirectional exit link');
+```
+
 WHEN TO READ THESE:
 - Player asks about history ("What happened to the world?")
 - Player asks about The Burning, the Corporate Wars, etc.
