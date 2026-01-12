@@ -169,9 +169,46 @@ export class AiImageGenBuilder implements Builder {
 
         const imageBuffer = await imageResp.arrayBuffer();
         const mimeType = imageResp.headers.get('content-type') || 'image/png';
-        const base64Data = Buffer.from(imageBuffer).toString('base64');
 
-        // Store in $blob (compression happens in midjourney-api via oxipng)
+        // Compress with oxipng before storing
+        let base64Data;
+        let originalSize = imageBuffer.byteLength;
+        let compressedSize = originalSize;
+        try {
+          const fs = await import('fs');
+          const path = await import('path');
+          const os = await import('os');
+          const { execFile } = await import('child_process');
+          const { promisify } = await import('util');
+          const execFileAsync = promisify(execFile);
+
+          // Write to temp file
+          const tempDir = os.tmpdir();
+          const tempFile = path.join(tempDir, 'mj_' + Date.now() + '.png');
+          fs.writeFileSync(tempFile, Buffer.from(imageBuffer));
+
+          // Run oxipng -o4
+          try {
+            const oxipngModule = require('oxipng-bin');
+            const oxipng = oxipngModule.default || oxipngModule;
+            await execFileAsync(oxipng, ['-o', '4', '--strip', 'safe', tempFile]);
+            const compressedBuffer = fs.readFileSync(tempFile);
+            compressedSize = compressedBuffer.length;
+            base64Data = compressedBuffer.toString('base64');
+            const savings = ((originalSize - compressedSize) / originalSize * 100).toFixed(1);
+            console.log('[Compress] ' + (originalSize/1024/1024).toFixed(2) + 'MB -> ' + (compressedSize/1024/1024).toFixed(2) + 'MB (' + savings + '% smaller)');
+          } catch (compressErr) {
+            console.warn('[Compress] oxipng failed, using original:', compressErr.message);
+            base64Data = Buffer.from(imageBuffer).toString('base64');
+          } finally {
+            // Cleanup temp file
+            try { fs.unlinkSync(tempFile); } catch {}
+          }
+        } catch (err) {
+          base64Data = Buffer.from(imageBuffer).toString('base64');
+        }
+
+        // Store in $blob
         const blob = $blob;
         if (!blob) {
           return { success: false, error: '$blob not available' };
