@@ -52,6 +52,12 @@ bun scripts/generate-room-images.ts --buildings-only # Only building rooms
 bun scripts/generate-room-images.ts --underground   # Only underground rooms (z < 0)
 bun scripts/generate-room-images.ts --surface       # Only surface rooms (z >= 0)
 bun scripts/generate-room-images.ts --parallel 3    # Process 3 rooms concurrently (default: 2)
+
+# Image Compression
+bun scripts/compress-images.ts                      # Compress all images (lossless PNG optimization)
+bun scripts/compress-images.ts --dry-run            # Preview compression without changes
+bun scripts/compress-images.ts --parallel 4         # Process 4 images concurrently
+bun scripts/compress-images.ts --limit 10           # Process max 10 images
 ```
 
 ## Architecture
@@ -1433,7 +1439,7 @@ const health = await $tts.health();
 
 ### $aiImageGen - AI Image Generation Object
 
-Generate images using Midjourney and store them in `$blob`:
+Generate images using Midjourney and store them in `$blob`. All generated images are automatically compressed using lossless PNG optimization (sharp library) before storage.
 
 ```typescript
 // Generate image and store in $blob
