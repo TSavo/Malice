@@ -464,13 +464,11 @@ export class DocsBuilder implements Builder {
       doc.content = newContent;
 
       // Re-extract title from new content
-      const titleMatch = newContent.match(/^#\\\\\\\\s+(.+)$/m);
+      const titleMatch = newContent.match(/^#\\\\s+(.+)$/m);
       if (titleMatch) {
         doc.title = titleMatch[1].trim();
-      } else {
-        // Fallback to document name if no heading found
-        doc.title = doc.name;
       }
+      // Note: If no heading found, leave title unchanged (don't overwrite with name)
 
       // Track edit
       doc.source = 'in-game';
@@ -518,10 +516,13 @@ export class DocsBuilder implements Builder {
       // Parse path to get name, category
       const parts = docPath.split('/');
       const name = parts[parts.length - 1];
+      if (!name || !name.trim()) {
+        return { success: false, error: 'Invalid path: document name cannot be empty' };
+      }
       const category = parts[0] || 'root';
 
       // Extract title from content
-      const titleMatch = content.match(/^#\\\\\\\\s+(.+)$/m);
+      const titleMatch = content.match(/^#\\\\s+(.+)$/m);
       const title = options.title || (titleMatch ? titleMatch[1].trim() : name);
 
       // Create the document object
