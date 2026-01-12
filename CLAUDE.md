@@ -263,7 +263,7 @@ Each faction gets its own isolated network infrastructure. Ports are calculated 
 Factions are created dynamically via `$factionManager.create()` - see Faction System below.
 
 **AI Services:**
-- **3000** (internal) - Midjourney API server (Discord bot proxy)
+- **Midjourney API** - Discord bot proxy (internal only, accessed via Docker network at midjourney-api:3000)
 
 ### Midjourney API Server
 
@@ -297,6 +297,9 @@ The Midjourney API server (`midjourney-api` service) runs as a Docker container 
 
 **Integration:**
 The `$aiImageGen` MOO object uses this service internally. You don't need to call the API directly - just use `$aiImageGen.generate()` from MOO code.
+
+**Image Compression:**
+When the `download: true` parameter is used, the server downloads the Midjourney-generated image from Discord CDN, compresses it using oxipng (lossless PNG optimization achieving ~12% size reduction), and returns the compressed image data. This reduces storage costs and bandwidth without any quality loss. The MOO integration always uses `download: true` to ensure all stored images are compressed.
 
 See `midjourney-api/API.md` for full API documentation.
 
@@ -1439,7 +1442,7 @@ const health = await $tts.health();
 
 ### $aiImageGen - AI Image Generation Object
 
-Generate images using Midjourney and store them in `$blob`. All generated images are automatically compressed using lossless PNG optimization (sharp library) before storage.
+Generate images using Midjourney and store them in `$blob`. The Midjourney API server downloads, compresses with oxipng (lossless PNG optimization, ~12% reduction), and returns the compressed image data, which is then stored in blob storage.
 
 ```typescript
 // Generate image and store in $blob

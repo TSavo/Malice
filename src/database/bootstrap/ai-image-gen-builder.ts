@@ -136,7 +136,7 @@ export class AiImageGenBuilder implements Builder {
             prompt: prompt,
             options: Object.keys(mjOptions).length > 0 ? mjOptions : undefined,
             upscaleIndex: options.upscaleIndex || 1,
-            download: false, // We'll fetch the image ourselves
+            download: true, // Enable server-side oxipng compression
           }),
           signal: controller.signal,
         });
@@ -150,55 +150,43 @@ export class AiImageGenBuilder implements Builder {
 
         const data = await resp.json();
 
-        if (!data.uri) {
-          return { success: false, error: 'No image URI in response', data };
+        if (!data.uri && !data.content) {
+          return { success: false, error: 'No image URI or content in response', data };
         }
 
-        // Fetch the image from Discord CDN with timeout
-        const cdnController = new AbortController();
-        const cdnTimeoutId = setTimeout(() => cdnController.abort(), 60000); // 1 min timeout for CDN
-        let imageResp;
-        try {
-          imageResp = await fetch(data.uri, { signal: cdnController.signal });
-        } finally {
-          clearTimeout(cdnTimeoutId);
-        }
-        if (!imageResp.ok) {
-          return { success: false, error: 'Failed to fetch image from CDN: ' + imageResp.status };
-        }
+        let base64Data: string;
+        let mimeType = 'image/png';
 
-        const imageBuffer = await imageResp.arrayBuffer();
-        const mimeType = imageResp.headers.get('content-type') || 'image/png';
+        // Use compressed content if available (download: true), otherwise fetch from CDN
+        if (data.content) {
+          // Server returned compressed image data directly
+          base64Data = data.content;
+        } else {
+          // Fetch the image from Discord CDN with timeout
+          const cdnController = new AbortController();
+          const cdnTimeoutId = setTimeout(() => cdnController.abort(), 60000); // 1 min timeout for CDN
+          let imageResp;
+          try {
+            imageResp = await fetch(data.uri, { signal: cdnController.signal });
+          } finally {
+            clearTimeout(cdnTimeoutId);
+          }
+          if (!imageResp.ok) {
+            return { success: false, error: 'Failed to fetch image from CDN: ' + imageResp.status };
+          }
 
-        // Lossless PNG compression using sharp
-        let compressedBase64;
-        let originalSize = imageBuffer.byteLength;
-        let compressedSize = originalSize;
-        try {
-          const sharp = (await import('sharp')).default;
-          const compressedBuffer = await sharp(Buffer.from(imageBuffer))
-            .png({
-              compressionLevel: 9,  // Max lossless compression
-              effort: 10,           // Max optimization effort
-              palette: false,       // Keep full color (no quantization)
-            })
-            .toBuffer();
-          compressedBase64 = compressedBuffer.toString('base64');
-          compressedSize = compressedBuffer.length;
-        } catch (compressErr) {
-          // If compression fails, fall back to original
-          console.warn('PNG compression failed, using original:', compressErr.message);
-          compressedBase64 = Buffer.from(imageBuffer).toString('base64');
+          const imageBuffer = await imageResp.arrayBuffer();
+          mimeType = imageResp.headers.get('content-type') || 'image/png';
+          base64Data = Buffer.from(imageBuffer).toString('base64');
         }
 
-        // Store in $blob
+        // Store in $blob (image is already oxipng-compressed by midjourney-api when download: true)
         const blob = $blob;
         if (!blob) {
           return { success: false, error: '$blob not available' };
         }
 
         const filename = (options.filename || 'mj_image_' + Date.now()) + '.png';
-        const compressionRatio = originalSize > 0 ? ((originalSize - compressedSize) / originalSize * 100).toFixed(1) : '0';
         const metadata = {
           contentType: mimeType,
           filename: filename,
@@ -207,15 +195,12 @@ export class AiImageGenBuilder implements Builder {
           midjourneyId: data.id,
           midjourneyHash: data.hash,
           generatedAt: new Date().toISOString(),
-          originalSize: originalSize,
-          compressedSize: compressedSize,
-          compressionRatio: compressionRatio + '%',
           ...(options.metadata || {}),
         };
 
         let blobKey;
         try {
-          blobKey = await blob.write(compressedBase64, metadata);
+          blobKey = await blob.write(base64Data, metadata);
         } catch (blobErr) {
           return {
             success: false,
@@ -232,16 +217,13 @@ export class AiImageGenBuilder implements Builder {
           uri: data.uri,
           width: data.width,
           height: data.height,
-          originalSize: originalSize,
-          compressedSize: compressedSize,
-          compressionRatio: compressionRatio + '%',
         };
       } catch (err) {
         clearTimeout(timeoutId);
         if (err.name === 'AbortError') {
           return {
             success: false,
-            error: 'Midjourney generation timeout (5 minutes). Check API health with health() method and verify Discord bot status.'
+            error: 'Midjourney generation timeout (10 minutes). Check API health with health() method and verify Discord bot status.'
           };
         }
         return { success: false, error: err.message || String(err) };
@@ -317,7 +299,7 @@ export class AiImageGenBuilder implements Builder {
       if (options.tile) mjOptions.tile = options.tile;
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 min timeout
+      const timeoutId = setTimeout(() => controller.abort(), 600000); // 10 min timeout for MJ (generation can take 2-4min + queue time)
 
       try {
         // Call Midjourney API /generate endpoint
@@ -330,7 +312,7 @@ export class AiImageGenBuilder implements Builder {
             prompt: prompt,
             options: Object.keys(mjOptions).length > 0 ? mjOptions : undefined,
             upscaleIndex: options.upscaleIndex || 1,
-            download: false,
+            download: true, // Enable server-side oxipng compression
           }),
           signal: controller.signal,
         });
@@ -344,68 +326,52 @@ export class AiImageGenBuilder implements Builder {
 
         const data = await resp.json();
 
-        if (!data.uri) {
-          return { success: false, error: 'No image URI in response', data };
+        if (!data.uri && !data.content) {
+          return { success: false, error: 'No image URI or content in response', data };
         }
 
-        // Fetch the image from Discord CDN with timeout
-        const cdnController = new AbortController();
-        const cdnTimeoutId = setTimeout(() => cdnController.abort(), 60000); // 1 min timeout for CDN
-        let imageResp;
-        try {
-          imageResp = await fetch(data.uri, { signal: cdnController.signal });
-        } finally {
-          clearTimeout(cdnTimeoutId);
-        }
-        if (!imageResp.ok) {
-          return { success: false, error: 'Failed to fetch image from CDN: ' + imageResp.status };
-        }
+        let base64Data: string;
+        let mimeType = 'image/png';
 
-        const imageBuffer = await imageResp.arrayBuffer();
-        const mimeType = imageResp.headers.get('content-type') || 'image/png';
+        // Use compressed content if available (download: true), otherwise fetch from CDN
+        if (data.content) {
+          // Server returned compressed image data directly
+          base64Data = data.content;
+        } else {
+          // Fetch the image from Discord CDN with timeout
+          const cdnController = new AbortController();
+          const cdnTimeoutId = setTimeout(() => cdnController.abort(), 60000); // 1 min timeout for CDN
+          let imageResp;
+          try {
+            imageResp = await fetch(data.uri, { signal: cdnController.signal });
+          } finally {
+            clearTimeout(cdnTimeoutId);
+          }
+          if (!imageResp.ok) {
+            return { success: false, error: 'Failed to fetch image from CDN: ' + imageResp.status };
+          }
 
-        // Lossless PNG compression using sharp
-        let compressedBase64;
-        let originalSize = imageBuffer.byteLength;
-        let compressedSize = originalSize;
-        try {
-          const sharp = (await import('sharp')).default;
-          const compressedBuffer = await sharp(Buffer.from(imageBuffer))
-            .png({
-              compressionLevel: 9,  // Max lossless compression
-              effort: 10,           // Max optimization effort
-              palette: false,       // Keep full color (no quantization)
-            })
-            .toBuffer();
-          compressedBase64 = compressedBuffer.toString('base64');
-          compressedSize = compressedBuffer.length;
-        } catch (compressErr) {
-          // If compression fails, fall back to original
-          console.warn('PNG compression failed, using original:', compressErr.message);
-          compressedBase64 = Buffer.from(imageBuffer).toString('base64');
+          const imageBuffer = await imageResp.arrayBuffer();
+          mimeType = imageResp.headers.get('content-type') || 'image/png';
+          base64Data = Buffer.from(imageBuffer).toString('base64');
         }
-
-        const compressionRatio = originalSize > 0 ? ((originalSize - compressedSize) / originalSize * 100).toFixed(1) : '0';
 
         return {
           success: true,
-          data: compressedBase64,
+          data: base64Data,
           contentType: mimeType,
           prompt: prompt,
           aspectRatio: aspectRatio,
           uri: data.uri,
           width: data.width,
           height: data.height,
-          originalSize: originalSize,
-          compressedSize: compressedSize,
-          compressionRatio: compressionRatio + '%',
         };
       } catch (err) {
         clearTimeout(timeoutId);
         if (err.name === 'AbortError') {
           return {
             success: false,
-            error: 'Midjourney generation timeout (5 minutes). Check API health with health() method and verify Discord bot status.'
+            error: 'Midjourney generation timeout (10 minutes). Check API health with health() method and verify Discord bot status.'
           };
         }
         return { success: false, error: err.message || String(err) };
