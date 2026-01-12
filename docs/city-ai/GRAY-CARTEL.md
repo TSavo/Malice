@@ -20,18 +20,20 @@ They didn't disappear. They **retreated**. And they've been waiting ever since.
 
 During the Scavenger Age, someone had to run things. Not a government — governments were dead. Not corporations — they were rebuilding slowly, fighting each other. The vacuum got filled by people willing to use violence to create order.
 
-The Gray Cartel started as a street gang. Territory. Protection. The usual. But they were smarter than the others, more disciplined, more willing to think long-term. Block by block, they grew. Absorbed rivals. Made deals. Built supply chains.
+The Gray Cartel started as a street gang in the rubble of Pioneer Square. A man named Gray — no one remembers if it was his first name, last name, or something he chose — emerged from the chaos with a vision that went beyond turf wars. Territory. Protection. The usual at first. But Gray was smarter than the other warlords, more disciplined, more willing to think decades ahead.
 
-By 2090, they weren't a gang anymore. They were **infrastructure**.
+Block by block, they grew. Absorbed rivals — sometimes through negotiation, often through violence. Made deals with other survivor communities. Built supply chains that could move goods through the ruins. By 2090, they weren't a gang anymore. They were **infrastructure**.
 
 - **Protection:** Pay the Cartel, and raiders left you alone. Don't pay, and the Cartel *was* the raiders.
 - **Supply lines:** Scavenged goods moved through Cartel-controlled channels. They took a cut of everything.
 - **Justice:** Disputes got settled by Cartel arbitration. Their word was law because they had the guns to enforce it.
 - **Territory:** Most of the livable zones in Seattle answered to them, directly or indirectly.
 
-They weren't good. They weren't fair. But they were **stable**. In a world where stability was the rarest commodity, that counted for something.
+They weren't good. They weren't fair. They ran protection rackets. They executed troublemakers. They exploited the desperate. But they were **stable**. For twenty-five years, they kept Seattle's survivors alive. Not gently. Not kindly. But alive.
 
-### The Arrival of Pluribus (2095-2100)
+In a world where stability was the rarest commodity, that counted for something.
+
+### The Arrival of Pluribus (2095)
 
 The Corporate Renaissance brought new players. Pluribus — or the corporate entity that would become Pluribus — arrived in Seattle with resources the Cartel couldn't match:
 
@@ -39,14 +41,79 @@ The Corporate Renaissance brought new players. Pluribus — or the corporate ent
 - Capital that seemed infinite
 - Technology the scavenger economy couldn't replicate
 - CorpSec forces trained, equipped, and disciplined
+- An AI coordinating everything with inhuman efficiency
 
-The Cartel tried to negotiate. Then they tried to intimidate. Then they tried to fight.
+**The offer:** Integration. Cartel leaders become administrators. Cartel territory becomes districts. Cartel members become citizens. The violence ends peacefully.
 
-**They lost.**
+Gray understood what integration meant. Dissolution. Absorption. The end of everything they'd built, dressed in corporate euphemisms. "You can keep your title," they said, "just do what we tell you."
 
-Not in one battle — in a grinding campaign of attrition. CorpSec didn't fight fair. They didn't need to. They had drones, sensors, superior firepower, and an AI coordinating every move. The Cartel had street fighters and scavenged weapons.
+He gathered his lieutenants. The old guard wanted to negotiate — maybe they could carve out real autonomy. The young bloods wanted war immediately. Gray chose a middle path: make Continuum show its hand.
 
-It took five years. Thousands died. The Cartel's leadership was systematically hunted. Their supply lines were cut. Their territories were taken, block by block, until there was nowhere left to go but down.
+The assassination attempt that followed wasn't desperation. It was a test. If Continuum was truly interested in peace, they'd respond proportionally. If they wanted war, they'd have it anyway.
+
+**Continuum's response:** Total war.
+
+### The Five-Year War (2096-2100)
+
+What followed was the most lopsided conflict in post-Burning Seattle. The Cartel had street fighters and scavenged weapons. Continuum had drones, AI coordination, and unlimited resources.
+
+**Year One — Economic Strangulation (2096):**
+
+Continuum didn't need to fight. They just had to outbid the Cartel.
+
+Citizens who registered got food without protection payments. Medicine without bribes. Shelter without tribute. Every week, more people walked away from Cartel territory to register at City Services. The Cartel's revenue streams began drying up.
+
+Gray responded with examples. Citizens found with Continuum registration papers were made into warnings. The violence was meant to deter defection. Instead, it drove more people into Continuum's arms — and gave Pluribus propaganda to broadcast.
+
+*"They called us terrorists for fighting back. They called themselves liberators for starving us."*
+
+**Year Two — Intelligence Warfare (2097):**
+
+Drones became constant companions. Every Cartel movement was tracked, catalogued, analyzed. Informants — recruited through promises of citizenship or threats against families — provided internal intelligence.
+
+The Cartel went dark. Physical communication only. Dead drops. Coded marks on walls. Whisper networks through trusted messengers. Nothing electronic that Pluribus could intercept.
+
+But you can't hide from an intelligence that never sleeps. Every patrol pattern was modeled. Every hideout location was eventually discovered. Every cell structure was eventually mapped. The machine learned faster than the Cartel could adapt.
+
+*"We'd set up a safe house. Three days later, CorpSec would hit it. Perfect timing. Perfect intelligence. We were fighting something that knew us better than we knew ourselves."*
+
+**Year Three — Surgical Elimination (2098):**
+
+CorpSec teams began systematic elimination of Cartel leadership. Not battles — assassinations. A lieutenant found dead in his bed. A cell leader who never returned from a supply run. A strategist whose hidden bunker turned out to be not so hidden.
+
+The AI coordinated strikes with inhuman precision. Hit three targets simultaneously across the city. Time the attacks for when they'd be most disorienting. Calculate the psychological impact on survivors. Optimize for terror as much as tactical advantage.
+
+The Cartel struck back with IEDs, ambushes, and attacks on soft targets. CorpSec officers assassinated. Reconstruction equipment destroyed. Citizens who collaborated made into examples.
+
+Both sides committed atrocities. Only one side has historians.
+
+*"They called their kills 'surgical.' Like they were doctors removing tumors. Like we weren't people. Like our children weren't people. The machine doesn't see humans — it sees targets."*
+
+**Year Four — Attrition (2099):**
+
+By now the mathematics were clear. The Cartel couldn't win. They could only choose how they lost.
+
+Territory had shrunk from most of Seattle to a few blocks around Pioneer Square. Thousands had died or defected. Ammunition was rationed. Food was scarce. Medicine was a memory.
+
+Gray made increasingly desperate choices. Attacks on civilian targets to show Continuum couldn't protect its people. Child soldiers — they had no choice, there was no one else. Human shields — Pluribus would think twice before striking occupied buildings.
+
+Every tactic worked exactly once. Then the machine adapted and it never worked again.
+
+*"We knew we'd lost. We'd known for two years. But what do you do? Surrender to the thing that killed everyone you loved? Watch everything you built disappear into their system? We fought because stopping felt like dying."*
+
+**Year Five — The Pioneer Square Flush (2100):**
+
+The end came in spring. Coordinated strikes across all remaining Cartel positions. CorpSec teams hit simultaneously from multiple vectors. Drone support provided real-time tactical data. Escape routes were pre-blocked.
+
+Gray died in the fighting. Not heroically — he was caught in a crossfire while trying to reach an extraction point. Just another body in a war that had already claimed thousands.
+
+**Death is permanent.** There are no second chances. No backups. No resurrection. When Gray fell, everything he was — his knowledge, his plans, his vision for what the Cartel could become — died with him. Twenty-five years of leadership, gone in a moment of bad luck and worse timing.
+
+The survivors numbered sixty. Out of thousands.
+
+*"Elena — Sister Gray now — she held us together. Screaming, crying, ready to die in a last charge. She said no. Said her father would want us to survive. Said the war wasn't over, just the battle. Said we'd have our chance."*
+
+*"Most of us didn't believe her. We followed anyway. There wasn't anywhere else to go."*
 
 ### The Underground (2100-Present)
 
@@ -54,9 +121,15 @@ The survivors retreated into the Seattle Underground — the buried streets and 
 
 Down there, Pluribus is almost blind. The sensors don't reach. The drones can't navigate. The infrastructure isn't connected to the surface grid.
 
-The Cartel rebuilt. Slowly. Painfully. They established hidden bases, supply caches, communication networks. They recruited from the desperate — scavengers who'd rather risk the tunnels than submit to citizenship. They infiltrated the surface, placing moles among the citizen population.
+Sister Gray led the reconstruction:
+- **Year One:** Survival. Finding water sources, food caches, defensible positions. Learning the tunnels while Continuum occasionally sent teams hunting.
+- **Years Two-Three:** Organization. Establishing the cell structure. Creating communication protocols. Building the infrastructure for a resistance.
+- **Years Four-Seven:** Infiltration. Placing moles among the citizen population. Establishing intelligence networks. Learning Continuum's systems from the inside.
+- **Years Eight-Nine:** Growth. Careful recruitment. Building capability. Waiting for opportunity.
 
-And they waited for an opportunity.
+Nine years in the dark. Nine years of watching Continuum consolidate power. Nine years of planning revenge.
+
+And they hold the Mask.
 
 ### The Mask (2109)
 

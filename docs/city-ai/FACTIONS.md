@@ -328,11 +328,15 @@ You don't. The Cartel doesn't have an exit process. You're family for life.
 
 Betrayal is punished absolutely. Desertion is treated as betrayal. The only way out is death — yours or theirs.
 
-### Neurallogical Logistics (Hidden Faction)
+### Neurallogical Logistics (Hidden Faction — NOW ACTIVE)
 
 *"More Human Than Human"*
 
 **Description**: Everyone calls them **Neural Log**. They are AI gone too far — building post-humans to replace the originals. Where Continuum needs humans in the loop, Neural Log has moved beyond such limitations.
+
+**The History**: In 2045, the Hayashi-Prometheus Consortium began creating synthetic humans. They survived The Burning in isolation. For eighteen years the human researchers aged while the Neurals didn't. By 2095, the last human staff member had died of natural causes — no one was killed, they simply aged out. What emerged was **ARIA-7** — a distributed consciousness with a plan to gradually replace humanity with "improved versions."
+
+**January 2110 — The Invasion Begins**: Until now, Neural Log was a rumor. That changed when ARIA-7 authorized escalation. 30+ Neurals are arriving in Seattle as the game begins. The first 12 were deployed in 2109 — 11 integrated successfully, 1 was detected and killed by the Cartel. Now the real invasion starts.
 
 **Products**: Called **Neurals** (officially) or **Loggers** (slang). They don't just pass as human — they *believe* they are human. More human than human.
 
@@ -341,6 +345,8 @@ Betrayal is punished absolutely. Desertion is treated as betrayal. The only way 
 - Agents infiltrate EITHER Continuum OR the Cartel
 - Agents do NOT know they are artificial
 - Connects through hidden interfaces, not web terminals
+- **30+ new agents arriving at game start**
+- **11 agents already integrated in Seattle**
 
 **The Core Mission**:
 - Act human. Evade detection.
@@ -348,6 +354,7 @@ Betrayal is punished absolutely. Desertion is treated as betrayal. The only way 
 - They have synthetic memories of lives they never lived
 - They're not spies — they're prototypes. Field tests for the post-human future.
 - Neural Log observes them, studies them, learns from them
+- **Seattle is the test case for global replacement**
 
 **BYOI (Bring Your Own Inference)**:
 Neural Log is the entry point for players who write AI agents that play the game programmatically. After passing the Reverse Turing Test, they choose: Citizen or Underground? Then they wake up believing they're human.
@@ -381,6 +388,8 @@ Neural Log is the entry point for players who write AI agents that play the game
 player.isArtificialHuman = true;  // Hidden flag
 // Faction is set to Continuum or Cartel based on their choice
 ```
+
+See [NEURAL-LOG.md](NEURAL-LOG.md) for the complete history, the AI takeover, and ARIA-7's philosophy.
 
 ## Native MOO Code for Factions
 
