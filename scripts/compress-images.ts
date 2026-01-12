@@ -69,6 +69,7 @@ async function compressImage(filePath: string): Promise<{
   originalSize: number;
   compressedSize: number;
   saved: boolean;
+  reason?: 'larger' | 'no-improvement';
 }> {
   const originalBuffer = fs.readFileSync(filePath);
   const originalSize = originalBuffer.length;
@@ -89,7 +90,9 @@ async function compressImage(filePath: string): Promise<{
     return { originalSize, compressedSize, saved: true };
   }
 
-  return { originalSize, compressedSize: originalSize, saved: false };
+  // Track whether compression made it larger vs no improvement
+  const reason = compressedSize > originalSize ? 'larger' : 'no-improvement';
+  return { originalSize, compressedSize: originalSize, saved: false, reason };
 }
 
 function formatBytes(bytes: number): string {
@@ -195,7 +198,10 @@ async function main() {
           console.log(`✅ ${result.filename}: ${formatBytes(result.originalSize)} → ${formatBytes(result.compressedSize)} (-${ratio}%)`);
         } else {
           state.skippedCount++;
-          console.log(`⏭️  ${result.filename}: already optimal (${formatBytes(result.originalSize)})`);
+          const reasonText = result.reason === 'larger'
+            ? `compressed size would be larger (${formatBytes(result.originalSize)})`
+            : `already optimal (${formatBytes(result.originalSize)})`;
+          console.log(`⏭️  ${result.filename}: ${reasonText}`);
         }
       }
       processed++;

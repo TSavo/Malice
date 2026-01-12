@@ -210,8 +210,8 @@ Metal rungs are bolted into the wall, forming a ladder that descends into the un
 The air moves in the shaft, a faint draft rising from the tunnels below, carrying the mineral smell of deep earth and the distant echo of dripping water. The shaft connects to the buried city that lies beneath Seattle—the original streets, entombed when the city rebuilt itself after the great fire.`,
       x: -15,
       y: 4,
-      z: -1
-      imageOnDisk: 'redux-smuggler-s-shaft-x-15-y4-z-1.5.png',.5,
+      z: -1,
+      imageOnDisk: 'redux-smuggler-s-shaft-x-15-y4-z-1.png',
       population: 0,
       ambientNoise: 5,
       lighting: 3,
