@@ -382,4 +382,326 @@ describe('AiImageGenBuilder', () => {
       expect(result?.error).toContain('Model ID is required');
     });
   });
+
+  describe('PNG compression', () => {
+    it('should include compression metadata in generate() result', async () => {
+      process.env.MIDJOURNEY_API_URL = 'http://midjourney-api:3000';
+
+      const builder = new AiImageGenBuilder(manager);
+      await builder.build();
+
+      const aiImageGen = await manager.load('aiImageGen');
+
+      // Mock the Midjourney API response
+      const originalFetch = global.fetch;
+      global.fetch = vi.fn(async (url: string) => {
+        if (url.includes('/generate')) {
+          // Mock Midjourney API response
+          return {
+            ok: true,
+            json: async () => ({
+              id: 'test-id',
+              hash: 'test-hash',
+              uri: 'http://example.com/test-image.png',
+              width: 1024,
+              height: 1024,
+              flags: 0,
+              content: null,
+            }),
+          } as Response;
+        } else if (url.includes('example.com/test-image.png')) {
+          // Mock CDN image fetch - return a simple PNG buffer
+          const buffer = Buffer.from('fake-png-data');
+          return {
+            ok: true,
+            arrayBuffer: async () => buffer.buffer,
+            headers: {
+              get: () => 'image/png',
+            },
+          } as any as Response;
+        }
+        return { ok: false, status: 404 } as Response;
+      }) as any;
+
+      try {
+        const result = await aiImageGen?.call('generate', 'A test image');
+
+        expect(result?.success).toBe(true);
+        expect(result?.originalSize).toBeDefined();
+        expect(result?.compressedSize).toBeDefined();
+        expect(result?.compressionRatio).toBeDefined();
+        expect(typeof result?.originalSize).toBe('number');
+        expect(typeof result?.compressedSize).toBe('number');
+        expect(typeof result?.compressionRatio).toBe('string');
+        expect(result?.compressionRatio).toMatch(/%$/);
+      } finally {
+        global.fetch = originalFetch;
+      }
+    });
+
+    it('should compress PNG images using sharp', async () => {
+      process.env.MIDJOURNEY_API_URL = 'http://midjourney-api:3000';
+
+      const builder = new AiImageGenBuilder(manager);
+      await builder.build();
+
+      const aiImageGen = await manager.load('aiImageGen');
+
+      // Create a larger fake PNG to test actual compression
+      const largeFakeImage = Buffer.alloc(10000, 0);
+
+      const originalFetch = global.fetch;
+      global.fetch = vi.fn(async (url: string) => {
+        if (url.includes('/generate')) {
+          return {
+            ok: true,
+            json: async () => ({
+              id: 'test-id',
+              hash: 'test-hash',
+              uri: 'http://example.com/test-image.png',
+              width: 1024,
+              height: 1024,
+              flags: 0,
+              content: null,
+            }),
+          } as Response;
+        } else if (url.includes('example.com/test-image.png')) {
+          return {
+            ok: true,
+            arrayBuffer: async () => largeFakeImage.buffer,
+            headers: {
+              get: () => 'image/png',
+            },
+          } as any as Response;
+        }
+        return { ok: false, status: 404 } as Response;
+      }) as any;
+
+      try {
+        const result = await aiImageGen?.call('generate', 'A test image');
+
+        expect(result?.success).toBe(true);
+        expect(result?.originalSize).toBe(largeFakeImage.length);
+        // Sharp should compress it (or at least process it)
+        expect(result?.compressedSize).toBeDefined();
+      } finally {
+        global.fetch = originalFetch;
+      }
+    });
+
+    it('should handle compression failure gracefully with fallback', async () => {
+      process.env.MIDJOURNEY_API_URL = 'http://midjourney-api:3000';
+
+      const builder = new AiImageGenBuilder(manager);
+      await builder.build();
+
+      const aiImageGen = await manager.load('aiImageGen');
+
+      const testBuffer = Buffer.from('not-a-real-png');
+
+      const originalFetch = global.fetch;
+      global.fetch = vi.fn(async (url: string) => {
+        if (url.includes('/generate')) {
+          return {
+            ok: true,
+            json: async () => ({
+              id: 'test-id',
+              hash: 'test-hash',
+              uri: 'http://example.com/test-image.png',
+              width: 1024,
+              height: 1024,
+              flags: 0,
+              content: null,
+            }),
+          } as Response;
+        } else if (url.includes('example.com/test-image.png')) {
+          return {
+            ok: true,
+            arrayBuffer: async () => testBuffer.buffer,
+            headers: {
+              get: () => 'image/png',
+            },
+          } as any as Response;
+        }
+        return { ok: false, status: 404 } as Response;
+      }) as any;
+
+      try {
+        const result = await aiImageGen?.call('generate', 'A test image');
+
+        // Should succeed even if compression fails (fallback to original)
+        expect(result?.success).toBe(true);
+        expect(result?.originalSize).toBe(testBuffer.length);
+        expect(result?.compressedSize).toBeDefined();
+      } finally {
+        global.fetch = originalFetch;
+      }
+    });
+
+    it('should calculate compression ratio correctly', async () => {
+      process.env.MIDJOURNEY_API_URL = 'http://midjourney-api:3000';
+
+      const builder = new AiImageGenBuilder(manager);
+      await builder.build();
+
+      const aiImageGen = await manager.load('aiImageGen');
+
+      const testBuffer = Buffer.from('test-image-data');
+
+      const originalFetch = global.fetch;
+      global.fetch = vi.fn(async (url: string) => {
+        if (url.includes('/generate')) {
+          return {
+            ok: true,
+            json: async () => ({
+              id: 'test-id',
+              hash: 'test-hash',
+              uri: 'http://example.com/test-image.png',
+              width: 1024,
+              height: 1024,
+              flags: 0,
+              content: null,
+            }),
+          } as Response;
+        } else if (url.includes('example.com/test-image.png')) {
+          return {
+            ok: true,
+            arrayBuffer: async () => testBuffer.buffer,
+            headers: {
+              get: () => 'image/png',
+            },
+          } as any as Response;
+        }
+        return { ok: false, status: 404 } as Response;
+      }) as any;
+
+      try {
+        const result = await aiImageGen?.call('generate', 'A test image');
+
+        expect(result?.success).toBe(true);
+        expect(result?.compressionRatio).toMatch(/^\d+\.\d%$/);
+
+        // Parse ratio and verify it's a valid percentage
+        const ratioValue = parseFloat(result?.compressionRatio);
+        expect(ratioValue).toBeGreaterThanOrEqual(0);
+        expect(ratioValue).toBeLessThanOrEqual(100);
+      } finally {
+        global.fetch = originalFetch;
+      }
+    });
+
+    it('should include compression metadata in generateRaw() result', async () => {
+      process.env.MIDJOURNEY_API_URL = 'http://midjourney-api:3000';
+
+      const builder = new AiImageGenBuilder(manager);
+      await builder.build();
+
+      const aiImageGen = await manager.load('aiImageGen');
+
+      const testBuffer = Buffer.from('test-raw-image');
+
+      const originalFetch = global.fetch;
+      global.fetch = vi.fn(async (url: string) => {
+        if (url.includes('/generate')) {
+          return {
+            ok: true,
+            json: async () => ({
+              id: 'test-id',
+              hash: 'test-hash',
+              uri: 'http://example.com/test-image.png',
+              width: 1024,
+              height: 1024,
+              flags: 0,
+              content: null,
+            }),
+          } as Response;
+        } else if (url.includes('example.com/test-image.png')) {
+          return {
+            ok: true,
+            arrayBuffer: async () => testBuffer.buffer,
+            headers: {
+              get: () => 'image/png',
+            },
+          } as any as Response;
+        }
+        return { ok: false, status: 404 } as Response;
+      }) as any;
+
+      try {
+        const result = await aiImageGen?.call('generateRaw', 'A test image');
+
+        expect(result?.success).toBe(true);
+        expect(result?.originalSize).toBeDefined();
+        expect(result?.compressedSize).toBeDefined();
+        expect(result?.compressionRatio).toBeDefined();
+      } finally {
+        global.fetch = originalFetch;
+      }
+    });
+
+    it('should store compressed image in blob storage', async () => {
+      process.env.MIDJOURNEY_API_URL = 'http://midjourney-api:3000';
+
+      const builder = new AiImageGenBuilder(manager);
+      await builder.build();
+
+      const aiImageGen = await manager.load('aiImageGen');
+      const blob = await manager.load('blob');
+
+      let capturedBlobData = '';
+      let capturedMetadata: any = {};
+
+      // Override blob.write to capture what's being stored
+      blob?.setMethod(
+        'write',
+        `
+        const data = args[0];
+        const metadata = args[1] || {};
+        self._lastData = data;
+        self._lastMetadata = metadata;
+        return 'test_blob_key';
+      `,
+      );
+
+      const testBuffer = Buffer.from('test-image');
+
+      const originalFetch = global.fetch;
+      global.fetch = vi.fn(async (url: string) => {
+        if (url.includes('/generate')) {
+          return {
+            ok: true,
+            json: async () => ({
+              id: 'test-id',
+              hash: 'test-hash',
+              uri: 'http://example.com/test-image.png',
+              width: 1024,
+              height: 1024,
+              flags: 0,
+              content: null,
+            }),
+          } as Response;
+        } else if (url.includes('example.com/test-image.png')) {
+          return {
+            ok: true,
+            arrayBuffer: async () => testBuffer.buffer,
+            headers: {
+              get: () => 'image/png',
+            },
+          } as any as Response;
+        }
+        return { ok: false, status: 404 } as Response;
+      }) as any;
+
+      try {
+        await aiImageGen?.call('generate', 'A test image');
+
+        const storedMetadata = blob?.get('_lastMetadata');
+        expect(storedMetadata.originalSize).toBeDefined();
+        expect(storedMetadata.compressedSize).toBeDefined();
+        expect(storedMetadata.compressionRatio).toBeDefined();
+      } finally {
+        global.fetch = originalFetch;
+      }
+    });
+  });
 });
