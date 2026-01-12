@@ -6,6 +6,8 @@ A comprehensive guide for creating new prototypes and systems in Malice.
 - [MCP-TOOLS.md](MCP-TOOLS.md) - MCP tools for AI assistants and automation
 - [moo-programming.md](moo-programming.md) - MOO programming reference
 - [plot-jobs.md](plot-jobs.md) - Plot/job system for AI city management
+- [$issues](../moo/utilities/issues.md) - In-game issue tracker for bugs and features
+- [$docs](../moo/utilities/docs.md) - Documentation system for browsing/searching docs
 
 ## Building Best Practices
 
@@ -1261,6 +1263,37 @@ Run tests:
 ```bash
 npm test
 ```
+
+## Reporting Issues
+
+When you encounter bugs or want to request features, use the in-game `$issues` tracker:
+
+```javascript
+// Report a bug found while building
+await $issues.create({
+  title: 'Door lock not checking canAccess correctly',
+  body: 'The biometric lock on door #456 always returns true',
+  type: 'bug',
+  priority: 'high',
+  tags: ['locks', 'doors'],
+  reporter: 'builder-name',
+  relatedObject: 456  // Link to the problematic object
+});
+
+// Request a new feature
+await $issues.create({
+  title: 'Add support for combination locks',
+  body: 'Need locks that accept number sequences',
+  type: 'feature',
+  priority: 'medium',
+  tags: ['locks', 'enhancement']
+});
+
+// Check existing issues before creating duplicates
+const existing = await $issues.search('combination lock');
+```
+
+The `$autoFixer` system automatically attempts to fix high-priority bugs using AI. See [$issues documentation](../moo/utilities/issues.md) for full API reference.
 
 ## Common Gotchas
 

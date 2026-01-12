@@ -706,6 +706,9 @@ Quick access to prototype objects for inheritance:
 | `$blob` | Binary storage (MongoDB GridFS) |
 | `$email` | Email sending (Resend) |
 | `$aiImageGen` | AI image generation (Midjourney via Discord bot) |
+| `$docs` | Documentation system (browse/search docs/) |
+| `$issues` | In-game issue tracker (bugs, features, tasks) |
+| `$autoFixer` | Automatic issue fixing via AI |
 
 ## Special Properties on $
 
@@ -747,9 +750,121 @@ const id = await $[0].getAlias('myUtil');
 // nothing, object_manager, root, system
 ```
 
+### $docs - Documentation System
+
+Browse and search documentation loaded from `docs/` at startup.
+
+```javascript
+// List all documents
+const allDocs = await $docs.list();
+
+// List documents in a folder
+const mooDocs = await $docs.list('moo');
+
+// Get document by name
+const guide = await $docs.get('BUILDERS-GUIDE');
+
+// Get document by exact path
+const agents = await $docs.getByPath('moo/prototypes/agents');
+
+// Search all docs
+const results = await $docs.search('bootstrap');
+
+// Search within a category
+const mooResults = await $docs.search('prototype', { category: 'moo' });
+
+// Get folder structure
+const tree = await $docs.tree('moo');
+
+// Get top-level categories
+const categories = await $docs.getCategories();
+// ['city-ai', 'greeter', 'guides', 'moo', ...]
+```
+
+**Document properties:** `name`, `path`, `category`, `title`, `content`, `filename`
+
+See [$docs utility documentation](../utilities/docs.md) for full API reference.
+
+### $issues - Issue Tracker
+
+In-game bug tracking, feature requests, and task management.
+
+```javascript
+// Create a bug report
+await $issues.create({
+  title: 'Exit command not working in basement',
+  body: 'When trying to go north from basement, nothing happens',
+  type: 'bug',
+  priority: 'high',
+  tags: ['rooms', 'exits'],
+  reporter: 'alice',
+  relatedObject: 42
+});
+
+// List open issues
+const issues = await $issues.list();
+
+// Filter by type/priority/status
+const criticalBugs = await $issues.list({ type: 'bug', priority: 'critical' });
+
+// Search issues
+const results = await $issues.search('exit');
+
+// Update an issue
+await $issues.update(42, { status: 'in_progress', priority: 'critical' });
+
+// Add a comment
+await $issues.comment(42, 'Found the root cause', 'alice');
+
+// Resolve and close
+await $issues.resolve(42, 'Fixed exit link');
+await $issues.close(42);
+
+// Get statistics
+const stats = await $issues.stats();
+// { total, openCount, byStatus, byType, byPriority, ... }
+```
+
+**Types:** `bug`, `feature`, `task`, `question`
+
+**Statuses:** `open`, `in_progress`, `resolved`, `closed`, `wontfix`
+
+**Priorities:** `low`, `medium`, `high`, `critical`
+
+See [$issues utility documentation](../utilities/issues.md) for full API reference.
+
+### $autoFixer - Automatic Issue Fixing
+
+AI-powered automatic bug fixing system that processes open issues hourly.
+
+```javascript
+// Check configuration
+const stats = await $autoFixer.getStats();
+// { enabled, minPriority, maxAttemptsPerHour, totalAttempts, totalFixed, ... }
+
+// Enable/disable
+await $autoFixer.setEnabled(true);
+
+// Set minimum priority (only attempt high+ issues)
+await $autoFixer.setMinPriority('high');
+
+// Manual tick (same as scheduler job)
+await $autoFixer.tick();
+
+// Attempt fix on specific issue
+await $autoFixer.attemptFix(42);
+
+// View fix history
+const history = await $autoFixer.getFixHistory(10);
+```
+
+The auto-fixer runs hourly via `$scheduler` and uses `$aiQuery` to analyze and fix bugs.
+
 ## See Also
 
 - [Types vs Objects](./types-vs-objects.md) - When to use `$.define` vs `$recycler.create`
 - [Prototypes Reference](./prototypes.md) - Object types and inheritance
 - [Verb System](./verbs.md) - Player command handling
 - [Architecture](../architecture.md) - How methods execute
+- [$docs](../utilities/docs.md) - Documentation system details
+- [$issues](../utilities/issues.md) - Issue tracker details
