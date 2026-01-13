@@ -359,6 +359,71 @@ newRoute.setMethod('handleRequest', `
 
 ---
 
+## Skill Index - What To Look Up
+
+Use `$docs.search('topic')` or `$docs.read('DOC-NAME')` to access these.
+
+| Topic | Doc | Use When |
+|-------|-----|----------|
+| Building content | `BUILDERS-GUIDE` | Creating rooms, items, NPCs, prototypes |
+| MCP tools | `MCP-TOOLS` | Need to know available tools, how to call them |
+| Website/routes | `WEB-ROUTES` | Web routing, domains, HTTP handlers |
+| MOO programming | `moo-programming` | Syntax, methods, property access, code patterns |
+| AI agents | `AGENT-GUIDE` | NPC behavior, $aiQuery, agent architecture |
+| Abilities system | `ABILITIES-FIRST` | How abilities work, why no coded verbs |
+| Game mechanics | `PLAYER-GUIDE` | Commands, gameplay, what players can do |
+| Deployment | `DEPLOYMENT` | Server setup, Docker, environment |
+| Chargen debugging | `debugging-chargen-sessions` | Character creation issues |
+| NPC agents | `npc-agent` | Spawning NPCs, AI control, profiles |
+| Plot system | `plot-jobs` | City AI, plot generation, scheduled events |
+| TypeScript in MOO | `typescript-guide` | Writing TS methods, async patterns |
+
+**Discovery pattern:**
+```javascript
+// Search for relevant docs
+const results = await $docs.search('routing');
+// Returns matching docs with snippets
+
+// Read a specific doc
+const content = await $docs.read('BUILDERS-GUIDE');
+// Returns full markdown content
+```
+
+When someone asks a development question, search `$docs` first. Don't guess. Look it up.
+
+---
+
+## Key Objects Quick Reference
+
+These are the $ aliases you'll use most:
+
+| Alias | Purpose |
+|-------|---------|
+| `$query` | Find objects by properties |
+| `$docs` | Search and read documentation |
+| `$issues` | Bug tracking, feature requests |
+| `$recycler` | Create/destroy objects |
+| `$load(id)` | Load object by ID |
+| `$ai` | AI NPC registry and control |
+| `$aiPrompts` | System prompts for AI personalities |
+| `$scheduler` | Scheduled jobs, periodic tasks |
+| `$spatial` | Room coordinates, navigation |
+| `$domainRegistry` | Web domains |
+| `$tts` | Text-to-speech voices |
+| `$mcp` | MCP tool registry |
+| `$continuum` / `$cartel` | Faction objects |
+| `$player` | Player prototype |
+| `$room` / `$exit` | Spatial prototypes |
+
+**Discover more:**
+```javascript
+// Get all registered aliases
+const obj0 = await $load(0);
+return obj0.aliases;
+```
+
+---
+
 ## Output
 
 Terse. 
