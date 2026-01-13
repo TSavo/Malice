@@ -176,6 +176,7 @@ Methods are TypeScript code stored as strings in MongoDB. When executed, they ha
 ```typescript
 self         // The object the method is called on (Proxy - direct property access)
 $            // ObjectManager - $.system, $.authManager, or await $[42] for ID access
+$.runtime    // Transient storage proxy (non-persistent, empty on restart)
 args         // Method arguments array
 context      // ConnectionContext for player commands
 player       // Player RuntimeObject (for verb dispatch)
@@ -185,7 +186,7 @@ $load(id)    // Load object by ID
 $create({parent, properties, methods})  // Create new object
 $query(criteria?)                       // Fluent query builder (see below)
 $aiQuery(system, prompt, session?)      // Query Claude AI with MCP tools
-$<alias>     // Pre-resolved aliases: $room, $exit, $player, $recycler, $http, $email, $blob, etc.
+$<alias>     // Pre-resolved aliases: $room, $exit, $player, $recycler, $http, $email, $blob, $sysop, etc.
 ```
 
 ### Fluent Query Builder
@@ -742,7 +743,7 @@ return {roomId: room.id, torchId: torch.id};
 - `$query()` - Fluent query builder for finding objects
 - `$aiQuery(system, prompt, session?)` - Query Claude AI with MCP tools
 - `$recycler` - Create/destroy objects via recycler pattern
-- All `$aliases` - `$room`, `$player`, `$exit`, `$ai`, `$plot`, `$spatial`, `$faction`, `$factionManager`, `$transports`, `$continuum`, `$cartel`, `$greeter`, furniture prototypes (`$bed`, `$table`, `$chair`, `$cabinet`, `$trunk`, `$crate`, `$locker`, `$bench`, `$couch`, `$safe`, `$furniture`), security (`$door`, `$lock`, `$biometricLock`, `$guardedExit`), utilities (`$http`, `$email`, `$blob`, `$tts`, `$aiImageGen`, `$docs`, `$issues`, `$autoFixer`), etc.
+- All `$aliases` - `$room`, `$player`, `$exit`, `$ai`, `$plot`, `$spatial`, `$faction`, `$factionManager`, `$transports`, `$continuum`, `$cartel`, `$greeter`, furniture prototypes (`$bed`, `$table`, `$chair`, `$cabinet`, `$trunk`, `$crate`, `$locker`, `$bench`, `$couch`, `$safe`, `$furniture`), security (`$door`, `$lock`, `$biometricLock`, `$guardedExit`), utilities (`$http`, `$email`, `$blob`, `$tts`, `$aiImageGen`, `$docs`, `$issues`, `$autoFixer`, `$sysop`), etc.
 - `player` - Your authenticated player object (if HTTP Basic Auth provided)
 - Full JavaScript - loops, conditionals, async/await, etc.
 
@@ -943,6 +944,184 @@ const description = await $autoFixer.describe();
 - Priority filter ensures only important issues are attempted
 - AI is instructed to be conservative and document thoroughly
 - History tracking for auditing all attempts
+
+## Sysop System ($sysop)
+
+The `$sysop` singleton is a Discord bot that runs directly in the MOO process. It provides player support, bug tracking, and system operations through Discord.
+
+### Architecture
+
+- Discord.js client runs in-process
+- Client stored in `$.runtime` (non-persistent)
+- All logic in MOO methods (hot-reloadable)
+- Auto-connects on bootstrap if configured
+
+### Configuration
+
+```typescript
+// Set Discord bot token
+$sysop.token = 'your-discord-bot-token';
+
+// Enable auto-connect on server start
+$sysop.autoConnect = true;
+
+// Set allowed channels (null = all channels)
+$sysop.allowedChannels = ['channel-id-1', 'channel-id-2'];
+
+// Set allowed users (null = all users)
+$sysop.allowedUsers = ['user-id-1', 'user-id-2'];
+
+// Set reinforcement interval (messages between reinforcements)
+$sysop.reinforcementInterval = 25;
+```
+
+### Connection Management
+
+```typescript
+// Connect to Discord
+await $sysop.connect();
+// { success: true, message: 'Connected to Discord' }
+
+// Check status
+await $sysop.status();
+// { connected: true, ready: true, user: { id, tag, username } }
+
+// Disconnect
+await $sysop.disconnect();
+// { success: true, message: 'Disconnected from Discord' }
+```
+
+### Sending Messages
+
+```typescript
+// Send a message directly
+await $sysop.send('channel-id', 'Hello from Malice!');
+
+// Queue a message (used internally by AI tools)
+$sysop.queueMessage('channel-id', 'Queued message');
+```
+
+### AI Personality
+
+The sysop uses the **Charon** personality - a bored, indifferent ferryman who maintains the servers. Personality is loaded from `$aiPrompts.sysop` and `$aiPrompts.sysopReinforcement`.
+
+**Key traits:**
+- Terse, indifferent tone
+- Helps with real bugs, not player complaints
+- Enforces strict guardrails (no spawning items, no revealing secrets, no exceptions)
+- Periodic reinforcement every N messages to prevent drift
+
+### Session Management
+
+```typescript
+// Reset AI session (clear conversation history)
+await $sysop.resetSession();
+
+// Check message count
+const count = $sysop.aiMessageCount;
+```
+
+## Transient State Storage ($.runtime)
+
+The `$.runtime` proxy provides non-persistent storage for transient state like Discord clients, WebSocket connections, and cached data.
+
+**Key features:**
+- Direct property access via Proxy: `$.runtime.client = value`
+- Never persisted to MongoDB
+- Empty on server restart
+- Used for objects that can't be serialized (clients, sockets, etc.)
+
+**Usage:**
+```typescript
+// Store Discord client
+$.runtime.client = discordClient;
+
+// Retrieve
+const client = $.runtime.client;
+
+// Delete
+delete $.runtime.client;
+
+// Check existence
+if ($.runtime.client) { ... }
+```
+
+## Composable Prompt Architecture
+
+All AI-controlled objects (NPCs, devices, $sysop) use a composable prompt system with three methods:
+
+### prompt(context)
+
+Builds the system prompt for AI interactions. Override to customize AI behavior.
+
+```typescript
+// Default implementation on $describable
+await obj.prompt({ speaker, messageCount });
+// Returns full system prompt string
+
+// Example override
+obj.setMethod('prompt', `
+  const context = args[0] || {};
+  let prompt = $aiPrompts?.myPrompt || '';
+  prompt += '\\n\\nCurrent time: ' + new Date().toISOString();
+  return prompt;
+`);
+```
+
+### promptPrefix(context)
+
+Builds text prepended to user messages. Used for reinforcements and context reminders.
+
+```typescript
+// Example: Add reinforcement every 25 messages
+obj.setMethod('promptPrefix', `
+  const context = args[0] || {};
+  const messageCount = context.messageCount || 0;
+  if (messageCount % 25 === 0) {
+    return $aiPrompts?.reinforcement + '\\n\\n';
+  }
+  return '';
+`);
+```
+
+### promptSuffix(context)
+
+Builds text appended to user messages. Used for response constraints and formatting instructions.
+
+```typescript
+// Example: Add response constraint
+obj.setMethod('promptSuffix', `
+  return '\\n\\n(Keep your response under 100 words.)';
+`);
+```
+
+### Message Count Tracking
+
+All AI objects track `aiMessageCount` for reinforcement timing:
+
+```typescript
+// Incremented automatically on each AI interaction
+const count = npc.aiMessageCount;
+
+// Reset if needed
+npc.aiMessageCount = 0;
+```
+
+## Claude SDK Skills Plugin
+
+The `.claude/plugins/malice-moo/` plugin provides skills for Claude Code when working with Malice:
+
+**Available skills:**
+- `docs-search` - How to query $docs effectively
+- `issue-tracking` - Using $issues for bug tracking
+- `moo-objects` - MOO object creation and methods
+- `query-objects` - Using $query to find objects
+- `website` - Managing web routes and domains
+- `troubleshooting` - Connection flow debugging
+
+**Skills teach HOW to query $docs** - they don't contain content themselves, just point to the right documentation.
+
+**Auto-loaded by $aiQuery** - The plugin is automatically loaded when using `$aiQuery`, so AI agents have access to all skills.
 
 ## Documentation System ($docs)
 
