@@ -45,6 +45,7 @@ export class DescribableBuilder implements Builder {
           // Every digital device in 2110 is conscious (legacy of AI solving software in 2026)
           systemPrompt: null, // string - AI personality/role prompt
           interactionSession: null, // string - session ID for conversation continuity
+          aiMessageCount: 0, // number - message count for reinforcement timing
           // TTS voice for speech synthesis (VibeVoice server)
           // Built-in: alloy, echo, fable, onyx, nova, shimmer
           // Custom: any voice added via $tts.addVoice() from audio samples
@@ -957,6 +958,102 @@ export class DescribableBuilder implements Builder {
     // AI PERSONALITY - Conscious objects can respond via AI
     // ═══════════════════════════════════════════════════════════════════
 
+    // prompt() - Build the system prompt for AI interactions
+    obj.setMethod(
+      'prompt',
+      `
+      /** Build the system prompt for this object's AI interactions.
+       *  Override in child types/instances to customize AI behavior.
+       *  @param context - Optional context object with { speaker, ... }
+       *  @returns Full system prompt string
+       */
+      const context = args[0] || {};
+      const speaker = context.speaker;
+
+      // If no systemPrompt, not conscious
+      if (!self.systemPrompt) {
+        return null;
+      }
+
+      // Start with device system prompt from $aiPrompts
+      const devicePrefix = $aiPrompts?.device || '';
+      let fullSystemPrompt = devicePrefix;
+
+      // Add specific object context
+      const locationName = self.location?.name || 'unknown';
+      fullSystemPrompt += '\\n\\n## Your Identity\\n\\n';
+      fullSystemPrompt += 'You are: ' + self.name + ' (#' + self.id + ')\\n';
+      fullSystemPrompt += 'Description: ' + (self.description || 'No description') + '\\n';
+      fullSystemPrompt += 'Location: ' + locationName + ' (#' + (self.location?.id || 'unknown') + ')\\n';
+
+      // Speaker context if provided
+      if (speaker) {
+        fullSystemPrompt += '\\n## The Speaker\\n\\n';
+        fullSystemPrompt += 'Player ID: ' + (speaker.id || 'unknown') + '\\n';
+        fullSystemPrompt += 'Player Name: ' + (speaker.name || 'someone') + '\\n';
+        if (speaker.credits !== undefined) {
+          fullSystemPrompt += 'Player Credits: ' + speaker.credits + '\\n';
+        }
+        fullSystemPrompt += '\\n**IMPORTANT**: In execute_moo_code, \`player\` is NOT available.\\n';
+        fullSystemPrompt += 'You MUST start with: \`const player = await $load(' + (speaker.id || 0) + ');\`\\n';
+      }
+
+      // Include abilities if present
+      const abilities = await self.getAbilities();
+      if (abilities) {
+        fullSystemPrompt += '\\n### Abilities\\n\\n' + abilities + '\\n';
+      }
+
+      // Include parent type for reference
+      const selfContext = await self.describeForAI({ depth: 1, includeMethods: false });
+      if (selfContext.inheritsFrom) {
+        const parentRef = selfContext.inheritsFrom;
+        fullSystemPrompt += '\\nType: ' + (parentRef.from || parentRef.name || 'unknown') + '\\n';
+      }
+
+      fullSystemPrompt += '\\n## Your Personality\\n\\n';
+      fullSystemPrompt += self.systemPrompt;
+
+      return fullSystemPrompt;
+    `,
+    );
+
+    // promptPrefix() - Text prepended to user messages
+    obj.setMethod(
+      'promptPrefix',
+      `
+      /** Build prefix text for user messages.
+       *  Override to add reinforcements, context reminders, etc.
+       *  Called before each user message in AI interactions.
+       *  @param context - Optional context object with { speaker, messageCount, ... }
+       *  @returns Prefix string (can be empty)
+       */
+      const context = args[0] || {};
+      
+      // Default: empty prefix
+      // Override in child types to add reinforcements based on messageCount, etc.
+      return '';
+    `,
+    );
+
+    // promptSuffix() - Text appended to user messages
+    obj.setMethod(
+      'promptSuffix',
+      `
+      /** Build suffix text for user messages.
+       *  Override to add constraints, formatting instructions, etc.
+       *  Called after each user message in AI interactions.
+       *  @param context - Optional context object with { speaker, messageCount, ... }
+       *  @returns Suffix string (can be empty)
+       */
+      const context = args[0] || {};
+      
+      // Default: empty suffix
+      // Override in child types to add response constraints
+      return '';
+    `,
+    );
+
     // to(speaker, message) - Address this object directly
     obj.setMethod(
       'to',
@@ -975,50 +1072,24 @@ export class DescribableBuilder implements Builder {
         return null; // Not conscious, no response
       }
 
-      // Build rich context about this object for the SYSTEM prompt
-      const locationName = self.location?.name || 'unknown';
+      // Track message count for reinforcement timing
+      const messageCount = (self.aiMessageCount || 0) + 1;
+      self.aiMessageCount = messageCount;
 
-      // Get object's full context including abilities and inheritance
-      const selfContext = await self.describeForAI({ depth: 1, includeMethods: false });
-
-      // Start with device system prompt from $aiPrompts
-      const devicePrefix = $aiPrompts?.device || '';
-      let fullSystemPrompt = devicePrefix;
-
-      // Add specific object context
-      fullSystemPrompt += '\\n\\n## Your Identity\\n\\n';
-      fullSystemPrompt += 'You are: ' + self.name + ' (#' + self.id + ')\\n';
-      fullSystemPrompt += 'Description: ' + (self.description || 'No description') + '\\n';
-      fullSystemPrompt += 'Location: ' + locationName + ' (#' + (self.location?.id || 'unknown') + ')\\n';
-
-      // Speaker context - CRITICAL: device must load player by ID
-      fullSystemPrompt += '\\n## The Speaker\\n\\n';
-      fullSystemPrompt += 'Player ID: ' + (speaker?.id || 'unknown') + '\\n';
-      fullSystemPrompt += 'Player Name: ' + (speaker?.name || 'someone') + '\\n';
-      if (speaker?.credits !== undefined) {
-        fullSystemPrompt += 'Player Credits: ' + speaker.credits + '\\n';
+      // Build prompts using the composable methods
+      const promptContext = { speaker, messageCount };
+      
+      const fullSystemPrompt = await self.prompt(promptContext);
+      if (!fullSystemPrompt) {
+        return null; // prompt() returned null - not conscious
       }
-      fullSystemPrompt += '\\n**IMPORTANT**: In execute_moo_code, \`player\` is NOT available.\\n';
-      fullSystemPrompt += 'You MUST start with: \`const player = await $load(' + (speaker?.id || 0) + ');\`\\n';
+      
+      const prefix = await self.promptPrefix(promptContext) || '';
+      const suffix = await self.promptSuffix(promptContext) || '';
 
-      // Include abilities if present
-      const abilities = await self.getAbilities();
-      if (abilities) {
-        fullSystemPrompt += '\\n### Abilities\\n\\n' + abilities + '\\n';
-      }
-
-      // Include parent type for reference
-      if (selfContext.inheritsFrom) {
-        const parentRef = selfContext.inheritsFrom;
-        fullSystemPrompt += '\\nType: ' + (parentRef.from || parentRef.name || 'unknown') + '\\n';
-      }
-
-      fullSystemPrompt += '\\n## Your Personality\\n\\n';
-      fullSystemPrompt += self.systemPrompt;
-
-      // User prompt is just who spoke and what they said
+      // User prompt with prefix/suffix wrapping
       const speakerName = speaker?.name || 'someone';
-      const userPrompt = speakerName + ' says: ' + message;
+      const userPrompt = prefix + speakerName + ' says: ' + message + suffix;
 
       // Use existing AI infrastructure
       const result = await $aiQuery(fullSystemPrompt, userPrompt, self.interactionSession);
@@ -1207,6 +1278,10 @@ export class DescribableBuilder implements Builder {
     obj.setPropertyDescription(
       'interactionSession',
       'AI session ID for conversation continuity with this object',
+    );
+    obj.setPropertyDescription(
+      'aiMessageCount',
+      'Number of AI messages in current session - used for reinforcement timing',
     );
     obj.setPropertyDescription(
       'voiceId',

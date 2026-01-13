@@ -48,6 +48,23 @@ describe('AiPromptsBuilder - Path Resolution', () => {
     expect(existsSync(oldPath)).toBe(false);
   });
 
+  it('should load sysop prompt from prompts/ subdirectory', () => {
+    const sysopPath = join(docsDir, 'prompts', 'SYSOP.md');
+    expect(existsSync(sysopPath)).toBe(true);
+
+    const content = readFileSync(sysopPath, 'utf-8');
+    expect(content.length).toBeGreaterThan(50);
+    expect(content.toLowerCase()).toContain('sysop');
+  });
+
+  it('should load sysop reinforcement prompt from prompts/ subdirectory', () => {
+    const reinforcementPath = join(docsDir, 'prompts', 'SYSOP-REINFORCEMENT.md');
+    expect(existsSync(reinforcementPath)).toBe(true);
+
+    const content = readFileSync(reinforcementPath, 'utf-8');
+    expect(content.length).toBeGreaterThan(10);
+  });
+
   it('should have all prompts from PROMPT_FILES available', () => {
     // These are the files defined in ai-prompts-builder.ts PROMPT_FILES constant
     const promptFiles = [
@@ -62,6 +79,9 @@ describe('AiPromptsBuilder - Path Resolution', () => {
       'MECHANIC.md',
       'NAV-COMPUTER.md',
       'DEVICE.md',
+      'AUTO-FIXER.md',
+      'SYSOP.md',
+      'SYSOP-REINFORCEMENT.md',
     ];
 
     for (const filename of promptFiles) {

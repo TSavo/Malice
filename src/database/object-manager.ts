@@ -633,6 +633,40 @@ export class ObjectManager {
   // Event emitter for change notifications (used by DevTools)
   private changeEmitter = new EventEmitter();
 
+  // In-memory-only storage for transient state (Discord clients, WebSocket connections, etc.)
+  // Never persisted to MongoDB. Empty on restart.
+  private runtimeStorage = new Map<string, unknown>();
+
+  // Runtime accessor - Proxy that allows direct property access
+  // Usage: $.runtime.client = discordClient; const c = $.runtime.client;
+  public readonly runtime = new Proxy({} as Record<string, unknown>, {
+    get: (_, key: string | symbol) => {
+      if (typeof key !== 'string') return undefined;
+      return this.runtimeStorage.get(key);
+    },
+    set: (_, key: string | symbol, value: unknown) => {
+      if (typeof key !== 'string') return false;
+      this.runtimeStorage.set(key, value);
+      return true;
+    },
+    deleteProperty: (_, key: string | symbol) => {
+      if (typeof key !== 'string') return false;
+      return this.runtimeStorage.delete(key);
+    },
+    has: (_, key: string | symbol) => {
+      if (typeof key !== 'string') return false;
+      return this.runtimeStorage.has(key);
+    },
+    ownKeys: () => Array.from(this.runtimeStorage.keys()),
+    getOwnPropertyDescriptor: (_, key: string | symbol) => {
+      if (typeof key !== 'string') return undefined;
+      if (this.runtimeStorage.has(key)) {
+        return { configurable: true, enumerable: true, value: this.runtimeStorage.get(key) };
+      }
+      return undefined;
+    },
+  });
+
   constructor(db: ObjectDatabase) {
     this.db = db;
     this.cache = new ObjectCache();
@@ -1595,6 +1629,10 @@ export class ObjectManager {
       Object.keys(mcpServers).join(', '),
     );
 
+    // Determine Malice root for plugin path
+    const maliceRoot = process.cwd();
+    const pluginPath = `${maliceRoot}/.claude/plugins/malice-moo`;
+
     const queryOptions: Record<string, unknown> = {
       systemPrompt,
       mcpServers,
@@ -1603,6 +1641,13 @@ export class ObjectManager {
       allowDangerouslySkipPermissions: true,
       cwd: process.env.HOME || '/home/node',
       persistSession: true,
+      // Load Malice skills plugin
+      plugins: [
+        {
+          name: 'malice-moo',
+          path: pluginPath,
+        },
+      ],
     };
 
     if (session) {
