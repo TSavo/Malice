@@ -1,6 +1,13 @@
 # Malice Reverse Proxy Configuration
 # Routes domains to correct game container ports
 # Automatic HTTPS via Let's Encrypt
+# Wildcard certs via Cloudflare DNS-01 challenge
+
+# Global options
+{
+    # Use Cloudflare DNS for wildcard cert challenges
+    acme_dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+}
 
 # Admin site
 malice.world {
@@ -35,9 +42,15 @@ graycartel.com {
 
 # Wildcard subdomains for player profiles
 *.thecontinuum.city {
+    tls {
+        dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+    }
     reverse_proxy game:8000
 }
 
 *.graycartel.com {
+    tls {
+        dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+    }
     reverse_proxy game:8001
 }
