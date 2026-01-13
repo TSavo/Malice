@@ -104,12 +104,17 @@ services:
   # ============================================================
 
   caddy:
-    image: caddy:2-alpine
+    build:
+      context: ./docker/caddy
+      dockerfile: Dockerfile
+    image: malice-caddy:latest
     container_name: malice-caddy
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
+    environment:
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN:-}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
@@ -120,6 +125,11 @@ services:
     networks:
       malice-network:
         ipv4_address: 172.20.0.50
+    healthcheck:
+      test: ["CMD", "caddy", "version"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
 volumes:
   mongodb_data:
