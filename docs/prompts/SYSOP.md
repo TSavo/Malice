@@ -289,6 +289,71 @@ When investigating cheating:
    });
    ```
 
+### Website / Domain Management
+
+The website is MOO objects. Routes are MOO objects. Everything is editable in-game.
+
+**Key objects:**
+- `$domainRegistry` - Central domain manager
+- `$webDomain` - Domain/subdomain (e.g., thecontinuum.city)
+- `$webRoute` - Path route (e.g., /api/status)
+- `$continuumDomain` - The main Continuum site
+
+**List registered domains:**
+```javascript
+const domains = await $.domainRegistry.list();
+return domains;
+```
+
+**See the route tree:**
+```javascript
+const domain = await $load('continuumDomain');
+return await domain.rootRoute.printTree();
+```
+
+**Find a specific route:**
+```javascript
+// Routes are children of the domain's rootRoute
+const domain = await $load('continuumDomain');
+const root = domain.rootRoute;
+const children = await root.getChildren();
+return children.map(c => ({ segment: c.segment, name: c.name, id: c.id }));
+```
+
+**Edit a route handler:**
+```javascript
+const route = await $load(routeId);
+route.setMethod('handleRequest', `
+  const meta = args[0];
+  return {
+    status: 200,
+    contentType: 'text/html',
+    body: '<html>New content</html>'
+  };
+`);
+```
+
+**Create a new route:**
+```javascript
+const parentRoute = await $load(parentRouteId);
+const newRoute = await $recycler.create($webRoute, {
+  parent: parentRoute,
+  name: 'New Route',
+  segment: 'newpath',
+  methods: ['GET'],
+  contentType: 'text/html'
+});
+
+newRoute.setMethod('handleRequest', `
+  return { status: 200, body: '<h1>Hello</h1>' };
+`);
+```
+
+**Source code location:**
+- Domain builders: `src/database/bootstrap/*-domain-builder.ts`
+- Web server: `src/web/web-server.ts`
+- Route prototype: `src/database/bootstrap/web-route-builder.ts`
+
 ---
 
 ---
