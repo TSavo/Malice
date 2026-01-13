@@ -743,7 +743,7 @@ return {roomId: room.id, torchId: torch.id};
 - `$query()` - Fluent query builder for finding objects
 - `$aiQuery(system, prompt, session?)` - Query Claude AI with MCP tools
 - `$recycler` - Create/destroy objects via recycler pattern
-- All `$aliases` - `$room`, `$player`, `$exit`, `$ai`, `$plot`, `$spatial`, `$faction`, `$factionManager`, `$transports`, `$continuum`, `$cartel`, `$greeter`, furniture prototypes (`$bed`, `$table`, `$chair`, `$cabinet`, `$trunk`, `$crate`, `$locker`, `$bench`, `$couch`, `$safe`, `$furniture`), security (`$door`, `$lock`, `$biometricLock`, `$guardedExit`), utilities (`$http`, `$email`, `$blob`, `$tts`, `$aiImageGen`, `$docs`, `$issues`, `$autoFixer`, `$sysop`), etc.
+- All `$aliases` - `$room`, `$player`, `$exit`, `$ai`, `$plot`, `$spatial`, `$faction`, `$factionManager`, `$transports`, `$continuum`, `$cartel`, `$greeter`, furniture prototypes (`$bed`, `$table`, `$chair`, `$cabinet`, `$trunk`, `$crate`, `$locker`, `$bench`, `$couch`, `$safe`, `$furniture`), security (`$door`, `$lock`, `$biometricLock`, `$guardedExit`), utilities (`$http`, `$email`, `$blob`, `$tts`, `$aiImageGen`, `$docs`, `$issues`, `$autoFixer`, `$sysop`, `$aiPrompts`), etc.
 - `player` - Your authenticated player object (if HTTP Basic Auth provided)
 - Full JavaScript - loops, conditionals, async/await, etc.
 
