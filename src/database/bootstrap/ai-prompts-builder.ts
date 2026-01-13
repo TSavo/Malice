@@ -24,6 +24,8 @@ const PROMPT_FILES: Record<string, string> = {
   navComputer: 'NAV-COMPUTER.md',
   device: 'DEVICE.md',
   autoFixer: 'AUTO-FIXER.md',
+  sysop: 'SYSOP.md',
+  sysopReinforcement: 'SYSOP-REINFORCEMENT.md',
 };
 
 /**

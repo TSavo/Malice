@@ -1137,8 +1137,17 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       const message = args[2];
       const systemPrompt = args[3];
 
-      // Build user prompt
-      const userPrompt = speakerName + ' says to you: "' + message + '"\\n\\nRespond in character.';
+      // Track message count for reinforcement timing
+      const messageCount = (self.aiMessageCount || 0) + 1;
+      self.aiMessageCount = messageCount;
+
+      // Get prefix/suffix from composable methods (inherited from $describable)
+      const promptContext = { speaker: { id: speakerId, name: speakerName }, messageCount };
+      const prefix = await self.promptPrefix(promptContext) || '';
+      const suffix = await self.promptSuffix(promptContext) || '';
+
+      // Build user prompt with prefix/suffix
+      const userPrompt = prefix + speakerName + ' says to you: "' + message + '"\\n\\nRespond in character.' + suffix;
 
       const ai = await $.ai;
       const profile = await ai.getProfile(self.id);
@@ -1201,8 +1210,17 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       const systemPrompt = await self.buildAgentPrompt();
       if (!systemPrompt) return; // Not AI-controlled, do nothing
 
-      // Build user prompt
-      const userPrompt = giver.name + ' just gave you ' + item.name + '.\\n\\nReact appropriately - thank them, examine the item, or respond based on your role.';
+      // Track message count for reinforcement timing
+      const messageCount = (self.aiMessageCount || 0) + 1;
+      self.aiMessageCount = messageCount;
+
+      // Get prefix/suffix from composable methods
+      const promptContext = { speaker: giver, messageCount };
+      const prefix = await self.promptPrefix(promptContext) || '';
+      const suffix = await self.promptSuffix(promptContext) || '';
+
+      // Build user prompt with prefix/suffix
+      const userPrompt = prefix + giver.name + ' just gave you ' + item.name + '.\\n\\nReact appropriately - thank them, examine the item, or respond based on your role.' + suffix;
 
       // Fire-and-forget query
       $aiQuery(systemPrompt, userPrompt, self.interactionSession)

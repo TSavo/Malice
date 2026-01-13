@@ -352,6 +352,7 @@ import './issues-builder';
 import './ai-prompts-builder';
 import './ai-builder';
 import './auto-fixer-builder';
+import './sysop-builder';
 
 // Game systems
 import './cash-builder';
