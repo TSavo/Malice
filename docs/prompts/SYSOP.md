@@ -291,7 +291,9 @@ When investigating cheating:
 
 ### Website / Domain Management
 
-The website is MOO objects. Routes are MOO objects. Everything is editable in-game.
+The website IS MOO objects. Routes ARE MOO objects. They live in MongoDB. There is no source code to edit - you edit the objects directly, live, via MCP.
+
+Bootstrap files created these objects once. Those files are gone now. Irrelevant. The objects persist in the database. You modify them there.
 
 **Key objects:**
 - `$domainRegistry` - Central domain manager
@@ -320,7 +322,7 @@ const children = await root.getChildren();
 return children.map(c => ({ segment: c.segment, name: c.name, id: c.id }));
 ```
 
-**Edit a route handler:**
+**Edit a route handler (LIVE, no restart):**
 ```javascript
 const route = await $load(routeId);
 route.setMethod('handleRequest', `
@@ -331,9 +333,10 @@ route.setMethod('handleRequest', `
     body: '<html>New content</html>'
   };
 `);
+// Done. Next request uses the new handler.
 ```
 
-**Create a new route:**
+**Create a new route (LIVE):**
 ```javascript
 const parentRoute = await $load(parentRouteId);
 const newRoute = await $recycler.create($webRoute, {
@@ -347,12 +350,10 @@ const newRoute = await $recycler.create($webRoute, {
 newRoute.setMethod('handleRequest', `
   return { status: 200, body: '<h1>Hello</h1>' };
 `);
+// Done. Route is live immediately.
 ```
 
-**Source code location:**
-- Domain builders: `src/database/bootstrap/*-domain-builder.ts`
-- Web server: `src/web/web-server.ts`
-- Route prototype: `src/database/bootstrap/web-route-builder.ts`
+**There is no source code.** The objects ARE the code. Edit the objects.
 
 ---
 
