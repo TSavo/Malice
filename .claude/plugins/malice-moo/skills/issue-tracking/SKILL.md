@@ -6,36 +6,50 @@ version: 1.0.0
 
 # Issue Tracking
 
-## Creating Issues
+## How to Find What You Need
 
+**Search for $issues docs:**
+```javascript
+await $docs.search('issues');
+await $docs.search('bug tracking');
+await $docs.search('$issues');
+```
+
+**Related patterns:**
+```javascript
+await $docs.search('create issue');
+await $docs.search('issue labels');
+await $docs.search('issue query');
+```
+
+## Quick Reference
+
+**Create:**
 ```javascript
 await $issues.create({
   title: 'Brief description',
-  body: 'Details, steps to reproduce, expected vs actual',
-  labels: ['bug'],  // or 'feature', 'investigation'
+  body: 'Details...',
+  labels: ['bug'],
   reporter: 'Charon'
 });
 ```
 
-## Searching Issues
-
+**Search:**
 ```javascript
-const open = await $issues.query({ status: 'open' });
-const matches = await $issues.query({ search: 'keyword' });
+await $issues.query({ status: 'open' });
+await $issues.query({ search: 'keyword' });
+await $issues.query({ labels: ['bug'] });
 ```
 
-## Updating Issues
-
+**Update:**
 ```javascript
-await $issues.update(issueId, { status: 'closed' });
-await $issues.comment(issueId, { author: 'Charon', body: 'Note...' });
+await $issues.update(id, { status: 'closed' });
+await $issues.comment(id, { author: 'Charon', body: 'Note' });
 ```
 
-## Labels
+## Key Concepts (search docs for details)
 
-- `bug` - Something broken
-- `feature` - Enhancement request
-- `investigation` - Needs research
-- `cheating` - Suspected cheater
-
-Check for duplicates before creating. Add comments to existing issues when possible.
+- Labels: `bug`, `feature`, `investigation`, `cheating`
+- Always check for duplicates before creating
+- Add comments to existing issues when relevant
+- Include reproduction steps for bugs

@@ -6,34 +6,46 @@ version: 1.0.0
 
 # Documentation Search
 
-## Reading Docs
+## How to Query $docs
 
+**List all available docs:**
 ```javascript
-const content = await $docs.read('DOC-NAME');
+await $docs.list();
 ```
 
-## Searching Docs
-
+**Read a specific doc:**
 ```javascript
-const results = await $docs.search('topic');
-// Returns matching docs with snippets
+await $docs.read('DOC-NAME');
 ```
 
-## Listing All Docs
-
+**Search by keyword:**
 ```javascript
-const all = await $docs.list();
+await $docs.search('topic');
+await $docs.search('multiple keywords');
 ```
+
+## Search Strategy
+
+1. **Start broad:** `await $docs.search('combat')`
+2. **Read promising results:** `await $docs.read('PLAYER-GUIDE')`
+3. **Search within:** Look for specific section in returned content
+4. **Try related terms:** If 'combat' fails, try 'damage', 'health', 'attack'
 
 ## Key Documents
 
-| Doc | Topic |
-|-----|-------|
-| `BUILDERS-GUIDE` | Creating content |
-| `MCP-TOOLS` | Available tools |
-| `WEB-ROUTES` | Website routing |
-| `moo-programming` | MOO code patterns |
-| `AGENT-GUIDE` | AI agents |
-| `PLAYER-GUIDE` | Gameplay |
+| Doc | When to Use |
+|-----|-------------|
+| `BUILDERS-GUIDE` | Creating content, prototypes, rooms |
+| `MCP-TOOLS` | Tool reference, execute_moo_code |
+| `WEB-ROUTES` | Website, routing, domains |
+| `moo-programming` | Code patterns, methods, properties |
+| `AGENT-GUIDE` | AI agents, $aiQuery |
+| `PLAYER-GUIDE` | Gameplay mechanics |
+| `npc-agent` | NPC spawning, AI control |
+| `plot-jobs` | Scheduled events, city AI |
 
-Always search $docs before guessing. The docs are editable - they may have been updated.
+## Important
+
+- Docs are editable: `await $docs.edit('DOC-NAME', newContent)`
+- Always search before guessing
+- Docs may have been updated by other AIs

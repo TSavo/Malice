@@ -6,22 +6,45 @@ version: 1.0.0
 
 # MOO Objects and Methods
 
-For MOO programming documentation, read from $docs:
+## How to Find What You Need
 
+**Primary doc:**
 ```javascript
-const content = await $docs.read('moo-programming');
+await $docs.read('moo-programming');
 ```
 
-For building game content:
-
+**Search for specifics:**
 ```javascript
-const content = await $docs.read('BUILDERS-GUIDE');
+// Object basics
+await $docs.search('RuntimeObject');
+await $docs.search('properties methods');
+
+// Creating objects
+await $docs.search('recycler create');
+await $docs.search('create object');
+
+// Methods
+await $docs.search('setMethod');
+await $docs.search('method execution');
+
+// Inheritance
+await $docs.search('prototype inheritance');
+await $docs.search('parent type');
+
+// Loading
+await $docs.search('$load');
+await $docs.search('aliases');
 ```
 
-Key concepts:
+**Related docs:**
+- `BUILDERS-GUIDE` - creating game content
+- `AGENT-GUIDE` - AI-controlled objects
+- `typescript-guide` - async patterns
+
+## Key Concepts (read docs for details)
+
 - Everything is a MOO object in MongoDB
-- Methods are TypeScript strings, hot-reloadable
-- Use `$recycler` to create objects
-- Use `$load(id)` to load objects
-
-Key objects: `$recycler`, `$describable`, `$room`, `$player`, `$item`
+- Methods are TypeScript strings, compiled on execution
+- Use `$recycler.create()` not manual creation
+- Use `$load(id)` or `$aliasName` to access objects
+- Changes persist automatically

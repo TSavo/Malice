@@ -6,20 +6,37 @@ version: 1.0.0
 
 # Query Objects
 
-For query documentation, read from $docs:
+## How to Find What You Need
 
+**Primary doc:**
 ```javascript
-const content = await $docs.read('moo-programming');
-// Search for the $query section
+await $docs.read('moo-programming');
 ```
 
-Or search:
-
+**Search for specifics:**
 ```javascript
-const results = await $docs.search('query');
+// Query basics
+await $docs.search('$query');
+await $docs.search('query builder');
+
+// Filtering
+await $docs.search('query prop');
+await $docs.search('query parent');
+await $docs.search('query filter');
+
+// Results
+await $docs.search('query all');
+await $docs.search('query first');
 ```
 
-Quick reference:
-- `$query().parent($room).all()` - all rooms
-- `$query().prop('name').contains('Tower').all()` - by property
-- `.first()` for single result, `.count()` for count
+**Related docs:**
+- `BUILDERS-GUIDE` - finding objects to modify
+- `MCP-TOOLS` - query via MCP
+
+## Key Concepts (read docs for details)
+
+- `$query()` returns a chainable builder
+- `.parent($type)` filters by prototype
+- `.prop('name').equals(value)` filters by property
+- `.all()` returns array, `.first()` returns one
+- `.count()` returns count without loading objects

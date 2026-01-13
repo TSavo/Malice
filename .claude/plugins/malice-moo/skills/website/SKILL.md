@@ -6,15 +6,35 @@ version: 1.0.0
 
 # Website Management
 
-For website and routing documentation, read from $docs:
+## How to Find What You Need
 
+**Primary doc:**
 ```javascript
-const content = await $docs.read('WEB-ROUTES');
+await $docs.read('WEB-ROUTES');
 ```
 
-Key concepts:
-- The website IS MOO objects in MongoDB
-- No source files - edit objects directly
-- Changes are live immediately
+**Search for specifics:**
+```javascript
+// Routing architecture
+await $docs.search('web routing');
+await $docs.search('domain registry');
 
-Key objects: `$domainRegistry`, `$webDomain`, `$webRoute`, `$continuumDomain`
+// Handler patterns
+await $docs.search('handleRequest');
+await $docs.search('route handler');
+
+// Creating routes
+await $docs.search('create route');
+await $docs.search('webRoute');
+```
+
+**Related docs:**
+- `BUILDERS-GUIDE` - general content creation
+- `moo-programming` - method syntax, object patterns
+
+## Key Concepts (read docs for details)
+
+- Website = MOO objects in MongoDB
+- No source files - edit objects via `execute_moo_code`
+- Changes are live immediately
+- Key objects: `$domainRegistry`, `$webDomain`, `$webRoute`
