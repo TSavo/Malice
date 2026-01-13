@@ -14,13 +14,13 @@ import { type Builder, registerBuilder } from './builder-registry';
  * - On bootstrap, auto-connects if autoConnect is true
  *
  * Usage:
- *   // Set token and enable auto-connect
- *   $sysop.token = 'your-discord-bot-token';
+ *   // Set DISCORD_BOT_TOKEN environment variable in .env file
+ *   // Then enable auto-connect
  *   $sysop.autoConnect = true;
- *   
- *   // Connect manually
+ *
+ *   // Or connect manually
  *   await $sysop.connect();
- *   
+ *
  *   // Disconnect
  *   await $sysop.disconnect();
  */
@@ -499,9 +499,9 @@ export class SysopBuilder implements Builder {
 
     // Check if autoConnect is enabled
     const autoConnect = this.obj.get('autoConnect');
-    const token = this.obj.get('token');
+    const hasEnvToken = !!process.env.DISCORD_BOT_TOKEN;
 
-    if (autoConnect && token) {
+    if (autoConnect && hasEnvToken) {
       console.log('[SysopBuilder] Auto-connecting to Discord...');
       try {
         const result = await this.obj.call('connect');

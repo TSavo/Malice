@@ -36,9 +36,9 @@ await $issues.create({
 
 **Search:**
 ```javascript
-await $issues.query({ status: 'open' });
-await $issues.query({ search: 'keyword' });
-await $issues.query({ labels: ['bug'] });
+await $issues.list({ status: 'open' });
+await $issues.search('keyword');
+await $issues.list({ tag: 'bug' });
 ```
 
 **Update:**
