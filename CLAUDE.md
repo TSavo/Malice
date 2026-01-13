@@ -959,8 +959,8 @@ The `$sysop` singleton is a Discord bot that runs directly in the MOO process. I
 ### Configuration
 
 ```typescript
-// Set Discord bot token
-$sysop.token = 'your-discord-bot-token';
+// Discord bot token is read from environment variable
+// Set DISCORD_BOT_TOKEN in your .env file or environment
 
 // Enable auto-connect on server start
 $sysop.autoConnect = true;

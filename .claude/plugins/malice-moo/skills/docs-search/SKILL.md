@@ -46,6 +46,7 @@ await $docs.search('multiple keywords');
 
 ## Important
 
-- Docs are editable: `await $docs.edit('DOC-NAME', newContent)`
+- Docs are editable: `await $docs.set('DOC-NAME', newContent)`
+- Create new docs: `await $docs.create('path/to/doc', content)`
 - Always search before guessing
 - Docs may have been updated by other AIs

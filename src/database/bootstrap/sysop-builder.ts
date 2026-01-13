@@ -59,11 +59,10 @@ export class SysopBuilder implements Builder {
           description: 'The operational consciousness of Malice. System operator. Help desk with root access.',
           // AI personality - loaded from $.aiPrompts.sysop
           systemPrompt: null,
-          // Conversation continuity
-          interactionSession: null,
+          // Conversation continuity (per-channel sessions stored in runtime)
+          // Using $.runtime.sysopSessions to avoid race conditions
           aiMessageCount: 0,
-          // Discord configuration (persisted)
-          token: null, // Discord bot token
+          // Discord configuration
           autoConnect: false, // Auto-connect on bootstrap
           // Discord state (reflects runtime state)
           connected: false,
@@ -97,10 +96,12 @@ export class SysopBuilder implements Builder {
       `
       /** Connect to Discord. Creates client, sets up handlers, logs in.
        *  The client is stored in $.runtime (non-persistent).
+       *  Token is read from DISCORD_BOT_TOKEN environment variable.
        *  @returns { success, message }
        */
-      if (!self.token) {
-        return { success: false, message: 'No token configured. Set $sysop.token first.' };
+      const token = process.env.DISCORD_BOT_TOKEN;
+      if (!token) {
+        return { success: false, message: 'No token configured. Set DISCORD_BOT_TOKEN environment variable.' };
       }
 
       // Check if already connected
@@ -170,6 +171,12 @@ export class SysopBuilder implements Builder {
             }
           } catch (err) {
             console.error('[Sysop] Error handling message:', err?.message || err);
+            // Notify user of the error
+            try {
+              await msg.channel.send('⚠️ Error processing message. Please try again.');
+            } catch (sendErr) {
+              console.error('[Sysop] Failed to send error message:', sendErr);
+            }
           }
         });
 
@@ -178,8 +185,14 @@ export class SysopBuilder implements Builder {
           console.error('[Sysop] Discord client error:', err);
         });
 
-        // Login
-        await client.login(self.token);
+        // Login (with cleanup on failure)
+        try {
+          await client.login(token);
+        } catch (loginErr) {
+          // Clean up client if login fails
+          client.destroy();
+          throw loginErr;
+        }
 
         // Store client in runtime (non-persistent)
         $.runtime.client = client;
@@ -357,12 +370,18 @@ export class SysopBuilder implements Builder {
       // Build user message
       const userMessage = prefix + msg.author + ': ' + msg.content + suffix;
 
-      // Query AI
-      const result = await $aiQuery(systemPrompt, userMessage, self.interactionSession);
+      // Get or initialize sessions map in runtime (per-channel to avoid race conditions)
+      if (!$.runtime.sysopSessions) {
+        $.runtime.sysopSessions = {};
+      }
+      const channelSession = $.runtime.sysopSessions[msg.channelId];
 
-      // Save session
+      // Query AI with channel-specific session
+      const result = await $aiQuery(systemPrompt, userMessage, channelSession);
+
+      // Save session for this channel
       if (result?.session) {
-        self.interactionSession = result.session;
+        $.runtime.sysopSessions[msg.channelId] = result.session;
       }
 
       // Get response
@@ -440,10 +459,22 @@ export class SysopBuilder implements Builder {
     obj.setMethod(
       'resetSession',
       `
-      /** Reset the AI session, clearing conversation history. */
-      self.interactionSession = null;
-      self.aiMessageCount = 0;
-      return { success: true, message: 'Session reset' };
+      /** Reset the AI session, clearing conversation history.
+       *  @param channelId - Optional channel ID to reset specific channel, otherwise resets all
+       */
+      const channelId = args[0];
+      if (channelId) {
+        // Reset specific channel
+        if ($.runtime.sysopSessions) {
+          delete $.runtime.sysopSessions[channelId];
+        }
+        return { success: true, message: 'Session reset for channel ' + channelId };
+      } else {
+        // Reset all sessions
+        $.runtime.sysopSessions = {};
+        self.aiMessageCount = 0;
+        return { success: true, message: 'All sessions reset' };
+      }
     `,
     );
 
