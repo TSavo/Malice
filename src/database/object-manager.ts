@@ -1618,6 +1618,10 @@ export class ObjectManager {
       Object.keys(mcpServers).join(', '),
     );
 
+    // Determine Malice root for plugin path
+    const maliceRoot = process.cwd();
+    const pluginPath = `${maliceRoot}/.claude/plugins/malice-moo`;
+
     const queryOptions: Record<string, unknown> = {
       systemPrompt,
       mcpServers,
@@ -1626,6 +1630,13 @@ export class ObjectManager {
       allowDangerouslySkipPermissions: true,
       cwd: process.env.HOME || '/home/node',
       persistSession: true,
+      // Load Malice skills plugin
+      plugins: [
+        {
+          name: 'malice-moo',
+          path: pluginPath,
+        },
+      ],
     };
 
     if (session) {
