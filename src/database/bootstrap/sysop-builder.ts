@@ -104,7 +104,7 @@ export class SysopBuilder implements Builder {
       }
 
       // Check if already connected
-      if ($.runtime.has(self, 'client')) {
+      if ($.runtime.client) {
         return { success: false, message: 'Already connected. Call disconnect() first.' };
       }
 
@@ -182,7 +182,7 @@ export class SysopBuilder implements Builder {
         await client.login(self.token);
 
         // Store client in runtime (non-persistent)
-        $.runtime.set(self, 'client', client);
+        $.runtime.client = client;
 
         return { success: true, message: 'Connected to Discord' };
       } catch (err) {
@@ -199,14 +199,14 @@ export class SysopBuilder implements Builder {
       /** Disconnect from Discord. Destroys the client.
        *  @returns { success, message }
        */
-      const client = $.runtime.get(self, 'client');
+      const client = $.runtime.client;
       if (!client) {
         return { success: false, message: 'Not connected' };
       }
 
       try {
         client.destroy();
-        $.runtime.delete(self, 'client');
+        delete $.runtime.client;
         self.connected = false;
         return { success: true, message: 'Disconnected from Discord' };
       } catch (err) {
@@ -223,7 +223,7 @@ export class SysopBuilder implements Builder {
       /** Get Discord connection status.
        *  @returns { connected, ready, user }
        */
-      const client = $.runtime.get(self, 'client');
+      const client = $.runtime.client;
       if (!client) {
         return { connected: false, ready: false, user: null };
       }
@@ -418,7 +418,7 @@ export class SysopBuilder implements Builder {
         return { success: false, message: 'Missing channelId or content' };
       }
 
-      const client = $.runtime.get(self, 'client');
+      const client = $.runtime.client;
       if (!client || !client.isReady()) {
         return { success: false, message: 'Not connected to Discord' };
       }

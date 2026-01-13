@@ -635,48 +635,26 @@ export class ObjectManager {
 
   // In-memory-only storage for transient state (Discord clients, WebSocket connections, etc.)
   // Never persisted to MongoDB. Empty on restart.
-  private runtimeStorage = new Map<string | number, Map<string, unknown>>();
+  private runtimeStorage = new Map<string, unknown>();
 
-  // Runtime accessor object exposed as $.runtime
-  public readonly runtime = {
-    get: (obj: { id?: string | number } | string | number, key: string): unknown => {
-      const objId = typeof obj === 'number' || typeof obj === 'string' ? obj : obj?.id;
-      if (objId === undefined || !key) return undefined;
-      const objStore = this.runtimeStorage.get(objId);
-      return objStore ? objStore.get(key) : undefined;
+  // Runtime accessor - Proxy that allows direct property access
+  // Usage: $.runtime.client = discordClient; const c = $.runtime.client;
+  public readonly runtime = new Proxy({} as Record<string, unknown>, {
+    get: (_, key: string) => this.runtimeStorage.get(key),
+    set: (_, key: string, value: unknown) => {
+      this.runtimeStorage.set(key, value);
+      return true;
     },
-    set: (obj: { id?: string | number } | string | number, key: string, value: unknown): void => {
-      const objId = typeof obj === 'number' || typeof obj === 'string' ? obj : obj?.id;
-      if (objId === undefined || !key) return;
-      if (!this.runtimeStorage.has(objId)) {
-        this.runtimeStorage.set(objId, new Map());
+    deleteProperty: (_, key: string) => this.runtimeStorage.delete(key),
+    has: (_, key: string) => this.runtimeStorage.has(key),
+    ownKeys: () => Array.from(this.runtimeStorage.keys()),
+    getOwnPropertyDescriptor: (_, key: string) => {
+      if (this.runtimeStorage.has(key)) {
+        return { configurable: true, enumerable: true, value: this.runtimeStorage.get(key) };
       }
-      this.runtimeStorage.get(objId)!.set(key, value);
+      return undefined;
     },
-    has: (obj: { id?: string | number } | string | number, key: string): boolean => {
-      const objId = typeof obj === 'number' || typeof obj === 'string' ? obj : obj?.id;
-      if (objId === undefined || !key) return false;
-      const objStore = this.runtimeStorage.get(objId);
-      return objStore ? objStore.has(key) : false;
-    },
-    delete: (obj: { id?: string | number } | string | number, key: string): boolean => {
-      const objId = typeof obj === 'number' || typeof obj === 'string' ? obj : obj?.id;
-      if (objId === undefined || !key) return false;
-      const objStore = this.runtimeStorage.get(objId);
-      return objStore ? objStore.delete(key) : false;
-    },
-    clear: (obj: { id?: string | number } | string | number): void => {
-      const objId = typeof obj === 'number' || typeof obj === 'string' ? obj : obj?.id;
-      if (objId === undefined) return;
-      this.runtimeStorage.delete(objId);
-    },
-    keys: (obj: { id?: string | number } | string | number): string[] => {
-      const objId = typeof obj === 'number' || typeof obj === 'string' ? obj : obj?.id;
-      if (objId === undefined) return [];
-      const objStore = this.runtimeStorage.get(objId);
-      return objStore ? Array.from(objStore.keys()) : [];
-    },
-  };
+  });
 
   constructor(db: ObjectDatabase) {
     this.db = db;
