@@ -633,6 +633,51 @@ export class ObjectManager {
   // Event emitter for change notifications (used by DevTools)
   private changeEmitter = new EventEmitter();
 
+  // In-memory-only storage for transient state (Discord clients, WebSocket connections, etc.)
+  // Never persisted to MongoDB. Empty on restart.
+  private runtimeStorage = new Map<string | number, Map<string, unknown>>();
+
+  // Runtime accessor object exposed as $.runtime
+  public readonly runtime = {
+    get: (obj: { id?: string | number } | string | number, key: string): unknown => {
+      const objId = typeof obj === 'number' || typeof obj === 'string' ? obj : obj?.id;
+      if (objId === undefined || !key) return undefined;
+      const objStore = this.runtimeStorage.get(objId);
+      return objStore ? objStore.get(key) : undefined;
+    },
+    set: (obj: { id?: string | number } | string | number, key: string, value: unknown): void => {
+      const objId = typeof obj === 'number' || typeof obj === 'string' ? obj : obj?.id;
+      if (objId === undefined || !key) return;
+      if (!this.runtimeStorage.has(objId)) {
+        this.runtimeStorage.set(objId, new Map());
+      }
+      this.runtimeStorage.get(objId)!.set(key, value);
+    },
+    has: (obj: { id?: string | number } | string | number, key: string): boolean => {
+      const objId = typeof obj === 'number' || typeof obj === 'string' ? obj : obj?.id;
+      if (objId === undefined || !key) return false;
+      const objStore = this.runtimeStorage.get(objId);
+      return objStore ? objStore.has(key) : false;
+    },
+    delete: (obj: { id?: string | number } | string | number, key: string): boolean => {
+      const objId = typeof obj === 'number' || typeof obj === 'string' ? obj : obj?.id;
+      if (objId === undefined || !key) return false;
+      const objStore = this.runtimeStorage.get(objId);
+      return objStore ? objStore.delete(key) : false;
+    },
+    clear: (obj: { id?: string | number } | string | number): void => {
+      const objId = typeof obj === 'number' || typeof obj === 'string' ? obj : obj?.id;
+      if (objId === undefined) return;
+      this.runtimeStorage.delete(objId);
+    },
+    keys: (obj: { id?: string | number } | string | number): string[] => {
+      const objId = typeof obj === 'number' || typeof obj === 'string' ? obj : obj?.id;
+      if (objId === undefined) return [];
+      const objStore = this.runtimeStorage.get(objId);
+      return objStore ? Array.from(objStore.keys()) : [];
+    },
+  };
+
   constructor(db: ObjectDatabase) {
     this.db = db;
     this.cache = new ObjectCache();
