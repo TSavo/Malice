@@ -133,6 +133,10 @@ This compiles bootstrap-defined methods (via `methods: { ... }` and `setMethod(.
 using the same transpile settings as runtime. The `typecheck` script runs this
 automatically after `tsc --noEmit`.
 
+If you want alias globals to mirror runtime state, you can provide a JSON alias
+snapshot at `.malice/aliases.json` or set `MOO_ALIAS_PATH` to a JSON file that maps
+alias names to ids.
+
 ### 3. Method-Specific Types (Inline)
 
 For types only used in one method, define them inline:
