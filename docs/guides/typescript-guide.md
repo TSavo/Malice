@@ -120,6 +120,19 @@ const result: CombatResult = {
 };
 ```
 
+## MOO Method Compilation Checks
+
+MOO method bodies are stored as TypeScript in string literals. To catch syntax errors
+before runtime, run:
+
+```bash
+npm run moo:check
+```
+
+This compiles bootstrap-defined methods (via `methods: { ... }` and `setMethod(...)`)
+using the same transpile settings as runtime. The `typecheck` script runs this
+automatically after `tsc --noEmit`.
+
 ### 3. Method-Specific Types (Inline)
 
 For types only used in one method, define them inline:
