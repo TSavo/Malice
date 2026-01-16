@@ -4,6 +4,9 @@
  * Allows MOO code to install npm packages at runtime without server restart.
  * After install, `await import('package')` just works.
  *
+ * SECURITY: Uses execFile() instead of execSync() to prevent shell injection.
+ * Input validation prevents command injection attacks.
+ *
  * Usage in MOO code:
  *   await $npm.install('lodash');
  *   const _ = await import('lodash');
@@ -48,6 +51,7 @@ export class NpmBuilder implements Builder {
     });
 
     // install(packageName, version?) - Install a package
+    // SECURITY: Validates inputs and uses execFile() to prevent shell injection
     this.npm.setMethod(
       'install',
       `
@@ -58,17 +62,30 @@ export class NpmBuilder implements Builder {
         throw new Error('Package name required');
       }
 
-      // Sanitize package name (basic validation)
-      if (!/^(@[a-z0-9-~][a-z0-9-._~]*\\/)?[a-z0-9-~][a-z0-9-._~]*$/.test(packageName)) {
-        throw new Error('Invalid package name');
+      // Strict package name validation (npm official rules)
+      // Allows: lodash, @babel/core, @org/package
+      // Blocks: anything with shell metacharacters or path traversal
+      const packageNameRegex = /^(@[a-z0-9][a-z0-9-]*\/)?[a-z0-9][a-z0-9._-]*$/;
+      if (!packageNameRegex.test(packageName) || packageName.length > 214) {
+        throw new Error('Invalid package name: must be lowercase alphanumeric with hyphens, underscores, dots');
+      }
+
+      // Validate version if provided (CRITICAL-2 FIX)
+      // Blocks: shell metacharacters, command substitution, variable expansion
+      if (version && !/^[0-9a-zA-Z.~^><=*\-+]*$/.test(version)) {
+        throw new Error('Invalid version specifier: contains invalid characters');
       }
 
       const spec = version ? packageName + '@' + version : packageName;
 
-      const { execSync } = await import('child_process');
+      // CRITICAL FIX: Use execFile() instead of execSync() to prevent shell injection
+      // execFile does NOT spawn a shell - arguments are passed directly to npm
+      const { execFile } = await import('child_process');
+      const { promisify } = await import('util');
+      const execFileAsync = promisify(execFile);
 
       try {
-        const output = execSync('npm install ' + spec, {
+        const result = await execFileAsync('npm', ['install', spec], {
           cwd: process.cwd(),
           encoding: 'utf8',
           stdio: ['pipe', 'pipe', 'pipe']
@@ -77,7 +94,7 @@ export class NpmBuilder implements Builder {
         return {
           success: true,
           package: spec,
-          output: output.trim()
+          output: result.stdout.trim()
         };
       } catch (err) {
         return {
@@ -90,6 +107,7 @@ export class NpmBuilder implements Builder {
     );
 
     // uninstall(packageName) - Remove a package
+    // SECURITY: HIGH-1 FIX - Added packageName validation that was missing
     this.npm.setMethod(
       'uninstall',
       `
@@ -99,10 +117,20 @@ export class NpmBuilder implements Builder {
         throw new Error('Package name required');
       }
 
-      const { execSync } = await import('child_process');
+      // HIGH-1 FIX: Validate packageName like install() does
+      // Strict package name validation (npm official rules)
+      const packageNameRegex = /^(@[a-z0-9][a-z0-9-]*\/)?[a-z0-9][a-z0-9._-]*$/;
+      if (!packageNameRegex.test(packageName) || packageName.length > 214) {
+        throw new Error('Invalid package name: must be lowercase alphanumeric with hyphens, underscores, dots');
+      }
+
+      // CRITICAL-1 FIX: Use execFile() instead of execSync() to prevent shell injection
+      const { execFile } = await import('child_process');
+      const { promisify } = await import('util');
+      const execFileAsync = promisify(execFile);
 
       try {
-        const output = execSync('npm uninstall ' + packageName, {
+        const result = await execFileAsync('npm', ['uninstall', packageName], {
           cwd: process.cwd(),
           encoding: 'utf8',
           stdio: ['pipe', 'pipe', 'pipe']
@@ -111,7 +139,7 @@ export class NpmBuilder implements Builder {
         return {
           success: true,
           package: packageName,
-          output: output.trim()
+          output: result.stdout.trim()
         };
       } catch (err) {
         return {
@@ -148,16 +176,18 @@ export class NpmBuilder implements Builder {
     this.npm.setMethod(
       'outdated',
       `
-      const { execSync } = await import('child_process');
+      const { execFile } = await import('child_process');
+      const { promisify } = await import('util');
+      const execFileAsync = promisify(execFile);
 
       try {
-        const output = execSync('npm outdated --json', {
+        const result = await execFileAsync('npm', ['outdated', '--json'], {
           cwd: process.cwd(),
           encoding: 'utf8',
           stdio: ['pipe', 'pipe', 'pipe']
         });
 
-        return JSON.parse(output || '{}');
+        return JSON.parse(result.stdout || '{}');
       } catch (err) {
         // npm outdated exits with code 1 if there are outdated packages
         if (err.stdout) {
