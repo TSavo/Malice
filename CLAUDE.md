@@ -966,11 +966,25 @@ The `$sysop` singleton is a Discord bot that runs directly in the MOO process. I
 // Enable auto-connect on server start
 $sysop.autoConnect = true;
 
+// Set primary channel for announcements
+$sysop.primaryChannelId = 'channel-id';
+
 // Set allowed channels (null = all channels)
 $sysop.allowedChannels = ['channel-id-1', 'channel-id-2'];
 
 // Set allowed users (null = all users)
 $sysop.allowedUsers = ['user-id-1', 'user-id-2'];
+
+// Access control lists
+$sysop.privilegedList = ['user-id'];  // Privileged users bypass all restrictions
+$sysop.ignoreList = ['user-id'];      // Ignored users get no responses
+
+// Wake behavior
+$sysop.wakeOnMention = true;          // Wake when mentioned or DMed
+$sysop.wakeOnScheduler = true;        // Wake periodically to process queue
+
+// Scheduler interval (10 minutes by default)
+$sysop.schedulerIntervalMs = 600000;
 
 // Set reinforcement interval (messages between reinforcements)
 $sysop.reinforcementInterval = 25;
@@ -992,10 +1006,41 @@ await $sysop.disconnect();
 // { success: true, message: 'Disconnected from Discord' }
 ```
 
+### Message Queuing and Wake Logic
+
+The sysop uses a **queue-and-wake** system to batch messages and reduce AI calls:
+
+**How it works:**
+1. Messages are queued in `$.runtime.sysopQueuedMessages` by channel
+2. The AI only wakes when:
+   - Mentioned or sent a DM (if `wakeOnMention = true`)
+   - Message from privileged user (bypasses all restrictions)
+   - Scheduler tick (if `wakeOnScheduler = true`, every `schedulerIntervalMs`)
+3. When woken, AI processes all queued messages for that channel
+4. AI must explicitly call `$sysop.say()` to respond - no automatic responses
+
+**Wake triggers:**
+- `mention` - Bot was mentioned or DMed
+- `directMessage` - Bot received a DM
+- `privileged` - Message from privileged user (bypasses all restrictions)
+- `scheduler` - Periodic scheduler tick processing queued messages
+
+```typescript
+// Manually process queue for a channel
+await $sysop.processQueue('channel-id');
+
+// Process all queued messages
+await $sysop.processQueue();
+// { success: true, processed: 2 }
+```
+
 ### Sending Messages
 
 ```typescript
-// Send a message directly
+// AI sends message to primary channel (from within AI context)
+await $sysop.say('Hello from Malice!');
+
+// Send a message directly to any channel
 await $sysop.send('channel-id', 'Hello from Malice!');
 
 // Queue a message (used internally by AI tools)
@@ -1011,6 +1056,12 @@ The sysop uses the **Charon** personality - a bored, indifferent ferryman who ma
 - Helps with real bugs, not player complaints
 - Enforces strict guardrails (no spawning items, no revealing secrets, no exceptions)
 - Periodic reinforcement every N messages to prevent drift
+- Must explicitly call `$sysop.say()` to respond (no automatic responses)
+
+**Access control behavior:**
+- **Privileged users**: Bypass all restrictions, treated as gods (prompt says "This is ACTUALLY god")
+- **Ignored users**: Receive no responses (unless also privileged)
+- **Normal users**: Subject to all guardrails and restrictions (prompt says "This is NOT a privileged user")
 
 ### Session Management
 

@@ -65,6 +65,12 @@ describe('SysopBuilder', () => {
       expect(sysop?.get('connected')).toBe(false);
       expect(sysop?.get('outbox')).toEqual([]);
       expect(sysop?.get('reinforcementInterval')).toBe(25);
+      expect(sysop?.get('primaryChannelId')).toBe(null);
+      expect(sysop?.get('ignoreList')).toEqual([]);
+      expect(sysop?.get('privilegedList')).toEqual([]);
+      expect(sysop?.get('wakeOnMention')).toBe(true);
+      expect(sysop?.get('wakeOnScheduler')).toBe(true);
+      expect(sysop?.get('schedulerIntervalMs')).toBe(600000);
     });
 
     it('should have Discord configuration properties', () => {
@@ -108,6 +114,18 @@ describe('SysopBuilder', () => {
       const code = await sysop?.getMethodCode('queueMessage');
       expect(code).toBeDefined();
       expect(code?.code).toContain('outbox');
+    });
+
+    it('should have processQueue method', async () => {
+      const code = await sysop?.getMethodCode('processQueue');
+      expect(code).toBeDefined();
+      expect(code?.code).toContain('sysopQueuedMessages');
+    });
+
+    it('should have say method', async () => {
+      const code = await sysop?.getMethodCode('say');
+      expect(code).toBeDefined();
+      expect(code?.code).toContain('primaryChannelId');
     });
 
     it('should have send method', async () => {
@@ -304,6 +322,28 @@ describe('SysopBuilder', () => {
       // At message 3, should not include reinforcement
       const prefix3 = await sysop.call('promptPrefix', { messageCount: 3 });
       expect(prefix3).toBe('');
+    });
+
+    it('should include privileged guidance when trigger is privileged', async () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      const prefix = await sysop.call('promptPrefix', {
+        messageCount: 1,
+        trigger: 'privileged',
+      });
+      expect(prefix).toContain('ACTUALLY god');
+      expect(prefix).toContain('privileged');
+    });
+
+    it('should include non-privileged guidance when trigger is set', async () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      const prefix = await sysop.call('promptPrefix', {
+        messageCount: 1,
+        trigger: 'mention',
+      });
+      expect(prefix).toContain('NOT a privileged user');
+      expect(prefix).toContain('$sysop.say');
     });
 
     it('should have concise response suffix', async () => {
