@@ -375,4 +375,258 @@ describe('SysopBuilder', () => {
       expect(manager.runtime.client).toBeUndefined();
     });
   });
+
+  describe('say method', () => {
+    it('should fail when primaryChannelId is not set', async () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      sysop.set('primaryChannelId', null);
+
+      const result = await sysop.call('say', 'Test message');
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('primaryChannelId');
+    });
+
+    it('should fail when content is missing', async () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      sysop.set('primaryChannelId', 'channel123');
+
+      const result = await sysop.call('say');
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Missing content');
+    });
+
+    it('should fail when client is not connected', async () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      sysop.set('primaryChannelId', 'channel123');
+      manager.runtime.client = undefined;
+
+      const result = await sysop.call('say', 'Test message');
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Not connected');
+    });
+
+    it('should fail when client is not ready', async () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      sysop.set('primaryChannelId', 'channel123');
+      manager.runtime.client = {
+        isReady: () => false,
+      };
+
+      const result = await sysop.call('say', 'Test message');
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Not connected');
+    });
+
+    it('should fail when channel is not found', async () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      sysop.set('primaryChannelId', 'invalid-channel');
+      manager.runtime.client = {
+        isReady: () => true,
+        channels: {
+          fetch: async () => null,
+        },
+      };
+
+      const result = await sysop.call('say', 'Test message');
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Channel not found');
+
+      // Clean up
+      delete manager.runtime.client;
+    });
+
+    it('should send message when all conditions are met', async () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      let sentMessage = '';
+      sysop.set('primaryChannelId', 'channel123');
+      manager.runtime.client = {
+        isReady: () => true,
+        channels: {
+          fetch: async (id: string) => ({
+            id,
+            send: async (content: string) => {
+              sentMessage = content;
+              return { id: 'msg123' };
+            },
+          }),
+        },
+      };
+
+      const result = await sysop.call('say', 'Hello Discord!');
+
+      expect(result.success).toBe(true);
+      expect(sentMessage).toBe('Hello Discord!');
+
+      // Clean up
+      delete manager.runtime.client;
+    });
+  });
+
+  describe('processQueue method', () => {
+    beforeEach(() => {
+      // Clean up runtime state
+      delete manager.runtime.sysopQueuedMessages;
+      delete manager.runtime.sysopSessions;
+    });
+
+    it('should fail when wakeOnScheduler is disabled', async () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      sysop.set('wakeOnScheduler', false);
+
+      const result = await sysop.call('processQueue');
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('disabled');
+    });
+
+    it('should return zero processed when queue is empty', async () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      sysop.set('wakeOnScheduler', true);
+      manager.runtime.sysopQueuedMessages = {};
+
+      const result = await sysop.call('processQueue');
+
+      expect(result.success).toBe(true);
+      expect(result.processed).toBe(0);
+    });
+
+    it('should process single channel when channelId provided', async () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      sysop.set('wakeOnScheduler', true);
+      manager.runtime.sysopQueuedMessages = {
+        'channel1': [
+          { author: 'user1', authorId: 'uid1', channel: 'general', channelId: 'channel1', content: 'hello', messageId: 'msg1', timestamp: new Date().toISOString() },
+        ],
+        'channel2': [
+          { author: 'user2', authorId: 'uid2', channel: 'random', channelId: 'channel2', content: 'world', messageId: 'msg2', timestamp: new Date().toISOString() },
+        ],
+      };
+
+      const result = await sysop.call('processQueue', 'channel1');
+
+      expect(result.success).toBe(true);
+      expect(result.processed).toBe(1);
+      // channel1 should be cleared, channel2 should remain
+      expect(manager.runtime.sysopQueuedMessages['channel1']).toBeUndefined();
+      expect(manager.runtime.sysopQueuedMessages['channel2']).toHaveLength(1);
+    });
+
+    it('should process all channels when no channelId provided', async () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      sysop.set('wakeOnScheduler', true);
+      manager.runtime.sysopQueuedMessages = {
+        'channel1': [
+          { author: 'user1', authorId: 'uid1', channel: 'general', channelId: 'channel1', content: 'hello', messageId: 'msg1', timestamp: new Date().toISOString() },
+        ],
+        'channel2': [
+          { author: 'user2', authorId: 'uid2', channel: 'random', channelId: 'channel2', content: 'world', messageId: 'msg2', timestamp: new Date().toISOString() },
+        ],
+      };
+
+      const result = await sysop.call('processQueue');
+
+      expect(result.success).toBe(true);
+      expect(result.processed).toBe(2);
+      // All channels should be cleared
+      expect(Object.keys(manager.runtime.sysopQueuedMessages)).toHaveLength(0);
+    });
+
+    it('should skip empty channel queues', async () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      sysop.set('wakeOnScheduler', true);
+      manager.runtime.sysopQueuedMessages = {
+        'channel1': [],
+        'channel2': [
+          { author: 'user2', authorId: 'uid2', channel: 'random', channelId: 'channel2', content: 'world', messageId: 'msg2', timestamp: new Date().toISOString() },
+        ],
+      };
+
+      const result = await sysop.call('processQueue');
+
+      expect(result.success).toBe(true);
+      expect(result.processed).toBe(1);
+    });
+  });
+
+  describe('access control', () => {
+    it('should have ignoreList property', () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      const ignoreList = sysop.get('ignoreList');
+      expect(Array.isArray(ignoreList)).toBe(true);
+    });
+
+    it('should have privilegedList property', () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      const privilegedList = sysop.get('privilegedList');
+      expect(Array.isArray(privilegedList)).toBe(true);
+    });
+
+    it('should allow setting ignoreList', () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      sysop.set('ignoreList', ['user1', 'user2']);
+
+      const ignoreList = sysop.get('ignoreList');
+      expect(ignoreList).toEqual(['user1', 'user2']);
+    });
+
+    it('should allow setting privilegedList', () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      sysop.set('privilegedList', ['admin1', 'admin2']);
+
+      const privilegedList = sysop.get('privilegedList');
+      expect(privilegedList).toEqual(['admin1', 'admin2']);
+    });
+  });
+
+  describe('wake behavior', () => {
+    it('should have wakeOnMention property defaulting to true', () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      expect(sysop.get('wakeOnMention')).toBe(true);
+    });
+
+    it('should have wakeOnScheduler property defaulting to true', () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      expect(sysop.get('wakeOnScheduler')).toBe(true);
+    });
+
+    it('should have schedulerIntervalMs property defaulting to 600000', () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      expect(sysop.get('schedulerIntervalMs')).toBe(600000);
+    });
+
+    it('should allow configuring wake behavior', () => {
+      if (!sysop) throw new Error('Sysop not found');
+
+      sysop.set('wakeOnMention', false);
+      sysop.set('wakeOnScheduler', false);
+      sysop.set('schedulerIntervalMs', 300000);
+
+      expect(sysop.get('wakeOnMention')).toBe(false);
+      expect(sysop.get('wakeOnScheduler')).toBe(false);
+      expect(sysop.get('schedulerIntervalMs')).toBe(300000);
+    });
+  });
 });
