@@ -302,6 +302,13 @@ npm run test:ui
 npm run typecheck
 ```
 
+The typecheck script also compiles MOO method bodies defined in bootstrap files to catch
+TypeScript syntax errors before runtime. You can run this step alone via:
+
+```bash
+npm run moo:check
+```
+
 ### Building
 
 ```bash
