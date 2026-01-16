@@ -2484,23 +2484,23 @@ function escapeHtml(str) {
       }
 
       if (selectedRoom.id) {
-        div.innerHTML = \`
-          <h3 class="text-lg font-bold mb-3">\${escapeHtml(selectedRoom.name)}</h3>
-          <div class="text-sm text-malice-muted mb-2">#\${selectedRoom.id} @ (\${selectedRoom.x}, \${selectedRoom.y}, \${currentZ})</div>
+        div.innerHTML = \\\`
+          <h3 class="text-lg font-bold mb-3">\\${escapeHtml(selectedRoom.name)}</h3>
+          <div class="text-sm text-malice-muted mb-2">#\\${selectedRoom.id} @ (\\${selectedRoom.x}, \\${selectedRoom.y}, \\${currentZ})</div>
 
           <div class="mb-4">
             <label class="block text-sm text-malice-muted mb-1">Name</label>
-            <input type="text" id="roomName" value="\${escapeHtml(selectedRoom.name)}" class="w-full bg-malice-bg border border-gray-700 rounded px-2 py-1">
+            <input type="text" id="roomName" value="\\${escapeHtml(selectedRoom.name)}" class="w-full bg-malice-bg border border-gray-700 rounded px-2 py-1">
           </div>
 
           <div class="mb-4">
             <label class="block text-sm text-malice-muted mb-1">Description</label>
-            <textarea id="roomDesc" rows="3" class="w-full bg-malice-bg border border-gray-700 rounded px-2 py-1">\${escapeHtml(selectedRoom.description || '')}</textarea>
+            <textarea id="roomDesc" rows="3" class="w-full bg-malice-bg border border-gray-700 rounded px-2 py-1">\\${escapeHtml(selectedRoom.description || '')}</textarea>
           </div>
 
           <div class="mb-4">
             <label class="block text-sm text-malice-muted mb-1">Exits</label>
-            <div id="exitsList" class="text-sm">\${renderExits(selectedRoom.exits)}</div>
+            <div id="exitsList" class="text-sm">\\${renderExits(selectedRoom.exits)}</div>
             <button onclick="addExit()" class="mt-2 px-2 py-1 bg-malice-surface border border-gray-700 rounded text-sm">+ Add Exit</button>
           </div>
 
@@ -2508,11 +2508,11 @@ function escapeHtml(str) {
             <button onclick="saveRoom()" class="px-3 py-1 bg-malice-accent text-black rounded">Save</button>
             <button onclick="openInEditor()" class="px-3 py-1 bg-malice-surface border border-gray-700 rounded">Open in Editor</button>
           </div>
-        \`;
+        \\\`;
       } else {
-        div.innerHTML = \`
+        div.innerHTML = \\\`
           <h3 class="text-lg font-bold mb-3">New Room</h3>
-          <div class="text-sm text-malice-muted mb-4">@ (\${selectedRoom.x}, \${selectedRoom.y}, \${currentZ})</div>
+          <div class="text-sm text-malice-muted mb-4">@ (\\${selectedRoom.x}, \\${selectedRoom.y}, \\${currentZ})</div>
 
           <div class="mb-4">
             <label class="block text-sm text-malice-muted mb-1">Name</label>
@@ -2520,17 +2520,17 @@ function escapeHtml(str) {
           </div>
 
           <button onclick="createRoom()" class="px-3 py-1 bg-malice-accent text-black rounded">Create Room</button>
-        \`;
+        \\\`;
       }
     }
 
     function renderExits(exits) {
       if (!exits || Object.keys(exits).length === 0) return '<span class="text-malice-muted">No exits</span>';
       return Object.entries(exits).map(([dir, dest]) =>
-        \`<div class="flex justify-between items-center py-1">
-          <span>\${dir} → #\${typeof dest === 'object' ? dest.id : dest}</span>
-          <button onclick="deleteExit('\${dir}')" class="text-malice-danger text-xs">×</button>
-        </div>\`
+        \\\`<div class="flex justify-between items-center py-1">
+          <span>\\${dir} → #\\${typeof dest === 'object' ? dest.id : dest}</span>
+          <button onclick="deleteExit('\\${dir}')" class="text-malice-danger text-xs">×</button>
+        </div>\\\`
       ).join('');
     }
 

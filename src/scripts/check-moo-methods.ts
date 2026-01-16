@@ -6,6 +6,7 @@ type MethodSource = {
   filePath: string;
   methodName: string;
   code: string;
+  rawCode?: string;
 };
 
 type MethodIssue = {
@@ -21,6 +22,7 @@ type MethodFile = {
 
 const bootstrapRoot = path.join(process.cwd(), 'src/database/bootstrap');
 const tsconfigPath = path.join(process.cwd(), 'tsconfig.json');
+const defaultAliasesPath = path.join(process.cwd(), '.malice', 'aliases.json');
 
 const listTsFiles = (dir: string): string[] => {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -36,20 +38,15 @@ const listTsFiles = (dir: string): string[] => {
   return files;
 };
 
-const unescapeTemplateLiteral = (value: string): string => {
-  return value
-    .replace(/\\\${/g, '${')
-    .replace(/\\`/g, '`')
-    .replace(/\\\\/g, '\\');
-};
-
-const extractStringLiteral = (node: ts.Expression): string | null => {
+const extractStringLiteral = (
+  node: ts.Expression,
+): { code: string; rawCode?: string } | null => {
   if (ts.isStringLiteral(node)) {
-    return node.text;
+    return { code: node.text };
   }
   if (ts.isNoSubstitutionTemplateLiteral(node)) {
     const raw = node.rawText ?? node.text;
-    return unescapeTemplateLiteral(raw);
+    return { code: node.text, rawCode: raw };
   }
   return null;
 };
@@ -83,6 +80,7 @@ const loadCompilerOptions = (): ts.CompilerOptions => {
     ...parsed.options,
     target: ts.ScriptTarget.ES2022,
     module: ts.ModuleKind.ESNext,
+    jsx: ts.JsxEmit.Preserve,
     strict: false,
     noImplicitAny: false,
     noImplicitReturns: false,
@@ -116,8 +114,13 @@ const collectMethodsFromFile = (filePath: string): MethodSource[] => {
         if (args.length >= 2) {
           const methodName = extractStringLiteral(args[0]);
           const code = extractStringLiteral(args[1]);
-          if (methodName && code !== null) {
-            methods.push({ filePath, methodName, code });
+          if (methodName && code) {
+            methods.push({
+              filePath,
+              methodName: methodName.code,
+              code: code.code,
+              rawCode: code.rawCode,
+            });
           }
         }
       }
@@ -135,8 +138,13 @@ const collectMethodsFromFile = (filePath: string): MethodSource[] => {
             continue;
           }
           const code = extractStringLiteral(prop.initializer as ts.Expression);
-          if (code !== null) {
-            methods.push({ filePath, methodName, code });
+          if (code) {
+            methods.push({
+              filePath,
+              methodName,
+              code: code.code,
+              rawCode: code.rawCode,
+            });
           }
         }
       }
@@ -163,9 +171,9 @@ const collectAliasesFromFile = (filePath: string): string[] => {
   const collectProvides = (initializer?: ts.Expression): void => {
     if (initializer && ts.isArrayLiteralExpression(initializer)) {
       for (const element of initializer.elements) {
-        const aliasName = extractStringLiteral(element as ts.Expression);
-        if (aliasName) {
-          aliases.push(aliasName);
+        const aliasLiteral = extractStringLiteral(element as ts.Expression);
+        if (aliasLiteral) {
+          aliases.push(aliasLiteral.code);
         }
       }
     }
@@ -184,9 +192,9 @@ const collectAliasesFromFile = (filePath: string): string[] => {
         ) {
           const args = node.arguments;
           if (args.length >= 1) {
-            const aliasName = extractStringLiteral(args[0]);
-            if (aliasName) {
-              aliases.push(aliasName);
+            const aliasLiteral = extractStringLiteral(args[0]);
+            if (aliasLiteral) {
+              aliases.push(aliasLiteral.code);
             }
           }
         }
@@ -194,11 +202,11 @@ const collectAliasesFromFile = (filePath: string): string[] => {
         if (methodName === 'call') {
           const args = node.arguments;
           if (args.length >= 2) {
-            const commandName = extractStringLiteral(args[0]);
-            if (commandName === 'addAlias') {
-              const aliasName = extractStringLiteral(args[1]);
-              if (aliasName) {
-                aliases.push(aliasName);
+            const commandLiteral = extractStringLiteral(args[0]);
+            if (commandLiteral?.code === 'addAlias') {
+              const aliasLiteral = extractStringLiteral(args[1]);
+              if (aliasLiteral) {
+                aliases.push(aliasLiteral.code);
               }
             }
           }
@@ -215,9 +223,9 @@ const collectAliasesFromFile = (filePath: string): string[] => {
       }
       if (ts.isElementAccessExpression(left) && ts.isIdentifier(left.expression)) {
         if (left.expression.text === 'aliases') {
-          const aliasName = extractStringLiteral(left.argumentExpression);
-          if (aliasName) {
-            aliases.push(aliasName);
+          const aliasLiteral = extractStringLiteral(left.argumentExpression);
+          if (aliasLiteral) {
+            aliases.push(aliasLiteral.code);
           }
         }
       }
@@ -226,9 +234,11 @@ const collectAliasesFromFile = (filePath: string): string[] => {
     if (ts.isPropertyAssignment(node)) {
       const propName = getPropertyName(node.name);
       if (propName === 'alias') {
-        const aliasName = extractStringLiteral(node.initializer as ts.Expression);
-        if (aliasName) {
-          aliases.push(aliasName);
+        const aliasLiteral = extractStringLiteral(
+          node.initializer as ts.Expression,
+        );
+        if (aliasLiteral) {
+          aliases.push(aliasLiteral.code);
         }
       }
       if (propName === 'provides') {
@@ -285,6 +295,21 @@ ${aliasDeclarations}
 `;
 };
 
+const loadAliasesFromFile = (filePath: string): string[] => {
+  if (!fs.existsSync(filePath)) {
+    return [];
+  }
+
+  try {
+    const raw = fs.readFileSync(filePath, 'utf8');
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    return Object.keys(parsed);
+  } catch (error) {
+    console.warn(`[moo:check] Failed to read aliases from ${filePath}:`, error);
+    return [];
+  }
+};
+
 const formatDiagnostic = (
   code: string,
   diagnostic: ts.Diagnostic,
@@ -297,7 +322,7 @@ const formatDiagnostic = (
     code,
     ts.ScriptTarget.ESNext,
     true,
-    ts.ScriptKind.TS,
+    ts.ScriptKind.TSX,
   );
   const { line, character } = methodFile.getLineAndCharacterOfPosition(position);
   const adjustedLine = Math.max(0, line - prefixLines) + 1;
@@ -310,6 +335,55 @@ const shouldReportDiagnostic = (diagnostic: ts.Diagnostic): boolean => {
   const isSyntaxError = code >= 1000 && code < 2000;
   const allowedCodes = new Set([2304, 2307, 2552]);
   return isSyntaxError || allowedCodes.has(code);
+};
+
+const ESCAPED_BACKTICK_PLACEHOLDER = '__MOO_ESCAPED_BACKTICK__';
+
+const normalizeTemplateLiteralRaw = (raw: string): string => {
+  let value = raw;
+  value = value.replace(/\\\\`/g, ESCAPED_BACKTICK_PLACEHOLDER);
+  value = value.replace(/\\\\/g, '\\');
+  value = value.replace(new RegExp(ESCAPED_BACKTICK_PLACEHOLDER, 'g'), '\\`');
+  return value;
+};
+
+const normalizeTemplateLiteral = (raw: string): string => {
+  let value = raw;
+  value = value.replace(/\\\\`/g, ESCAPED_BACKTICK_PLACEHOLDER);
+  value = value.replace(/\\\\/g, '\\');
+  value = value.replace(/\\`/g, '`');
+  value = value.replace(new RegExp(ESCAPED_BACKTICK_PLACEHOLDER, 'g'), '\\`');
+  return value;
+};
+
+const scoreMethodCode = (code: string): number => {
+  const wrapped = `async function __moo_check() {\n${code}\n}\n`;
+  const sourceFile = ts.createSourceFile(
+    'method.tsx',
+    wrapped,
+    ts.ScriptTarget.ESNext,
+    true,
+    ts.ScriptKind.TSX,
+  );
+  return sourceFile.parseDiagnostics.length;
+};
+
+const selectMethodCode = (method: MethodSource): string => {
+  if (!method.rawCode) {
+    return method.code;
+  }
+
+  const rawCandidate = normalizeTemplateLiteral(method.rawCode);
+  const rawPreserved = normalizeTemplateLiteralRaw(method.rawCode);
+  const cookedCandidate = method.code;
+  const candidates = [
+    { code: rawCandidate, score: scoreMethodCode(rawCandidate) },
+    { code: rawPreserved, score: scoreMethodCode(rawPreserved) },
+    { code: cookedCandidate, score: scoreMethodCode(cookedCandidate) },
+  ];
+
+  candidates.sort((a, b) => a.score - b.score);
+  return candidates[0].code;
 };
 
 const compileMethods = (
@@ -325,10 +399,11 @@ const compileMethods = (
   virtualFiles.set(contextFile, buildContextDts(aliasNames));
 
   methods.forEach((method, index) => {
+    const selectedCode = selectMethodCode(method);
     const prefix = `async function __moo_method_${index}() {\n`;
     const suffix = '\n}\n';
     const filePath = path.join(virtualRoot, `method-${index}.ts`);
-    virtualFiles.set(filePath, `${prefix}${method.code}${suffix}`);
+    virtualFiles.set(filePath, `${prefix}${selectedCode}${suffix}`);
     methodFiles.set(filePath, {
       filePath: method.filePath,
       prefixLines: prefix.split('\n').length - 1,
@@ -372,7 +447,13 @@ const compileMethods = (
   ): ts.SourceFile | undefined => {
     if (virtualFiles.has(fileName)) {
       const contents = virtualFiles.get(fileName) ?? '';
-      return ts.createSourceFile(fileName, contents, languageVersion, true);
+      return ts.createSourceFile(
+        fileName,
+        contents,
+        languageVersion,
+        true,
+        ts.ScriptKind.TSX,
+      );
     }
     return defaultGetSourceFile(
       fileName,
@@ -419,10 +500,22 @@ const compileMethods = (
 };
 
 const run = (): void => {
+  const timeoutMs = Number(process.env.MOO_CHECK_TIMEOUT_MS ?? '60000');
+  const timeoutHandle =
+    Number.isFinite(timeoutMs) && timeoutMs > 0
+      ? setTimeout(() => {
+          console.error(
+            `[moo:check] Timed out after ${timeoutMs}ms. Aborting check.`,
+          );
+          process.exit(1);
+        }, timeoutMs)
+      : null;
   const files = listTsFiles(bootstrapRoot);
   const methods: MethodSource[] = [];
   const aliases = new Set<string>();
+  const aliasPath = process.env.MOO_ALIAS_PATH || defaultAliasesPath;
 
+  console.log(`[moo:check] Scanning ${files.length} bootstrap files...`);
   for (const filePath of files) {
     methods.push(...collectMethodsFromFile(filePath));
     for (const alias of collectAliasesFromFile(filePath)) {
@@ -430,6 +523,19 @@ const run = (): void => {
     }
   }
 
+  if (fs.existsSync(aliasPath)) {
+    console.log(`[moo:check] Loading aliases from ${aliasPath}...`);
+  } else {
+    console.log(`[moo:check] Alias snapshot not found at ${aliasPath}.`);
+  }
+
+  for (const alias of loadAliasesFromFile(aliasPath)) {
+    aliases.add(alias);
+  }
+
+  console.log(
+    `[moo:check] Compiling ${methods.length} methods with ${aliases.size} aliases...`,
+  );
   const issues = compileMethods(methods, [...aliases]);
 
   if (issues.length > 0) {
@@ -440,10 +546,16 @@ const run = (): void => {
       );
     }
     process.exitCode = 1;
+    if (timeoutHandle) {
+      clearTimeout(timeoutHandle);
+    }
     return;
   }
 
   console.log('MOO method compilation check passed.');
+  if (timeoutHandle) {
+    clearTimeout(timeoutHandle);
+  }
 };
 
 run();
