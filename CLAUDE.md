@@ -29,7 +29,8 @@ npm test -- --watch                         # Watch mode
 npm run test:coverage                       # With coverage
 
 # Type checking
-npm run typecheck   # tsc --noEmit
+npm run typecheck   # tsc --noEmit + MOO method validation
+npm run moo:check   # Validate MOO method bodies only
 
 # Building
 npm run build       # Compile TypeScript
