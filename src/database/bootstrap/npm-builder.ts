@@ -65,14 +65,14 @@ export class NpmBuilder implements Builder {
       // Strict package name validation (npm official rules)
       // Allows: lodash, @babel/core, @org/package
       // Blocks: anything with shell metacharacters or path traversal
-      const packageNameRegex = /^(@[a-z0-9][a-z0-9\\-]*\\/)?[a-z0-9][a-z0-9\\.\\-_]*$/;
+      const packageNameRegex = /^(@[a-z0-9][a-z0-9-]*\/)?[a-z0-9][a-z0-9._-]*$/;
       if (!packageNameRegex.test(packageName) || packageName.length > 214) {
         throw new Error('Invalid package name: must be lowercase alphanumeric with hyphens, underscores, dots');
       }
 
       // Validate version if provided (CRITICAL-2 FIX)
       // Blocks: shell metacharacters, command substitution, variable expansion
-      if (version && !/^[0-9a-zA-Z.~^><=*\\-+|&]*$/.test(version)) {
+      if (version && !/^[0-9a-zA-Z.~^><=*\-+]*$/.test(version)) {
         throw new Error('Invalid version specifier: contains invalid characters');
       }
 
@@ -119,7 +119,7 @@ export class NpmBuilder implements Builder {
 
       // HIGH-1 FIX: Validate packageName like install() does
       // Strict package name validation (npm official rules)
-      const packageNameRegex = /^(@[a-z0-9][a-z0-9\\-]*\\/)?[a-z0-9][a-z0-9\\.\\-_]*$/;
+      const packageNameRegex = /^(@[a-z0-9][a-z0-9-]*\/)?[a-z0-9][a-z0-9._-]*$/;
       if (!packageNameRegex.test(packageName) || packageName.length > 214) {
         throw new Error('Invalid package name: must be lowercase alphanumeric with hyphens, underscores, dots');
       }

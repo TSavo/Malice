@@ -21,3 +21,6 @@ configs/
 
 # Auto Claude data directory
 .auto-claude/
+
+# BRV session files
+.brv/
