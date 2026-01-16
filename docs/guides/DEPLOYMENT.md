@@ -142,6 +142,27 @@ ssh -i ~/.ssh/malice-do root@<DROPLET_IP>
 
 **WebSockets require DNS-only mode** (gray cloud, not orange). Cloudflare's proxy doesn't support persistent WebSocket connections well with Let's Encrypt certificates from Caddy.
 
+### Cloudflare API Token for Wildcard Certs
+
+**Wildcard SSL certificates** (`*.thecontinuum.city`, `*.graycartel.com`) require DNS-01 challenge validation. Caddy needs a Cloudflare API token to automatically create TXT records for Let's Encrypt verification.
+
+**Create API Token:**
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/profile/api-tokens)
+2. Click "Create Token"
+3. Use "Edit zone DNS" template
+4. Configure permissions:
+   - **Zone → DNS → Edit**
+5. Zone Resources:
+   - Include → Specific zone → Select all domains (`malice.world`, `thecontinuum.city`, `graycartel.com`)
+6. Create token and copy it
+
+**Add to `.env` on server:**
+```bash
+CLOUDFLARE_API_TOKEN=your_token_here
+```
+
+This token is used by Caddy's Cloudflare DNS plugin for automatic wildcard certificate renewal.
+
 ### Configure DNS Records
 
 Each domain needs A records pointing to your droplet IP.
@@ -250,12 +271,13 @@ cd Malice
 
 # Configure environment
 cp .env.example .env
-nano .env  # Set EMAIL_API_KEY=re_xxxxxxxxxx
+nano .env  # Set EMAIL_API_KEY and CLOUDFLARE_API_TOKEN
 
 # Bootstrap database and start all services
 npm run docker:reset
 
-# Start Caddy (runs after game is healthy)
+# Build and start Caddy (custom image with Cloudflare DNS plugin)
+docker compose build caddy
 docker compose up -d caddy
 
 # Verify HTTPS is working
@@ -345,7 +367,15 @@ The production stack uses three containers:
 
 ### Caddyfile
 
+Caddy is built with the Cloudflare DNS plugin (`caddy-dns/cloudflare`) for wildcard certificate support.
+
 ```caddyfile
+# Global options
+{
+    # Use Cloudflare DNS for wildcard cert challenges
+    acme_dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+}
+
 # Admin site
 malice.world {
     reverse_proxy game:80
@@ -373,13 +403,25 @@ graycartel.com {
 
 # Wildcard subdomains for player profiles
 *.thecontinuum.city {
+    tls {
+        dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+    }
     reverse_proxy game:8000
 }
 
 *.graycartel.com {
+    tls {
+        dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+    }
     reverse_proxy game:8001
 }
 ```
+
+**Key features:**
+- Custom Caddy build with Cloudflare DNS plugin
+- Automatic wildcard certificates via DNS-01 challenge
+- WebSocket upgrade handling for `/mux` endpoint
+- Player profile subdomains (`username.faction.domain`)
 
 ## Common Operations
 
@@ -414,7 +456,14 @@ docker compose down && docker compose up -d
 ```bash
 cd /root/Malice
 git pull
+
+# Rebuild game (always needed)
 docker compose build game
+
+# Rebuild Caddy only if Caddyfile or docker/caddy/Dockerfile changed
+docker compose build caddy
+
+# Start updated services
 docker compose up -d
 ```
 
@@ -454,6 +503,28 @@ docker compose logs --tail 20 game
 1. Check DNS propagation: `dig +short your-domain.com`
 2. Check Caddy logs: `docker logs malice-caddy`
 3. Verify Caddy can reach game: `docker exec malice-caddy curl -I http://game:80`
+
+### Wildcard SSL Certificate Issues
+
+**Error: "no solvers available for remaining challenges"**
+
+This means Caddy doesn't have DNS-01 challenge support enabled.
+
+1. Verify `CLOUDFLARE_API_TOKEN` is set in `.env`
+2. Rebuild Caddy with Cloudflare DNS plugin:
+   ```bash
+   docker compose build caddy
+   docker compose up -d caddy
+   ```
+3. Check Caddy has the plugin:
+   ```bash
+   docker exec malice-caddy caddy list-modules | grep cloudflare
+   ```
+4. Verify Cloudflare API token permissions (needs DNS:Edit for all zones)
+5. Check Caddy logs for DNS challenge errors:
+   ```bash
+   docker logs malice-caddy | grep -i cloudflare
+   ```
 
 ### WebSocket Connection Failed
 
