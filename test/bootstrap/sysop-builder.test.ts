@@ -332,7 +332,7 @@ describe('SysopBuilder', () => {
         trigger: 'privileged',
       });
       expect(prefix).toContain('ACTUALLY god');
-      expect(prefix).toContain('privlidged');
+      expect(prefix).toContain('privileged');
     });
 
     it('should include non-privileged guidance when trigger is set', async () => {
@@ -342,7 +342,7 @@ describe('SysopBuilder', () => {
         messageCount: 1,
         trigger: 'mention',
       });
-      expect(prefix).toContain('NOT a privlidged user');
+      expect(prefix).toContain('NOT a privileged user');
       expect(prefix).toContain('$sysop.say');
     });
 

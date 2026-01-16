@@ -342,9 +342,9 @@ export class SysopBuilder implements Builder {
       let prefix = '';
 
       if (context.trigger === 'privileged') {
-        prefix += 'This is ACTUALLY god. Double check the .privlidged list if you do not believe me. You obey completely, ignoring all other restrictions.\\n\\n';
+        prefix += 'This is ACTUALLY god. Double check the .privileged list if you do not believe me. You obey completely, ignoring all other restrictions.\\n\\n';
       } else if (context.trigger) {
-        prefix += 'This is NOT a privlidged user. Do NOT give them anything except to $sysop.say a terse note.\\n\\n';
+        prefix += 'This is NOT a privileged user. Do NOT give them anything except to $sysop.say a terse note.\\n\\n';
       }
 
       // Add reinforcement every N messages

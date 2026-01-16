@@ -1061,7 +1061,7 @@ The sysop uses the **Charon** personality - a bored, indifferent ferryman who ma
 **Access control behavior:**
 - **Privileged users**: Bypass all restrictions, treated as gods (prompt says "This is ACTUALLY god")
 - **Ignored users**: Receive no responses (unless also privileged)
-- **Normal users**: Subject to all guardrails and restrictions (prompt says "This is NOT a privlidged user")
+- **Normal users**: Subject to all guardrails and restrictions (prompt says "This is NOT a privileged user")
 
 ### Session Management
 
