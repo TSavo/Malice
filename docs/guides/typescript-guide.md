@@ -137,6 +137,10 @@ If you want alias globals to mirror runtime state, you can provide a JSON alias
 snapshot at `.malice/aliases.json` or set `MOO_ALIAS_PATH` to a JSON file that maps
 alias names to ids.
 
+**Environment variables:**
+- `MOO_ALIAS_PATH` - Path to alias snapshot JSON file (default: `.malice/aliases.json`)
+- `MOO_CHECK_TIMEOUT_MS` - Timeout in milliseconds for the checker (default: `60000`)
+
 ### 3. Method-Specific Types (Inline)
 
 For types only used in one method, define them inline:
