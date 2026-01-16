@@ -2,7 +2,7 @@ name: Claude Documentation
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened]
   # Allow fixer to re-trigger after pushing fixes
   workflow_dispatch:
     inputs:
