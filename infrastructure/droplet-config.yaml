@@ -1,0 +1,52 @@
+# malice-prod Droplet Configuration
+# Saved: 2026-01-17
+# Use this to recreate the droplet when ready
+
+droplet:
+  name: malice-prod
+  id: 540866071  # Original ID (for reference)
+  
+  # Specs
+  size: s-1vcpu-2gb
+  memory: 2048
+  vcpus: 1
+  disk: 50
+  
+  # Location
+  region: sfo3
+  vpc_uuid: 6e3d5277-38b8-4fcb-964b-2ae886141acb
+  
+  # Image
+  image: ubuntu-25-10-x64
+  image_id: 204596533
+  
+  # Network
+  public_ip: 146.190.135.71  # Will change on recreate
+  private_ip: 10.124.0.2
+  
+  # Features
+  features:
+    - monitoring
+    - droplet_agent
+    - private_networking
+  
+  # SSH Key
+  ssh_key:
+    id: 52980537
+    name: malice-do
+    fingerprint: "56:77:47:90:aa:5c:d2:9f:62:c8:d0:a0:d0:68:e1:2f"
+
+  # Snapshot (for restore)
+  snapshot:
+    id: 212704420
+    name: malice-prod-1767836483485
+    size_gb: 23.84
+    created: 2026-01-08T01:41:27Z
+
+  # Pricing
+  price_monthly: 12
+  price_hourly: 0.01786
+  
+  # Dates
+  created_at: 2025-12-30T23:24:07Z
+  deleted_at: 2026-01-17

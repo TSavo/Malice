@@ -1,0 +1,42 @@
+# Cloudflare DNS Records pointing to malice-prod
+# Saved: 2026-01-17
+# Update these when droplet is recreated with new IP
+
+droplet_ip: 146.190.135.71  # OLD - update after recreate
+
+zones:
+  - name: graycartel.com
+    zone_id: f27a4e36ea115507b83ba086516971c0
+    records:
+      - type: A
+        name: graycartel.com
+        content: 146.190.135.71
+        proxied: true
+      - type: A
+        name: "*.graycartel.com"
+        content: 146.190.135.71
+        proxied: false  # wildcards can't be proxied
+        
+  - name: malice.world
+    zone_id: 60737199fe071b45bb80e77b2fb9329d
+    records:
+      - type: A
+        name: malice.world
+        content: 146.190.135.71
+        proxied: true
+      - type: A
+        name: www.malice.world
+        content: 146.190.135.71
+        proxied: true
+        
+  - name: thecontinuum.city
+    zone_id: 055a5e9131aa7892be57c67a6a99fe8d
+    records:
+      - type: A
+        name: thecontinuum.city
+        content: 146.190.135.71
+        proxied: true
+      - type: A
+        name: "*.thecontinuum.city"
+        content: 146.190.135.71
+        proxied: false  # wildcards can't be proxied
