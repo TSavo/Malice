@@ -13,14 +13,20 @@ jobs:
   claude-fixer:
     # Only run if:
     # 1. Comment is on a PR (not an issue)
-    # 2. Comment contains a Claude marker (review or verdict) requesting changes
-    #    Note: Claude sometimes escapes ! as \! so we check for both variants
-    # 3. Comment contains "Changes Requested" (not LGTM)
+    # 2. One of:
+    #    a. Comment contains a Claude marker (review or verdict) requesting changes
+    #       Note: Claude sometimes escapes ! as \! so we check for both variants
+    #    b. Comment is exactly "/fix" (manual trigger)
     if: |
       github.event.issue.pull_request &&
-      (contains(github.event.comment.body, 'CLAUDE_VERDICT_MARKER') ||
-       contains(github.event.comment.body, 'CLAUDE_REVIEW_MARKER')) &&
-      contains(github.event.comment.body, 'Changes Requested')
+      (
+        (
+          (contains(github.event.comment.body, 'CLAUDE_VERDICT_MARKER') ||
+           contains(github.event.comment.body, 'CLAUDE_REVIEW_MARKER')) &&
+          contains(github.event.comment.body, 'Changes Requested')
+        ) ||
+        github.event.comment.body == '/fix'
+      )
 
     runs-on: [self-hosted, malice]
     permissions:
