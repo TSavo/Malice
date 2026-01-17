@@ -9,7 +9,7 @@ Guide to deploying Malice to production with Caddy reverse proxy, automatic HTTP
 ssh -i ~/.ssh/malice-do root@malice.world
 ```
 
-**Server:** `malice-prod` @ `146.190.135.71`
+**Server:** `malice-prod` (see `infrastructure/droplet-config.yaml` for current IP)
 
 **Domains:**
 | Domain | Purpose |
@@ -423,6 +423,82 @@ graycartel.com {
 - WebSocket upgrade handling for `/mux` endpoint
 - Player profile subdomains (`username.faction.domain`)
 
+## Droplet Teardown and Recreation
+
+The production droplet can be torn down to save costs ($12/month) and recreated from snapshot when needed.
+
+### Teardown Process
+
+**Before tearing down:**
+1. Ensure latest snapshot exists in DigitalOcean
+2. Verify `infrastructure/droplet-config.yaml` is up to date
+3. Verify `infrastructure/cloudflare-dns.yaml` has correct DNS records
+
+**Tear down droplet:**
+```bash
+# Via DigitalOcean web UI:
+# Droplets → malice-prod → Destroy
+
+# Or via doctl CLI:
+doctl compute droplet delete malice-prod
+```
+
+### Recreation from Snapshot
+
+When ready to restore production:
+
+```bash
+cd infrastructure
+
+# Recreate from snapshot (preserves all data)
+./recreate-droplet.sh --from-snapshot
+
+# Or fresh install (requires full setup)
+./recreate-droplet.sh
+
+# Get new droplet IP
+doctl compute droplet list --format ID,Name,PublicIPv4
+
+# Update DNS to new IP
+./update-dns.sh <new-droplet-ip>
+```
+
+**What's preserved in snapshot:**
+- Full MongoDB database
+- All configuration files
+- Installed packages and Docker images
+- NPC session logs
+
+**After recreation:**
+1. Verify services started: `ssh root@<new-ip> 'docker compose ps'`
+2. Check HTTPS: `curl -I https://malice.world`
+3. Test WebSocket connections
+4. Verify email sending (if needed)
+
+### Infrastructure Configuration Files
+
+All droplet configuration is documented in `infrastructure/`:
+
+| File | Purpose |
+|------|---------|
+| `droplet-config.yaml` | Full droplet specs (size, region, VPC, SSH key, snapshot) |
+| `cloudflare-dns.yaml` | DNS records for all 3 domains with zone IDs |
+| `recreate-droplet.sh` | Script to recreate droplet from snapshot or fresh |
+| `update-dns.sh` | Script to update all DNS records to new IP |
+
+**To update configs after changes:**
+```bash
+# Get current droplet info
+doctl compute droplet get malice-prod --format ID,Name,Memory,VCPUs,Disk,Region,Image
+
+# List DNS records
+doctl compute domain records list malice.world
+doctl compute domain records list thecontinuum.city
+doctl compute domain records list graycartel.com
+
+# Update YAML files manually
+```
+
 ## Common Operations
 
 ### View Logs
@@ -591,7 +667,7 @@ mcp__cloudflare-malice__list_dns_records
 mcp__cloudflare-malice__create_dns_record
   type: A
   name: @
-  content: 146.190.135.71
+  content: YOUR_DROPLET_IP
   proxied: false
 
 # Update record
@@ -619,7 +695,7 @@ ssh -L 4000:localhost:3000 \
     -L 4999:localhost:9999 \
     -L 4012:localhost:3012 \
     -L 4013:localhost:3013 \
-    -i ~/.ssh/malice-do root@146.190.135.71
+    -i ~/.ssh/malice-do root@malice.world
 ```
 
 ### Port Mapping
@@ -654,7 +730,7 @@ For persistent access, use autossh or add to SSH config:
 ```bash
 # ~/.ssh/config
 Host malice-prod
-    HostName 146.190.135.71
+    HostName malice.world  # Or use droplet IP directly
     User root
     IdentityFile ~/.ssh/malice-do
     LocalForward 4000 localhost:3000
@@ -743,10 +819,12 @@ EOF'
 ## Current Production
 
 **Droplet:** `malice-prod`
-**IP:** `146.190.135.71`
+**IP:** See `infrastructure/droplet-config.yaml`
 **SSH:** `ssh -i ~/.ssh/malice-do root@malice.world`
 
 **Domains:**
 - https://malice.world (admin)
 - https://thecontinuum.city (Continuum faction)
 - https://graycartel.com (Gray Cartel faction)
+
+**Note:** The droplet may be torn down between active development periods to save costs. See "Droplet Teardown and Recreation" section above for restoration workflow.
