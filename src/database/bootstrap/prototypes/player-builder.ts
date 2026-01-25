@@ -67,6 +67,14 @@ export class PlayerBuilder implements Builder {
             taskbarOrder: [],
             lastUpdated: null,
           },
+
+          // BYOK Credentials (encrypted API keys)
+          apiCredentials: [],
+
+          // Trial System
+          trialStarted: null, // ISO timestamp when trial began
+          trialActions: 0, // Actions consumed on house key
+          trialExhausted: false, // Whether trial has been exhausted
         },
         methods: {},
       });
@@ -122,6 +130,22 @@ export class PlayerBuilder implements Builder {
       'windowLayout',
       'Web client window positions, sizes, and state for session restore',
     );
+    obj.setPropertyDescription(
+      'apiCredentials',
+      'Encrypted API credentials for BYOK (Bring Your Own Key) - array of StoredCredential objects',
+    );
+    obj.setPropertyDescription(
+      'trialStarted',
+      'ISO timestamp when trial period began for this player',
+    );
+    obj.setPropertyDescription(
+      'trialActions',
+      'Number of AI actions consumed on house API key during trial period',
+    );
+    obj.setPropertyDescription(
+      'trialExhausted',
+      'Whether trial period has been exhausted (hit 50 actions OR 30 minutes)',
+    );
 
     this.addConnectionMethods(obj);
     this.addInputMethods(obj);
@@ -130,6 +154,7 @@ export class PlayerBuilder implements Builder {
     this.addActionMethods(obj);
     this.addInventoryMethods(obj);
     this.addFitnessMethods(obj);
+    this.addCredentialMethods(obj);
 
     this.obj = obj;
   }
@@ -3631,6 +3656,155 @@ export class PlayerBuilder implements Builder {
       }
 
       return null; // submitAction handles messaging
+    `,
+    );
+  }
+
+  /**
+   * Credential management methods for BYOK
+   */
+  private addCredentialMethods(obj: RuntimeObject): void {
+    // addCredential - Add encrypted API credential
+    obj.setMethod(
+      'addCredential',
+      `
+      /** Add an encrypted API credential for BYOK
+       *  @param {ProviderType} provider - 'anthropic', 'bedrock', or 'vertex'
+       *  @param {string} apiKey - Plaintext API key
+       *  @param {CredentialOptions} options - Additional options
+       *  @returns {Promise<StoredCredential>} Stored credential metadata
+       */
+      const provider = args[0];
+      const apiKey = args[1];
+      const options = args[2] || {};
+
+      // Import credential manager
+      const { credentialManager } = await import('@/database/credential-manager.js');
+
+      // Add credential (encrypts and validates)
+      const credential = await credentialManager.add(self.id, provider, apiKey, options);
+
+      // Store in player's credentials array
+      if (!self.apiCredentials) {
+        self.apiCredentials = [];
+      }
+      self.apiCredentials.push(credential);
+
+      return credential;
+    `,
+    );
+
+    // getCredential - Get decrypted credential for provider
+    obj.setMethod(
+      'getCredential',
+      `
+      /** Get decrypted credential for a provider
+       *  @param {ProviderType} provider - Provider to get credential for
+       *  @returns {Promise<DecryptedCredential | null>} Decrypted credential or null
+       */
+      const provider = args[0];
+
+      if (!self.apiCredentials || self.apiCredentials.length === 0) {
+        return null;
+      }
+
+      // Find credential for provider
+      const stored = self.apiCredentials.find(c => c.provider === provider);
+      if (!stored) {
+        return null;
+      }
+
+      // Import credential manager
+      const { credentialManager } = await import('@/database/credential-manager.js');
+
+      // Decrypt just-in-time
+      return credentialManager.decrypt(stored);
+    `,
+    );
+
+    // listCredentials - List all credentials (encrypted)
+    obj.setMethod(
+      'listCredentials',
+      `
+      /** List all stored credentials (encrypted, safe to display)
+       *  @returns {Array<StoredCredential>} Array of stored credentials
+       */
+      return self.apiCredentials || [];
+    `,
+    );
+
+    // removeCredential - Remove a credential by ID
+    obj.setMethod(
+      'removeCredential',
+      `
+      /** Remove a credential by ID
+       *  @param {string} credentialId - ID of credential to remove
+       *  @returns {boolean} True if removed, false if not found
+       */
+      const credentialId = args[0];
+
+      if (!self.apiCredentials || self.apiCredentials.length === 0) {
+        return false;
+      }
+
+      const initialLength = self.apiCredentials.length;
+      self.apiCredentials = self.apiCredentials.filter(c => c.id !== credentialId);
+
+      return self.apiCredentials.length < initialLength;
+    `,
+    );
+
+    // validateCredential - Validate a credential with test API call
+    obj.setMethod(
+      'validateCredential',
+      `
+      /** Validate a credential by making a test API call
+       *  @param {string} credentialId - ID of credential to validate
+       *  @returns {Promise<ValidationResult>} Validation result
+       */
+      const credentialId = args[0];
+
+      if (!self.apiCredentials || self.apiCredentials.length === 0) {
+        return { success: false, message: 'No credentials found' };
+      }
+
+      const credential = self.apiCredentials.find(c => c.id === credentialId);
+      if (!credential) {
+        return { success: false, message: 'Credential not found' };
+      }
+
+      // Import credential manager
+      const { credentialManager } = await import('@/database/credential-manager.js');
+
+      // Validate
+      const result = await credentialManager.validateCredential(credential);
+
+      // Update lastValidated if successful
+      if (result.success) {
+        credential.lastValidated = new Date().toISOString();
+      } else {
+        credential.lastError = result.message;
+      }
+
+      return result;
+    `,
+    );
+
+    // hasCredential - Check if player has a credential for provider
+    obj.setMethod(
+      'hasCredential',
+      `
+      /** Check if player has a credential for a provider
+       *  @param {ProviderType} provider - Provider to check
+       *  @returns {boolean} True if credential exists
+       */
+      const provider = args[0];
+
+      if (!self.apiCredentials || self.apiCredentials.length === 0) {
+        return false;
+      }
+
+      return self.apiCredentials.some(c => c.provider === provider);
     `,
     );
   }
