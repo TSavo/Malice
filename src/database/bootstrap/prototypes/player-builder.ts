@@ -67,6 +67,14 @@ export class PlayerBuilder implements Builder {
             taskbarOrder: [],
             lastUpdated: null,
           },
+
+          // BYOK Credentials (encrypted API keys)
+          apiCredentials: [],
+
+          // Trial System
+          trialStarted: null, // ISO timestamp when trial began
+          trialActions: 0, // Actions consumed on house key
+          trialExhausted: false, // Whether trial has been exhausted
         },
         methods: {},
       });
@@ -122,6 +130,22 @@ export class PlayerBuilder implements Builder {
       'windowLayout',
       'Web client window positions, sizes, and state for session restore',
     );
+    obj.setPropertyDescription(
+      'apiCredentials',
+      'Encrypted API credentials for BYOK (Bring Your Own Key) - array of StoredCredential objects',
+    );
+    obj.setPropertyDescription(
+      'trialStarted',
+      'ISO timestamp when trial period began for this player',
+    );
+    obj.setPropertyDescription(
+      'trialActions',
+      'Number of AI actions consumed on house API key during trial period',
+    );
+    obj.setPropertyDescription(
+      'trialExhausted',
+      'Whether trial period has been exhausted (hit 50 actions OR 30 minutes)',
+    );
 
     this.addConnectionMethods(obj);
     this.addInputMethods(obj);
@@ -130,6 +154,7 @@ export class PlayerBuilder implements Builder {
     this.addActionMethods(obj);
     this.addInventoryMethods(obj);
     this.addFitnessMethods(obj);
+    this.addBYOKSettingsMethods(obj);
 
     this.obj = obj;
   }
@@ -184,6 +209,9 @@ export class PlayerBuilder implements Builder {
       // See docs/internal/NARRATOR-PROMPT.md "Command Handling" section.
       // Only keep meta/admin commands that bypass the narrator:
       await self.registerVerb(['@options', '@options %s', '@options %s %s'], self, 'options');
+
+      // BYOK settings menu - OpenRouter integration
+      await self.registerVerb(['@settings', '@settings %s'], self, 'settings');
 
       // SSH key management (system command)
       await self.registerVerb(['addkey %s'], self, 'addkey');
@@ -864,6 +892,12 @@ export class PlayerBuilder implements Builder {
         return;
       }
 
+      // Check if in BYOK settings menu
+      if (self._inSettingsMenu) {
+        await self.handleSettingsInput(trimmed);
+        return;
+      }
+
       // Check if in fitness menu
       if (self._inFitnessMenu) {
         await self.handleFitnessInput(trimmed);
@@ -1417,25 +1451,40 @@ export class PlayerBuilder implements Builder {
         : 'Player intends: ' + inputs.join('. Then: ');
 
       try {
-        // Use existing narrator session or create new one
-        const session = self.narratorSession || null;
+        // Route: BYOK (OpenRouter) if player has key, else house (Claude SDK)
+        if (self.openRouterApiKey) {
+          // BYOK mode - player-funded via OpenCode + OpenRouter
+          const result = await $openCodeQuery(self, systemPrompt, userPrompt, {
+            sessionId: self.openCodeSession,
+          });
 
-        const result = await $aiQuery(systemPrompt, userPrompt, session);
+          if (result.success) {
+            self.openCodeSession = result.sessionId;
+            if (result.response) {
+              await self.tell(result.response);
+            }
+          } else {
+            console.error('[Narrator] BYOK error for player #' + self.id + ':', result.error);
+            await self.tell('%{yellow}[BYOK Error: ' + (result.error || 'Unknown error') + ']%{/}');
+            await self.tell('(The narrator seems distracted... try again.)');
+          }
+        } else {
+          // House mode - system-funded via Claude Agent SDK
+          const result = await $aiQuery(systemPrompt, userPrompt, self.agentSession);
 
-        // Store session for continuity
-        self.narratorSession = result.session;
+          // Store session for continuity
+          if (result.session) {
+            self.agentSession = result.session;
+          }
 
-        // Register session with $ai for persistence
-        if (result.session && $ai) {
-          await $ai.registerSession(result.session, self.id, self.name + ' (narrator)', 'player-narrator', 'interaction');
-        }
-
-        // Send narrative to player
-        if (result.response) {
-          await self.tell(result.response);
+          // Send narrative to player
+          if (result.response) {
+            await self.tell(result.response);
+          }
         }
       } catch (err) {
-        console.error('[Narrator] AI error for player #' + self.id + ':', err?.message || err);
+        const errMsg = err?.message || String(err);
+        console.error('[Narrator] AI error for player #' + self.id + ':', errMsg);
         await self.tell('(The narrator seems distracted... try again.)');
       }
 
@@ -3631,6 +3680,203 @@ export class PlayerBuilder implements Builder {
       }
 
       return null; // submitAction handles messaging
+    `,
+    );
+  }
+
+  /**
+   * BYOK Settings menu methods - OpenRouter integration
+   * Players can add their OpenRouter API key to use their own credits
+   */
+  private addBYOKSettingsMethods(obj: RuntimeObject): void {
+    // Enter settings menu
+    obj.setMethod(
+      'settings',
+      `
+      player._inSettingsMenu = true;
+      player._settingsSubMenu = null;
+      await player.showSettingsMenu();
+    `,
+    );
+
+    // Show main menu
+    obj.setMethod(
+      'showSettingsMenu',
+      `
+      const hasKey = !!self.openRouterApiKey;
+      const model = self.preferredModel || 'kimi-k2.5';
+
+      let status = '';
+      if (hasKey) {
+        status = '%{green}BYOK Active%{/} - Using your OpenRouter key';
+      } else {
+        status = '%{yellow}House Mode%{/} - Using game AI quota';
+      }
+
+      let menu = '%{bold}%{cyan}======== AI SETTINGS ========%{/}\\r\\n';
+      menu += 'Status: ' + status + '\\r\\n';
+      menu += 'Model: %{bold}' + model + '%{/}\\r\\n\\r\\n';
+      menu += '%{yellow}1%{/}. ' + (hasKey ? 'Update' : 'Add') + ' OpenRouter API Key\\r\\n';
+      if (hasKey) {
+        menu += '%{yellow}2%{/}. Remove API Key\\r\\n';
+      }
+      menu += '%{yellow}3%{/}. Change Model\\r\\n';
+      menu += '%{yellow}4%{/}. About BYOK\\r\\n';
+      menu += '%{bold}Q%{/}. Exit\\r\\n\\r\\n';
+      menu += 'Enter choice: ';
+      await self.tell(menu);
+    `,
+    );
+
+    // Handle input
+    obj.setMethod(
+      'handleSettingsInput',
+      `
+      const input = args[0].trim().toLowerCase();
+
+      if (self._settingsSubMenu === 'addKey') {
+        await self.handleAddKeyInput(args[0]);
+        return;
+      }
+      if (self._settingsSubMenu === 'modelSelect') {
+        await self.handleModelSelectInput(args[0]);
+        return;
+      }
+
+      if (input === 'q' || input === 'quit') {
+        self._inSettingsMenu = false;
+        await self.tell('Settings saved.\\r\\n> ');
+        return;
+      }
+
+      switch (input) {
+        case '1':
+          self._settingsSubMenu = 'addKey';
+          await self.showAddKeyMenu();
+          break;
+        case '2':
+          if (self.openRouterApiKey) {
+            self.openRouterApiKey = null;
+            await self.tell('%{green}API key removed. Using house quota.%{/}\\r\\n\\r\\n');
+          }
+          await self.showSettingsMenu();
+          break;
+        case '3':
+          self._settingsSubMenu = 'modelSelect';
+          await self.showModelSelectMenu();
+          break;
+        case '4':
+          await self.showBYOKInfo();
+          await self.showSettingsMenu();
+          break;
+        default:
+          await self.tell('%{red}Invalid choice.%{/}\\r\\n');
+          await self.showSettingsMenu();
+      }
+    `,
+    );
+
+    // Add key submenu
+    obj.setMethod(
+      'showAddKeyMenu',
+      `
+      let menu = '%{bold}%{cyan}======== ADD API KEY ========%{/}\\r\\n\\r\\n';
+      menu += 'Get your OpenRouter API key at:\\r\\n';
+      menu += '%{cyan}https://openrouter.ai/keys%{/}\\r\\n\\r\\n';
+      menu += 'OpenRouter provides access to 75+ AI models including:\\r\\n';
+      menu += '  - Kimi K2.5 (fast & cheap)\\r\\n';
+      menu += '  - Claude Sonnet/Opus\\r\\n';
+      menu += '  - GPT-4o\\r\\n';
+      menu += '  - DeepSeek\\r\\n\\r\\n';
+      menu += 'First 1M BYOK requests/month are FREE!\\r\\n\\r\\n';
+      menu += 'Enter your API key (sk-or-...) or %{bold}B%{/} to go back: ';
+      await self.tell(menu);
+    `,
+    );
+
+    obj.setMethod(
+      'handleAddKeyInput',
+      `
+      const input = args[0].trim();
+      const inputLower = input.toLowerCase();
+
+      if (inputLower === 'b' || inputLower === 'back') {
+        self._settingsSubMenu = null;
+        await self.showSettingsMenu();
+        return;
+      }
+
+      // Validate OpenRouter key format
+      if (!input.startsWith('sk-or-')) {
+        await self.tell('%{red}Invalid key format. OpenRouter keys start with sk-or-%{/}\\r\\n\\r\\n');
+        await self.showAddKeyMenu();
+        return;
+      }
+
+      // Store the key
+      self.openRouterApiKey = input;
+      await self.tell('%{green}API key saved! You are now using BYOK mode.%{/}\\r\\n\\r\\n');
+      self._settingsSubMenu = null;
+      await self.showSettingsMenu();
+    `,
+    );
+
+    // Model selection
+    obj.setMethod(
+      'showModelSelectMenu',
+      `
+      const current = self.preferredModel || 'kimi-k2.5';
+      let menu = '%{bold}%{cyan}======== SELECT MODEL ========%{/}\\r\\n\\r\\n';
+      menu += 'Current: %{bold}' + current + '%{/}\\r\\n\\r\\n';
+      menu += '%{yellow}1%{/}. kimi-k2.5  - Fast & cheap ($0.50/$2.80 per 1M tokens)' + (current === 'kimi-k2.5' ? ' %{green}*%{/}' : '') + '\\r\\n';
+      menu += '%{yellow}2%{/}. claude     - Claude Sonnet 4 (balanced)' + (current === 'claude' ? ' %{green}*%{/}' : '') + '\\r\\n';
+      menu += '%{yellow}3%{/}. gpt       - GPT-4o (OpenAI)' + (current === 'gpt' ? ' %{green}*%{/}' : '') + '\\r\\n';
+      menu += '%{yellow}4%{/}. deepseek  - DeepSeek Chat (very cheap)' + (current === 'deepseek' ? ' %{green}*%{/}' : '') + '\\r\\n\\r\\n';
+      menu += '%{bold}B%{/}. Back\\r\\n\\r\\n';
+      menu += 'Enter choice: ';
+      await self.tell(menu);
+    `,
+    );
+
+    obj.setMethod(
+      'handleModelSelectInput',
+      `
+      const input = args[0].trim().toLowerCase();
+
+      if (input === 'b' || input === 'back') {
+        self._settingsSubMenu = null;
+        await self.showSettingsMenu();
+        return;
+      }
+
+      const models = { '1': 'kimi-k2.5', '2': 'claude', '3': 'gpt', '4': 'deepseek' };
+
+      if (models[input]) {
+        self.preferredModel = models[input];
+        await self.tell('%{green}Model set to ' + models[input] + '.%{/}\\r\\n\\r\\n');
+      } else {
+        await self.tell('%{red}Invalid choice.%{/}\\r\\n');
+      }
+      await self.showModelSelectMenu();
+    `,
+    );
+
+    // BYOK info
+    obj.setMethod(
+      'showBYOKInfo',
+      `
+      let info = '\\r\\n%{bold}%{cyan}======== ABOUT BYOK ========%{/}\\r\\n\\r\\n';
+      info += '%{bold}Bring Your Own Key (BYOK)%{/} lets you use your own AI credits.\\r\\n\\r\\n';
+      info += '%{bold}How it works:%{/}\\r\\n';
+      info += '1. Sign up at openrouter.ai (free)\\r\\n';
+      info += '2. Add credits or connect existing provider keys\\r\\n';
+      info += '3. Generate an API key and add it here\\r\\n\\r\\n';
+      info += '%{bold}Benefits:%{/}\\r\\n';
+      info += '- Choose from 75+ AI models\\r\\n';
+      info += '- First 1M BYOK requests FREE each month\\r\\n';
+      info += '- Use existing Anthropic/OpenAI credits via OpenRouter\\r\\n';
+      info += '- No house quota limits\\r\\n\\r\\n';
+      await self.tell(info);
     `,
     );
   }

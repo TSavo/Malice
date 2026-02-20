@@ -128,7 +128,10 @@ const collectMethodsFromFile = (filePath: string): MethodSource[] => {
 
     if (ts.isPropertyAssignment(node)) {
       const propName = getPropertyName(node.name);
-      if (propName === 'methods' && ts.isObjectLiteralExpression(node.initializer)) {
+      if (
+        propName === 'methods' &&
+        ts.isObjectLiteralExpression(node.initializer)
+      ) {
         for (const prop of node.initializer.properties) {
           if (!ts.isPropertyAssignment(prop)) {
             continue;
@@ -214,14 +217,23 @@ const collectAliasesFromFile = (filePath: string): string[] => {
       }
     }
 
-    if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
+    if (
+      ts.isBinaryExpression(node) &&
+      node.operatorToken.kind === ts.SyntaxKind.EqualsToken
+    ) {
       const left = node.left;
-      if (ts.isPropertyAccessExpression(left) && ts.isIdentifier(left.expression)) {
+      if (
+        ts.isPropertyAccessExpression(left) &&
+        ts.isIdentifier(left.expression)
+      ) {
         if (left.expression.text === 'aliases') {
           aliases.push(left.name.text);
         }
       }
-      if (ts.isElementAccessExpression(left) && ts.isIdentifier(left.expression)) {
+      if (
+        ts.isElementAccessExpression(left) &&
+        ts.isIdentifier(left.expression)
+      ) {
         if (left.expression.text === 'aliases') {
           const aliasLiteral = extractStringLiteral(left.argumentExpression);
           if (aliasLiteral) {
@@ -324,7 +336,8 @@ const formatDiagnostic = (
     true,
     ts.ScriptKind.TSX,
   );
-  const { line, character } = methodFile.getLineAndCharacterOfPosition(position);
+  const { line, character } =
+    methodFile.getLineAndCharacterOfPosition(position);
   const adjustedLine = Math.max(0, line - prefixLines) + 1;
   const adjustedCharacter = character + 1;
   return `Line ${adjustedLine}:${adjustedCharacter} - ${message}`;
@@ -365,7 +378,7 @@ const scoreMethodCode = (code: string): number => {
     true,
     ts.ScriptKind.TSX,
   );
-  return sourceFile.parseDiagnostics.length;
+  return (sourceFile as any).parseDiagnostics?.length ?? 0;
 };
 
 const selectMethodCode = (method: MethodSource): string => {
@@ -484,7 +497,9 @@ const compileMethods = (
     if (!methodInfo) {
       continue;
     }
-    const methodIndex = Number(path.basename(fileName).match(/method-(\d+)\.ts/)?.[1]);
+    const methodIndex = Number(
+      path.basename(fileName).match(/method-(\d+)\.ts/)?.[1],
+    );
     const method = methods[methodIndex];
     if (!method) {
       continue;
@@ -492,7 +507,11 @@ const compileMethods = (
     issues.push({
       filePath: method.filePath,
       methodName: method.methodName,
-      message: formatDiagnostic(method.code, diagnostic, methodInfo.prefixLines),
+      message: formatDiagnostic(
+        method.code,
+        diagnostic,
+        methodInfo.prefixLines,
+      ),
     });
   }
 

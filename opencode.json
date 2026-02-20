@@ -1,11 +1,14 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
-    "malice": {
-      "type": "remote",
-      "url": "http://localhost:3010/mcp",
-      "enabled": true,
-      "oauth": false
+    "linear": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@odgrim/linear-mcp"
+      ],
+      "environment": {}
     }
   }
 }

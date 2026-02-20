@@ -1709,6 +1709,68 @@ export class ObjectManager {
   }
 
   /**
+   * BYOK Query - Player-funded AI via OpenCode SDK + OpenRouter
+   *
+   * This uses the player's own OpenRouter API key to access any model
+   * (Kimi K2.5, Claude, GPT, etc.) with full agentic capabilities.
+   *
+   * @param player - Player RuntimeObject (must have openRouterApiKey)
+   * @param systemPrompt - System prompt for the AI
+   * @param userPrompt - User input
+   * @param options - Optional model and session configuration
+   * @returns { response, sessionId, model, success, error? }
+   *
+   * @example
+   * const result = await $openCodeQuery(self, systemPrompt, userPrompt, { model: 'kimi' });
+   * if (result.success) {
+   *   self.tell(result.response);
+   *   self.openCodeSession = result.sessionId;
+   * }
+   */
+  async openCodeQuery(
+    player: RuntimeObject,
+    systemPrompt: string,
+    userPrompt: string,
+    options?: {
+      model?: string;
+      sessionId?: string;
+    },
+  ): Promise<{
+    response: string;
+    sessionId: string;
+    model: string;
+    success: boolean;
+    error?: string;
+  }> {
+    // Get player's OpenRouter API key
+    const openRouterApiKey = player.get('openRouterApiKey') as string | undefined;
+
+    if (!openRouterApiKey) {
+      return {
+        response: '',
+        sessionId: '',
+        model: '',
+        success: false,
+        error: 'No OpenRouter API key configured. Use @settings to add one.',
+      };
+    }
+
+    // Dynamic import to avoid loading at startup
+    const { openCodeQuery: queryFn } = await import('../ai/opencode-client.js');
+
+    return queryFn(
+      String(player.id),
+      {
+        openRouterApiKey,
+        model: options?.model || (player.get('preferredModel') as string) || undefined,
+        sessionId: options?.sessionId,
+      },
+      systemPrompt,
+      userPrompt,
+    );
+  }
+
+  /**
    * Emit a game event to the game_events collection
    * Used by $.events.emit() for NPC agent service and other external consumers
    * @param event - Event object with type, data, timestamp
