@@ -1228,6 +1228,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
           const $create = $.create.bind($);
           const $query = $.query.bind($);
           const $aiQuery = $.aiQuery.bind($);
+          const $openCodeQuery = $.openCodeQuery.bind($);
           const $addAlias = $.addAlias.bind($);
           const $removeAlias = $.removeAlias.bind($);
           const $getAlias = $.getAlias.bind($);
@@ -1315,6 +1316,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
         const $create = $.create.bind($);
         const $query = $.query.bind($);
         const $aiQuery = $.aiQuery.bind($);
+        const $openCodeQuery = $.openCodeQuery.bind($);
         const $addAlias = $.addAlias.bind($);
         const $removeAlias = $.removeAlias.bind($);
         const $getAlias = $.getAlias.bind($);

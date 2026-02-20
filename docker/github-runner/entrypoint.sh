@@ -70,7 +70,8 @@ echo "Configuring runner..."
     --work "$RUNNER_WORKDIR" \
     --runnergroup "$RUNNER_GROUP" \
     --unattended \
-    --replace
+    --replace \
+    --disableupdate
 
 # Cleanup function for graceful shutdown
 cleanup() {
