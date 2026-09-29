@@ -124,7 +124,7 @@
     "@types/vscode": "^1.80.0",
     "@types/ws": "^8.5.0",
     "@vitest/coverage-v8": "^4.0.16",
-    "@vscode/vsce": "^2.19.0",
+    "@vscode/vsce": "^4.0.0",
     "typescript": "^5.0.0",
     "vitest": "^4.0.16"
   },
