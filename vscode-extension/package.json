@@ -123,10 +123,10 @@
     "@types/node": "^20.0.0",
     "@types/vscode": "^1.80.0",
     "@types/ws": "^8.5.0",
-    "@vitest/coverage-v8": "^4.0.16",
+    "@vitest/coverage-v8": "^4.1.12",
     "@vscode/vsce": "^2.19.0",
     "typescript": "^5.0.0",
-    "vitest": "^4.0.16"
+    "vitest": "^4.1.12"
   },
   "dependencies": {
     "vscode-languageclient": "^9.0.1",
